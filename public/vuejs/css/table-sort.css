@@ -1,0 +1,33 @@
+table th:hover{
+ cursor: pointer;
+}
+
+/* Table sort indicators */
+
+.sortable {
+  position: relative;
+  cursor: pointer;
+  padding-left: 2px !important;
+}
+
+.sortable::after {
+  font-family: FontAwesome;
+  content: "\f0dc";
+  position: absolute;
+  right: 6px;
+  color: #c1c0c0;
+}
+
+.sortable.asc::after {
+  content: "\f0d8";
+}
+
+.sortable.desc::after {
+  content: "\f0d7";
+}
+
+.sortable:hover::after {
+  color: #a29e9e;
+}
+
+

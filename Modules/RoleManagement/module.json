@@ -1,0 +1,16 @@
+{
+    "name": "RoleManagement",
+    "alias": "rolemanagement",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\RoleManagement\\Providers\\RoleManagementServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Communication",
+    "alias": "communication",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Communication\\Providers\\CommunicationServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

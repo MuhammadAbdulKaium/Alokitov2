@@ -1,0 +1,13 @@
+{
+    "name": "HealthCare",
+    "alias": "healthcare",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\HealthCare\\Providers\\HealthCareServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

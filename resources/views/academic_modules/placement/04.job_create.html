@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Keywords" content="edusec,edusec4,rudra softech,open source development in ahmedabad, college management software,college management system,education management software,school management system,school management software">
+    <meta name="Description" content="Software development company for open source technology in Ahmedabad. Provide Enterprise solution and quality services.">
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Rudra Softech - Provide Enterprise Solution | Development on open source technology | College Management Software | School Management Software" />
+    <meta property="og:description" content="Core functions like admissions, library management, transport management, students attendance in short entire range of university functions can be well performed by EduSec" />
+    <meta property="og:image" content="http://www.rudrasoftech.com/rudra.png">
+    <meta name="csrf-param" content="_csrf">
+    <meta name="csrf-token" content="NjJtS0EyTlJQaiECK3QKNHp8PDxxcyI1BX05HA1jHQpObTQvKVQWHQ==">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <title>Add Job</title>
+    <link href="../../css/all_style.css?v=1486729641" rel="stylesheet">
+    <link href="../../css/jquery-ui.min.css?v=1469444669" rel="stylesheet">
+    <link href="../../css/bootstrap-multiselect.css?v=1469444669" rel="stylesheet"> </head>
+
+<body class="layout-top-nav skin-blue-light">
+    <div class="wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-fixed-top">
+                <div class="container-fluid">
+                    <!--Start Mega menu block-->
+                    <div class="es-megamenu esmenu pull-left">
+                        <div id="navbar-collapse" role="navigation" class="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown esmenu-full">
+                                    <a href="javascript:void(0)" data-target="#megamenu-items" data-toggle="collapse" class="navbar-toggle">
+                                        <span class="fa fa-th-large fa-lg menu-icon"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" id="megamenu-items">
+                                        <li>
+                                            <div class="esmenu-content">
+                                                <div class="tabbable row">
+                                                    <div class="col-md-3">
+                                                        <ul class="nav nav-pills nav-stacked">
+                                                            <li>
+                                                                <a href="#academics"><i class="fa fa-calendar-o"></i> Academics</a> </li>
+                                                            <li>
+                                                                <a href="#hrms"><i class="fa fa-user"></i> Human Resource</a> </li>
+                                                            <li>
+                                                                <a href="#student"><i class="fa fa-users"></i> Student</a> </li>
+                                                            <li>
+                                                                <a href="#fees"><i class="fa fa-money"></i> Fees</a> </li>
+                                                            <li>
+                                                                <a href="#communication"><i class="fa fa-comments"></i> Communication</a> </li>
+                                                            <li>
+                                                                <a href="#reports"><i class="fa fa-line-chart"></i> Reports Center</a> </li>
+                                                            <li>
+                                                                <a href="#administration"><i class="fa fa-wrench"></i> Administration</a> </li>
+                                                            <li>
+                                                                <a href="#document"><i class="fa fa-file-text-o"></i> Document</a> </li>
+                                                            <li>
+                                                                <a href="#library"><i class="fa fa-university"></i> Library</a> </li>
+                                                            <li>
+                                                                <a href="#settings"><i class="fa fa-cogs"></i> Settings</a> </li>
+                                                        </ul>
+                                                    </div>
+                                                    <!-- end col -->
+                                                    <div class="col-md-9 menu-sub-items">
+                                                        <div class="tab-content">
+                                                            <div id="academics" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-calendar-o"></i> Academics</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-graduation-cap"></i> Course Management</a></li>
+                                                                                <li><a href="/academic-year/index"><i class="glyphicon glyphicon-calendar"></i> Academic Year</a></li>
+                                                                                <li><a href="/course/courses/index"><i class="fa fa-graduation-cap"></i> Course</a></li>
+                                                                                <li><a href="/course/courses-year-wise/index"><i class="fa fa-info-circle"></i> Year Wise Course</a></li>
+                                                                                <li><a href="/course/subject-master/index"><i class="fa fa-book"></i> Subject</a></li>
+                                                                                <li><a href="/course/batches/index"><i class="fa fa-sitemap"></i> Batch</a></li>
+                                                                                <li><a href="/course/section/index"><i class="fa fa-share-alt"></i> Section</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/timetable/default/index"><i class="fa fa-calendar-o"></i> Timetable</a></li>
+                                                                                <li><a href="/timetable/room-category/index"><i class="fa fa-sort-alpha-asc"></i> Room Category</a></li>
+                                                                                <li><a href="/timetable/room-master/index"><i class="fa fa-object-ungroup"></i> Room Master</a></li>
+                                                                                <li><a href="/timetable/timetable-details/index"><i class="fa fa-calendar"></i> Timetable</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-list"></i> Online Test</a></li>
+                                                                                <li><a href="/onlinetest/question-category/index"><i class="fa fa-link"></i> Question Category</a></li>
+                                                                                <li><a href="/onlinetest/question-master/index"><i class="fa fa-question-circle"></i> Questions</a></li>
+                                                                                <li><a href="/onlinetest/test-grading-system/index"><i class="fa fa-sort-alpha-asc"></i> Grading System</a></li>
+                                                                                <li><a href="/onlinetest/online-test-master/index"><i class="fa fa-list-alt"></i> Online Test</a></li>
+                                                                                <li><a href="/onlinetest/online-test-master/view-test-result"><i class="fa fa-file-text"></i> View Result</a></li>
+                                                                                <li><a href="/onlinetest/import-question/index"><i class="fa fa-upload"></i> Import Questions</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/attendance/default/student-attendance"><i class="fa fa-check-square-o"></i> Student Attendance</a></li>
+                                                                                <li><a href="/attendance/stu-attendance/index"><i class="fa fa-check-square"></i> Manage Student Attendance</a></li>
+                                                                                <li><a href="/attendance/stu-attendance/emp-stu-attendance?id=1"><i class="fa fa-check-square"></i> Lecture Attendance</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-calendar-o"></i> Academics</a></li>
+                                                                                <li><a href="/dashboard/events/index"><i class="fa fa-flag"></i> Event Management</a></li>
+                                                                                <li><a href="/academics/assignment/index"><i class="fa fa-object-group"></i> Assignment</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-map-marker"></i> Placement</a></li>
+                                                                                <li><a href="/academics/placement/recruiter/index"><i class="fa fa-user"></i> Recruiter</a></li>
+                                                                                <li><a href="/academics/placement/jobs/index"><i class="fa fa-search"></i> Jobs</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="hrms" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-user"></i> Human Resource</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/employee/default/index"><i class="fa fa-user"></i> Employee Management</a></li>
+                                                                                <li><a href="/employee/emp-department/index"><i class="fa fa-sitemap"></i> Department</a></li>
+                                                                                <li><a href="/employee/emp-designation/index"><i class="fa fa-signal"></i> Designation</a></li>
+                                                                                <li><a href="/employee/emp-master/create"><i class="fa fa-user-plus"></i> Add Employee</a></li>
+                                                                                <li><a href="/employee/emp-master/index"><i class="fa fa-reorder"></i> Manage Employee</a></li>
+                                                                                <li><a href="/employee/emp-import/index"><i class="fa fa-upload"></i> Import Employee</a></li>
+                                                                                <li><a href="/hr/shift-allocation/index"><i class="fa fa-plus-square"></i> Shift Allocation</a></li>
+                                                                                <li><a href="/hr/emp-settings/index"><i class="fa fa-gear"></i> Employee Settings</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-gears"></i> Employee Configuration</a></li>
+                                                                                <li><a href="/hr/shift/index"><i class="fa fa-clock-o"></i> Shift</a></li>
+                                                                                <li><a href="/hr/loan-type/index"><i class="fa fa-life-bouy"></i> Loan Type</a></li>
+                                                                                <li><a href="/hr/week-off/index"><i class="fa fa-calendar"></i> Week Off</a></li>
+                                                                                <li><a href="/national-holidays/index"><i class="fa fa-calendar-o"></i> National Holiday</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-file-text-o"></i> Leave Management</a></li>
+                                                                                <li><a href="/hr/leave-type/index"><i class="fa fa-life-bouy"></i> Leave Type</a></li>
+                                                                                <li><a href="/hr/hr-leave-structure/index"><i class="fa fa-clock-o"></i> Leave Structure</a></li>
+                                                                                <li><a href="/hr/leave-allocation/index"><i class="fa fa-plus-square"></i> Leave Entitlement</a></li>
+                                                                                <li><a href="/hr/leave-reporting/index"><i class="fa fa-users"></i> Leave Reporting</a></li>
+                                                                                <li><a href="/hr/leave-application/leave-report"><i class="fa fa-list-alt"></i> Leave Applications</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-check-square-o"></i> Attendance</a></li>
+                                                                                <li><a href="/hr/employee-attendance/index"><i class="glyphicon glyphicon-check"></i> Take Attendance</a></li>
+                                                                                <li><a href="/hr/employee-attendance/manage-attnd"><i class="fa fa-reorder"></i> Manage Attendance</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-bullseye"></i> Payroll</a></li>
+                                                                                <li><a href="/hr/salary-component/index"><i class="glyphicon glyphicon-tasks"></i> Salary Component</a></li>
+                                                                                <li><a href="/hr/salary-structure/index"><i class="fa fa-clock-o"></i> Salary Structure</a></li>
+                                                                                <li><a href="/hr/emp-salary-component/index"><i class="fa fa-check-square-o"></i> Employee Salary Component</a></li>
+                                                                                <li><a href="/hr/loan/index"><i class="fa fa-money"></i> Employee Loan</a></li>
+                                                                                <li><a href="/hr/salary-slip/index"><i class="fa fa-credit-card"></i> Salary Slip</a></li>
+                                                                                <li><a href="/hr/salary-slip/list"><i class="fa fa-print"></i> Print Salary Slip</a></li>
+                                                                                <li><a href="/hr/publish-slip/index"><i class="fa fa-bullhorn"></i> Publish Salary Slip</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="student" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-users"></i> Student</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/student/default/index"><i class="fa fa-users"></i> Student</a></li>
+                                                                                <li><a href="/student/stu-category/index"><i class="fa fa-sort-alpha-asc"></i> Admission Category</a></li>
+                                                                                <li><a href="/student/stu-master/create"><i class="fa fa-user-plus"></i> Add Student</a></li>
+                                                                                <li><a href="/student/stu-master/index"><i class="fa fa-reorder"></i> Manage Student</a></li>
+                                                                                <li><a href="/student/stu-import/index"><i class="fa fa-upload"></i> Import Student</a></li>
+                                                                                <li><a href="/student/stu-status/index"><i class="fa fa-info-circle"></i> Student Status</a></li>
+                                                                                <li><a href="/student/stu-master/promote-student"><i class="fa fa-exchange"></i> Promote Student</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/admission/default/index"><i class="fa fa-user-plus"></i> Enquiry</a></li>
+                                                                                <li><a href="/admission/stu-admission-master/create"><i class="fa fa-external-link"></i> Online Application</a></li>
+                                                                                <li><a href="/admission/stu-admission-master/index"><i class="fa fa-users"></i> Manage Enquiry</a></li>
+                                                                                <li><a href="/admission/admission-letter/index"><i class="fa fa-file-text-o"></i> Admission Letter</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="fees" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-money"></i> Fees</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/fees/default/index"><i class="fa fa-money"></i> Fees</a></li>
+                                                                                <li><a href="/fees/bank-master/index"><i class="fa fa-bank"></i> Bank Master</a></li>
+                                                                                <li><a href="/fees/fees-collect-category/index"><i class="fa fa-sort-alpha-asc"></i> Fees Category</a></li>
+                                                                                <li><a href="/fees/fees-other-category/index"><i class="fa fa-sort-alpha-asc"></i> Other Fees Category</a></li>
+                                                                                <li><a href="/fees/fees-collect-category/assign-fees"><i class="fa fa-exchange"></i> Assign Fees</a></li>
+                                                                                <li><a href="/fees/fees-payment-transaction/student-list"><i class="fa fa-money"></i> Student Fees</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="communication" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-comments"></i> Communication</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-comment"></i> SMS</a></li>
+                                                                                <li><a href="/communication/sms/employee-sms/index"><i class="fa fa-comments-o"></i> Employee SMS</a></li>
+                                                                                <li><a href="/communication/sms/student-sms/index"><i class="fa fa-comments-o"></i> Student SMS</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-envelope-o"></i> Email</a></li>
+                                                                                <li><a href="/communication/email/employee-email/index"><i class="fa fa-comments-o"></i> Employee Email</a></li>
+                                                                                <li><a href="/communication/email/student-email/index"><i class="fa fa-comments-o"></i> Student Email</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/dashboard/default/index"><i class="fa fa-dashboard"></i>Dashboard Management</a></li>
+                                                                                <li><a href="/dashboard/msg-of-day/index"><i class="fa fa-list-alt"></i> Message of Day</a></li>
+                                                                                <li><a href="/dashboard/notice/index"><i class="fa fa-columns"></i> Notice</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-phone"></i> Telephone Diary</a></li>
+                                                                                <li><a href="/communication/telephone-diary/student-contact"><i class="fa fa-phone-square"></i> Student Contact</a></li>
+                                                                                <li><a href="/communication/telephone-diary/employee-contact"><i class="fa fa-phone-square"></i> Employee Contact</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-question-circle"></i> Helpdesk</a></li>
+                                                                                <li><a href="/communication/helpdesk/helpdesk-subjects/index"><i class="fa fa-question"></i> Inquiry Subjects</a></li>
+                                                                                <li><a href="/communication/helpdesk/helpdesk-tickets/index"><i class="fa fa-ticket"></i> Inquiry Tickets</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="reports" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-line-chart"></i> Reports Center</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/report/default/index"><i class="fa fa-line-chart"></i> Reports Center</a></li>
+                                                                                <li><a href="/report/employee/empinforeport"><i class="fa fa-bar-chart"></i> Employee</a></li>
+                                                                                <li><a href="/report/student/stuinforeport"><i class="fa fa-bar-chart"></i> Student</a></li>
+                                                                                <li><a href="/report/fees/index"><i class="fa fa-bar-chart"></i> Fees</a></li>
+                                                                                <li><a href="/report/fees/date-wise-fees"><i class="fa fa-bar-chart"></i> Daily Fees Collection</a></li>
+                                                                                <li><a href="/report/leave/index"><i class="fa fa-bar-chart"></i> Leave</a></li>
+                                                                                <li><a href="/report/transport/index"><i class="fa fa-bar-chart"></i> Transport</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-building-o"></i> Hostel Report</a></li>
+                                                                                <li><a href="/report/hostel/fees-report"><i class="fa fa-money fa-lg"></i> Fees Report</a></li>
+                                                                                <li><a href="/report/hostel/hostel-occupied-room"><i class="fa fa-info-circle fa-lg"></i> Occupied Room</a></li>
+                                                                                <li><a href="/report/hostel/hostel-unoccupied-room"><i class="fa fa-info-circle fa-lg"></i> Unoccupied Room</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-check-square-o"></i> Enquiry</a></li>
+                                                                                <li><a href="/report/admission/enquiry"><i class="fa fa-users"></i> Enquiry Report</a></li>
+                                                                                <li><a href="/report/admission/followups"><i class="fa fa-random"></i> Follow-up Report</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-check-square-o"></i> Attendance</a></li>
+                                                                                <li><a href="/report/attendance/emp-attn-report"><i class="fa fa-check-square"></i> Employee</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class = "fa fa-calendar-o" aria-hidden="true"></i> Timetable</a></li>
+                                                                                <li><a href="/report/timetable/daily-schedule"><i class = "fa fa-bank" aria-hidden="true"></i> Daily Schedule</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="administration" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-wrench"></i> Administration</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/hostel/default/index"><i class="fa fa-building"></i> Hostel</a></li>
+                                                                                <li><a href="/hostel/hostel-type/index"><i class="fa fa-sort-alpha-asc"></i> Hostel Type</a></li>
+                                                                                <li><a href="/hostel/hostel-detail/index"><i class="fa fa-building-o"></i> Hostel Details</a></li>
+                                                                                <li><a href="/hostel/hostel-blocks/index"><i class="fa fa-sitemap"></i> Hostel Blocks</a></li>
+                                                                                <li><a href="/hostel/hostel-room-master/index"><i class="fa fa-building"></i> Room Details</a></li>
+                                                                                <li><a href="/hostel/hostel-fees-master/index"><i class="fa fa-money"></i> Fees Structure</a></li>
+                                                                                <li><a href="/hostel/hostel-student-registration/index"><i class="fa fa-user-plus"></i> Student Registration</a></li>
+                                                                                <li><a href="/hostel/hostel-student-registration/registered-student-list"><i class="fa fa-users"></i> Registered Students</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/transport/default/index"><i class="fa fa-bus"></i> Transport</a></li>
+                                                                                <li><a href="/transport/transport-vehicle/index"><i class="fa fa-ambulance"></i> Vehicle Details</a></li>
+                                                                                <li><a href="/transport/transport-drivers-details/index"><i class="fa fa-user-plus"></i> Driver Details</a></li>
+                                                                                <li><a href="/transport/transport-route/index"><i class="fa fa-calendar"></i> Manage Route</a></li>
+                                                                                <li><a href="/transport/transport-allocation/index"><i class="fa fa-list-alt"></i> Student Bus Allocation</a></li>
+                                                                                <li><a href="/transport/transport-fees-master/index"><i class="fa fa-money"></i> Fees Collect</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/accounts/default/index"><i class="fa fa-book"></i> Accounts</a></li>
+                                                                                <li><a href="/accounts/exp-category/index"><i class="fa fa-file-text"></i> Exp. Category</a></li>
+                                                                                <li><a href="/accounts/exp-payable/index"><i class="fa fa-file-text"></i> Payable</a></li>
+                                                                                <li><a href="/accounts/exp-payable-details/index"><i class="fa fa-file"></i> Expenses</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="document" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-file-text-o"></i> Document</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-certificate"></i> Certificate/Letters</a></li>
+                                                                                <li><a href="/document/certificate-letter/index"><i class="fa fa-file-text"></i> Manage Certificate/Letter</a></li>
+                                                                                <li><a href="/document/student-letter/index"><i class="fa fa-server"></i> Student Certificate/Letter</a></li>
+                                                                                <li><a href="/document/employee-letter/index"><i class="fa fa-server"></i> Employee Certificate/Letter</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-files-o"></i> Manage Documents</a></li>
+                                                                                <li><a href="/document-category/index"><i class="fa fa-reorder"></i> Document Category</span></a></li>
+                                                                                <li><a href="/document/manage-docs/student"><i class="fa fa-file-o"></i> Student Docs</a></li>
+                                                                                <li><a href="/document/manage-docs/employee"><i class="fa fa-file-o"></i> Employee Docs</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="javascript:void(0);"><i class="fa fa-share-alt"></i> File Sharing</a></li>
+                                                                                <li><a href="/document/file-uploads-category/index"><i class="fa fa-list"></i> File Category</a></li>
+                                                                                <li><a href="/document/file-uploads/index"><i class="fa fa-file-text"></i> File Uploads</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="library" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-university"></i> Library</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/library/default/index"><i class="fa fa-university"></i> Library</a></li>
+                                                                                <li><a href="/library/library-book-category/index"><i class="fa fa-sort-alpha-asc"></i> Book Category</a></li>
+                                                                                <li><a href="/library/library-cupboard-master/index"><i class="glyphicon glyphicon-object-align-bottom"></i> Cup Board</a></li>
+                                                                                <li><a href="/library/library-cupboard-shelf/index"><i class="glyphicon glyphicon-equalizer"></i> Cup Board Shelf</a></li>
+                                                                                <li><a href="/library/library-vendor-master/index"><i class="fa fa-cart-plus"></i> Book Vendor</a></li>
+                                                                                <li><a href="/library/library-book-status/index"><i class="glyphicon glyphicon-tag"></i> Book Status</a></li>
+                                                                                <li><a href="/library/library-book-master/index"><i class="glyphicon glyphicon-book"></i> Books</a></li>
+                                                                                <li><a href="/library/library-borrow-transaction/index"><i class="fa fa-book"></i> Issue Book</a></li>
+                                                                                <li><a href="/library/library-borrow-transaction/borrower"><i class="fa fa-reply-all"></i> Return/Renew Book</a></li>
+                                                                                <li><a href="/library/library-fine-master/index"><i class="fa fa-eject"></i> Fine</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                            <div id="settings" class="tab-pane">
+                                                                <div class="visible-sm visible-xs menu-box-header">
+                                                                    <button aria-label="Close" class="close" type="button">
+                                                                        <span aria-hidden="true">×</span>
+                                                                    </button>
+                                                                    <h4><i class="fa fa-cogs"></i> Settings</h4>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="/default/index"><i class="fa fa-cogs"></i> Configuration</a></li>
+                                                                                <li><a href="/country/index"><i class="fa fa-globe"></i> Country</a></li>
+                                                                                <li><a href="/state/index"><i class="fa fa-map-marker"></i> State/Province</a></li>
+                                                                                <li><a href="/city/index"><i class="fa fa-building-o"></i> City/Town</a></li>
+                                                                                <li><a href="/languages/index"><i class="fa fa-language"></i> Languages</a></li>
+                                                                                <li><a href="/nationality/index"><i class="fa fa-flag-checkered"></i> Nationality</a></li>
+                                                                                <li><a href="/organization/index"><i class="fa fa-bank"></i> Institute</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-user"></i> Manage Users</a></li>
+                                                                                <li><a href="/user/resetstudpassword"><i class="fa fa-key"></i> Student Reset Password</a></li>
+                                                                                <li><a href="/user/resetemppassword"><i class="fa fa-key"></i> Employee Reset Password</a></li>
+                                                                                <li><a href="/user/manage-parent"><i class="fa fa-key"></i> Manage Parent</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-user-secret"></i> Manage User Rights</a></li>
+                                                                                <li><a href="/rights/assignment/index"><i class="fa fa-male"></i> Assignment</a></li>
+                                                                                <li><a href="/rights/role/index"><i class="fa fa-user-times"></i> Role</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-3 col-sm-4 col-xs-12">
+                                                                        <div class="menu-box">
+                                                                            <ul>
+                                                                                <li><a href="#"><i class="fa fa-cog"></i> Additional</a></li>
+                                                                                <li><a href="/configuration/system-setting"><i class="fa fa-cogs"></i> System Settings</a></li>
+                                                                                <li><a href="/notification/setting/conf"><i class="fa fa-bell-o"></i> Notification Settings</a></li>
+                                                                                <li><a href="/backup/default/index"><i class="fa fa-database"></i> Backup</a></li>
+                                                                                <li><a href="/login-details/index"><i class="fa fa-history"></i> Login History</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--./tab-pane-->
+                                                        </div>
+                                                        <!-- end col -->
+                                                    </div>
+                                                    <!-- /.tabbable -->
+                                                </div>
+                                                <!-- end esmenu-content -->
+                                        </li>
+                                    </ul>
+                                    <!-- dropdown-menu -->
+                                </li>
+                                <!-- end mega menu -->
+                            </ul>
+                            <!--./navbar-nav-->
+                            </div>
+                            <!--./navbar-collapse-->
+                        </div>
+                        <!--./esmenu-->
+                        <div class="navbar-header pull-left">
+                            <a class="navbar-brand text-bold hidden-xs" href="/">Rudrasoftech</a> <a class="navbar-brand text-bold visible-xs" href="/">RS</a> </div>
+                        <div class="navbar-custom-menu">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown user-link">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fa fa-th"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <ul class="menu">
+                                                <li><a href="/employee/emp-master/view?id=1"><i class="fa fa-user fa-2x"></i> <h4>View Profile</h4></a></li>
+                                                <li><a href="/hr/employee-attendance/view?id=1"><i class="fa fa-check-square-o fa-2x"></i><h4>My Attendance</h4></a></li>
+                                                <li><a href="/timetable/timetable-details/emp-daily-timetable?id=1"><i class="fa fa-calendar-o fa-2x"></i><h4>Time Table</h4></a></li>
+                                                <li><a href="/academics/assignment/index"><i class="fa fa-object-group fa-2x"></i><h4>Assignment</h4></a></li>
+                                                <li><a href="/communication/helpdesk/helpdesk-tickets/index"><i class="fa fa-question-circle fa-2x"></i><h4>Helpdesk</h4></a></li>
+                                                <li><a href="/hr/leave-application/index"><i class="fa fa-list-alt fa-2x"></i><h4>Leave Application</h4></a></li>
+                                                <li><a href="/library/library-borrow-transaction/user-issued-books"><i class="fa fa-book fa-2x"></i><h4>Issued Books</h4></a></li>
+                                                <li><a href="/employee/emp-master/view?id=1&amp;tab=salary-slip"><i class="fa fa-credit-card fa-2x"></i><h4>Salary Slip</h4></a></li>
+                                                <li><a href="/hr/leave-application/leave-reporting"><i class="fa fa-check-square-o fa-2x"></i><h4>Leave Reporting</h4></a></li>
+                                                <li><a href="/library/library-borrow-transaction/index"><i class="fa fa-search fa-2x"></i><h4>Search Books</h4></a></li>
+                                                <li><a href="/user/my-logins"><i class="fa fa-sign-in fa-2x"></i><h4>My Logins</h4></a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown" id="lang-select">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Select Language">
+                                        <span class="fa fa-language fa-lg"></span>
+                                    </a>
+                                    <ul role="menu" class="dropdown-menu">
+                                        <li class="dropdown-header text-bold">
+                                            <big>Select Language</big></li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="/site/language?language=en-US">English</a> </li>
+                                        <li>
+                                            <a href="/site/language?language=hi">Hindi (हिन्दी)</a> </li>
+                                        <li>
+                                            <a href="/site/language?language=gu">Gujarati (ગુજરાતી)</a> </li>
+                                        <li>
+                                            <a href="/site/language?language=ar">Arabic (العربية)</a> </li>
+                                    </ul>
+                                </li>
+                                <!-- User Account: style can be found in dropdown.less -->
+                                <li class="dropdown">
+                                    <a href="/notification">
+                                        <i class="fa fa-bell-o"></i>
+                                    </a>
+                                </li>
+                                <li class="dropdown user user-menu">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <img class="user-image" src="/user/image?name=default.png" alt="NI"> <span class="hidden-xs">
+                                Kyle                            </span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <!-- User image -->
+                                        <li class="user-header">
+                                            <img class="img-circle" src="/user/image?name=default.png" alt="NI">
+                                            <p style="font-size: 18px;">
+                                                Kyle
+                                                <br/> (admin@edusec.org)
+                                            </p>
+                                        </li>
+                                        <!-- Menu Footer-->
+                                        <li class="user-footer">
+                                            <div class="pull-left">
+                                                <a class="btn btn-default btn-flat" href="/user/change" style="font-size:12px">Change Password</a> </div>
+                                            <div class="pull-right">
+                                                <a class="btn btn-default btn-flat" href="/site/logout" data-method="post" style="font-size:12px">Sign out</a> </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--./navbar-custom-menu-->
+                    </div>
+            </nav>
+        </header>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>
+            <i class="fa fa-plus-square"></i> Add Job        </h1>
+                <ul class="breadcrumb">
+                    <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+                    <li><a href="/academics/default/index">Academics</a></li>
+                    <li class="active">Placement</li>
+                    <li><a href="/academics/placement/jobs/index">Jobs</a></li>
+                    <li class="active">Add Job</li>
+                </ul>
+            </section>
+            <section class="content">
+                <div class="box box-primary">
+                    <form id="w0" action="/academics/placement/jobs/create" method="post">
+                        <input type="hidden" name="_csrf" value="NjJtS0EyTlJQaiECK3QKNHp8PDxxcyI1BX05HA1jHQpObTQvKVQWHQ==">
+                        <div class="box-body">
+                            <h2 class="page-header edusec-page-header-1 text-blue edusec-border-bottom-primary">
+		<i class="fa fa-graduation-cap"></i> Job Details	</h2>
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_recruiter_id required">
+                                        <label class="control-label" for="jobs-pj_recruiter_id">Recruiter</label>
+                                        <select id="jobs-pj_recruiter_id" class="form-control" name="Jobs[pj_recruiter_id]" aria-required="true">
+                                            <option value="">--- Select Recruiter ---</option>
+                                            <option value="1">Rudram Softech PVT LTD</option>
+                                        </select>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_title required">
+                                        <label class="control-label" for="jobs-pj_title">Title</label>
+                                        <input type="text" id="jobs-pj_title" class="form-control" name="Jobs[pj_title]" maxlength="255" aria-required="true">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_start_date required">
+                                        <label class="control-label" for="jobs-pj_start_date">Start Date</label>
+                                        <input type="text" id="jobs-pj_start_date" class="form-control" name="Jobs[pj_start_date]" readOnly>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_end_date required">
+                                        <label class="control-label" for="jobs-pj_end_date">End Date</label>
+                                        <input type="text" id="jobs-pj_end_date" class="form-control" name="Jobs[pj_end_date]" readOnly>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_interview_date required">
+                                        <label class="control-label" for="jobs-pj_interview_date">Interview Date</label>
+                                        <input type="text" id="jobs-pj_interview_date" class="form-control" name="Jobs[pj_interview_date]" readOnly>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class="form-group field-jobs-pj_interview_location required">
+                                        <label class="control-label" for="jobs-pj_interview_location">Interview Location</label>
+                                        <input type="text" id="jobs-pj_interview_location" class="form-control" name="Jobs[pj_interview_location]" maxlength="50" aria-required="true">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobs-pj_vacancies required">
+                                        <label class="control-label" for="jobs-pj_vacancies">Vacancies</label>
+                                        <input type="text" id="jobs-pj_vacancies" class="form-control" name="Jobs[pj_vacancies]" maxlength="50" aria-required="true">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobs-pj_skills required">
+                                        <label class="control-label" for="jobs-pj_skills">Skills</label>
+                                        <input type="text" id="jobs-pj_skills" class="form-control" name="Jobs[pj_skills]" maxlength="100" aria-required="true">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobs-pj_salary required">
+                                        <label class="control-label" for="jobs-pj_salary">Salary</label>
+                                        <input type="text" id="jobs-pj_salary" class="form-control" name="Jobs[pj_salary]" maxlength="50" aria-required="true">
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-sm-12'>
+                                    <div class="form-group field-jobs-pj_description required">
+                                        <label class="control-label" for="jobs-pj_description">Description</label>
+                                        <textarea id="jobs-pj_description" class="form-control" name="Jobs[pj_description]" maxlength="500" rows="3" aria-required="true"></textarea>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h2 class="page-header edusec-page-header-1 text-blue edusec-border-bottom-primary">
+		<i class="fa fa-graduation-cap"></i> Qualification	</h2>
+                            <div class='row'>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobmultiplecourse-pjm_academic_year required">
+                                        <label class="control-label" for="jobmultiplecourse-pjm_academic_year">Academic Year</label>
+                                        <select id="jobmultiplecourse-pjm_academic_year" class="form-control" name="JobMultipleCourse[pjm_academic_year]" onchange="$.get( &quot;/academics/placement/dependent/get-academic-courses&quot;, { yid: $(this).val() } )
+						.done(function(data) {
+							$(&quot;#jobmultiplecourse-pjm_section&quot;).multiselect(&quot;clearSelection&quot;);
+							$(&quot;#jobmultiplecourse-pjm_course&quot;).multiselect(&quot;clearSelection&quot;);
+							$( &quot;#jobmultiplecourse-pjm_course&quot;).html(data);
+							$( &quot;#jobmultiplecourse-pjm_course&quot;).multiselect(&quot;rebuild&quot;);
+					});" aria-required="true">
+                                            <option value="">--- Select Academic Year ---</option>
+                                            <option value="1" selected>2016-17</option>
+                                        </select>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobmultiplecourse-pjm_course required">
+                                        <label class="control-label" for="jobmultiplecourse-pjm_course">Course</label>
+                                        <input type="hidden" name="JobMultipleCourse[pjm_course]" value="">
+                                        <select id="jobmultiplecourse-pjm_course" class="form-control" name="JobMultipleCourse[pjm_course][]" multiple size="4" onchange="$.get( &quot;/academics/placement/dependent/get-academic-section&quot;, {cid: JSON.stringify($(this).val()), aid : $(&quot;#jobmultiplecourse-pjm_academic_year&quot;).val()} )
+						.done(function(data) {
+							$( &quot;#jobmultiplecourse-pjm_section&quot;).html(data);
+							$( &quot;#jobmultiplecourse-pjm_section&quot;).multiselect(&quot;rebuild&quot;);
+					});" aria-required="true">
+                                            <option value="1">Preschool</option>
+                                            <option value="2">Primary</option>
+                                            <option value="3">Secondary</option>
+                                        </select>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-4'>
+                                    <div class="form-group field-jobmultiplecourse-pjm_section required">
+                                        <label class="control-label" for="jobmultiplecourse-pjm_section">Section</label>
+                                        <input type="hidden" name="JobMultipleCourse[pjm_section]" value="">
+                                        <select id="jobmultiplecourse-pjm_section" name="JobMultipleCourse[pjm_section][]" multiple="multiple" size="4" aria-required="true">
+                                        </select>
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-primary btn-create">Create</button> <a class="btn btn-default btn-create" href="/academics/placement/jobs/index">Cancel</a></div>
+                    </form>
+                </div>
+            </section>
+        </div>
+        <div id="slideToTop"><i class="fa fa-chevron-up"></i></div>
+        </div>
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <div class="pull-right hidden-xs text-bold">
+                    Powered by <a href="http://www.rudrasoftech.com">EduSec<sup>&trade;</sup></a>
+                </div>
+            </div>
+            <strong>Copyright &copy; 2017 <a href="http://www.rudrasoftech.com">Rudra Softech</a>.</strong> All rights reserved. </footer>
+        <div class="modal" id="globalModal" tabindex="-1" role="dialog" aria-labelledby="esModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="loader">
+                            <div class="es-spinner">
+                                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../../js/all.js?v=1486729641"></script>
+        <script src="../../js/jquery-ui.js?v=1469444669"></script>
+        <script src="../../js/bootstrap-multiselect.min.js?v=1473847809"></script>
+        <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#jobs-pj_start_date').datepicker({
+                "changeMonth": true,
+                "changeYear": true,
+                "minDate": "0",
+                "autoSize": true,
+                "onClose": function(selectedDate) {
+                    $("#jobs-pj_end_date").datepicker("option", "minDate", selectedDate);
+                    $("#jobs-pj_interview_date").datepicker("option", "minDate", selectedDate);
+                },
+                "dateFormat": "dd-mm-yy"
+            });
+            jQuery('#jobs-pj_end_date').datepicker({
+                "changeMonth": true,
+                "changeYear": true,
+                "autoSize": true,
+                "dateFormat": "dd-mm-yy"
+            });
+            jQuery('#jobs-pj_interview_date').datepicker({
+                "minDate": "0",
+                "changeMonth": true,
+                "changeYear": true,
+                "autoSize": true,
+                "dateFormat": "dd-mm-yy"
+            });
+            jQuery('#jobmultiplecourse-pjm_course').multiselect({
+                "includeSelectAllOption": true,
+                "enableFiltering": true,
+                "enableCaseInsensitiveFiltering": true,
+                "enableClickableOptGroups": true,
+                "numberDisplayed": 1,
+                "nonSelectedText": "None Selected",
+                "selectAllText": "Select all",
+                "allSelectedText": "All selected",
+                "filterPlaceholder": "Search"
+            });
+            jQuery('#jobmultiplecourse-pjm_section').multiselect({
+                "includeSelectAllOption": true,
+                "enableFiltering": true,
+                "enableCaseInsensitiveFiltering": true,
+                "enableClickableOptGroups": true,
+                "numberDisplayed": 1,
+                "nonSelectedText": "None Selected",
+                "selectAllText": "Select all",
+                "allSelectedText": "All selected",
+                "filterPlaceholder": "Search"
+            });
+            jQuery('#w0').yiiActiveForm([{
+                "id": "jobs-pj_recruiter_id",
+                "name": "pj_recruiter_id",
+                "container": ".field-jobs-pj_recruiter_id",
+                "input": "#jobs-pj_recruiter_id",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Recruiter cannot be blank."
+                    });
+                    yii.validation.number(value, messages, {
+                        "pattern": /^\s*[+-]?\d+\s*$/,
+                        "message": "Recruiter must be an integer.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_title",
+                "name": "pj_title",
+                "container": ".field-jobs-pj_title",
+                "input": "#jobs-pj_title",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Title cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Title must be a string.",
+                        "max": 255,
+                        "tooLong": "Title should contain at most 255 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_start_date",
+                "name": "pj_start_date",
+                "container": ".field-jobs-pj_start_date",
+                "input": "#jobs-pj_start_date",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Start Date cannot be blank."
+                    });
+                }
+            }, {
+                "id": "jobs-pj_end_date",
+                "name": "pj_end_date",
+                "container": ".field-jobs-pj_end_date",
+                "input": "#jobs-pj_end_date",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "End Date cannot be blank."
+                    });
+                }
+            }, {
+                "id": "jobs-pj_interview_date",
+                "name": "pj_interview_date",
+                "container": ".field-jobs-pj_interview_date",
+                "input": "#jobs-pj_interview_date",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Interview Date cannot be blank."
+                    });
+                }
+            }, {
+                "id": "jobs-pj_interview_location",
+                "name": "pj_interview_location",
+                "container": ".field-jobs-pj_interview_location",
+                "input": "#jobs-pj_interview_location",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Interview Location cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Interview Location must be a string.",
+                        "max": 50,
+                        "tooLong": "Interview Location should contain at most 50 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_vacancies",
+                "name": "pj_vacancies",
+                "container": ".field-jobs-pj_vacancies",
+                "input": "#jobs-pj_vacancies",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Vacancies cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Vacancies must be a string.",
+                        "max": 50,
+                        "tooLong": "Vacancies should contain at most 50 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_skills",
+                "name": "pj_skills",
+                "container": ".field-jobs-pj_skills",
+                "input": "#jobs-pj_skills",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Skills cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Skills must be a string.",
+                        "max": 100,
+                        "tooLong": "Skills should contain at most 100 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_salary",
+                "name": "pj_salary",
+                "container": ".field-jobs-pj_salary",
+                "input": "#jobs-pj_salary",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Salary cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Salary must be a string.",
+                        "max": 50,
+                        "tooLong": "Salary should contain at most 50 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobs-pj_description",
+                "name": "pj_description",
+                "container": ".field-jobs-pj_description",
+                "input": "#jobs-pj_description",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Description cannot be blank."
+                    });
+                    yii.validation.string(value, messages, {
+                        "message": "Description must be a string.",
+                        "max": 500,
+                        "tooLong": "Description should contain at most 500 characters.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobmultiplecourse-pjm_academic_year",
+                "name": "pjm_academic_year",
+                "container": ".field-jobmultiplecourse-pjm_academic_year",
+                "input": "#jobmultiplecourse-pjm_academic_year",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Academic Year cannot be blank."
+                    });
+                    yii.validation.number(value, messages, {
+                        "pattern": /^\s*[+-]?\d+\s*$/,
+                        "message": "Academic Year must be an integer.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobmultiplecourse-pjm_course",
+                "name": "pjm_course",
+                "container": ".field-jobmultiplecourse-pjm_course",
+                "input": "#jobmultiplecourse-pjm_course",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Course cannot be blank."
+                    });
+                    yii.validation.number(value, messages, {
+                        "pattern": /^\s*[+-]?\d+\s*$/,
+                        "message": "Course must be an integer.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }, {
+                "id": "jobmultiplecourse-pjm_section",
+                "name": "pjm_section",
+                "container": ".field-jobmultiplecourse-pjm_section",
+                "input": "#jobmultiplecourse-pjm_section",
+                "validate": function(attribute, value, messages, deferred, $form) {
+                    yii.validation.required(value, messages, {
+                        "message": "Section cannot be blank."
+                    });
+                    yii.validation.number(value, messages, {
+                        "pattern": /^\s*[+-]?\d+\s*$/,
+                        "message": "Section must be an integer.",
+                        "skipOnEmpty": 1
+                    });
+                }
+            }], []);
+            $("#jobmultiplecourse-pjm_course").nextAll("div").first().addClass("dropup");
+            $("#jobmultiplecourse-pjm_section").nextAll("div").first().addClass("dropup");
+        });
+        </script>
+</body>
+
+</html>

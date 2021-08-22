@@ -1,0 +1,18 @@
+.fee-loader 
+{
+    height: 20px;
+    width: 40px;
+    margin-left:10px;
+    display:none;
+}
+
+#FormSendtoTrans
+{
+    display:inline-block;
+}
+
+.hidden-print
+{
+    position:relative;
+    z-index: 9;
+}

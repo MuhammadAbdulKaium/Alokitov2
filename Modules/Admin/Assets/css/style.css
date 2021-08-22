@@ -1,0 +1,100 @@
+.subscription-management .table,
+.manage-bill,
+.manage-bill .table
+{
+    margin-bottom: 0;
+}
+
+.subscription-management img
+{
+    width: 30px;
+    height: auto;
+}
+
+.subscription-management .table > thead > tr > th,
+.subscription-management .table > tbody > tr > th,
+.subscription-management .table > tbody > tr > td,
+.manage-bill > thead > tr > th,
+.manage-bill > tbody > tr > th,
+.manage-bill > tbody > tr > td 
+{
+    font-size:1.2rem;
+    vertical-align: middle;
+}
+
+.subscription-management .table > thead > tr > th > em,
+.subscription-management .table > tbody > tr > th > em,
+.subscription-management .table > tbody > tr > td > em
+{
+    font-size:1rem;
+}
+
+.subscription-management .table>thead>tr>th, 
+.subscription-management .table>tbody>tr>th, 
+.subscription-management .table>tfoot>tr>th, 
+.subscription-management .table>thead>tr>td, 
+.subscription-management .table>tbody>tr>td, 
+.subscription-management .table>tfoot>tr>td 
+{
+    padding: 3px;
+}
+
+table.dataTable thead > tr > th
+{
+    padding-right: 0;
+}
+
+.table>thead>tr>th, 
+.table>tbody>tr>th, 
+.table>tfoot>tr>th, 
+.table>thead>tr>td, 
+.table>tbody>tr>td, 
+.table>tfoot>tr>td 
+{
+    vertical-align: middle;
+}
+
+table.dataTable thead .sorting:after, 
+table.dataTable thead .sorting_asc:after, 
+table.dataTable thead .sorting_desc:after 
+{
+    top: 37%;
+}
+
+.table-striped>tbody>tr.sm-odd,
+.table-striped>tbody>tr.sm-odd>td>table>tbody>tr
+{
+    background-color:#e1f5ff;
+}
+
+.table-hover>tbody>tr:hover,
+.table-striped>tbody>tr:hover>td>table>tbody>tr
+{
+    background-color: #f5f5f5;
+}
+
+.form-control.olddues[disabled], 
+.form-control.olddues[readonly], 
+.form-control.olddues
+{
+    border: 0;
+    text-align: center;
+    padding: 0 0;
+    font-size: 1.2rem;
+}
+
+.form-control.paidamount[disabled], 
+.form-control.paidamount[readonly], 
+.form-control.paidamount
+{
+    background-color: #c6eaff;
+    border: 0;
+    text-align: center;
+    padding: 0 0;
+    font-size: 1.2rem;
+}
+
+.subscription-management .form-group
+{
+    margin-bottom:0;
+}

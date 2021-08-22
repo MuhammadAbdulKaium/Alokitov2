@@ -1,0 +1,98 @@
+@extends('layouts.master')
+
+@section('styles')
+    <link rel="stylesheet" type="text/css" href="https://www.jqueryscript.net/demo/jQuery-Based-Bootstrap-Popover-Enhancement-Plugin-Bootstrap-Popover-X/bootstrap-popover-x.css">
+
+
+@endsection
+<!-- page content -->
+@section('content')
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1><i class="fa fa-plus-square"></i>Fee Assign</h1>
+
+            {{--<ul class="breadcrumb">--}}
+                {{--<li><a href="{{URL::to('home')}}"><i class="fa fa-home"></i>Home</a></li>--}}
+                {{--<li><a href="{{URL::to('finance')}}">Finance</a></li>--}}
+                {{--<li><a href="{{URL::to('/fees')}}">Fees</a></li>--}}
+            {{--</ul>--}}
+        </section>
+        <section class="content">
+            {{--@if(Session::has('success'))--}}
+            {{--<div class="alert-success alert-auto-hide alert fade in" id="w0-success-0" style="opacity: 423.642;">--}}
+            {{--<button aria-hidden="true" class="close" data-dismiss="alert" type="button">×</button>--}}
+            {{--<h4><i class="icon fa fa-check"></i>{{ Session::get('success') }}</h4>--}}
+            {{--</div>--}}
+            {{--@elseif(Session::has('warning'))--}}
+            {{--<div class="alert-warning alert-auto-hide alert fade in" id="w0-success-0" style="opacity: 423.642;">--}}
+            {{--<button aria-hidden="true" class="close" data-dismiss="alert" type="button">×</button>--}}
+            {{--<h4><i class="icon fa fa-check"></i>{{ Session::get('warning') }}</h4>--}}
+            {{--</div>--}}
+            {{--@endif--}}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>
+                        <ul class="nav-tabs margin-bottom nav" id="">
+                            <li @if($page == "feeassign") class="active" @endif  id="#">
+                                <a href="{{url('/fee/feeassign/index')}}">Fee Assign</a>
+                            </li>
+                            <li @if($page == "feelist") class="active" @endif  id="#">
+                                <a href="{{url('/fee/feeassign/feelist')}}">Fee List</a>
+                            </li>
+                            <li @if($page == "assignwaiver") class="active" @endif  id="#">
+                                <a href="{{url('/fee/feeassign/assignwaiver')}}">Assign Waiver</a>
+                            </li>
+
+                            <li @if($page == "assignwaiverlist") class="active" @endif  id="#">
+                                <a href="{{url('/fee/feeassign/assignwaiverlist')}}">Assigned Waiver List</a>
+                            </li>
+                            {{--<li @if($page == "feefineamount") class="active" @endif  id="#">--}}
+                                {{--<a href="{{url('/fee/feeassign/feefineamount')}}">Fee Fine Amount</a>--}}
+                            {{--</li>--}}
+                            {{--<li @if($page == "attendancefine") class="active" @endif  id="#">--}}
+                                {{--<a href="{{url('/fee/feeassign/attendancefine')}}">Attendance Fine</a>--}}
+                            {{--</li>--}}
+                        </ul>
+                        <!-- page content div -->
+                        @yield('page-content')
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- global modal -->
+    <div aria-hidden="true" aria-labelledby="esModalLabel" class="modal" id="globalModal" role="dialog" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="loader">
+                        <div class="es-spinner">
+                            <i class="fa fa-spinner fa-pulse fa-5x fa-fw">
+                            </i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+    @parent
+    {{--<script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.6/js/dataTables.checkboxes.min.js"></script>--}}
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup(
+                {
+                    headers:
+                        {
+                            'X-CSRF-Token': $('input[name="_token"]').val()
+                        }
+                });
+        })
+    </script>
+   @yield('page-script')
+
+@endsection

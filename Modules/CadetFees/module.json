@@ -1,0 +1,13 @@
+{
+    "name": "CadetFees",
+    "alias": "cadetfees",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\CadetFees\\Providers\\CadetFeesServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

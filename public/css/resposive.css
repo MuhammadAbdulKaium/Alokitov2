@@ -1,0 +1,76 @@
+.media-logo{display: none;}
+.std_id_report,.std_name_report{height: 35px;}
+
+
+@media only screen and (max-width:991px) {
+
+    /*Mda update*/
+  .margin-media-top{margin-top: 100px;}
+
+	.table.student-address tbody > tr > td{font-size: 12px; padding: 0;}
+}
+/*media sereen max 767*/
+@media only screen and (max-width:767px) {
+	.panel.institute-panel{margin-bottom: 40px;}
+	.institute-panel .panel-title> a{font-size: 12px;}
+	.media-hidden{display: none;}
+	.media-logo{display: block; margin-top: 10px;}
+	.sm-collapsible> li{display: inline-block;}
+	.sm-collapsible li.main-menu-style a{display: inline-block;}
+	.navbar-nav.sm-collapsible a.has-submenu {padding-right: 10px;}
+	.school-name{font-size: 25px;}
+	.logo-button{border-top: 0;}
+	/*dashboard timeTable list*/
+	.class-section-timetable-device{overflow-x: auto;}
+	/*gread book pdf file*/
+	#grade_book_export_import_btn{text-align: center;}
+	.send-matic-btn{text-align: center;}
+	.std_id_report{width: 50px;}
+}
+@media only screen and (max-width:600px){
+	.institute-panel .panel-title> span{margin-top: 20px;}
+	.panel-title a.institute-name{display: block;}
+	.panel-title a.add-campus{margin-top: 20px;}
+	.school-name,
+	.school-name.institute-name{font-size: 18px;}
+	.logo-button {margin-top: 12px;}
+}
+/*media sereen max 480*/
+@media only screen and (max-width:480px) {
+	.table.student-address tbody tr th,
+	.table.student-address tbody tr td{font-size: 12px; padding: 0;}
+	/*super admin*/
+	.atten-bg .institute-list-box > h4{font-size: 14px;}
+	.panel-title a.add-campus{margin-bottom: 20px;margin-top: 20px;}
+	.panel.institute-panel{margin-bottom: 40px;}
+	.institute-panel .panel-title> span{margin-top: 20px; margin-left: 2px !important; font-size: 10px;}
+	.panel-title a.institute-name{display: block;}
+	.school-name {margin-top: 20px; font-size: 12px;}
+	.icon-margin5{margin-right: 5px;}
+	.institute-panel .panel-title> a{font-size: 9px; margin-left: 2px !important;}
+	.logo-nav {margin-top: -12px; margin-right: -22px;}
+	/*institute admin panel*/
+	.school-name.institute-name{font-size: 14px;}
+	.dashboard-attendance-percent {margin-left: 15px;}
+	/*greadbook page*/
+	.breadcrumb li a{font-size: 10px; }
+	.breadcrumb > li + li::before{padding: 0 2px;}
+	.breadcrumb > .active {font-size: 10px;}
+	.nav li>a{padding: 10px 12px;}
+	.tech-timetable-report> thead > tr > th,.tech-timetable-report > tbody > tr > td{padding: 2px; font-size: 12px;}
+	.wrapper
+}
+@media only screen and (max-width:380px){
+	.nav li>a{padding: 10px 6px;}
+}
+/*media sereen max 320*/
+@media only screen and (max-width:320px) {
+	.institute-panel .panel-title> span{margin-top: 20px; margin-left: 10px !important; font-size: 12px;}
+	.institute-panel .panel-title span:nth-of-type(2){margin-top: 10px; margin-right: 20px;}
+	.institute-panel .panel-title span:last-child{margin-top: -18px; padding-left: 0px;}
+	.padding-left0{padding-right: 0;}
+	.nav-tabs > li > a{padding: 10px 6px; font-size: 12px;}
+	.nav li>a{padding: 10px 4px;}
+	.panel.institute-panel{margin-bottom: 65px;}
+
+}

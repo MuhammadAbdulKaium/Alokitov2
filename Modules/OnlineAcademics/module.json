@@ -1,0 +1,16 @@
+{
+    "name": "OnlineAcademics",
+    "alias": "onlineacademics",
+    "description": "",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\OnlineAcademics\\Providers\\OnlineAcademicsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": []
+}

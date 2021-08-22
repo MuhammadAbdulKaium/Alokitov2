@@ -1,0 +1,13 @@
+{
+    "name": "Mess",
+    "alias": "mess",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\Mess\\Providers\\MessServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
