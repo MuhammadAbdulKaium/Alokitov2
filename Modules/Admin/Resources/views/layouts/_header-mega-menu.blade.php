@@ -20,7 +20,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>-->
-         <h4 class="head-text"><span class="fa fa-dashboard icon-margin"></span><a href="/admin/dashboard/statics">Dashboard</a></h4>
+{{--         <h4 class="head-text"><span class="fa fa-dashboard icon-margin"></span><a href="/admin/dashboard/statics">Dashboard</a></h4>--}}
       </div>
       <div class="">
          @if (!Request::is('/'))
@@ -193,7 +193,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
 
                      </li>
 
-                     <li><a href="#"><span class="fa fa-user icon-margin"></span> Cadets <span class="caret"></span></a>
+                     <li><a href="#"><span class="fa fa-user icon-margin"></span> Students <span class="caret"></span></a>
 
                         <ul class="dropdown-menus">
                            <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
@@ -204,7 +204,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
                                  {{--<li><a href="#"><i class="fa fa-sort-alpha-asc"></i> Admission Category</a></li>--}}
                                  
                                  {{--                              <li><a href="/student/manage/alumni"><i class="fa fa-reorder"></i> Alumni Cadet</a></li>--}}
-                                 <li><a href="/student/cadet-activity-directory"><i class="fa fa-list"></i> Cadet Activity Directory</a></li>
+                                 <li><a href="/student/cadet-activity-directory"><i class="fa fa-list"></i> Student Activity Directory</a></li>
                                  {{--                              <li><a href="/student/update/profile"><i class="fa fa-reorder"></i> Update Cadet Profile</a></li>--}}
                                  {{--                              <li><a href="/fees/attendance_fine"><i class="fa fa-reorder"></i> Attendance Fine Generate</a></li>--}}
                                  {{--                              <li><a href="/student/upload/images"><i class="fa fa-upload"></i> Upload Images</a></li>--}}
@@ -249,12 +249,12 @@ background:{{ $headerBgColor->attribute_value }} !important;
                            </li>
                            <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a>
                               <ul class="dropdown-menus">
-                                 <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Cadet Enrollment</a></li>
-                                 <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Cadet</a></li>
+                                 <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Student Enrollment</a></li>
+                                 <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Student</a></li>
                                  <li><a href="/student/cadet-performance-bulk"><i class="fa fa-reorder"></i> Factor Entries</a></li>
-                                 <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Cadet</a></li>
-                                 <li><a href="/student/import"><i class="fa fa-upload"></i> Import Cadet</a></li>
-                                 <li><a href="/student/promote"><i class="fa fa-exchange"></i> Promote Cadet</a></li>
+                                 <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Student</a></li>
+                                 <li><a href="/student/import"><i class="fa fa-upload"></i> Import Student</a></li>
+                                 <li><a href="/student/promote"><i class="fa fa-exchange"></i> Promote Student</a></li>
                                  <li><a href="/student/parent/manage"><i class="fa fa-users"></i> Manage Parents</a></li>
                               </ul>
                            </li>
@@ -370,16 +370,16 @@ background:{{ $headerBgColor->attribute_value }} !important;
                               <ul class="dropdown-menus">
                                  <li><a href="/reports/academics"><i class="fa fa-line-chart"></i>Academics<span class="caret"></span></a>
                                     <ul class="dropdown-menus">
-                                       <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Cadet Reports</a></li>
+                                       <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Student Reports</a></li>
                                        <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Teacher Reports</a></li>
                                        <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Parents Reports</a></li>
                                     </ul>
                                  </li>
                                  <li><a href="/reports/attendance"><i class="fa fa-building-o"></i> Attendance<span class="caret"></span></a>
                                     <ul class="dropdown-menus">
-                                       <li><a href="/report/attendance"><i class="fa fa-users"></i> Cadet Attendance</a></li>
+                                       <li><a href="/report/attendance"><i class="fa fa-users"></i> Student Attendance</a></li>
                                        <li><a href="/report/attendance"><i class="fa fa-users"></i> Class Section Attendance</a></li>
-                                       <li><a href="/report/attendance"><i class="fa fa-users"></i> Cadet Absent Days Report</a></li>
+                                       <li><a href="/report/attendance"><i class="fa fa-users"></i> Student Absent Days Report</a></li>
                                     </ul>
                                  </li>
                                  <li><a href="/reports/result"><i class="fa fa-check-square-o"></i> Result<span class="caret"></span></a>

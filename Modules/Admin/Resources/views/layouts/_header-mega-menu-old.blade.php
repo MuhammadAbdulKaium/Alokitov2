@@ -20,7 +20,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>-->
-         <h4 class="head-text"><span class="fa fa-dashboard icon-margin"></span><a href="/admin/dashboard/statics">Dashboard</a></h4>
+{{--         <h4 class="head-text"><span class="fa fa-dashboard icon-margin"></span><a href="/admin/dashboard/statics">Dashboard</a></h4>--}}
       </div>
       <div class="">
       @if (!Request::is('/'))

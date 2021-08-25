@@ -25,9 +25,9 @@ background:#0b460b !important;
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>-->
-         @role(['super-admin','admin'])
-         <h4 class="head-text"><a href="{{URL::to('home')}}">Dashboard</a></h4>
-         @endrole
+{{--         @role(['super-admin','admin'])--}}
+{{--         <h4 class="head-text"><a href="{{URL::to('home')}}">Dashboard</a></h4>--}}
+{{--         @endrole--}}
       </div>
       <div class="">
       @if (!Request::is('/'))
@@ -218,7 +218,7 @@ background:#0b460b !important;
                      </ul>
 
                   </li>
-                  <li><a href="#"><span class="fa fa-user icon-margin"></span> Cadets <span class="caret"></span></a>
+                  <li><a href="#"><span class="fa fa-user icon-margin"></span> Students <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
@@ -229,7 +229,7 @@ background:#0b460b !important;
                               {{--<li><a href="#"><i class="fa fa-sort-alpha-asc"></i> Admission Category</a></li>--}}
                               
                               {{--                              <li><a href="/student/manage/alumni"><i class="fa fa-reorder"></i> Alumni Cadet</a></li>--}}
-                              <li><a href="/student/cadet-activity-directory"><i class="fa fa-list"></i> Cadet Activity Directory</a></li>
+                              <li><a href="/student/cadet-activity-directory"><i class="fa fa-list"></i> Student Activity Directory</a></li>
                               {{--                              <li><a href="/student/update/profile"><i class="fa fa-reorder"></i> Update Cadet Profile</a></li>--}}
                               {{--                              <li><a href="/fees/attendance_fine"><i class="fa fa-reorder"></i> Attendance Fine Generate</a></li>--}}
                               {{--                              <li><a href="/student/upload/images"><i class="fa fa-upload"></i> Upload Images</a></li>--}}
@@ -274,13 +274,13 @@ background:#0b460b !important;
                         </li>
                         <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a>
                            <ul class="dropdown-menus">
-                              <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Cadet Enrollment</a></li>
-                              <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Cadet</a></li>
+                              <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Student Enrollment</a></li>
+                              <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Student</a></li>
                               <li><a href="/student/cadet-performance-bulk"><i class="fa fa-reorder"></i> Factor Entries</a></li>
-                              <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Cadet</a></li>
-                              <li><a href="/student/import"><i class="fa fa-upload"></i> Import Cadet</a></li>
+                              <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Student</a></li>
+                              <li><a href="/student/import"><i class="fa fa-upload"></i> Import Student</a></li>
                               <li><a href="/student/import/images"><i class="fa fa-upload"></i> Import Photos</a></li>
-                              <li><a href="/student/promote"><i class="fa fa-exchange"></i> Promote Cadet</a></li>
+                              <li><a href="/student/promote"><i class="fa fa-exchange"></i> Promote Student</a></li>
                               <li><a href="/student/parent/manage"><i class="fa fa-users"></i> Manage Parents</a></li>
                               <li><a href="{{url('academics/manage/attendance/manage')}}"><i class="fa fa-book "></i>Manage Attendance</a></li>
                            </ul>

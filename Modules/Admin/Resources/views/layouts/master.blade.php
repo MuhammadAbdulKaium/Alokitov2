@@ -97,8 +97,8 @@
                     <img src="{{URL::asset('assets/users/images/cadet-logo.png')}}" style="height: 70px" width="70px" align="center" class="brand-logo" alt="Alokito logo">
                 </a>
             </div>
-            <div class="col-md-4"><h2 class="school-name">Cadet College ERP</h2></div>
-            <div class="col-md-3"><h2 class="school-name">Cadet College SOP</h2>
+            <div class="col-md-4"><h2 class="school-name">Alokito ERP</h2></div>
+            <div class="col-md-3"><h2 class="school-name">Alokito ERP SOP</h2>
             <p>Knowledge, Morality, Patriotism</p></div>
             @include('admin::layouts._header-custom-menu')
 
