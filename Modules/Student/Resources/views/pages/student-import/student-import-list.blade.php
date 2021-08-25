@@ -100,7 +100,7 @@
                                                 <td class="text-center">{{$count}}</td>
                                                 <td class="text-center">
                                                     <div class="form-group">
-                                                        <input class="form-control text-center" type="text" name="username[]" value="{{$student['cadet_number']}}" required/>
+{{--                                                        <input class="form-control text-center" type="text" name="username[]" value="{{$student['cadet_number']}}" required/>--}}
                                                     </div>
                                                 </td>
                                                 <td class="text-center">

@@ -21,7 +21,7 @@ class StudentImport implements ToModel, WithHeadingRow
     {
         if(!empty($row[0])){
             return ([
-                'username'                  => $row[0],
+                'student_id'                  => $row[0],
                 'first_name'                => $row[1],
                 'last_name'                 => $row[2],
                 'bn_fullname'               => $row[3],
@@ -57,6 +57,7 @@ class StudentImport implements ToModel, WithHeadingRow
                 'aim'                       => $row[33],
                 'dream'                     => $row[34],
                 'idol'                      => $row[35],
+                'roll'                      => $row[36],
             ]);
         }
     }

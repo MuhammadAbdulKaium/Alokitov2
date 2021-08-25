@@ -94,6 +94,7 @@ class StudentImportController extends Controller
     public function upload(Request $request)
     {
         $data = Excel::toArray(new StudentImport(),$request->file('student_import'));
+//        return $data;
         return view('student::pages.student-import.student-import-list', compact('data'));
 
 
