@@ -30,9 +30,9 @@ o<!-- DataTables -->
                             <th><a data-sort="sub_master_alias">Teacher</a></th>
                             <th><a data-sort="sub_master_alias">Duration(Minutes)</a></th>
                             <th><a data-sort="sub_master_alias">Total</a></th>
-                            <th><a data-sort="sub_master_alias">P</a></th>
+                            {{-- <th><a data-sort="sub_master_alias">P</a></th>
                             <th><a data-sort="sub_master_alias redcolor">A</a></th>
-                            <th><a data-sort="sub_master_alias redcolor">L</a></th>
+                            <th><a data-sort="sub_master_alias redcolor">L</a></th> --}}
                             <th><a data-sort="sub_master_alias">Remarks</a></th> 
                             <th><a data-sort="sub_master_alias">Status</a></th>    
                         </tr>
@@ -143,7 +143,7 @@ o<!-- DataTables -->
                                             @endif
                                         </td>
                                         <td style="text-align: center;">{{ $studentList }}</td>
-                                        <td style="text-align: center;">
+                                        {{-- <td style="text-align: center;">
                                             @if(isset($scheduledData[$subjectProfile->id][14]))    
                                                 {{ $scheduledData[$subjectProfile->id][14] }}
                                             @else
@@ -163,7 +163,7 @@ o<!-- DataTables -->
                                             @else
                                             {{ '--' }}
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             @if(isset($scheduledData[$subjectProfile->id][12]))    
                                                 {{ $scheduledData[$subjectProfile->id][12] }}
