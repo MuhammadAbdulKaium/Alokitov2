@@ -56,7 +56,7 @@
 	                              <td>{{ $personalInfo->blood_group }}</td>
 	                           </tr>
 	                           <tr>
-	                              <th>Cadet Type</th>
+	                              <th>Student Type</th>
 	                              <td>
 					                  @php
 					                     switch($personalInfo->type) {
@@ -80,7 +80,7 @@
 								<tr>
 									<th>Batch No</th>
 									<td>{{ $personalInfo->batch_no }}
-									</td><th>Cadet No</th>
+									</td><th>Student No</th>
 									<td>{{ $personalInfo->email }}</td>
 								</tr>
 								<tr>

@@ -60,7 +60,7 @@
                                 <option value="">Evaluation For</option>
                                 <option value="1">HR/FM - Teaching</option>
                                 <option value="2">HR/FM - Non Teaching</option>
-                                <option value="3">Cadets</option>
+                                <option value="3">Studentts</option>
                             </select>
                         </div>
                         <div class="col-sm-3">

@@ -12,12 +12,12 @@
 	<div class="content-wrapper">
 	   <section class="content-header">
 	      <h1>
-	         <i class = "fa fa-eye" aria-hidden="true"></i> View Cadet | <small>{{$personalInfo->title." ". $personalInfo->first_name." ".$personalInfo->middle_name." ".$personalInfo->last_name }}</small>
+	         <i class = "fa fa-eye" aria-hidden="true"></i> View Student | <small>{{$personalInfo->title." ". $personalInfo->first_name." ".$personalInfo->middle_name." ".$personalInfo->last_name }}</small>
 	      </h1>
 	      <ul class="breadcrumb">
 	         <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-	         <li><a href="/student">Cadet</a></li>
-	         <li><a href="/student/manage/">Manage Cadet</a></li>
+	         <li><a href="/student">Student</a></li>
+	         <li><a href="/student/manage/">Manage Student</a></li>
 	         <li class="active">{{ $personalInfo->first_name." ".$personalInfo->middle_name." ".$personalInfo->last_name }}</li>
 	      </ul>
 	   </section>

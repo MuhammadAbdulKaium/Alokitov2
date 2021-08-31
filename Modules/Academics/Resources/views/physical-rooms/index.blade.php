@@ -121,7 +121,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-sm-2">
-                                    <label for="">Cadets Per Seat:</label>
+                                    <label for="">Students Per Seat:</label>
                                     <input type="number" class="form-control add-val room-field" name="cadets_per_seat" required>
                                     @error('cadets_per_seat')
                                     <div class="text-danger">{{ $message }}</div>

@@ -14,12 +14,12 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                <i class="fa fa-th-list"></i>Deactive Cadet | <small>List</small>
+                <i class="fa fa-th-list"></i>Deactive Student | <small>List</small>
             </h1>
             <ul class="breadcrumb">
                 <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-                <li><a href="/student/">Cadet</a></li>
-                <li class="active">>Deactive Cadet Manage</li>
+                <li><a href="/student/">Student</a></li>
+                <li class="active">>Deactive Student Manage</li>
             </ul>
         </section>
 
@@ -27,7 +27,7 @@
             <div class="box box-solid">
                 <div class="et">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-search"></i> Search Active/Deactive Cadet</h3>
+                        <h3 class="box-title"><i class="fa fa-search"></i> Search Active/Deactive Student</h3>
                     </div>
                 </div>
                 <form id="std_manage_search_form" method="POST">

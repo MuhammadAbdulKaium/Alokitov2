@@ -6,7 +6,7 @@
     <link href="{{ asset('css/datatable.css') }}" rel="stylesheet" type="text/css" />
     <section class="content-header">
         <h1>
-            <i class="fa fa-th-list"></i> Cadet Academics |<small>Exam Attendance</small>
+            <i class="fa fa-th-list"></i> Student Academics |<small>Exam Attendance</small>
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
@@ -430,7 +430,7 @@
                                     '" class="attendance-select" '+checked+'></td></tr>';
                                 });
 
-                                table = '<thead><tr><th>SL</th><th>Cadet Names</th><th>Roll No</th><th><input type="checkbox" class="attendance-all-select"></th></tr></thead><tbody>'+studentTr+'</tbody>';
+                                table = '<thead><tr><th>SL</th><th>Student Names</th><th>Roll No</th><th><input type="checkbox" class="attendance-all-select"></th></tr></thead><tbody>'+studentTr+'</tbody>';
 
                                 $('.attendance-table').empty();
                                 $('.attendance-table').append(table);
@@ -449,7 +449,7 @@
                                         '</td><td>'+ele.gr_no+'</td><td>'+attendance+'</td></tr>';
                                     });
 
-                                    table = '<thead><tr><th>SL</th><th>Cadet Names</th><th>Roll No</th><th>Attendance</th></tr></thead><tbody>'+studentTr+'</tbody>';
+                                    table = '<thead><tr><th>SL</th><th>Student Names</th><th>Roll No</th><th>Attendance</th></tr></thead><tbody>'+studentTr+'</tbody>';
 
                                     $('.attendance-table').empty();
                                     $('.attendance-save-btn-holder').empty();

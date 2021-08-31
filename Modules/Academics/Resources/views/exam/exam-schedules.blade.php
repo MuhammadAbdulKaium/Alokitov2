@@ -6,7 +6,7 @@
     <link href="{{ asset('css/datatable.css') }}" rel="stylesheet" type="text/css" />
     <section class="content-header">
         <h1>
-            <i class="fa fa-th-list"></i> Cadet Academics |<small>Exam Schedules</small>
+            <i class="fa fa-th-list"></i> Student Academics |<small>Exam Schedules</small>
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>

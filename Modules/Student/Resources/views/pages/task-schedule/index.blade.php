@@ -17,7 +17,7 @@
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-            <li><a href="/student/default/index">Cadets</a></li>
+            <li><a href="/student/default/index">Students</a></li>
             <li><a href="">SOP Setup</a></li>
             <li class="active">Task Schedule</li>
         </ul>

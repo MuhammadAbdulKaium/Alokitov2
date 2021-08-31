@@ -69,7 +69,7 @@
 {{--				</strong>--}}
 {{--				<p class="text-muted">{{$personalInfo->user()->username}}</p>--}}
 				<strong>
-					Cadet Number
+					Student Number
 					<a id="edit-email" href="/student/profile/email/{{$personalInfo->id}}" title="Change Email/Login ID" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">
 						<i class="fa fa-pencil-square fa-lg"></i>
 					</a>

@@ -85,7 +85,7 @@
                                 <div class="col-sm-8">
                                     <select name="evaluationBy[]" id="designation-by" multiple class="form-control evaluation-field" required>
                                         <option value="hrfm">HR/FM</option>
-                                        <option value="cadets">Cadets</option>
+                                        <option value="cadets">Students</option>
                                         @foreach ($designations as $designation)
                                             <option value="{{$designation->id}}">{{$designation->name}}</option>
                                         @endforeach
@@ -100,7 +100,7 @@
                                     <select name="evaluationFor" id="designation-for" class="form-control evaluation-field" required>
                                         <option value="1">HR/FM - Teaching</option>
                                         <option value="2">HR/FM - Non Teaching</option>
-                                        <option value="3">Cadets</option>
+                                        <option value="3">Students</option>
                                     </select>
                                 </div>
                             </div>

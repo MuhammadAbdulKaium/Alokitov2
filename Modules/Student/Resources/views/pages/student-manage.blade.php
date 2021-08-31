@@ -15,18 +15,18 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                <i class="fa fa-th-list"></i> Manage | <small>Cadet</small>
+                <i class="fa fa-th-list"></i> Manage | <small>Student</small>
             </h1>
             <ul class="breadcrumb">
                 <li><a href="{{URL::to('/home')}}"><i class="fa fa-home"></i>Home</a></li>
-                <li class="active">Manage Cadet</li>
+                <li class="active">Manage Student</li>
             </ul>
         </section>
         <section class="content">
             <div class="box box-solid">
                 <div class="et">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-search"></i> Search Cadet</h3>
+                        <h3 class="box-title"><i class="fa fa-search"></i> Search Student</h3>
                         <div class="box-tools">
                             <a class="btn btn-success btn-sm" href="/student/profile/create"><i class="fa fa-plus-square"></i> Add</a>
                         </div>
@@ -98,13 +98,13 @@
                             </div>
                             <div class="col-sm-2" style="margin-top: 25px;">
                                 <div class="form-group">
-                                    <input id="std_username" class="form-control" name="std_username" placeholder="Enter Cadet Number" type="text">
+                                    <input id="std_username" class="form-control" name="std_username" placeholder="Enter Student Number" type="text">
                                     <div class="help-block"></div>
                                 </div>
                             </div>
                             <div class="col-sm-1" style="margin-top: 25px;">
                                 <div class="form-group">
-                                    <input id="gr_no" class="form-control" name="gr_no" placeholder="Enter Cadet Roll" type="text">
+                                    <input id="gr_no" class="form-control" name="gr_no" placeholder="Enter Student Roll" type="text">
                                     <div class="help-block"></div>
                                 </div>
                             </div>

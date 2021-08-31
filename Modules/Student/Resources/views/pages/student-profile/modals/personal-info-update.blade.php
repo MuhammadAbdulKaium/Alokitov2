@@ -12,9 +12,9 @@
       <div class="row">
          <div class="col-sm-4">
             <div class="form-group {{ $errors->has('type') ? ' has-error' : '' }}">
-               <label class="control-label" for="type">Cadet Type</label>
+               <label class="control-label" for="type">Student Type</label>
                <select id="type" class="form-control" name="type">
-                  <option value="">--- Select Cadet Type ---</option>
+                  <option value="">--- Select Student Type ---</option>
                   <option value="2" @if($personalInfo->type =='1') selected="selected" @endif>Pre Admission</option>
                   <option value="1" @if($personalInfo->type =='2') selected="selected" @endif>Regular</option>
                </select>
@@ -27,10 +27,10 @@
          </div>
          <div class="col-sm-4">
             <div class="form-group {{ $errors->has('title') ? ' has-error' : '' }}">
-               <label class="control-label" for="title">Cadet Title</label>
+               <label class="control-label" for="title">Student Title</label>
                <select id="title" class="form-control" name="title">
-                  <option value="">--- Select Cadet Title ---</option>
-                  <option value="Cadet" @if($personalInfo->title=='Cadet') selected="selected" @endif>Cadet</option>
+                  <option value="">--- Select Student Title ---</option>
+                  <option value="Cadet" @if($personalInfo->title=='Cadet') selected="selected" @endif>Student</option>
                   <option value="FM" @if($personalInfo->title=='FM') selected="selected" @endif>FM</option>
                   <option value="Mr." @if($personalInfo->title =='Mr.') selected="selected" @endif>Mr.</option>
                   <option value="Mrs." @if($personalInfo->title =='Mrs.') selected="selected" @endif>Mrs.</option>
@@ -95,13 +95,13 @@
 
          <div class="col-sm-8">
             <div class="form-group">
-               <label class="control-label" for="">ক্যাডেটের পূর্ণ নামঃ </label>
+               <label class="control-label" for="">ছাত্রের পূর্ণ নামঃ </label>
                <input type="text" id="bn_fullname" class="form-control" name="bn_fullname" value="{{$personalInfo->bn_fullname}}">
             </div>
          </div>
          <div class="col-sm-4">
             <div class="form-group">
-               <label class="control-label" for="">Cadet Number* </label>
+               <label class="control-label" for="">Student Number* </label>
                <input type="text" id="email" class="form-control" name="email" value="{{$personalInfo->email}}" required>
             </div>
          </div>

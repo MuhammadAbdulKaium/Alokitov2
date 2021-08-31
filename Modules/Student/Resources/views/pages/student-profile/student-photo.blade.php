@@ -20,7 +20,7 @@
                   <div class="card with-border">
                      <img class="card-img-top" src="{{URL::asset('assets/users/images/'.$photo->image)}}" alt="Card image cap" width="150">
                      <div class="card-body">
-                        <h5 class="card-title"><b>Cadet Number: {{$photo->cadet_no}}</b></h5>
+                        <h5 class="card-title"><b>Student Number: {{$photo->cadet_no}}</b></h5>
                         <h5 class="card-title"><b>Class: {{$photo->batch()->batch_name}}</b></h5>
                         <h5 class="card-title"><b>Form: {{$photo->section()->section_name}}</b></h5>
                         <h5 class="card-title"><b>Academic Year: {{$photo->year()->year_name}}</b></h5>

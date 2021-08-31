@@ -10,7 +10,7 @@
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-            <li><a href="/">Cadets</a></li>
+            <li><a href="/">Students</a></li>
             <li>SOP Setup</li>
             <li class="active">Club Setup</li>
         </ul>
@@ -195,7 +195,7 @@
             <div class="col-sm-8">
                 <div class="box box-solid">
                     <div class="box-header">
-                        <h3 class="box-title" style="line-height: 40px"><i class="fa fa-search"></i> Associated Cadet
+                        <h3 class="box-title" style="line-height: 40px"><i class="fa fa-search"></i> Associated Student
                             List </h3>
                     </div>
                     <div class="box-body">
@@ -253,7 +253,7 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-7">
-                                            <label for="">Cadets</label>
+                                            <label for="">Students</label>
                                             <select name="cadets[]" id="select-cadets" class="form-control" multiple>
                                                 <option value="">-- Select --</option>
                                                 @foreach ($students as $student)

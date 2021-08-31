@@ -15,11 +15,11 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                <i class="fa fa-th-list"></i> Cadet Factor Entries
+                <i class="fa fa-th-list"></i> Student Factor Entries
             </h1>
             <ul class="breadcrumb">
                 <li><a href="{{URL::to('/home')}}"><i class="fa fa-home"></i>Home</a></li>
-                <li class="active">Cadet Factor Entries</li>
+                <li class="active">Student Factor Entries</li>
             </ul>
         </section>
         <section class="content">
@@ -129,7 +129,7 @@
                             </div>
                             <div class="col-sm-2">
                                 <div class="form-group">
-                                    <label class="control-label" for="section">Cadet Number & Name</label>
+                                    <label class="control-label" for="section">Student Number & Name</label>
                                     <select id="section" class="form-control academicSection" name="section">
                                         <option value="" selected>--- Select Section ---</option>
 
@@ -157,8 +157,8 @@
                     <tr>
                         <th>SL</th>
                         <th>Photo</th>
-                        <th>Cadet Number</th>
-                        <th>Cadet Name</th>
+                        <th>Student Number</th>
+                        <th>Student Name</th>
                         <th>Admission Year</th>
                         <th>Academic Year</th>
                         <th>Division</th>

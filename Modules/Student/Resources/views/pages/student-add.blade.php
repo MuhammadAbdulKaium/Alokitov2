@@ -23,13 +23,13 @@
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>
-				<i class="fa fa-plus-square"></i> Create <small> New Cadet </small>
+				<i class="fa fa-plus-square"></i> Create <small> New Student </small>
 			</h1>
 			<ul class="breadcrumb">
 				<li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-				<li><a href="/student">Cadet</a></li>
-				<li><a href="/student/manage/profile">Manage Cadet</a></li>
-				<li class="active">Create New Cadet</li>
+				<li><a href="/student">Student</a></li>
+				<li><a href="/student/manage/profile">Manage Student</a></li>
+				<li class="active">Create New Student</li>
 			</ul>
 		</section>
 		<section class="content">
@@ -55,10 +55,10 @@
 
 							<div class="col-sm-3">
 								<div class="form-group {{ $errors->has('title') ? ' has-error' : '' }}">
-									<label class="control-label" for="title">Cadet Title</label>
+									<label class="control-label" for="title">Student Title</label>
 									<select id="title" class="form-control" name="title">
-										<option value="">--- Select Cadet Title ---</option>
-										<option value="Cadet" @if(old('title')=='Cadet') selected="selected" @endif>Cadet</option>
+										<option value="">--- Select Student Title ---</option>
+										<option value="Cadet" @if(old('title')=='Cadet') selected="selected" @endif>Student</option>
 										<option value="FM" @if(old('title')=='FM') selected="selected" @endif>FM</option>
 										<option value="Mr." @if(old('title')=='Mr.') selected="selected" @endif>Mr.</option>
 										<option value="Mrs." @if(old('title')=='Mrs.') selected="selected" @endif>Mrs.</option>
@@ -96,9 +96,9 @@
 							</div>
 							<div class="col-sm-3">
 								<div class="form-group {{ $errors->has('type') ? ' has-error' : '' }}">
-									<label class="control-label" for="type">Cadet Type</label>
+									<label class="control-label" for="type">Student Type</label>
 									<select id="type" class="form-control" name="type">
-										<option value="">--- Select Cadet Type ---</option>
+										<option value="">--- Select Student Type ---</option>
 										<option value="2">Pre Admission</option>
 										<option value="1">Regular</option>
 									</select>
@@ -141,7 +141,7 @@
 
 							<div class="col-sm-3">
 								<div class="form-group {{ $errors->has('email') ? ' has-error' : '' }}">
-									<label class="control-label" for="email">Cadet Number <span class="required">*</span></label>
+									<label class="control-label" for="email">Student Number <span class="required">*</span></label>
 									<input type="text" id="email" class="form-control" name="email" maxlength="60" value="{{old('email')}}" required>
 									<div class="help-block">
 										@if ($errors->has('email'))
@@ -470,7 +470,7 @@
 
 						<h2 class="page-header edusec-page-header-1">
 							<input  id="waiverCheckBoxSeclectHidden" name="waivercheck" type="hidden" value="0">
-							<i class="fa fa-info-circle"></i> Cadet Waiver <input id="waiverCheckBoxSeclect" name="waivercheck" type="checkbox" value="1">
+							<i class="fa fa-info-circle"></i> Student Waiver <input id="waiverCheckBoxSeclect" name="waivercheck" type="checkbox" value="1">
 						</h2>
 
 					<div class="waiverSection">

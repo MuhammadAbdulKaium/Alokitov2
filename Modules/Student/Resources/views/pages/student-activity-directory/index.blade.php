@@ -13,12 +13,12 @@
 <div class="content-wrapper">
     <section class="content-header">
         <h1>
-            <i class="fa fa-th-list"></i> Cadet Activity Directory</small>
+            <i class="fa fa-th-list"></i> Student Activity Directory</small>
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-            <li><a href="/student/default/index">Cadet</a></li>
-            <li class="active">Cadet Activity Directory</li>
+            <li><a href="/student/default/index">Student</a></li>
+            <li class="active">Student Activity Directory</li>
         </ul>
     </section>
     <section class="content">
@@ -135,7 +135,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Category</th>
-                                    <th>Cadet/HR/FM</th>
+                                    <th>Student/HR/FM</th>
                                     <th>Remarks</th>
                                     <th>Action</th>
                                 </tr>

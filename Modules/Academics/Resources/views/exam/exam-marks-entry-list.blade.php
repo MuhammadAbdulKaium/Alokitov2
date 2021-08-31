@@ -17,8 +17,8 @@
                         <thead>
                         <tr>
                             <th class="text-center">#</th>
-                            <th class="text-center"><a data-sort="sub_master_name">Cadet Name</a></th>
-                            <th class="text-center"><a data-sort="sub_master_name">Cadet Number</a></th>
+                            <th class="text-center"><a data-sort="sub_master_name">Student Name</a></th>
+                            <th class="text-center"><a data-sort="sub_master_name">Student Number</a></th>
                             <th class="text-center"><a data-sort="sub_master_name">Full Marks</a></th>
                             <th class="text-center"><a data-sort="sub_master_name">Pass Marks</a></th>
                             <th class="text-center"><a data-sort="sub_master_name">Conversion</a></th>
