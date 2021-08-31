@@ -53,7 +53,7 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Cadet Number</th>
+                                    <th>Student Number</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>BN Name</th>
@@ -73,6 +73,7 @@
                                     <th>Tuition Fees</th>
                                     <th>Academic Level</th>
                                     <th>Class</th>
+                                    <th>Roll</th>
                                     <th>Group</th>
                                     <th>Form</th>
                                     <th>Batch No</th>
@@ -100,7 +101,7 @@
                                                 <td class="text-center">{{$count}}</td>
                                                 <td class="text-center">
                                                     <div class="form-group">
-                                                        <input class="form-control text-center" type="text" name="username[]" value="{{$student['cadet_number']}}" required/>
+                                                       <input class="form-control text-center" type="text" name="username[]" value="{{$student['student_id']}}" required/>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
@@ -168,6 +169,9 @@
                                                 </td>
                                                 <td>
                                                     <input type="text" name="class[]" value="{{$student['class']}}" class="form-control"/>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="roll[]" value="{{$student['roll']}}" class="form-control"/>
                                                 </td>
                                                 <td>
                                                     <input type="text" name="group_science_humanities[]" value="{{$student['group_science_humanities']}}" class="form-control">
