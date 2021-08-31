@@ -139,7 +139,7 @@ class OnlineAcademicsController extends Controller
 
                 $subjectList    = $this->subject->get();
 
-                $topic_list     = $this->OnlineClassTopic->get();
+                $topic_list     = $this->OnlineClassTopic->where($qry)->get();
 
                 $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
 
@@ -706,7 +706,7 @@ class OnlineAcademicsController extends Controller
     public function ClassHistory(Request $request)
     {
 
-        //dd($request->all());
+        // dd($request->all());
 
         $timestamp = strtotime($request->input('start_date'));
         $day1 = date('l', $timestamp);
@@ -851,12 +851,13 @@ class OnlineAcademicsController extends Controller
 
         // all timetables
         $allTimetables = $this->timeTable->where([
-            'batch' => $batch,
-            'section' => $section,
-            'shift' => $shift,
-            //'academic_year'=>$academicYear,
-            'campus' => $campus_id,
-            'institute' => $institute_id
+            ['batch', $batch],
+            ['section', $section],
+            ['shift', $shift],
+            ['subject', 'LIKE', '%' . $subject . '%'],
+            ['teacher', 'LIKE', '%' . $teacher_id . '%'],
+            ['campus', $campus_id],
+            ['institute', $institute_id],
         ])->get();
 
         // batch section assigned period id

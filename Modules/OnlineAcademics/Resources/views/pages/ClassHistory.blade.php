@@ -104,11 +104,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-1">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="control-label label-margin50">Teacher</label>
+                                <label class="control-label label-margin30">Teacher</label>
                                 <select id="teacher_id" class="form-control academicTeacher" name="teacher_id">
                                     <option value="">--Select Teacher--</option>
                                     @foreach($empList as $emp)
@@ -118,7 +118,7 @@
                                 <div class="help-block"></div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        {{-- <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label label-margin50">Topic</label>
                                 <select id="subject_class_topic" class="form-control academicSubjectTopic" name="subject_class_topic">
@@ -126,10 +126,10 @@
                                 </select>
                                 <div class="help-block"></div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-3">
                     <div class="row" style="margin: 0; padding: 0;">
                         <div class="col-sm-12 label-margin50">
                             <span><strong>Online Class Date</strong></span>
@@ -138,20 +138,20 @@
                     <div class="row" style="margin: 0; padding: 0;">     
                         <div class="col-sm-6" style="margin: 0; padding: 0;">
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
-                                  <input type="text" class="form-control sdate" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date">
+                                  <input type="text" class="form-control sdate" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date" disabled>
                                 <div class="help-block"></div>
                             </div>  
                         </div>
                         <div class="col-sm-6" style="margin: 0;">
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
-                                <input type="text" value="{{ date('m/d/Y') }}" class="form-control sdate" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date">
+                                <input type="text" value="{{ date('m/d/Y') }}" class="form-control sdate" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date" disabled>
                                 <div class="help-block"></div>
                             </div>  
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-1" >
+                <div class="col-sm-2" >
                     <div class="input-group">
                         <label class="control-label">Status</label>
                         <select id="status" class="form-control" name="status">
@@ -163,7 +163,7 @@
                             <option value="5">Class Time Over</option>
                         </select>
                         <span class="input-group-btn">
-                            <button id="class_schedule_list_search_btn" class="btn search-button" type="submit">
+                            <button id="class_schedule_list_search_btn" class="btn search-button" style="margin-top: 20px" type="submit">
                                 <i class="fa fa-search font-size22"></i>
                             </button>
                         </span>
