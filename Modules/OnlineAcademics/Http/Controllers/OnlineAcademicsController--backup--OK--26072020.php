@@ -773,6 +773,7 @@ class OnlineAcademicsController extends Controller
             ->where('id', $request->input('subject_id'))
             ->value('subject_id');
 
+
         $class_schedule_list = $this->OnlineClassSchedule
             ->when($institute_id, function ($query, $institute_id) {
                 return $query->where('institute_id', $institute_id);
@@ -853,8 +854,8 @@ class OnlineAcademicsController extends Controller
             ['batch', $batch],
             ['section', $section],
             ['shift', $shift],
-            ['subject', 'LIKE', '%' . $subject . '%'],
-            ['teacher', 'LIKE', '%' . $teacher_id . '%'],
+            ['subject', 'LIKE', "%$subject%"],
+            ['teacher', 'LIKE', "%$teacher_id%"],
             ['campus', $campus_id],
             ['institute', $institute_id],
         ])->get();

@@ -147,12 +147,13 @@
                             <td style="text-align: center;">
                                 @if(isset($scheduledData[$subjectProfile->id][14]))  
                                     @php
-                                        $presentStds = $scheduledData[$subjectProfile->id][14]->where('attendance_status', 1);
+                                        $presentStds = $scheduledData[$subjectProfile->id][14]->where('attendance_status', 1)->sortByDesc('updated_at');
                                     @endphp  
                                     <div class="present-students">
                                         <span class="no-of-present-students">{{ count($presentStds) }}</span>
-                                        <div class="present-students-details">
-                                            @if (count($presentStds)>0)
+                                        @if (count($presentStds)>0)
+                                            <div class="present-students-details">
+                                                <h5><b>Present Students</b></h5>
                                                 <table>
                                                     <thead>
                                                         <tr>
@@ -166,12 +167,13 @@
                                                             <tr>
                                                                 <td>{{ $loop->index+1 }}</td>
                                                                 <td>{{ $attendance->student->first_name }} {{ $attendance->student->last_name }}</td>
+                                                                <td>{{ Carbon\Carbon::parse($attendance->updated_at)->format('g:i:s a') }}</td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
                                                 </table>
-                                            @endif
-                                        </div>
+                                            </div>
+                                        @endif
                                     </div>
                                     
                                 @else
@@ -575,5 +577,15 @@
 
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
+        $(document).on('mouseover', '.no-of-present-students', function(){
+            var studentDetails = $(this).parent().find('.present-students-details');
+            
+            studentDetails.css('display', 'block');
+        });
+        $(document).on('mouseout', '.no-of-present-students', function(){
+            var studentDetails = $(this).parent().find('.present-students-details');
+            
+            studentDetails.css('display', 'none');
+        });
     });
 </script>

@@ -10,8 +10,27 @@
 .redcolor{
     color: red;
 }
+
+.present-students{
+    position: relative;
+}
 .present-students-details{
-    background: yellowgreen;
+    background: lightsteelblue;
+    padding: 6px;
+    border-radius: 3px;
+    position: absolute;
+    right: 0;
+    min-width: 220px;
+    display: none;
+}
+.present-students-details table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.present-students-details table,.present-students-details td,.present-students-details th {
+  border: 1px solid black;
+  padding: 1px 2px;
 }
 </style>
 @role(['super-admin','admin'])
@@ -141,15 +160,13 @@
                     <div class="row" style="margin: 0; padding: 0;">     
                         <div class="col-sm-6" style="margin: 0; padding: 0;">
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
-                                  {{-- <input type="text" class="form-control sdate" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date"> --}}
-                                  <input type="text" class="form-control" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date">
+                                  <input type="text" class="form-control sdate" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date">
                                 <div class="help-block"></div>
                             </div>  
                         </div>
                         <div class="col-sm-6" style="margin: 0;">
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
-                                {{-- <input type="text" value="{{ date('m/d/Y') }}" class="form-control sdate" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date"> --}}
-                                <input type="text" value="{{ date('m/d/Y') }}" class="form-control" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date">
+                                <input type="text" value="{{ date('m/d/Y') }}" class="form-control sdate" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date">
                                 <div class="help-block"></div>
                             </div>  
                         </div>
