@@ -4,7 +4,7 @@
 	<div class="box box-solid">
 		<div class="et">
 			<div class="box-header with-border">
-				<h3 class="box-title"><i class="fa fa-search"></i> View Cadet List</h3>
+				<h3 class="box-title"><i class="fa fa-search"></i> View Student List</h3>
 			</div>
 		</div>
 		<div class="card">
@@ -18,7 +18,7 @@
 						<tr>
 							<th>SL</th>
 							<th>Photo</th>
-							<th>Cadet Number</th>
+							<th>Student Number</th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Form</th>

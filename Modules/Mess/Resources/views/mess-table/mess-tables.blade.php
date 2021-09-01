@@ -33,7 +33,7 @@
                                 if ($previousSeat) {
                                     if ($previousSeat->person_type == 1) {
                                         $person = $students->firstWhere('std_id', $previousSeat->person_id);
-                                        $personTxt = "Cadet: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
+                                        $personTxt = "Student: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
                                     }elseif ($previousSeat->person_type == 2) {
                                         $person = $employees->firstWhere('id', $previousSeat->person_id);
                                         $personTxt = "Hr/Fm: ".$person->first_name." ".$person->last_name." (ID: ".$person->id.")";
@@ -57,7 +57,7 @@
                                 if ($previousSeat) {
                                     if ($previousSeat->person_type == 1) {
                                         $person = $students->firstWhere('std_id', $previousSeat->person_id);
-                                        $personTxt = "Cadet: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
+                                        $personTxt = "Student: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
                                     }elseif ($previousSeat->person_type == 2) {
                                         $person = $employees->firstWhere('id', $previousSeat->person_id);
                                         $personTxt = "Hr/Fm: ".$person->first_name." ".$person->last_name." (ID: ".$person->id.")";
@@ -77,7 +77,7 @@
                                 if ($previousSeat) {
                                     if ($previousSeat->person_type == 1) {
                                         $person = $students->firstWhere('std_id', $previousSeat->person_id);
-                                        $personTxt = "Cadet: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
+                                        $personTxt = "Student: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
                                     }elseif ($previousSeat->person_type == 2) {
                                         $person = $employees->firstWhere('id', $previousSeat->person_id);
                                         $personTxt = "Hr/Fm: ".$person->first_name." ".$person->last_name." (ID: ".$person->id.")";
@@ -101,7 +101,7 @@
                                 if ($previousSeat) {
                                     if ($previousSeat->person_type == 1) {
                                         $person = $students->firstWhere('std_id', $previousSeat->person_id);
-                                        $personTxt = "Cadet: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
+                                        $personTxt = "Student: ".$person->first_name." ".$person->last_name." (ID: ".$person->std_id.")";
                                     }elseif ($previousSeat->person_type == 2) {
                                         $person = $employees->firstWhere('id', $previousSeat->person_id);
                                         $personTxt = "Hr/Fm: ".$person->first_name." ".$person->last_name." (ID: ".$person->id.")";

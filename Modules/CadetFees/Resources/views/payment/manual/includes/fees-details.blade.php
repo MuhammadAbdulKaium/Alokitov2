@@ -2,7 +2,7 @@
     <div class="box box-solid">
         <div class="et">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-search"></i> View Cadet Info</h3>
+                <h3 class="box-title"><i class="fa fa-search"></i> View Student Info</h3>
             </div>
         </div>
 
@@ -54,7 +54,7 @@
                     </tbody>
                 </table>
                 @else
-                <p>No Fees Generate for this cadet</p>
+                <p>No Fees Generate for this student</p>
             @endif
         </div>
         </div>

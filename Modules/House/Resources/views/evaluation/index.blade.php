@@ -38,7 +38,7 @@
             <div class="col-sm-12">
                 <div class="box box-solid">
                     <div class="box-header with-border">
-                        <h3 class="box-title" style="line-height: 40px"><i class="fa fa-eye"></i> Cadets Evaluation </h3>
+                        <h3 class="box-title" style="line-height: 40px"><i class="fa fa-eye"></i> Students Evaluation </h3>
                         <div class="box-tools">
                             <a class="btn btn-primary" href="{{url('/house/weightage-config')}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"><i class="fa fa-edit"></i> Weightage Config</a>
                         </div>

@@ -47,7 +47,7 @@
                                 <div class="col-sm-2">
                                     <select name="userType" id="select-user-type" class="form-control" required>
                                         <option value="">--Prescription For--</option>
-                                        <option value="1">Cadet</option>
+                                        <option value="1">Student</option>
                                         <option value="2">HR/FM</option>
                                     </select>
                                 </div>
@@ -89,7 +89,7 @@
                                     <tr>
                                         <td>{{ $loop->index+1 }}</td>
                                         @if ($prescription->patient_type == 1)
-                                            <td>Cadet</td>
+                                            <td>Student</td>
                                             <td>{{ $prescription->cadet->first_name }} {{ $prescription->cadet->last_name }}</td>
                                             <td>{{ $prescription->cadet->id }}</td>
                                         @elseif($prescription->patient_type == 2) 
@@ -182,7 +182,7 @@
             
                 success: function (data) {
                     if (userType == 1) {
-                        txt = '<option value="">--Cadet--</option>';
+                        txt = '<option value="">--Student--</option>';
                     } else if(userType == 2){
                         txt = '<option value="">--HR/FM--</option>';
                     }else {

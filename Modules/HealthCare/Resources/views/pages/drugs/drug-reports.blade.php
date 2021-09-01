@@ -62,7 +62,7 @@
                                         <td>{{ $drugReport->drug->product_name }}</td>
                                         <td>{{ $drugReport->quantity }}</td>
                                         @if ($drugReport->patient_type == 1)
-                                            <td>Cadet</td>
+                                            <td>Student</td>
                                             <td>{{ $drugReport->cadet->first_name }} {{ $drugReport->cadet->last_name }}</td>
                                             <td>{{ $drugReport->cadet->id }}</td>
                                         @elseif($drugReport->patient_type == 2) 

@@ -13,11 +13,11 @@
 <div class="content-wrapper">
     <section class="content-header">
         <h1>
-            <i class="fa fa-th-list"></i> Cadet Mess Management |<small>Food Menu Schedule</small>
+            <i class="fa fa-th-list"></i> Student Mess Management |<small>Food Menu Schedule</small>
         </h1>
         <ul class="breadcrumb">
             <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
-            <li><a href="/academics/default/index">Cadet Mess Management</a></li>
+            <li><a href="/academics/default/index">Student Mess Management</a></li>
             <li class="active">Food Menu Schedule</li>
         </ul>
     </section>

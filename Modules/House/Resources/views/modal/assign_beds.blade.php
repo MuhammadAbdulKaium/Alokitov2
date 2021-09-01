@@ -5,7 +5,7 @@
 </div>
 <div class="modal-body">
     <form class="assign-form">
-        <h4>Assign Cadet to Bed <b class="heading-bed-no"></b></h4>
+        <h4>Assign Student to Bed <b class="heading-bed-no"></b></h4>
         <input name="bed" class="bed-field" type="hidden">
         <div class="row">
             <div class="col-sm-3">
@@ -23,7 +23,7 @@
             </div>
             <div class="col-sm-3">
                 <select name="" id="" class="form-control select-cadet">
-                    <option value="">--Cadet--</option>
+                    <option value="">--Student--</option>
                 </select>
             </div>
             <div class="col-sm-2">
@@ -71,7 +71,7 @@
             $('.bed-field').val(bedNo);
             $('.select-academic-level').val('');
             $('.select-class').html('<option value="">--Classes with Form--</option>');
-            $('.select-cadet').html('<option value="">--Cadet--</option>');
+            $('.select-cadet').html('<option value="">--Student--</option>');
 
             $('.assign-form').css('display', 'block');
             $('.heading-bed-no').text(bedNo);
@@ -155,7 +155,7 @@
                             bedRmvBtn.css('display', 'inline-block');
                         } else{
                             stdInfoContainer.html('<div style="line-height: 80px">Blank</div>');
-                            swal('Error!', 'Error assigning cadet.', 'error');
+                            swal('Error!', 'Error assigning Student.', 'error');
                         }   
                         
                         $('.assign-form').css('display', 'none');
@@ -194,7 +194,7 @@
 
                     $('.select-class').empty();
                     $('.select-class').append(txt);
-                    $('.select-cadet').html('<option>--Cadet--</option>');
+                    $('.select-cadet').html('<option>--Student--</option>');
                 },
 
                 error: function (error) {}
@@ -217,7 +217,7 @@
                 datatype: 'application/json',
 
                 success: function (data) {
-                    var txt = '<option value="">--Cadet--</option>';
+                    var txt = '<option value="">--Student--</option>';
                     data.forEach(element => {
                         txt += '<option value="' + element.std_id + '">' + element
                             .first_name + ' '+element.last_name+'</option>';

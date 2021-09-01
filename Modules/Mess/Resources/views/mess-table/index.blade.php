@@ -70,7 +70,7 @@
                             <div class="col-sm-3">
                                 <select name="" class="form-control person-type-search-field">
                                     <option value="">--Person Type--</option>
-                                    <option value="1">Cadet</option>
+                                    <option value="1">Student</option>
                                     <option value="2">HR/FM</option>
                                 </select>
                             </div>
@@ -127,7 +127,7 @@
                         <div class="col-sm-5">
                             <select name="" class="form-control person-type-field">
                                 <option value="">--Person Type--</option>
-                                <option value="1">Cadet</option>
+                                <option value="1">Student</option>
                                 <option value="2">HR/FM</option>
                             </select>
                         </div>

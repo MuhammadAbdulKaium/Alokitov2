@@ -24,7 +24,7 @@
                             <td>{{ $messTableHistory->created_at }}</td>
                             <td>
                                 @if ($messTableHistory->person_type == 1)
-                                    Cadet {{ $messTableHistory->cadet->first_name }} {{ $messTableHistory->cadet->last_name }}
+                                Student {{ $messTableHistory->cadet->first_name }} {{ $messTableHistory->cadet->last_name }}
                                 @elseif ($messTableHistory->person_type == 2)
                                     Employee {{ $messTableHistory->employee->first_name }} {{ $messTableHistory->employee->last_name }}
                                 @endif

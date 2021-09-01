@@ -15,7 +15,7 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                <i class="fa fa-th-list"></i> Fees Generate | <small>Cadet</small>
+                <i class="fa fa-th-list"></i> Fees Generate | <small>Student</small>
             </h1>
             <ul class="breadcrumb">
                 <li><a href="{{URL::to('/home')}}"><i class="fa fa-home"></i>Home</a></li>
@@ -36,7 +36,7 @@
             <div class="box box-solid">
                 <div class="et">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-search"></i> Search Cadet</h3>
+                        <h3 class="box-title"><i class="fa fa-search"></i> Search Student</h3>
                         <div class="box-tools">
                             <a class="btn btn-success btn-sm" href="/student/profile/create"><i class="fa fa-plus-square"></i> Add</a>
                         </div>
