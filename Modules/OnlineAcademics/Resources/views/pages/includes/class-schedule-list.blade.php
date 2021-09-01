@@ -1,4 +1,3 @@
-o
 <!-- DataTables -->
 <link href="{{ URL::asset('css/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
 
@@ -31,9 +30,9 @@ o
                         <th><a data-sort="sub_master_alias">Teacher</a></th>
                         <th><a data-sort="sub_master_alias">Duration(Minutes)</a></th>
                         <th><a data-sort="sub_master_alias">Total</a></th>
-                        {{-- <th><a data-sort="sub_master_alias">P</a></th>
-                            <th><a data-sort="sub_master_alias redcolor">A</a></th>
-                            <th><a data-sort="sub_master_alias redcolor">L</a></th> --}}
+                        <th><a data-sort="sub_master_alias">P</a></th>
+                        {{-- <th><a data-sort="sub_master_alias redcolor">A</a></th>
+                        <th><a data-sort="sub_master_alias redcolor">L</a></th> --}}
                         <th><a data-sort="sub_master_alias">Remarks</a></th>
                         <th><a data-sort="sub_master_alias">Status</a></th>
                     </tr>
@@ -45,8 +44,8 @@ o
                     $currentDate = date('m-d-Y');
                     @endphp
 
-                    @for($i=1;$i<=count($days);$i++) @if(isset($total_Day_Date)) @foreach($total_Day_Date as $key=>
-                        $date)
+                    @for($i=1;$i<=count($days);$i++) @if(isset($total_Day_Date)) 
+                    @foreach($total_Day_Date as $key=>$date)
                         @if($days[$i] == $key)
                         @foreach($allClassPeriods as $period)
                         @php
@@ -145,14 +144,41 @@ o
                                 @endif
                             </td>
                             <td style="text-align: center;">{{ $studentList }}</td>
-                            {{-- <td style="text-align: center;">
-                                            @if(isset($scheduledData[$subjectProfile->id][14]))    
-                                                {{ $scheduledData[$subjectProfile->id][14] }}
-                            @else
-                            {{ '--' }}
-                            @endif
+                            <td style="text-align: center;">
+                                @if(isset($scheduledData[$subjectProfile->id][14]))  
+                                    @php
+                                        $presentStds = $scheduledData[$subjectProfile->id][14]->where('attendance_status', 1);
+                                    @endphp  
+                                    <div class="present-students">
+                                        <span class="no-of-present-students">{{ count($presentStds) }}</span>
+                                        <div class="present-students-details">
+                                            @if (count($presentStds)>0)
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>SL</th>
+                                                            <th>Name</th>
+                                                            <th>Time</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($presentStds as $attendance)
+                                                            <tr>
+                                                                <td>{{ $loop->index+1 }}</td>
+                                                                <td>{{ $attendance->student->first_name }} {{ $attendance->student->last_name }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                @else
+                                    {{ '--' }}
+                                @endif
                             </td>
-                            <td class="redcolor">
+                            {{-- <td class="redcolor">
                                 @if(isset($scheduledData[$subjectProfile->id][15]))
                                 {{ $scheduledData[$subjectProfile->id][15] }}
                                 @else

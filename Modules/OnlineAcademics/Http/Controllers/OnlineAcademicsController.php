@@ -1720,7 +1720,6 @@ class OnlineAcademicsController extends Controller
 
     public function onlineclass_condduct_std_teach(Request $request)
     {
-
         $scheduledId = $request->scheduleid;
         $class_scheduled_id = $request->class_scheduled_id;
         $class_status = $request->class_status;

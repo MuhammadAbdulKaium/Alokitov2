@@ -831,7 +831,7 @@ class OnlineAcademicsController extends Controller
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_teacher_remarks;
 
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_total_student;
-            $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_present;
+            $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->presentStudents;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_absent;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_leave;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_conduct_time;
@@ -843,7 +843,6 @@ class OnlineAcademicsController extends Controller
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_duration_time;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_scheduled_id;
         }
-
 
 
 
@@ -1594,9 +1593,6 @@ class OnlineAcademicsController extends Controller
 
     public function LiveClassScheduled($scheduledId)
     {
-
-
-
         $scheduledId = (isset($scheduledId) ? $scheduledId : "");
 
         $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->first();
@@ -1652,5 +1648,37 @@ class OnlineAcademicsController extends Controller
                 echo "Do Not Update ";
             }
         }
+    }
+
+    public function onlineclass_condduct_std_teach(Request $request)
+    {
+        $scheduledId = $request->scheduleid;
+        $class_scheduled_id = $request->class_scheduled_id;
+        $class_status = $request->class_status;
+        $personalInfo  = $this->studentInformation->where(['user_id' => Auth::user()->id])->first();
+
+        if ($class_status == 6) {
+
+            $ScheduledData = DB::table('online_attandences')
+                ->where(['online_class_id' => $scheduledId])
+                ->where(['std_id'         => $personalInfo->id])
+                ->update([
+                    'attendance_status' => 1,
+                    'updated_at' => date("Y-m-d H:i:s"),
+                ]);
+        }
+
+
+        $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $class_scheduled_id])->first();
+
+        $studentList = $this->studentProfileView
+            ->join('online_attandences', 'student_manage_view.std_id', '=', 'online_attandences.std_id')
+            ->where('batch', $ScheduledData->academic_class_id)
+            ->where('online_class_id', $ScheduledData->id)
+            ->where('section', $ScheduledData->academic_section_id)
+            ->where('academic_level', $ScheduledData->academic_level_id)
+            ->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')
+            ->get();
+        return view('onlineacademics::pages.updatestd_status', compact('studentList'));
     }
 }
