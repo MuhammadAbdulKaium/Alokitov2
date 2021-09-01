@@ -31,13 +31,13 @@ class AcademicsYearController extends Controller
     {
         $pageTitle = "Academic Year Information";
         $insertOrEdit = 'insert'; //To identify insert
-        $data=$this->getAll();
-        return view('academics::academicsyear.index', compact('data','pageTitle','insertOrEdit') );
+        $data = $this->getAll();
+        return view('academics::academicsyear.index', compact('data', 'pageTitle', 'insertOrEdit'));
     }
 
     public function getAll()
     {
-        return $this->academicsYear->where(['institute_id'=>$this->academicHelper->getInstitute(), 'campus_id'=>$this->academicHelper->getCampus()])->get();
+        return $this->academicsYear->where(['institute_id' => $this->academicHelper->getInstitute(), 'campus_id' => $this->academicHelper->getCampus()])->get();
     }
 
     /**
@@ -49,7 +49,7 @@ class AcademicsYearController extends Controller
         // validator
         $validator = Validator::make($request->all(), ['year_name' => 'required|max:100']);
         // validator checking
-        if($validator->passes()) {
+        if ($validator->passes()) {
             // institute details
             $campus = $this->academicHelper->getCampus();
             $institute = $this->academicHelper->getInstitute();
@@ -61,7 +61,7 @@ class AcademicsYearController extends Controller
             $yearProfile->year_name = $request->input('year_name');
             $yearProfile->start_date = date('Y-m-d', strtotime($request->input('start_date')));
             $yearProfile->end_date = date('Y-m-d', strtotime($request->input('end_date')));
-            $yearProfile->status = $activeAcademicYearList>0?0:$request->input('status', 0);
+            $yearProfile->status = $activeAcademicYearList > 0 ? 0 : $request->input('status', 0);
             $yearProfile->campus_id = $campus;
             $yearProfile->institute_id = $institute;
             //save and checking
@@ -71,11 +71,10 @@ class AcademicsYearController extends Controller
             } else {
                 // failed msg
                 Session::flash('message', 'Failed! Data has not been saved successfully.');
-
             }
             // return back
             return redirect()->back();
-        }else {
+        } else {
             return redirect()->back()->withErrors($validator)->withInput();
         }
     }
@@ -88,10 +87,10 @@ class AcademicsYearController extends Controller
     public function show($id)
     {
         $pageTitle = 'Academic Year Informations';
-        $academicYear= new AcademicsYear();
+        $academicYear = new AcademicsYear();
         $academicYear = $academicYear->where('id', $id)->get();
         $insertOrEdit = 'edit';
-        return view('academics::academicsyear.view',compact('insertOrEdit','editdata','academicYear','pageTitle'));
+        return view('academics::academicsyear.view', compact('insertOrEdit', 'academicYear', 'pageTitle'));
     }
 
     /**
@@ -103,10 +102,10 @@ class AcademicsYearController extends Controller
 
         $data = new AcademicsYear();
         $editdata = $data->where('id', $id)->get();
-        $data=$this->getAll();
+        $data = $this->getAll();
         $insertOrEdit = 'edit';
 
-        return view('academics::academicsyear.index',compact('insertOrEdit','editdata','data'));
+        return view('academics::academicsyear.index', compact('insertOrEdit', 'editdata', 'data'));
     }
 
     /**
@@ -119,7 +118,7 @@ class AcademicsYearController extends Controller
 
         $validator = Validator::make($request->all(), ['year_name' => 'required']);
         // checking validator
-        if($validator->passes()) {
+        if ($validator->passes()) {
             // request details
             $status = $request->input('status');
             // institute details
@@ -134,11 +133,11 @@ class AcademicsYearController extends Controller
             $yearProfile->start_date = date('Y-m-d', strtotime($request->input('start_date')));
             $yearProfile->end_date = date('Y-m-d', strtotime($request->input('end_date')));
             // checking status
-            if($status==1 AND $activeAcademicYearList->count()>0){
+            if ($status == 1 and $activeAcademicYearList->count() > 0) {
                 // $activeAcademicYearList looping
-                foreach ($activeAcademicYearList as $year){
+                foreach ($activeAcademicYearList as $year) {
                     // checking
-                    if($year->id==$id) continue;
+                    if ($year->id == $id) continue;
                     $year->status = 0;
                     $year->save();
                 }
@@ -152,15 +151,11 @@ class AcademicsYearController extends Controller
             } else {
                 // failed msg
                 Session::flash('message', 'Failed! Data has not been saved successfully.');
-
             }
             // return back
             return redirect('/academics/academic-year');
-        }
-        else
-        {
+        } else {
             return redirect()->back()->withErrors($validator)->withInput();
-
         }
     }
 
@@ -170,17 +165,17 @@ class AcademicsYearController extends Controller
         // find year profile
         $yearProfile = $this->academicsYear->find($id);
         // checking year profile
-        if($yearProfile->status==0){
+        if ($yearProfile->status == 0) {
 
             // delete and checking
-            if($yearProfile->delete()){
+            if ($yearProfile->delete()) {
                 // success msg
                 Session::flash('message', 'Success!Data has been deleted successfully.');
             } else {
                 // failed msg
                 Session::flash('message', 'Failed!Data has not been deleted successfully.');
             }
-        }else{
+        } else {
             // failed msg
             Session::flash('message', 'Unable to Delete Active Academic Year');
         }
@@ -192,8 +187,6 @@ class AcademicsYearController extends Controller
     public function getAcademicYearStatus($campus, $institute)
     {
         // get all active year list
-        return $this->academicsYear->where(['campus_id'=>$campus, 'institute_id'=>$institute, 'status'=>1])->get();
+        return $this->academicsYear->where(['campus_id' => $campus, 'institute_id' => $institute, 'status' => 1])->get();
     }
-
-
 }

@@ -35,39 +35,40 @@ class AcademicsLevelController extends Controller
 
         $pageTitle = "Academic level Information";
         $insertOrEdit = 'insert'; //To identify insert
-        $academicLevels=$this->getAll();
+        $academicLevels = $this->getAll();
         $academicYearData = $this->academicHelper->getAllAcademicYears();
         //  return 'hello';
 
-//        return ($academicYearData);
+        //        return ($academicYearData);
 
-        return view('academics::academicsLevel.index', compact('academicLevels','academicYearData','insertOrEdit','pageTitle'));
+        return view('academics::academicsLevel.index', compact('academicLevels', 'academicYearData', 'insertOrEdit', 'pageTitle'));
     }
 
     public function getAll()
     {
         return $academicLevels =  $this->academicsLevel->where([
-            'institute_id'=>$this->academicHelper->getInstitute(),
-            'campus_id'=>$this->academicHelper->getCampus(),
-//            'academics_year_id'=>$this->academicHelper->getAcademicYear()
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus(),
+            //            'academics_year_id'=>$this->academicHelper->getAcademicYear()
         ])->get();
         // return $data =AcademicsLevel::findOrfail(1)->year();
         // return $data =AcademicsLevel::where('id', 1)->with('academicsYear')->first();
     }
 
-    public function getLevel($id){
+    public function getLevel($id)
+    {
         // level profile
-//        $yearName = AcademicsLevel::where('id', $id)->with('year')->get();
+        //        $yearName = AcademicsLevel::where('id', $id)->with('year')->get();
 
         // level details
-//        $levelName = $levelProfile->level_name;
-//        $levelCode = $levelProfile->level_code;
-//        $levelYearId = $levelProfile->year_id;
+        //        $levelName = $levelProfile->level_name;
+        //        $levelCode = $levelProfile->level_code;
+        //        $levelYearId = $levelProfile->year_id;
 
         // years details
         // $yearProfile = AcademicsYear::FindOrFail($levelYearId);
 
-//         = $levelProfile;
+        //         = $levelProfile;
     }
 
     /**
@@ -84,7 +85,7 @@ class AcademicsLevelController extends Controller
             'is_active'         => 'required',
         ]);
         // checking validator pass or fail
-        if($validator->passes()) {
+        if ($validator->passes()) {
             // new academic level
             $data = new AcademicsLevel();
             // store requested profile name
@@ -96,14 +97,14 @@ class AcademicsLevelController extends Controller
             $data->campus_id = $this->academicHelper->getCampus();
             $data->institute_id = $this->academicHelper->getInstitute();
             // save new profile
-            if($data->save()) {
+            if ($data->save()) {
                 Session::flash('message', 'Success!Data has been saved successfully.');
             } else {
                 Session::flash('message', 'Success!Data has not been saved successfully.');
             }
             // return back
             return redirect()->back();
-        }else {
+        } else {
             return redirect()->back()->withErrors($validator)->withInput();
         }
     }
@@ -116,25 +117,25 @@ class AcademicsLevelController extends Controller
     public function show($id)
     {
         $pageTitle = 'Academic level Informations';
-//        $data = newAcademicLevel();
-//        $data = new AcademicsLevel();
-//        $data = $data->where('id', $id)->get();
-//        return $id;
-        $academicLevel=new AcademicsLevel();
-        $academicLevel=$academicLevel->where('id', $id)->get();
-////        findOrFail('id',$id);
-//        echo '<pre>';
-//        foreach($academicLevel as $value)
-//        {
-//            print_r($value);
-//        }
+        //        $data = newAcademicLevel();
+        //        $data = new AcademicsLevel();
+        //        $data = $data->where('id', $id)->get();
+        //        return $id;
+        $academicLevel = new AcademicsLevel();
+        $academicLevel = $academicLevel->where('id', $id)->get();
+        ////        findOrFail('id',$id);
+        //        echo '<pre>';
+        //        foreach($academicLevel as $value)
+        //        {
+        //            print_r($value);
+        //        }
         // return $academicLevel;
 
 
 
         //var_dump($academicLevel);
         $insertOrEdit = 'edit';
-        return view('academics::academicsLevel.view',compact('insertOrEdit','editdata','academicLevel','pageTitle'));
+        return view('academics::academicsLevel.view', compact('insertOrEdit', 'academicLevel', 'pageTitle'));
     }
 
     /**
@@ -150,11 +151,11 @@ class AcademicsLevelController extends Controller
         $editdata = $data->where('id', $id)->get();
         //$academicYears=AcademicsYear::all();
 
-        $academicLevels=$this->getAll();
+        $academicLevels = $this->getAll();
 
         $insertOrEdit = 'edit';
 
-        return view('academics::academicsLevel.index',compact('insertOrEdit','editdata','academicLevels','academicYears'));
+        return view('academics::academicsLevel.index', compact('insertOrEdit', 'editdata', 'academicLevels'));
     }
 
     /**
@@ -167,7 +168,7 @@ class AcademicsLevelController extends Controller
         // find academic level profile
         $academicLevel = AcademicsLevel::find($id);
         // save new profile
-        if($academicLevel->update($request->all())) {
+        if ($academicLevel->update($request->all())) {
             Session::flash('message', 'Success ! Academic Level Updated ');
         } else {
             Session::flash('message', 'Unable to Update Academic Level');
@@ -177,12 +178,12 @@ class AcademicsLevelController extends Controller
     }
 
 
-    public function delete(Request $request,$id)
+    public function delete(Request $request, $id)
     {
         // find academic level profile
         $academicLevel = AcademicsLevel::find($id);
         // delete and checking
-        if($academicLevel->delete()){
+        if ($academicLevel->delete()) {
             Session::flash('message', 'Success ! Academic Level Updated ');
         } else {
             Session::flash('message', 'Unable to Update Academic Level');
@@ -197,24 +198,22 @@ class AcademicsLevelController extends Controller
         // response array
         $data = array();
         // all level
-        $levelList = $this->academicsLevel->where(['campus_id'=>$request->campus, 'institute_id'=>$request->institute])->orderBy('level_name', 'ASC')->get();
+        $levelList = $this->academicsLevel->where(['campus_id' => $request->campus, 'institute_id' => $request->institute])->orderBy('level_name', 'ASC')->get();
         //$levelList = $this->academicsLevel->where('academics_year_id', $request->id)->orderBy('level_name', 'ASC')->get();
         // looping for adding division into the batch name
         foreach ($levelList as $level) {
             $data[] = [
-                'id' =>$level->id,
-                'level_name' =>$level->level_name,
-                'level_code' =>$level->level_code,
-                'is_active' =>$level->is_active,
-                'academics_year_id' =>'N/A',
-                'institute_id' =>$level->institute_id,
-                'campus_id' =>$level->campus_id,
+                'id' => $level->id,
+                'level_name' => $level->level_name,
+                'level_code' => $level->level_code,
+                'is_active' => $level->is_active,
+                'academics_year_id' => 'N/A',
+                'institute_id' => $level->institute_id,
+                'campus_id' => $level->campus_id,
             ];
         }
         //then sent this data to ajax success
         return $data;
-
-
     }
 
 
@@ -230,18 +229,16 @@ class AcademicsLevelController extends Controller
         // looping for adding division into the batch name
         foreach ($levelList as $level) {
             $data[] = [
-                'id' =>$level->id,
-                'level_name' =>$level->level_name,
-                'level_code' =>$level->level_code,
-                'is_active' =>$level->is_active,
-                'academics_year_id' =>'N/A',
-                'institute_id' =>$level->institute_id,
-                'campus_id' =>$level->campus_id,
+                'id' => $level->id,
+                'level_name' => $level->level_name,
+                'level_code' => $level->level_code,
+                'is_active' => $level->is_active,
+                'academics_year_id' => 'N/A',
+                'institute_id' => $level->institute_id,
+                'campus_id' => $level->campus_id,
             ];
         }
         //then sent this data to ajax success
         return $data;
-
-
     }
 }
