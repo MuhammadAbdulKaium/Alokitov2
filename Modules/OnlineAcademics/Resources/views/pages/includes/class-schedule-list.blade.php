@@ -44,323 +44,318 @@
                     $currentDate = date('m-d-Y');
                     @endphp
 
-                    @for($i=1;$i<=count($days);$i++) @if(isset($total_Day_Date)) 
-                    @foreach($total_Day_Date as $key=>$date)
-                        @if($days[$i] == $key)
-                        @foreach($allClassPeriods as $period)
-                        @php
-                        $sortedTimetableProfile = sortTimetable($i, $period->id, $allTimetables);
-
-                        $timetableCount = $sortedTimetableProfile->count();
-                        @endphp
-
-                        @if($timetableCount>0)
-                        @php
-                        $timetableProfile = (array) $sortedTimetableProfile->toArray();
-                        $timetableProfile = reset($timetableProfile);
-                        $teacherProfile = $period->teacher($timetableProfile['teacher']);
-                        // $classSubjectProfile = $period->subject($timetableProfile['subject']);
-                        $classSubjectProfile = findClassSubject($timetableProfile['subject']);
-                        $subjectProfile = $classSubjectProfile?$classSubjectProfile->subject():null;
-                        @endphp
-                        @endif
-                        @isset($subjectProfile)
-                        <tr class="gradeX">
-                            <td>{{ ++$loop->index }}.</td>
-                            <td>
-                                {{ $date }} <br /> {{ $key }}
-                            </td>
-                            <td>
-                                @if(isset($topicList)) {{ $PeriodList[$loop->index] }} @endif
-                            </td>
-                            <td style="text-align: center;">
-                                @if(isset($scheduledData[$subjectProfile->id][17])&& $timetableCount>0)
-                                {{date('H:i',strtotime($scheduledData[$subjectProfile->id][17]) )}}
-                                - {{ date('H:i',strtotime($scheduledData[$subjectProfile->id][20]) ) }}
-
-
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td>
-                            {{-- <td style="text-align: center;">
-
-                                @if(isset($scheduledData[$subjectProfile->id][19]) && $timetableCount)
-                                <?php $str = $scheduledData[$subjectProfile->id][21]  ?>
-
-                                <a href="#" data-toggle="tooltip"
-                                    title="{{ $scheduledData[$subjectProfile->id][21] }}"><?php echo (count(explode(",",$str))); ?></a>
-
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td> --}}
-                            <td style="text-align: center;">
-                                @if($timetableCount>0)
-                                {{$subjectProfile?$subjectProfile->subject_name:'(removed)'}}
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td>
-                            <td>{{ $ClassName->batch_name }}</td>
-                            <td>{{ $SectionName->section_name }}</td>
-                            <td style="text-align: center;">
-                                @if($timetableCount>0)
-                                {{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}
-                                @else
-                                {{ '--' }}
-                                @endif
-                                <br />
-                                @if(isset($scheduledData[$subjectProfile->id][17]))
-                                <strong class="redcolor">(
-                                    {{date('H:i',strtotime($scheduledData[$subjectProfile->id][17]) )}}
-                                    )</strong>
-                                @endif
-
-                            </td>
-                            <td style="text-align: center;">
-
-
-
-                                @if(isset($scheduledData[$subjectProfile->id][17]))
-                                <?php   $to_time = strtotime($scheduledData[$subjectProfile->id][20]); 
-                                          $from_time =strtotime($scheduledData[$subjectProfile->id][17]);
-                                          
-
-                            $start_date = new DateTime($scheduledData[$subjectProfile->id][17]);
-                            $end_date = new DateTime($scheduledData[$subjectProfile->id][20]);
-                                 $interval = $start_date->diff($end_date);
-                            $hours   = $interval->format('%h'); 
-                            $minutes = $interval->format('%i');
-
-                              echo $hours.':'. $minutes;
- 
-                                       ?>
-
-
-
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td>
-                            <td style="text-align: center;">{{ $studentList }}</td>
-                            <td style="text-align: center;">
-                                @if(isset($scheduledData[$subjectProfile->id][14]))  
-                                    @php
-                                        $presentStds = $scheduledData[$subjectProfile->id][14]->where('attendance_status', 1)->sortByDesc('updated_at');
-                                    @endphp  
-                                    <div class="present-students">
-                                        <span class="no-of-present-students">{{ count($presentStds) }}</span>
-                                        @if (count($presentStds)>0)
-                                            <div class="present-students-details">
-                                                <h5><b>Present Students</b></h5>
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>SL</th>
-                                                            <th>Name</th>
-                                                            <th>Time</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach ($presentStds as $attendance)
-                                                            <tr>
-                                                                <td>{{ $loop->index+1 }}</td>
-                                                                <td>{{ $attendance->student->first_name }} {{ $attendance->student->last_name }}</td>
-                                                                <td>{{ Carbon\Carbon::parse($attendance->updated_at)->format('g:i:s a') }}</td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                    @for($i=1;$i<=count($days);$i++) {{-- Iterate the loop 7 times as a reflex for a full week --}}
+                        @if(isset($total_Day_Date)) 
+                            @foreach($total_Day_Date as $key=>$date) {{-- Iterate as per total selected days - max 7 days --}}
+                                @if($days[$i] == $key) {{-- For sorting the days only, ultimately iterate for total selected days --}}
+                                    @foreach($allClassPeriods as $period) {{-- Iterate by all class periods of selected category --}}
+                                        @php
+                                            $sortedTimetableProfile = sortTimetable($i, $period->id, $allTimetables); // Returns 1 timetable for particular period 
+                                            $timetableCount = $sortedTimetableProfile->count();
+                                        @endphp
+                                        @if($timetableCount>0)
+                                            @php
+                                            $timetableProfile = (array) $sortedTimetableProfile->toArray();
+                                            $timetableProfile = reset($timetableProfile); // Only 1 timetable
+                                            $teacherProfile = $period->teacher($timetableProfile['teacher']);
+                                            // $classSubjectProfile = $period->subject($timetableProfile['subject']);
+                                            $classSubjectProfile = findClassSubject($timetableProfile['subject']);
+                                            $subjectProfile = $classSubjectProfile?$classSubjectProfile->subject():null;
+                                            @endphp
                                         @endif
-                                    </div>
+                                        @isset($subjectProfile)
+                                        <tr class="gradeX">
+                                            <td>{{ ++$loop->index }}.</td>
+                                            <td>
+                                                {{ $date }} <br /> {{ $key }}
+                                            </td>
+                                            <td>
+                                                @if(isset($topicList)) {{ $PeriodList[$loop->index] }} @endif
+                                            </td>
+                                            <td style="text-align: center;">
+                                                @if(isset($scheduledData[$subjectProfile->id][17])&& $timetableCount>0)
+                                                    {{date('g:i:a',strtotime($scheduledData[$subjectProfile->id][17]) )}}
+                                                    @if ($scheduledData[$subjectProfile->id][11] == 4)
+                                                    - {{ date('g:i:a',strtotime($scheduledData[$subjectProfile->id][20]) ) }}
+                                                    @else
+                                                    - ......
+                                                    @endif
+                                                @else
+                                                    {{ '--' }}
+                                                @endif
+                                            </td>
+                                            {{-- <td style="text-align: center;">
+
+                                                @if(isset($scheduledData[$subjectProfile->id][19]) && $timetableCount)
+                                                <?php $str = $scheduledData[$subjectProfile->id][21]  ?>
+
+                                                <a href="#" data-toggle="tooltip"
+                                                    title="{{ $scheduledData[$subjectProfile->id][21] }}"><?php echo (count(explode(",",$str))); ?></a>
+
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                            </td> --}}
+                                            <td style="text-align: center;">
+                                                @if($timetableCount>0)
+                                                {{$subjectProfile?$subjectProfile->subject_name:'(removed)'}}
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                            </td>
+                                            <td>{{ $ClassName->batch_name }}</td>
+                                            <td>{{ $SectionName->section_name }}</td>
+                                            <td style="text-align: center;">
+                                                @if($timetableCount>0)
+                                                {{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                                <br />
+                                                @if(isset($scheduledData[$subjectProfile->id][17]) && $scheduledData[$subjectProfile->id][11] == 4)
+                                                <strong class="redcolor">(
+                                                    {{date('H:i',strtotime($scheduledData[$subjectProfile->id][17]) )}}
+                                                    )</strong>
+                                                @endif
+
+                                            </td>
+                                            <td style="text-align: center;">
+                                                @if(isset($scheduledData[$subjectProfile->id][17]) && $scheduledData[$subjectProfile->id][11] == 4)
+                                                    @php
+                                                        $to_time = strtotime($scheduledData[$subjectProfile->id][20]); 
+                                                        $from_time =strtotime($scheduledData[$subjectProfile->id][17]);
+                                                        
+                                                        $start_date = new DateTime($scheduledData[$subjectProfile->id][17]);
+                                                        $end_date = new DateTime($scheduledData[$subjectProfile->id][20]);
+                                                        $interval = $start_date->diff($end_date);
+                                                        $hours   = $interval->format('%h'); 
+                                                        $minutes = $interval->format('%i');
+
+                                                        echo $hours.':'. $minutes;
+                                                    @endphp
+                                                @else
+                                                    {{ '--' }}
+                                                @endif
+                                            </td>
+                                            <td style="text-align: center;">{{ $studentList }}</td>
+                                            <td style="text-align: center;">
+                                                @if(isset($scheduledData[$subjectProfile->id][14]))  
+                                                    @php
+                                                        $presentStds = $scheduledData[$subjectProfile->id][14]->where('attendance_status', 1)->sortByDesc('updated_at');
+                                                    @endphp  
+                                                    <div class="present-students">
+                                                        <span class="no-of-present-students">{{ count($presentStds) }}</span>
+                                                        @if (count($presentStds)>0)
+                                                            <div class="present-students-details">
+                                                                <span class="student-details-cross-btn">X</span>
+                                                                <h5><b>Present Students</b></h5>
+                                                                <table>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>SL</th>
+                                                                            <th>Name</th>
+                                                                            <th>Time</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($presentStds as $attendance)
+                                                                            <tr>
+                                                                                <td>{{ $loop->index+1 }}</td>
+                                                                                <td>{{ $attendance->student->first_name }} {{ $attendance->student->last_name }}</td>
+                                                                                <td>{{ Carbon\Carbon::parse($attendance->updated_at)->format('g:i:s a') }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    
+                                                @else
+                                                    {{ '--' }}
+                                                @endif
+                                            </td>
+                                            {{-- <td class="redcolor">
+                                                @if(isset($scheduledData[$subjectProfile->id][15]))
+                                                {{ $scheduledData[$subjectProfile->id][15] }}
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                            </td>
+                                            <td class="redcolor">
+                                                @if(isset($scheduledData[$subjectProfile->id][16]))
+                                                {{ $scheduledData[$subjectProfile->id][16] }}
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                            </td> --}}
+                                            <td>
+                                                @if(isset($scheduledData[$subjectProfile->id][12]))
+                                                {{ $scheduledData[$subjectProfile->id][12] }}
+                                                @else
+                                                {{ '--' }}
+                                                @endif
+                                            </td>
+
+                                            <td style="color: green;">
+                                                @php
+                                                $currentTime = date('h:i');
+                                                @endphp
+
+
+
+                                                <br />
+
+                                                @if(isset($scheduledData) && $timetableCount>0)
+
+                                                @if(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                $scheduledData[$subjectProfile->id][11] == 2 && $scheduledData[$subjectProfile->id][9]
+                                                == $date)
+
+                                                @if (isset($scheduledData[$subjectProfile->id][9]) &&
+                                                $scheduledData[$subjectProfile->id][9] >$currentDate &&
+                                                $scheduledData[$subjectProfile->id][11] == 2)
+                                                @php echo "Schedule But Date is not appper";
+                                                @endphp
+
+                                                @elseif (isset($scheduledData[$subjectProfile->id][9]) &&
+                                                $scheduledData[$subjectProfile->id][9] < $currentDate &&
+                                                    $scheduledData[$subjectProfile->id][11] == 2)
+
+                                                    @php echo "Schedule But Date is Over"; @endphp
+
+
+
+                                                    {{-- @elseif (isset($scheduledData[$subjectProfile->id][9])    &&  $scheduledData[$subjectProfile->id][9] >$currentDate && $scheduledData[$subjectProfile->id][11] == 2) --}}
+                                                    @elseif ($scheduledData[$subjectProfile->id][9])
+                                                    @role(['super-admin','admin','teacher'])
+                                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
+                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
+                                                        @if(isset($scheduledData[$subjectProfile->id][23]))
+                                                        <input type="hidden" name="class_scheduled_id"
+                                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
+                                                        @else
+                                                        <input type="hidden" name="class_scheduled_id" value="">
+                                                        @endif
+                                                        <span>
+                                                            <i class="icon-eye-open"> </i>
+                                                        </span>
+                                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
+                                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Ongoing</button>
+
+                                                    </form>
+
+
+                                                    @endrole
+
+                                                    @role(['student'])
+                                                    <span style="color: red">
+                                                        Tecaher Did not start the class
+                                                    </span>
+                                                    @endrole
+                                                    @endif
+
+                                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                    $scheduledData[$subjectProfile->id][11] == 4)
+
+                                                    {{ 'Completed' }}
+
+                                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                    $scheduledData[$subjectProfile->id][11] == 6)
+
+
+                                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
+                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
+                                                        @if(isset($scheduledData[$subjectProfile->id][23]))
+                                                        <input type="hidden" name="class_scheduled_id"
+                                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
+                                                        @else
+                                                        <input type="hidden" name="class_scheduled_id" value="">
+                                                        @endif
+                                                        <span><i class="icon-eye-open"></i></span>
+                                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
+                                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Started</button>
+
+                                                    </form>
+
+                                                    @else
+                                                    @role(['super-admin','admin','teacher'])
+                                                    <form method="post" action="" id="formq{{ $subjectProfile->id }}">
+                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
+
+                                                        <input type="hidden" name="class_opening_date" value="{{ $date }}">
+                                                        <input type="hidden" name="class_opening_day" value="{{ $key }}">
+                                                        <input type="hidden" name="class_routine_time"
+                                                            value="{{ $PeriodList[$loop->index] }}">
+
+                                                        <input type="hidden" name="campus_id" value="{{ $subjectProfile->campus }}">
+                                                        <input type="hidden" name="institute_id"
+                                                            value="{{ $subjectProfile->institute }}">
+
+                                                        @if($timetableCount>0)
+                                                        <input type="hidden" name="class_subject"
+                                                            value="{{ $subjectProfile->subject_name }}">
+                                                        <input type="hidden" name="class_subject_id" value="{{ $subjectProfile->id }}">
+                                                        @else
+                                                        <input type="hidden" name="class_subject" value="">
+                                                        <input type="hidden" name="class_subject_id" value="">
+                                                        @endif
+
+                                                        <input type="hidden" name="academic_level_id"
+                                                            value="{{ $ClassName->academics_level_id }}">
+
+
+                                                        <input type="hidden" name="academic_section_id" value="{{ $SectionName->id }}">
+                                                        <input type="hidden" name="academic_section"
+                                                            value="{{ $SectionName->section_name }}">
+
+                                                        @if($timetableCount>0)
+                                                        <input type="hidden" name="class_teacher_id" value="{{$teacherProfile->id}}">
+                                                        <input type="hidden" name="class_teacher_name"
+                                                            value='{{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}'>
+                                                        @else
+                                                        <input type="hidden" name="class_teacher_id" value="">
+                                                        <input type="hidden" name="class_teacher_name" value=''>
+                                                        @endif
+                                                        <input type="hidden" name="class_total_student" value='{{ $studentList }}'>
+                                                        <input type="hidden" name="class_status" value='2'>
+                                                        <input type="hidden" name="academic_shift_id" value='{{ $shift }}'>
+                                                        <input type="hidden" name="academic_class" value="{{ $ClassName->batch_name }}">
+                                                        <input type="hidden" name="academic_class_id" value="{{ $ClassName->id }}">
+
+                                                        @if(isset($topicNameList[$subjectProfile->id]) && $timetableCount>0)
+                                                        <input type="hidden" name="class_topic_name"
+                                                            value="{{ $topicNameList[$subjectProfile->id] }}">
+                                                        @else
+                                                        <input type="hidden" name="class_topic_name" value="">
+                                                        @endif
+
+
+
+                                                        <button type="button" id="schedule_status_update_{{ $subjectProfile->id }}"
+                                                            onclick="addFunction({{ $subjectProfile->id }});">UnScheduled</button>
+                                                    </form>
+                                                    @endif
+                                                    @endif
+                                                    @endrole
+
+                                                    @role(['student'])
+
+
+                                                    @endrole
+
+
+                                            </td>
+                                        </tr>
+                                        @endisset
+
                                     
-                                @else
-                                    {{ '--' }}
+
+                                    @endforeach
                                 @endif
-                            </td>
-                            {{-- <td class="redcolor">
-                                @if(isset($scheduledData[$subjectProfile->id][15]))
-                                {{ $scheduledData[$subjectProfile->id][15] }}
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td>
-                            <td class="redcolor">
-                                @if(isset($scheduledData[$subjectProfile->id][16]))
-                                {{ $scheduledData[$subjectProfile->id][16] }}
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td> --}}
-                            <td>
-                                @if(isset($scheduledData[$subjectProfile->id][12]))
-                                {{ $scheduledData[$subjectProfile->id][12] }}
-                                @else
-                                {{ '--' }}
-                                @endif
-                            </td>
-
-                            <td style="color: green;">
-                                @php
-                                $currentTime = date('h:i');
-                                @endphp
-
-
-
-                                <br />
-
-                                @if(isset($scheduledData) && $timetableCount>0)
-
-                                @if(isset($scheduledData[$subjectProfile->id][0]) &&
-                                $scheduledData[$subjectProfile->id][11] == 2 && $scheduledData[$subjectProfile->id][9]
-                                == $date)
-
-                                @if (isset($scheduledData[$subjectProfile->id][9]) &&
-                                $scheduledData[$subjectProfile->id][9] >$currentDate &&
-                                $scheduledData[$subjectProfile->id][11] == 2)
-                                @php echo "Schedule But Date is not appper";
-                                @endphp
-
-                                @elseif (isset($scheduledData[$subjectProfile->id][9]) &&
-                                $scheduledData[$subjectProfile->id][9] < $currentDate &&
-                                    $scheduledData[$subjectProfile->id][11] == 2)
-
-                                    @php echo "Schedule But Date is Over"; @endphp
-
-
-
-                                    {{-- @elseif (isset($scheduledData[$subjectProfile->id][9])    &&  $scheduledData[$subjectProfile->id][9] >$currentDate && $scheduledData[$subjectProfile->id][11] == 2) --}}
-                                    @elseif ($scheduledData[$subjectProfile->id][9])
-                                    @role(['super-admin','admin','teacher'])
-                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
-                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-                                        @if(isset($scheduledData[$subjectProfile->id][23]))
-                                        <input type="hidden" name="class_scheduled_id"
-                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
-                                        @else
-                                        <input type="hidden" name="class_scheduled_id" value="">
-                                        @endif
-                                        <span>
-                                            <i class="icon-eye-open"> </i>
-                                        </span>
-                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
-                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Ongoing</button>
-
-                                    </form>
-
-
-                                    @endrole
-
-                                    @role(['student'])
-                                    <span style="color: red">
-                                        Tecaher Did not start the class
-                                    </span>
-                                    @endrole
-                                    @endif
-
-                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                    $scheduledData[$subjectProfile->id][11] == 4)
-
-                                    {{ 'Completed' }}
-
-                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                    $scheduledData[$subjectProfile->id][11] == 6)
-
-
-                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
-                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-                                        @if(isset($scheduledData[$subjectProfile->id][23]))
-                                        <input type="hidden" name="class_scheduled_id"
-                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
-                                        @else
-                                        <input type="hidden" name="class_scheduled_id" value="">
-                                        @endif
-                                        <span><i class="icon-eye-open"></i></span>
-                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
-                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Started</button>
-
-                                    </form>
-
-                                    @else
-                                    @role(['super-admin','admin','teacher'])
-                                    <form method="post" action="" id="formq{{ $subjectProfile->id }}">
-                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-
-                                        <input type="hidden" name="class_opening_date" value="{{ $date }}">
-                                        <input type="hidden" name="class_opening_day" value="{{ $key }}">
-                                        <input type="hidden" name="class_routine_time"
-                                            value="{{ $PeriodList[$loop->index] }}">
-
-                                        <input type="hidden" name="campus_id" value="{{ $subjectProfile->campus }}">
-                                        <input type="hidden" name="institute_id"
-                                            value="{{ $subjectProfile->institute }}">
-
-                                        @if($timetableCount>0)
-                                        <input type="hidden" name="class_subject"
-                                            value="{{ $subjectProfile->subject_name }}">
-                                        <input type="hidden" name="class_subject_id" value="{{ $subjectProfile->id }}">
-                                        @else
-                                        <input type="hidden" name="class_subject" value="">
-                                        <input type="hidden" name="class_subject_id" value="">
-                                        @endif
-
-                                        <input type="hidden" name="academic_level_id"
-                                            value="{{ $ClassName->academics_level_id }}">
-
-
-                                        <input type="hidden" name="academic_section_id" value="{{ $SectionName->id }}">
-                                        <input type="hidden" name="academic_section"
-                                            value="{{ $SectionName->section_name }}">
-
-                                        @if($timetableCount>0)
-                                        <input type="hidden" name="class_teacher_id" value="{{$teacherProfile->id}}">
-                                        <input type="hidden" name="class_teacher_name"
-                                            value='{{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}'>
-                                        @else
-                                        <input type="hidden" name="class_teacher_id" value="">
-                                        <input type="hidden" name="class_teacher_name" value=''>
-                                        @endif
-                                        <input type="hidden" name="class_total_student" value='{{ $studentList }}'>
-                                        <input type="hidden" name="class_status" value='2'>
-                                        <input type="hidden" name="academic_shift_id" value='{{ $shift }}'>
-                                        <input type="hidden" name="academic_class" value="{{ $ClassName->batch_name }}">
-                                        <input type="hidden" name="academic_class_id" value="{{ $ClassName->id }}">
-
-                                        @if(isset($topicNameList[$subjectProfile->id]) && $timetableCount>0)
-                                        <input type="hidden" name="class_topic_name"
-                                            value="{{ $topicNameList[$subjectProfile->id] }}">
-                                        @else
-                                        <input type="hidden" name="class_topic_name" value="">
-                                        @endif
-
-
-
-                                        <button type="button" id="schedule_status_update_{{ $subjectProfile->id }}"
-                                            onclick="addFunction({{ $subjectProfile->id }});">UnScheduled</button>
-                                    </form>
-                                    @endif
-                                    @endif
-                                    @endrole
-
-                                    @role(['student'])
-
-
-                                    @endrole
-
-
-                            </td>
-                        </tr>
-                        @endisset
-
-                        
-
-                        @endforeach
+                            @endforeach
                         @endif
-                        @endforeach
-                        @endif
-                        @endfor
+                    @endfor
                 </tbody>
             </table>
             @else
@@ -577,13 +572,13 @@
 
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
-        $(document).on('mouseover', '.no-of-present-students', function(){
+        $(document).on('click', '.no-of-present-students', function(){
             var studentDetails = $(this).parent().find('.present-students-details');
             
             studentDetails.css('display', 'block');
         });
-        $(document).on('mouseout', '.no-of-present-students', function(){
-            var studentDetails = $(this).parent().find('.present-students-details');
+        $(document).on('click', '.student-details-cross-btn', function(){
+            var studentDetails = $(this).parent();
             
             studentDetails.css('display', 'none');
         });

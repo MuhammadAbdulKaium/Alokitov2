@@ -4,8 +4,6 @@
 
 Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace' => 'Modules\Student\Http\Controllers'], function () {
 
-    date_default_timezone_set('America/Los_Angeles');
-
     Route::get('/', 'StudentInfoController@index');
 
     Route::get('/manage', 'StudentController@manageStudent')->name('manage-student');

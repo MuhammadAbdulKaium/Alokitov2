@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Subject;
 use App\OnlineClassTopic;
+use DateTimeZone;
 use Redirect;
 use Session;
 use Validator;
@@ -705,9 +706,6 @@ class OnlineAcademicsController extends Controller
 
     public function ClassHistory(Request $request)
     {
-
-        // dd($request->all());
-
         $timestamp = strtotime($request->input('start_date'));
         $day1 = date('l', $timestamp);
 
@@ -730,6 +728,8 @@ class OnlineAcademicsController extends Controller
             $total_Day_Date[$day] =  $date; //date("m-d-Y", $i);
             //$totalDay[]  =  date('l', $i);  
         }
+
+
 
         $topic_name = "ClassHistory";
         // all academics levels
@@ -803,16 +803,17 @@ class OnlineAcademicsController extends Controller
                 return $query->where('class_topic_id', $subject_class_topic);
             })
             ->when($start_date, function ($query, $start_date) {
-                return $query->where('class_opening_date', $start_date);
+                return $query->where('class_opening_date', '>=', $start_date);
             })
             ->when($end_date, function ($query, $end_date) {
-                return $query->where('class_opening_date', $end_date);
+                return $query->where('class_opening_date', '<=', $end_date);
             })
             ->when($status, function ($query, $status) {
                 return $query->where('class_status', $status);
             })
             //->toSql();
             ->get();
+
 
         $scheduledData = [];
         foreach ($class_schedule_list as $scheduledList) {
@@ -846,7 +847,6 @@ class OnlineAcademicsController extends Controller
         }
 
 
-
         /* New Search Part Integration Start 02/07/2020 */
 
         // all timetables
@@ -859,6 +859,7 @@ class OnlineAcademicsController extends Controller
             ['campus', $campus_id],
             ['institute', $institute_id],
         ])->get();
+
 
         // batch section assigned period id
         $batchSectionPeriodId = $this->getBatchSectionPeriodCategoryId($institute_id, $campus_id, null, $level, $batch, $section, $shift);

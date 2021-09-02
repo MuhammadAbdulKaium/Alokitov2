@@ -15,13 +15,15 @@
     position: relative;
 }
 .present-students-details{
-    background: lightsteelblue;
+    background: #FBF7AA;
     padding: 6px;
     border-radius: 3px;
     position: absolute;
     right: 0;
     min-width: 220px;
     display: none;
+    z-index: 5;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
 }
 .present-students-details table{
     width: 100%;
@@ -31,6 +33,16 @@
 .present-students-details table,.present-students-details td,.present-students-details th {
   border: 1px solid black;
   padding: 1px 2px;
+}
+
+.student-details-cross-btn{
+    float: right;
+    color: red;
+    cursor: pointer;
+}
+
+.no-of-present-students{
+    cursor: pointer;
 }
 </style>
 @role(['super-admin','admin'])
@@ -61,7 +73,7 @@
                             <div class="form-group">
                                 <label class="control-label ">Academic Level</label>
                                     <select id="level" class="form-control academicLevel" name="level" required>
-                                        <option value="" selected disabled>--Select Level--</option>
+                                        <option value="" selected>--Select Level--</option>
                                         @foreach($allAcademicsLevel as $level)
                                             <option value="{{$level->id}}">{{$level->level_name}}</option>
                                         @endforeach
@@ -74,7 +86,7 @@
                             <div class="form-group">
                                 <label class="control-label label-margin50">Class</label>
                                 <select id="batch" class="form-control academicBatch" name="batch" required>
-                                    <option value="" disabled="true" selected="true">--Select Class--</option>
+                                    <option value="" selected="true">--Select Class--</option>
                                     @if(isset($topic_info->academic_class_id))
                                         <option value="{{$topic_info->academic_class_id}}" selected="selected">{{$topic_info->academic_class}}</option>
                                     @endif
@@ -91,7 +103,7 @@
                             <div class="input-group">
                                 <label class="control-label label-margin50">Section</label>
                                     <select id="section" class="form-control academicSection" name="section" required>
-                                    <option value="" disabled="true" selected="true">--Select Section--</option>
+                                    <option value="" selected="true">--Select Section--</option>
                                     @if(isset($topic_info->academic_section_id))
                                     <option value="{{$topic_info->academic_section_id}}" selected="selected">{{$topic_info->academic_section}}</option>
                                     @endif
@@ -104,7 +116,7 @@
                             <div class="input-group">
                                 <label class="control-label label-margin50">Shift</label>
                                     <select id="shift" class="form-control academicShift" name="shift" required>
-                                        <option value="" selected disabled>--Select Shift--</option>
+                                        <option value="" selected>--Select Shift--</option>
                                         <option value="0">Day</option>
                                         <option value="1">Morning</option>
                                     </select>
@@ -177,7 +189,7 @@
                     <div class="input-group">
                         <label class="control-label">Status</label>
                         <select id="status" class="form-control" name="status">
-                            <option value="" disabled="true" selected="true">--Select Status--</option>
+                            <option value="" selected="true">--Select Status--</option>
                             <option value="1">Unscheduled</option>
                             <option value="2">Scheduled</option>
                             <option value="3">Ongoing</option>
@@ -233,7 +245,7 @@
                             <div class="form-group">
                                 <label class="control-label ">Academic Level</label>
                                     <select id="level" class="form-control academicLevel" name="level" required>
-                                        <option value="" selected disabled>--Select Level--</option>
+                                        <option value="" selected>--Select Level--</option>
                                         @foreach($allAcademicsLevel as $level)
                                             <option value="{{$level->id}}">{{$level->level_name}}</option>
                                         @endforeach
@@ -246,7 +258,7 @@
                             <div class="form-group">
                                 <label class="control-label label-margin50">Class</label>
                                 <select id="batch" class="form-control academicBatch" name="batch" required>
-                                    <option value="" disabled="true" selected="true">--Select Class--</option>
+                                    <option value="" selected="true">--Select Class--</option>
                                     @if(isset($topic_info->academic_class_id))
                                         <option value="{{$topic_info->academic_class_id}}" selected="selected">{{$topic_info->academic_class}}</option>
                                     @endif
@@ -263,7 +275,7 @@
                             <div class="input-group">
                                 <label class="control-label label-margin50">Section</label>
                                     <select id="section" class="form-control academicSection" name="section" required>
-                                    <option value="" disabled="true" selected="true">--Select Section--</option>
+                                    <option value="" selected="true">--Select Section--</option>
                                     @if(isset($topic_info->academic_section_id))
                                     <option value="{{$topic_info->academic_section_id}}" selected="selected">{{$topic_info->academic_section}}</option>
                                     @endif
@@ -276,7 +288,7 @@
                             <div class="input-group">
                                 <label class="control-label label-margin50">Shift</label>
                                     <select id="shift" class="form-control academicShift" name="shift" required>
-                                        <option value="" selected disabled>--Select Shift--</option>
+                                        <option value="" selected>--Select Shift--</option>
                                         <option value="0">Day</option>
                                         <option value="1">Morning</option>
                                     </select>
@@ -349,7 +361,7 @@
                     <div class="input-group">
                         <label class="control-label">Status</label>
                         <select id="status" class="form-control" name="status">
-                            <option value="" disabled="true" selected="true">--Select Status--</option>
+                            <option value="" selected="true">--Select Status--</option>
                             <option value="1">Unscheduled</option>
                             <option value="2">Scheduled</option>
                             <option value="3">Ongoing</option>
@@ -449,7 +461,7 @@
                             <div class="input-group">
                                 <label class="control-label label-margin50">Shift</label>
                                     <select id="shift" class="form-control academicShift" name="shift" required>
-                                        <option value="" selected disabled>--Select Shift--</option>
+                                        <option value="" selected>--Select Shift--</option>
                                         <option value="0">Day</option>
                                         <option value="1">Morning</option>
                                     </select>
@@ -522,7 +534,7 @@
                     <div class="input-group">
                         <label class="control-label">Status</label>
                         <select id="status" class="form-control" name="status">
-                            <option value="" disabled="true" selected="true">--Select Status--</option>
+                            <option value="" selected="true">--Select Status--</option>
                             <option value="1">Unscheduled</option>
                             <option value="2">Scheduled</option>
                             <option value="3">Ongoing</option>
@@ -660,7 +672,7 @@ jQuery(function(){
                 console.log('success');
 
                 //console.log(data.length);
-                op+='<option value="0" selected disabled>--- Select Level ---</option>';
+                op+='<option value="0" selected>--- Select Level ---</option>';
                 for(var i=0;i<data.length;i++){
                     // console.log(data[i].level_name);
                     op+='<option value="'+data[i].id+'">'+data[i].level_name+'</option>';
@@ -668,11 +680,11 @@ jQuery(function(){
 
                 // set value to the academic secton
                 $('.academicSection').html("");
-                $('.academicSection').append('<option value="" selected disabled>--- Select Section ---</option>');
+                $('.academicSection').append('<option value="" selected>--- Select Section ---</option>');
 
                 // set value to the academic batch
                 $('.academicBatch').html("");
-                $('.academicBatch').append('<option value="" selected disabled>--- Select Class ---</option>');
+                $('.academicBatch').append('<option value="" selected>--- Select Class ---</option>');
 
                 // set value to the academic batch
                 $('.academicLevel').html("");
@@ -709,7 +721,7 @@ jQuery(function(){
                 console.log('success');
 
                 //console.log(data.length);
-                op+='<option value="" selected disabled>--- Select Class ---</option>';
+                op+='<option value="" selected>--- Select Class ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].batch_name+'</option>';
                 }
@@ -720,7 +732,7 @@ jQuery(function(){
 
                 // set value to the academic secton
                 $('.academicSection').html("");
-                $('.academicSection').append('<option value="0" selected disabled>--- Select Section ---</option>');
+                $('.academicSection').append('<option value="0" selected>--- Select Section ---</option>');
             },
 
             error:function(){
@@ -753,7 +765,7 @@ jQuery(function(){
                 console.log('success');
 
                 //console.log(data.length);
-                op+='<option value="" selected disabled>--- Select Section ---</option>';
+                op+='<option value="" selected>--- Select Section ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].section_name+'</option>';
                 }
@@ -793,7 +805,7 @@ jQuery(function(){
 
                 console.log(data);
 
-                op+='<option value="" selected disabled>--- Select Subject ---</option>';
+                op+='<option value="" selected>--- Select Subject ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].sub_name+'</option>';
                 }
@@ -837,7 +849,7 @@ jQuery(function(){
                 // set value to the academic teacher
                 if(data.teacher_data){
                     //alert('teacher data goes to here');
-                    op+='<option value="" selected disabled>--- Select Teacher ---</option>';
+                    op+='<option value="" selected>--- Select Teacher ---</option>';
                     for(var i=0;i<data.teacher_data.length;i++){
                         op+='<option value="'+data.teacher_data[i].id+'">'+data.teacher_data[i].first_name+'</option>';
                     }
@@ -848,7 +860,7 @@ jQuery(function(){
                 // set value to the academic topic
                 if(data.topic_data){
                     //alert('topic data goes to here');
-                    op+='<option value="" selected disabled>--- Select Topic ---</option>';
+                    op+='<option value="" selected>--- Select Topic ---</option>';
                     for(var i=0;i<data.topic_data.length;i++){
                         op+='<option value="'+data.topic_data[i].id+'">'+data.topic_data[i].sub_topic+'</option>';
                     }
@@ -891,7 +903,7 @@ jQuery(function(){
 
                 console.log(data);
 
-                op+='<option value="" selected disabled>--- Select Topic ---</option>';
+                op+='<option value="" selected>--- Select Topic ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].sub_topic+'</option>';
                 }
@@ -932,7 +944,7 @@ jQuery(function(){
 
                 console.log(data);
 
-                op+='<option value="" selected disabled>--- Select Topic ---</option>';
+                op+='<option value="" selected>--- Select Topic ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].sub_topic+'</option>';
                 }
@@ -974,7 +986,7 @@ jQuery(function(){
 
                 console.log(data);
 
-                op+='<option value="" selected disabled>--- Select Subject ---</option>';
+                op+='<option value="" selected>--- Select Subject ---</option>';
                 for(var i=0;i<data.length;i++){
                     op+='<option value="'+data[i].id+'">'+data[i].sub_name+'</option>';
                 }
