@@ -17,7 +17,7 @@
                 </select>
             </div>
             <div class="col-sm-12">
-                <label for="">Cadets</label>
+                <label for="">Students</label>
                 <select name="cadets[]" id="select-cadets" class="form-control" multiple>
                     <option value="">-- Select --</option>
                 </select>

@@ -50,7 +50,7 @@
                 <input type="number" class="form-control edit-val" name="cols" value="{{$room->cols}}" required>
             </div>
             <div class="col-sm-2">
-                <label for="">Cadets Per Seat:</label>
+                <label for="">Students Per Seat:</label>
                 <input type="number" class="form-control edit-val" name="cadets_per_seat" value="{{$room->cadets_per_seat}}" required>
             </div>
             <div class="col-sm-2">

@@ -31,7 +31,7 @@
             <div class="col-sm-8">
                 <select name="evaluationBy[]" id="designation-by-edit" multiple class="form-control" required>
                     <option value="hrfm" {{($evaluation->evaluation_by == 1 || $evaluation->evaluation_by == 3)?'selected':''}}>HR/FM</option>
-                    <option value="cadets" {{($evaluation->evaluation_by == 2 || $evaluation->evaluation_by == 3)?'selected':''}}>Cadets</option>
+                    <option value="cadets" {{($evaluation->evaluation_by == 2 || $evaluation->evaluation_by == 3)?'selected':''}}>Students</option>
                     @foreach ($designations as $designation)
                         @php
                             $selected = '';

@@ -84,7 +84,7 @@
                     </div>
                     <div class="icon-containt-wrap">
                         <h1 class="text-center">{{$totalStudent}}</h1>
-                        <p class="text-center">{{trans('dashboard/index.student')}}</p>
+                        <p class="text-center">Student</p>
                     </div>
                 </a>
             </div>
@@ -343,7 +343,7 @@
                         <ul class="nav nav-tabs notice-tabs">
                             <li class="active"><a data-toggle="tab" id="1" href="#general"><div class="hidden-xs" >{{trans('dashboard/index.general')}}</div><div class="visible-xs">GN</div></a></li>
                             @role(['student', 'admin', 'super-admin'])
-                            <li><a data-toggle="tab" id="4" href="#student"><div class="hidden-xs" >{{trans('dashboard/index.student')}}</div><div class="visible-xs">ST</div></a></li>
+                            <li><a data-toggle="tab" id="4" href="#student"><div class="hidden-xs" >Student</div><div class="visible-xs">ST</div></a></li>
                             @endrole
                             @role(['teacher', 'admin', 'super-admin'])
                             <li><a data-toggle="tab" id="3" href="#employee"><div class="hidden-xs" >{{trans('dashboard/index.employee')}}</div><div class="visible-xs">EM</div></a></li>
