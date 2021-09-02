@@ -202,7 +202,6 @@
                <label class="control-label" for="designation">Designation <span class="text-red">*</span></label>
                <select id="designation" class="form-control" name="designation" required>
                   <option value="">--- Select Designation ---</option>
-                  @php $allDesignaitons = $employeeInfo->designations() @endphp
                   @if($allDesignaitons->count()>0)
                      @foreach($allDesignaitons as $designation)
                         <option value="{{$designation->id}}" @if($employeeInfo->designation ==$designation->id) selected="selected" @endif>{{$designation->name}} </option>
@@ -405,41 +404,6 @@
                 form.submit();
             }
         });
-
-            // request for designation list using department id
-            jQuery(document).on('change','#department',function(){
-                // get department id
-                var dept_id = $(this).val();
-                // ajax request
-                $.ajax({
-                    url: '/employee/find/designation/list/'+dept_id,
-                    type: 'GET',
-                    cache: false,
-                    datatype: 'application/json',
-
-                    beforeSend: function() {
-                    },
-
-                    success:function(data){
-
-                        var op = ''; 
-                        //console.log(data.length);
-                        op+='<option value="0" selected disabled>--- Select Designation ---</option>';
-                        for(var i=0;i<data.length;i++){
-                            // console.log(data[i].level_name);
-                            op+='<option value="'+data[i].id+'">'+data[i].name+'</option>';
-                        }
-
-                        // set value to the designation
-                        $('#designation').html("");
-                        $('#designation').append(op);
-                    },
-
-                    error:function(){
-
-                    }
-                });
-            });
 
     });
 </script>

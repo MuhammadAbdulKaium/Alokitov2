@@ -190,6 +190,11 @@
                                     <label class="control-label" for="designation">Designation <span class="text-red">*</span></label>
                                     <select id="designation" class="form-control" name="designation" required>
                                         <option value="" selected disabled>Select Designation</option>
+                                        @if($allDesignations)
+                                            @foreach($allDesignations as $designation)
+                                                <option value="{{$designation->id}}" @if(old('designation')==$designation->id) selected="selected" @endif>{{$designation->name}} </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     <div class="help-block">
                                         @if ($errors->has('designation'))
@@ -469,41 +474,6 @@
                 submitHandler: function(form) {
                     form.submit();
                 }
-            });
-
-            // request for designation list using department id
-            jQuery(document).on('change','#department',function(){
-                // get department id
-                var dept_id = $(this).val();
-                // ajax request
-                $.ajax({
-                    url: '/employee/find/designation/list/'+dept_id,
-                    type: 'GET',
-                    cache: false,
-                    datatype: 'application/json',
-
-                    beforeSend: function() {
-                    },
-
-                    success:function(data){
-
-                        var op = ''; 
-                        //console.log(data.length);
-                        op+='<option value="0" selected disabled>--- Select Designation ---</option>';
-                        for(var i=0;i<data.length;i++){
-                            // console.log(data[i].level_name);
-                            op+='<option value="'+data[i].id+'">'+data[i].name+'</option>';
-                        }
-
-                        // set value to the designation
-                        $('#designation').html("");
-                        $('#designation').append(op);
-                    },
-
-                    error:function(){
-
-                    }
-                });
             });
 
         });

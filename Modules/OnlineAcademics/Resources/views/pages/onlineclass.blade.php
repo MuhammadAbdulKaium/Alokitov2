@@ -282,7 +282,7 @@
                             
 			 <form  id="myForm" action="{{url('onlineacademics/onlineacademic/onlineclass')}}"  method="post">
 			    <input type="hidden" name="_token" value="{{csrf_token()}}">
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                 	@php
                     $currentDate = date('m-d-Y');
                     $currentTime = date('h:i');
@@ -386,17 +386,17 @@
 
                 <button  type="button" class="btn right" style="text-align: center; color: green ; border: 1px solid black"   id="join-room">Join Class</button>
 
-					<div class="row" style="margin-top: 0px;padding-bottom: 0px">
+					{{-- <div class="row" style="margin-top: 0px;padding-bottom: 0px">
 
 						<div class="board" style="width: 100%; height:  550px; border:1px solid #C0C0C0"> 
 							<a data-toggle="tab" href="#pcsharing" style="display: none">
                                 <button type="button" class="pull-right Textonlybutton" style="margin-right: 10px"><strong>PC</strong>
                               </button>
-                        </a>
-							{{-- <a data-toggle="tab" href="#camera"><button type="button" class="pull-right Textonlybutton">
+                            </a>
+							<a data-toggle="tab" href="#camera"><button type="button" class="pull-right Textonlybutton">
                                 <strong>Camera</strong></button></a>
 							<a data-toggle="tab" href="#board">
-                                <button type="button" class="pull-right Textonlybutton" style="color: red"><strong>Board</strong></button></a> --}}
+                                <button type="button" class="pull-right Textonlybutton" style="color: red"><strong>Board</strong></button></a>
 							
 							<!--- New File Integration -->
 							<style type="text/css">
@@ -455,7 +455,6 @@
                                        </section>
                                     </div>
 								<!--Board html Start-->
-                                {{-- zzzzzzzzzzzzzzzzzzz
 								<div id="board" class="tab-pane fade in" >
 									<div class="content-box">
 										<!-- jQuery UI -->
@@ -577,12 +576,12 @@
 											});
 										  </script>
 									</div>
-								</div> --}}
+								</div>
 								<!--Board html End-->
 								
 								<!--Camera html Start-->
 
-{{--                                 <div id="camera" class="tab-pane fade active">
+                               <div id="camera" class="tab-pane fade active">
                                     <div class="content-box" style="background:#ffffff; margin:30px auto 20px auto; height:425px;" >
                                     <section class="experiment recordrtc">
                                            <button id="btn-leave-room" disabled>Leave /or close the room</button>
@@ -604,7 +603,7 @@
                                        </section>
                                     </div>
                                 </div>
- --}}
+
 								<!--Camera html End-->
 								
 								<!--PC Sharing html Start-->	
@@ -620,9 +619,9 @@
 								<button type="button" class="pull-right Textonlybutton"></button>
 							</div>
 						</div>
-					</div>
+					</div> --}}
 				</div>
-                <div class="col-md-3">
+                {{-- <div class="col-md-3">
                             <div class="topic_list">
                         <div class="headind_srch">
                             <div class="recent_heading">
@@ -651,10 +650,11 @@
                             
                         </div>
                     </div>
-                </div>
-				<div class="col-sm-6" style="margin-left: 0px; padding: 0px;">
+                </div> --}}
+                <div class="col-md-1"></div>
+				<div class="col-sm-7" style="margin-left: 0px; padding: 0px;">
 					<!--Chat box start -->
-					<div class="row">
+					{{-- <div class="row">
 						<div class="col-sm-12">
 							<div class="messaging" >
 								<div class="inbox_msg" >
@@ -802,8 +802,13 @@
                                         </div>  
 
 										</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> --}}
                                                
-					<div class="type_msg">
+					{{-- <div class="type_msg">
 					     	<div class="input_msg_write">
 						         <input type="text"  id="input-text-chat"  class="write_msg" placeholder="Type a message" />
 									<button  id="share-file"  
@@ -813,25 +818,23 @@
 							</div>
 							<div class="row" >
 								<div class="col-sm-3"  style="margin-right: 0px;  ">
-									{{-- <button  class="btn  Textonlybutton" type="button" ><strong>Send To</strong></button> --}}
+									<button  class="btn  Textonlybutton" type="button" ><strong>Send To</strong></button>
 								</div>
 								<div class="col-sm-5" style="margin-left: 0px;margin-right: 0px ;padding: 0px;" >
-									{{-- <div class="form-group">
-									<select  class="form-control" name="chat_topic" aria-required="true">
-										<option value="">Every One</option>
-									</select>
-									<div class="help-block">
-                                        
+									<div class="form-group">
+                                        <select  class="form-control" name="chat_topic" aria-required="true">
+                                            <option value="">Every One</option>
+                                        </select>
+                                        <div class="help-block">
+                                            
+                                        </div>
                                     </div>
-									</div> --}}
-												</div>
-												<div class="col-sm-3" style="margin-left: 0px;margin-right: 0px ;padding: 0px;" >
-												   <button type="button" class="btn  Textonlybutton" style="color: green"><strong>Send </strong></button>
-												</div>
-											</div>
-										</div>
-									</div>
+                                    <div class="col-sm-3" style="margin-left: 0px;margin-right: 0px ;padding: 0px;" >
+                                        <button type="button" class="btn  Textonlybutton" style="color: green"><strong>Send </strong></button>
+                                    </div>
 								</div>
+                            </div>
+                    </div> --}}
 
                             @role(['super-admin','admin','teacher'])
 								<div class="row">
@@ -843,9 +846,9 @@
 								</div>
 								</div>
                                 <input type="hidden" name="scheduleid" value="{{ $ScheduledData->id}}">
-									<div class="col-sm-3" style="margin-left: 0px;margin-right: 0px ;padding: 0px;" >
-										<div style="margin-top: 31px;"></div>
-										<button type="button" onclick="myFunction()"  class="btn  Textonlybutton" style="font-size: 20px" ><strong>End Class </strong></button>
+									<div class="col-sm-3">
+										<div style="margin-top: 24px;"></div>
+										<button type="button" onclick="myFunction()"  class="btn btn-danger"><strong>End Class </strong></button>
 									</div>
                                     
 								</div>
@@ -872,7 +875,7 @@
 							</div>
 						</div>
 					</div>
-				</div>"
+				</div>
 			<!-- </form>	 -->
             </div>
         </div>

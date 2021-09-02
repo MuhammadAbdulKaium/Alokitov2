@@ -27,16 +27,14 @@ class AcademicsAdmissionYearController extends Controller
     {
         $pageTitle = "Admission Year Information";
         $insertOrEdit = 'insert'; //To identify insert
-        $admissionYears=$this->getAll();
-        return view('academics::academicsadmissionyear.index', compact('admissionYears','pageTitle','insertOrEdit') );
-
-
+        $admissionYears = $this->getAll();
+        return view('academics::academicsadmissionyear.index', compact('admissionYears', 'pageTitle', 'insertOrEdit'));
     }
 
     public function getAll()
     {
         return  $admissionYears = $this->admissionYear->where([
-            'institute_id'=>$this->academicHelper->getInstitute(), 'campus_id'=>$this->academicHelper->getCampus()
+            'institute_id' => $this->academicHelper->getInstitute(), 'campus_id' => $this->academicHelper->getCampus()
         ])->get();
     }
 
@@ -52,9 +50,9 @@ class AcademicsAdmissionYearController extends Controller
             'year_name' => 'required|max:100',
         ]);
 
-        if($validator->passes()){
+        if ($validator->passes()) {
 
-            $insertOrEdit='insert';
+            $insertOrEdit = 'insert';
 
             $data = new AcademicsAdmissionYear();
             // store requested profile name
@@ -63,27 +61,21 @@ class AcademicsAdmissionYearController extends Controller
             $data->campus_id = $this->academicHelper->getCampus();
             $data->institute_id = $this->academicHelper->getInstitute();
             // save new profile
-            try
-            {
+            try {
                 $saved = $data->save();
-                if($saved)
-                {
+                if ($saved) {
                     Session::flash('message', 'Success!Data has been saved successfully.');
-                }
-                else
-                {
+                } else {
                     Session::flash('message', 'Failed!Data has not been saved successfully.');
                 }
-            }
-            catch (\Exception $e)
-            {
+            } catch (\Exception $e) {
 
                 return $e->getMessage();
             }
 
-             $admissionYears=$this->getAll();
-            return view('academics::academicsadmissionyear.index',compact('insertOrEdit','admissionYears'));
-        }else{
+            $admissionYears = $this->getAll();
+            return view('academics::academicsadmissionyear.index', compact('insertOrEdit', 'admissionYears'));
+        } else {
             // Session::flash('warning', 'unable to crate student profile');
             // receiving page action
             return redirect()->back()->withErrors($validator)->withInput();
@@ -107,8 +99,7 @@ class AcademicsAdmissionYearController extends Controller
 
         $insertOrEdit = 'edit';
 
-        return view('academics::academicsadmissionyear.view',compact('insertOrEdit','academicsYearView','pageTitle'));
-
+        return view('academics::academicsadmissionyear.view', compact('insertOrEdit', 'academicsYearView', 'pageTitle'));
     }
 
     /**
@@ -119,9 +110,9 @@ class AcademicsAdmissionYearController extends Controller
     {
         $data = new AcademicsAdmissionYear();
         $academicsYearEdit = $data->where('id', $id)->get();
-        $admissionYears=$this->getAll();
+        $admissionYears = $this->getAll();
         $insertOrEdit = 'edit';
-        return view('academics::academicsadmissionyear.index',compact('insertOrEdit','editdata','admissionYears','academicsYearEdit'));
+        return view('academics::academicsadmissionyear.index', compact('insertOrEdit', 'admissionYears', 'academicsYearEdit'));
     }
 
     /**
@@ -136,58 +127,41 @@ class AcademicsAdmissionYearController extends Controller
         $subject->year_name = $request->input('year_name');
 
         $subject->status = $request->input('status');
-        
-        try
-        {
+
+        try {
             $saved = $subject->update($request->all());
-            if($saved)
-            {
+            if ($saved) {
                 Session::flash('message', 'Success!Data has been updated successfully.');
-            }
-            else
-            {
+            } else {
                 Session::flash('message', 'Failed!Data has not been updated successfully.');
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
 
             return $e->getMessage();
-
-
         }
-        $admissionYears=$this->getAll();
-        $insertOrEdit='insert';
+        $admissionYears = $this->getAll();
+        $insertOrEdit = 'insert';
 
-        return view('academics::academicsadmissionyear.index',compact('insertOrEdit','editdata','admissionYears'));
+        return view('academics::academicsadmissionyear.index', compact('insertOrEdit', 'editdata', 'admissionYears'));
     }
 
 
     public function delete($id)
     {
-
-
         $table = new AcademicsAdmissionYear();
-        $admissionYears=$this->getAll();
-        $insertOrEdit='insert';
-        try
-        {
+        $admissionYears = $this->getAll();
+        $insertOrEdit = 'insert';
+        try {
             $saved = $table->where('id', $id)->update(['deleted_at' => Carbon::now()]);
-            if($saved)
-            {
+            if ($saved) {
                 Session::flash('message', 'Success!Data has been deleted successfully.');
-            }
-            else
-            {
+            } else {
                 Session::flash('message', 'Failed!Data has not been deleted successfully.');
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
 
             return $e->getMessage();
-
         }
-        return view('academics::academicsadmissionyear.index',compact('insertOrEdit','editdata','admissionYears'));
+        return view('academics::academicsadmissionyear.index', compact('insertOrEdit', 'admissionYears'));
     }
 }

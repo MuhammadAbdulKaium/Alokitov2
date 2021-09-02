@@ -629,6 +629,10 @@ class EmployeeController extends Controller
         $allDepartments = $this->department->where([
             'campus_id' => $campusId, 'institute_id' => $instituteId, 'dept_type' => 0
         ])->orderBy('name', 'ASC')->get();
+        // all designation list
+        $allDesignations = $this->designation->where([
+            'campus_id' => $campusId, 'institute_id' => $instituteId
+        ])->orderBy('name', 'ASC')->get();
         // all nationality
         $allNationality = $this->country->orderBy('nationality', 'ASC')->get(['id', 'nationality']);
         // institute all campus list
@@ -636,7 +640,7 @@ class EmployeeController extends Controller
         // all roles
         $allRole = $this->role->orderBy('name', 'ASC')->whereNotIn('name', ['parent', 'student', 'admin'])->get();
 
-        return view('employee::pages.employee-add', compact('allDepartments', 'allRole', 'allNationality', 'allCampus'));
+        return view('employee::pages.employee-add', compact('allDepartments', 'allDesignations', 'allRole', 'allNationality', 'allCampus'));
     }
 
     // store employee function
@@ -799,9 +803,11 @@ class EmployeeController extends Controller
         $instituteId = $this->academicHelper->getInstitute();
         // employee departments
         $allDepartments = $this->department->where(['institute_id' => $instituteId, 'dept_type' => 0])->orderBy('name', 'ASC')->get();
+        // employee designations
+        $allDesignations = $this->designation->where(['institute_id' => $instituteId])->orderBy('name', 'ASC')->get();
         // // all inputs as objects
         // return view
-        return view('employee::pages.employee-manage', compact('allDepartments'));
+        return view('employee::pages.employee-manage', compact('allDepartments', 'allDesignations'));
     }
     public function imagePage()
     {

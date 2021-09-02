@@ -1,7 +1,6 @@
 <?php
 
-Route::group(['middleware' => 'web', 'prefix' => 'onlineacademics', 'namespace' => 'Modules\OnlineAcademics\Http\Controllers'], function()
-{
+Route::group(['middleware' => 'web', 'prefix' => 'onlineacademics', 'namespace' => 'Modules\OnlineAcademics\Http\Controllers'], function () {
     Route::get('/', 'OnlineAcademicsController@index');
     Route::get('/onlineacademic/{classtopic}', 'OnlineAcademicsController@index');
     Route::post('/onlineacademic/getTopicInfo/', 'OnlineAcademicsController@getTopicInfo');
@@ -21,16 +20,13 @@ Route::group(['middleware' => 'web', 'prefix' => 'onlineacademics', 'namespace' 
     Route::post('onlineacademic/OnlineScheduleClass', 'OnlineAcademicsController@OnlineScheduleClass');
 
     Route::post('onlineacademic/OnlineScheduleClass', 'OnlineAcademicsController@OnlineScheduleClass');
-    
+
 
     Route::get('onlineacademic/LiveClassScheduled/{ScheduleId}', 'OnlineAcademicsController@LiveClassScheduled');
 
     Route::get('onlineacademic/LiveClassScheduledbroadcast/{ScheduleId}', 'OnlineAcademicsController@LiveClassScheduledbroadcast');
-       
+
     Route::get('onlineclass/onlineclass_conducts', 'OnlineAcademicsController@onlineclass_condduct');
 
-     Route::get('onlineclass/onlineclass_conducts_std_teach', 'OnlineAcademicsController@onlineclass_condduct_std_teach');
-
-
-    
+    Route::get('onlineclass/onlineclass_conducts_std_teach', 'OnlineAcademicsController@onlineclass_condduct_std_teach');
 });
