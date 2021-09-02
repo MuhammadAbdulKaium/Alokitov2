@@ -57,7 +57,6 @@
                   <th>#</th>
                   <th>Name</th>
                   <th>Alias</th>
-                  <th>Department</th>
                   <th>Action</th>
                 </tr>
                 </thead>
@@ -67,12 +66,6 @@
                    <tr>
                   <td>{{$i++}}</td>
                   <td>{{$designation->name}}</td>
-                       @if(!empty($designation->department()))
-                           <td>{{$designation->department()->name}}</td>
-                           @else
-                           <td></td>
-                           @endif
-
                   <td>{{$designation->alias}}</td>
                   <td>
                     <!-- <a href="/employee/designations/edit/{{$designation->id}}" oncontextmenu="return false;" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-pencil-square-o"></i></button></a>

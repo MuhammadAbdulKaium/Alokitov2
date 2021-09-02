@@ -81,13 +81,13 @@ class EmployeeController extends Controller
     {
         $employeeCounter = $request->input('emp_count');
         // checking
-        if($employeeCounter>0){
+        if ($employeeCounter > 0) {
             // Start transaction!
             DB::beginTransaction();
             // loop counter
             $loopCounter = 0;
             // looping
-            for ($i=1; $i<=$employeeCounter; $i++){
+            for ($i = 1; $i <= $employeeCounter; $i++) {
                 // receive single employee
                 $singleEmployee = $request->$i;
 
@@ -107,7 +107,7 @@ class EmployeeController extends Controller
                 $joiningDate = $singleEmployee['joining_date'];
 
                 // validating all requested input data
-                $validator = Validator::make(['email'=>$email], [
+                $validator = Validator::make(['email' => $email], [
                     'email' => 'required|unique:users'
                 ]);
 
@@ -116,15 +116,15 @@ class EmployeeController extends Controller
 
                     // employee user creation
                     try {
-                        $userFullName = $firstName." ".$middleName." ".$lastName;
+                        $userFullName = $firstName . " " . $middleName . " " . $lastName;
                         // create user profile for student
                         $userProfile = $this->manageUserProfile(0, [
-                            'name' =>$userFullName,
+                            'name' => $userFullName,
                             'email' => $email,
-                            'password'=> bcrypt(123456)
+                            'password' => bcrypt(123456)
                         ]);
                         // checking user profile
-                        if($userProfile){
+                        if ($userProfile) {
                             $userInfoProfile = new $this->userInfo();
                             // add user details
                             $userInfoProfile->user_id = $userProfile->id;
@@ -150,7 +150,7 @@ class EmployeeController extends Controller
                     try {
                         $employeeInfo = $this->manageEmployeeProfile(0, [
                             'user_id'     => $userProfile->id,
-//                            'title'        => $title,
+                            //                            'title'        => $title,
                             'first_name'  => $firstName,
                             'middle_name' => $middleName,
                             'last_name'   => $lastName,
@@ -165,11 +165,10 @@ class EmployeeController extends Controller
                             'phone'       => 0,
                             'campus_id'       => $this->academicHelper->getCampus(),
                             'institute_id'       => $this->academicHelper->getInstitute(),
-//                           'nationality'   => 0,
-//                        'experience_year' => $request->input('experience_year'),
-//                        'experience_month' => $request->input('experience_month'),
+                            //                           'nationality'   => 0,
+                            //                        'experience_year' => $request->input('experience_year'),
+                            //                        'experience_month' => $request->input('experience_month'),
                         ]);
-
                     } catch (ValidationException $e) {
                         // Rollback and then redirect
                         // back to form with errors
@@ -186,7 +185,6 @@ class EmployeeController extends Controller
                     try {
                         // set employee role
                         $employeeRoleProfileAssignment =  $this->setEmpRole($role, $userProfile);
-
                     } catch (ValidationException $e) {
                         // Rollback and then redirect
                         // back to form with errors
@@ -200,9 +198,8 @@ class EmployeeController extends Controller
                     }
 
                     // loop counter
-                    $loopCounter = ($loopCounter+1);
-
-                }else{
+                    $loopCounter = ($loopCounter + 1);
+                } else {
                     Session::flash('warning', 'Duplicate email found');
                     // receiving page action
                     return redirect('/employee/import');
@@ -213,12 +210,12 @@ class EmployeeController extends Controller
             // Commit the queries!
             DB::commit();
             // looping checking
-            if($loopCounter == $employeeCounter){
+            if ($loopCounter == $employeeCounter) {
                 Session::flash('success', 'employee list uploaded');
                 // return redirect
                 return redirect('/employee/manage');
             }
-        }else{
+        } else {
             Session::flash('warning', 'Employee List is empty');
             // return redirect
             return redirect()->back();
@@ -228,9 +225,9 @@ class EmployeeController extends Controller
     public function showImportedEmployeeList(Request $request)
     {
         $users = User::all();
-        $data = Excel::toArray(new EmployeeImport(),$request->file('employee_list'));
-//        return $data;
-        return view('employee::pages.employee-import.employee-import-list', compact('data','users'));
+        $data = Excel::toArray(new EmployeeImport(), $request->file('employee_list'));
+        //        return $data;
+        return view('employee::pages.employee-import.employee-import-list', compact('data', 'users'));
     }
     public function checkImportedEmployeeList(Request $request)
     {
@@ -240,10 +237,10 @@ class EmployeeController extends Controller
         $totalRow = array();
         $currentUserEmailArray = array();
         for ($i = 0; $i < count($request->employee_no); $i++) {
-            if (isset($array2[$request['employee_no'][$i]])){
-                $array3[$array2[$request['employee_no'][$i]]+1] = $request['employee_no'][$i];
-                $array3[$i+1] = $request['employee_no'][$i];
-            } else{
+            if (isset($array2[$request['employee_no'][$i]])) {
+                $array3[$array2[$request['employee_no'][$i]] + 1] = $request['employee_no'][$i];
+                $array3[$i + 1] = $request['employee_no'][$i];
+            } else {
                 $array2[$request['employee_no'][$i]] = $i;
             }
         }
@@ -258,11 +255,10 @@ class EmployeeController extends Controller
             }
             if (sizeof($array)) {
                 return ['status' => 'duplicate', 'msg' => 'Duplicated Data', 'currentUser' => $array];
-            }
-            else{
+            } else {
                 for ($i = 0; $i < count($request->employee_no); $i++) {
-                    if ($request['email_login_id'][$i]){
-                        $currentUserEmail = User::where('email',$request['email_login_id'][$i])->first();
+                    if ($request['email_login_id'][$i]) {
+                        $currentUserEmail = User::where('email', $request['email_login_id'][$i])->first();
                         if ($currentUserEmail) {
                             array_push($currentUserEmailArray, $currentUserEmail);
                         }
@@ -270,110 +266,98 @@ class EmployeeController extends Controller
                 }
                 if (sizeof($currentUserEmailArray)) {
                     return ['status' => 'emailDuplicate', 'msg' => 'Email Duplicated Data', 'duplicateEmail' => $currentUserEmailArray];
-                }
-                else{
+                } else {
                     DB::beginTransaction();
                     try {
-                        for($i=0;$i<count($request['employee_no']);$i++)
-                        {
+                        for ($i = 0; $i < count($request['employee_no']); $i++) {
                             //Get Department Value
                             $deptInput = $request['department'][$i];
-                            if($deptInput)
-                            {
+                            if ($deptInput) {
                                 $deptInfo = EmployeeDepartment::where([
                                     'institute_id' => $this->academicHelper->getInstitute(),
                                     'campus_id' => $this->academicHelper->getCampus(),
-                                    'name' =>$deptInput
+                                    'name' => $deptInput
                                 ])->first();
 
-                                if($deptInfo)
-                                {
+                                if ($deptInfo) {
                                     $department = $deptInfo->id;
-                                }
-                                else{
+                                } else {
                                     $department = 0;
                                 }
                             }
                             //Get Designation Value
                             $desigInput = $request['designation'][$i];
-                            if($desigInput)
-                            {
+                            if ($desigInput) {
                                 $desigInfo = EmployeeDesignation::where([
                                     'institute_id' => $this->academicHelper->getInstitute(),
                                     'campus_id' => $this->academicHelper->getCampus(),
-                                    'name' =>$desigInput
+                                    'name' => $desigInput
                                 ])->first();
-                                if($desigInfo)
-                                {
+                                if ($desigInfo) {
                                     $designation = $desigInfo->id;
-                                }
-                                else{
-                                    $designation =0;
+                                } else {
+                                    $designation = 0;
                                 }
                             }
 
                             //Get category Value
                             $getCategoryInput = $request['category'][$i];
-                            if($getCategoryInput)
-                            {
-                                if($getCategoryInput == 'Teaching'){
+                            if ($getCategoryInput) {
+                                if ($getCategoryInput == 'Teaching') {
                                     $category = 1;
-                                }
-                                else{
+                                } else {
                                     $category = 2;
                                 }
                             }
 
-                            $userName=$request['employee_no'][$i];
-                            $userEmail=$request['email_login_id'][$i];
-                            $checkEmployee = User::where('username','=',$userName)->first();
-                            $checkEmployeeEmail = User::where('email','=',$userEmail)->first();
-                            if(!$checkEmployee){
-                                $empStore=new User();
-                                $empStore->name = $request['first_name'][$i] .' '. $request['last_name'][$i];
+                            $userName = $request['employee_no'][$i];
+                            $userEmail = $request['email_login_id'][$i];
+                            $checkEmployee = User::where('username', '=', $userName)->first();
+                            $checkEmployeeEmail = User::where('email', '=', $userEmail)->first();
+                            if (!$checkEmployee) {
+                                $empStore = new User();
+                                $empStore->name = $request['first_name'][$i] . ' ' . $request['last_name'][$i];
                                 $empStore->email = $request['email_login_id'][$i];
                                 $empStore->username = $request['employee_no'][$i];
                                 $empStore->password = bcrypt(123456);
-                                $storeRecordID=$empStore->save();
-                                if($storeRecordID)
-                                {
-                                    if($storeRecordID)
-                                    {
-                                        $role_user=new RoleUser();
+                                $storeRecordID = $empStore->save();
+                                if ($storeRecordID) {
+                                    if ($storeRecordID) {
+                                        $role_user = new RoleUser();
                                         $role_user->user_id = $empStore->id;
                                         $role_user->role_id  = 5;
                                         $role_user->save();
 
-                                        $user_campus_inst=new UserInfo();
+                                        $user_campus_inst = new UserInfo();
                                         $user_campus_inst->user_id = $empStore->id;
                                         $user_campus_inst->campus_id = $this->academicHelper->getCampus();
                                         $user_campus_inst->institute_id = $this->academicHelper->getInstitute();
                                         $user_campus_inst->save();
 
                                         // Generating date
-                                        $dob = ($this->validateDate($request['date_of_birth'][$i]))?$request['date_of_birth'][$i]:null;
-                                        $doj = ($this->validateDate($request['date_of_joining'][$i]))?$request['date_of_joining'][$i]:null;
-                                        $dor = ($this->validateDate($request['date_of_retirement'][$i]))?$request['date_of_retirement'][$i]:null;
+                                        $dob = ($this->validateDate($request['date_of_birth'][$i])) ? $request['date_of_birth'][$i] : null;
+                                        $doj = ($this->validateDate($request['date_of_joining'][$i])) ? $request['date_of_joining'][$i] : null;
+                                        $dor = ($this->validateDate($request['date_of_retirement'][$i])) ? $request['date_of_retirement'][$i] : null;
 
-                                        $employeeInfo =new EmployeeInformation();
-                                        $employeeInfo->user_id=$empStore->id;
-                                        $employeeInfo->title= 'FM';
-                                        $employeeInfo->first_name= $request['first_name'][$i];
-                                        $employeeInfo->last_name= $request['last_name'][$i];
-                                        $employeeInfo->alias= $request['alias'][$i];
-                                        $employeeInfo->gender= $request['gender'][$i];
-                                        $employeeInfo->dob= $dob;
-                                        $employeeInfo->doj= $doj;
-                                        $employeeInfo->dor= $dor;
-                                        $employeeInfo->department= $department;
-                                        $employeeInfo->designation= $designation;
-                                        $employeeInfo->category= $category;
-                                        $employeeInfo->email= $request['email_login_id'][$i];
-                                        $employeeInfo->phone= $request['phone'][$i];
-                                        $employeeInfo->alt_mobile= $request['alternative_mobile'][$i];
-                                        $employeeInfo->marital_status= $request['marital_status'][$i];
-                                        $employeeInfo->institute_id= $this->academicHelper->getInstitute();
-                                        $employeeInfo->campus_id= $this->academicHelper->getCampus();
+                                        $employeeInfo = new EmployeeInformation();
+                                        $employeeInfo->user_id = $empStore->id;
+                                        $employeeInfo->title = 'FM';
+                                        $employeeInfo->first_name = $request['first_name'][$i];
+                                        $employeeInfo->last_name = $request['last_name'][$i];
+                                        $employeeInfo->alias = $request['alias'][$i];
+                                        $employeeInfo->gender = $request['gender'][$i];
+                                        $employeeInfo->dob = $dob;
+                                        $employeeInfo->doj = $doj;
+                                        $employeeInfo->dor = $dor;
+                                        $employeeInfo->department = $department;
+                                        $employeeInfo->designation = $designation;
+                                        $employeeInfo->category = $category;
+                                        $employeeInfo->email = $request['email_login_id'][$i];
+                                        $employeeInfo->phone = $request['phone'][$i];
+                                        $employeeInfo->alt_mobile = $request['alternative_mobile'][$i];
+                                        $employeeInfo->marital_status = $request['marital_status'][$i];
+                                        $employeeInfo->institute_id = $this->academicHelper->getInstitute();
+                                        $employeeInfo->campus_id = $this->academicHelper->getCampus();
                                         $employeeInfo->save();
 
 
@@ -393,10 +377,10 @@ class EmployeeController extends Controller
                                         $last_qft->employee_id = $employeeInfo->id;
                                         $last_qft->document_type = 1;
                                         $last_qft->qualification_type = 3;
-                                        $last_qft->document_details = $request['last_academic_qualification'][$i] ;
+                                        $last_qft->document_details = $request['last_academic_qualification'][$i];
                                         $last_qft->created_by = Auth::id();
-                                        $last_qft->campus_id =$this->academicHelper->getCampus();
-                                        $last_qft->institute_id= $this->academicHelper->getInstitute();
+                                        $last_qft->campus_id = $this->academicHelper->getCampus();
+                                        $last_qft->institute_id = $this->academicHelper->getInstitute();
 
                                         $last_qft->save();
 
@@ -404,82 +388,76 @@ class EmployeeController extends Controller
                                         $spcl_qft->employee_id = $employeeInfo->id;
                                         $spcl_qft->document_type = 1;
                                         $spcl_qft->qualification_type = 2;
-                                        $spcl_qft->document_details = $request['special_qualification'][$i] ;
+                                        $spcl_qft->document_details = $request['special_qualification'][$i];
                                         $spcl_qft->created_by = Auth::id();
-                                        $spcl_qft->campus_id =$this->academicHelper->getCampus();
-                                        $spcl_qft->institute_id= $this->academicHelper->getInstitute();
+                                        $spcl_qft->campus_id = $this->academicHelper->getCampus();
+                                        $spcl_qft->institute_id = $this->academicHelper->getInstitute();
                                         $spcl_qft->save();
 
-                                        if($request['nid_no'][$i])
-                                        {
+                                        if ($request['nid_no'][$i]) {
                                             $employeeDocument = new EmployeeDocument();
                                             $employeeDocument->employee_id = $employeeInfo->id;
                                             $employeeDocument->document_type = 3;
-                                            $employeeDocument->	document_category = 'nid';
-                                            $employeeDocument->	document_details = $request['nid_no'][$i];
-                                            $employeeDocument->	created_by = Auth::id();
-                                            $employeeDocument->campus_id =$this->academicHelper->getCampus();
-                                            $employeeDocument->institute_id= $this->academicHelper->getInstitute();
+                                            $employeeDocument->document_category = 'nid';
+                                            $employeeDocument->document_details = $request['nid_no'][$i];
+                                            $employeeDocument->created_by = Auth::id();
+                                            $employeeDocument->campus_id = $this->academicHelper->getCampus();
+                                            $employeeDocument->institute_id = $this->academicHelper->getInstitute();
                                             $employeeDocument->save();
                                         }
-                                        if($request['passport_no'][$i])
-                                        {
+                                        if ($request['passport_no'][$i]) {
                                             $employeeDocument = new EmployeeDocument();
                                             $employeeDocument->employee_id = $employeeInfo->id;
                                             $employeeDocument->document_type = 3;
-                                            $employeeDocument->	document_category = 'passport';
-                                            $employeeDocument->	document_details = $request['passport_no'][$i];
-                                            $employeeDocument-> created_by = Auth::id();
-                                            $employeeDocument->campus_id =$this->academicHelper->getCampus();
-                                            $employeeDocument->institute_id= $this->academicHelper->getInstitute();
-                                            $employeeDocument->save();
-                                        }
-
-                                        if($request['birth_certificate_no'][$i])
-                                        {
-                                            $employeeDocument = new EmployeeDocument();
-                                            $employeeDocument->employee_id = $employeeInfo->id;
-                                            $employeeDocument->document_type = 3;
-                                            $employeeDocument->	document_category = 'birth';
-                                            $employeeDocument->	document_details = $request['birth_certificate_no'][$i];
-                                            $employeeDocument->	created_by = Auth::id();
-                                            $employeeDocument->campus_id =$this->academicHelper->getCampus();
-                                            $employeeDocument->institute_id= $this->academicHelper->getInstitute();
+                                            $employeeDocument->document_category = 'passport';
+                                            $employeeDocument->document_details = $request['passport_no'][$i];
+                                            $employeeDocument->created_by = Auth::id();
+                                            $employeeDocument->campus_id = $this->academicHelper->getCampus();
+                                            $employeeDocument->institute_id = $this->academicHelper->getInstitute();
                                             $employeeDocument->save();
                                         }
 
-                                        if($request['tin_no'][$i])
-                                        {
+                                        if ($request['birth_certificate_no'][$i]) {
                                             $employeeDocument = new EmployeeDocument();
                                             $employeeDocument->employee_id = $employeeInfo->id;
                                             $employeeDocument->document_type = 3;
-                                            $employeeDocument->	document_category = 'tin';
-                                            $employeeDocument->	document_details = $request['tin_no'][$i];
-                                            $employeeDocument->campus_id =$this->academicHelper->getCampus();
-                                            $employeeDocument->institute_id= $this->academicHelper->getInstitute();
-                                            $employeeDocument->	created_by = Auth::id();
+                                            $employeeDocument->document_category = 'birth';
+                                            $employeeDocument->document_details = $request['birth_certificate_no'][$i];
+                                            $employeeDocument->created_by = Auth::id();
+                                            $employeeDocument->campus_id = $this->academicHelper->getCampus();
+                                            $employeeDocument->institute_id = $this->academicHelper->getInstitute();
                                             $employeeDocument->save();
                                         }
-                                        if($request['driving_license_no'][$i])
-                                        {
+
+                                        if ($request['tin_no'][$i]) {
                                             $employeeDocument = new EmployeeDocument();
                                             $employeeDocument->employee_id = $employeeInfo->id;
                                             $employeeDocument->document_type = 3;
-                                            $employeeDocument->	document_category = 'dl';
-                                            $employeeDocument->	document_details = $request['driving_license_no'][$i];
-                                            $employeeDocument->campus_id =$this->academicHelper->getCampus();
-                                            $employeeDocument->institute_id= $this->academicHelper->getInstitute();
-                                            $employeeDocument->	created_by = Auth::id();
+                                            $employeeDocument->document_category = 'tin';
+                                            $employeeDocument->document_details = $request['tin_no'][$i];
+                                            $employeeDocument->campus_id = $this->academicHelper->getCampus();
+                                            $employeeDocument->institute_id = $this->academicHelper->getInstitute();
+                                            $employeeDocument->created_by = Auth::id();
+                                            $employeeDocument->save();
+                                        }
+                                        if ($request['driving_license_no'][$i]) {
+                                            $employeeDocument = new EmployeeDocument();
+                                            $employeeDocument->employee_id = $employeeInfo->id;
+                                            $employeeDocument->document_type = 3;
+                                            $employeeDocument->document_category = 'dl';
+                                            $employeeDocument->document_details = $request['driving_license_no'][$i];
+                                            $employeeDocument->campus_id = $this->academicHelper->getCampus();
+                                            $employeeDocument->institute_id = $this->academicHelper->getInstitute();
+                                            $employeeDocument->created_by = Auth::id();
                                             $employeeDocument->save();
                                         }
 
                                         $father_info = new StudentGuardian();
                                         $father_info->type = 1;
                                         $father_info->gender = 1;
-                                        $father_info->first_name = $request['fathers_name'][$i] ;
+                                        $father_info->first_name = $request['fathers_name'][$i];
                                         $father_info_store = $father_info->save();
-                                        if($father_info_store)
-                                        {
+                                        if ($father_info_store) {
                                             $parent_info = new StudentParent();
                                             $parent_info->gud_id  = $father_info->id;
                                             $parent_info->emp_id  = $employeeInfo->id;
@@ -489,10 +467,9 @@ class EmployeeController extends Controller
                                         $mothers_info = new StudentGuardian();
                                         $mothers_info->type = 0;
                                         $mothers_info->gender = 2;
-                                        $mothers_info->first_name = $request['mothers_name'][$i] ;
+                                        $mothers_info->first_name = $request['mothers_name'][$i];
                                         $mothers_info_store = $mothers_info->save();
-                                        if($mothers_info_store)
-                                        {
+                                        if ($mothers_info_store) {
                                             $parent_info = new StudentParent();
                                             $parent_info->gud_id  = $mothers_info->id;
                                             $parent_info->emp_id  = $employeeInfo->id;
@@ -500,73 +477,64 @@ class EmployeeController extends Controller
                                         }
 
                                         // Spouse Date
-                                        $spouseDob = ($this->validateDate($request['spouse_date_of_birth'][$i]))?$request['spouse_date_of_birth'][$i]:null;
+                                        $spouseDob = ($this->validateDate($request['spouse_date_of_birth'][$i])) ? $request['spouse_date_of_birth'][$i] : null;
 
                                         $spouse_details = new StudentGuardian();
                                         $spouse_details->type = 6;
                                         $spouse_details->gender = 2;
-                                        $spouse_details->first_name = $request['spouse_name'][$i] ;
-                                        $spouse_details->occupation = $request['spouse_occupation'][$i] ;
-                                        $spouse_details->mobile = $request['spouse_mobile'][$i] ;
-                                        $spouse_details->nid_number = $request['spouse_nid'][$i] ;
-                                        $spouse_details->date_of_birth = $spouseDob ;
+                                        $spouse_details->first_name = $request['spouse_name'][$i];
+                                        $spouse_details->occupation = $request['spouse_occupation'][$i];
+                                        $spouse_details->mobile = $request['spouse_mobile'][$i];
+                                        $spouse_details->nid_number = $request['spouse_nid'][$i];
+                                        $spouse_details->date_of_birth = $spouseDob;
                                         $spouse_details_save = $spouse_details->save();
-                                        if($spouse_details_save)
-                                        {
+                                        if ($spouse_details_save) {
                                             $parent_info = new StudentParent();
                                             $parent_info->gud_id  = $spouse_details->id;
                                             $parent_info->emp_id  = $employeeInfo->id;
                                             $parent_info->save();
                                         }
 
-                                        if($request['child_1_name'][$i])
-                                        {
+                                        if ($request['child_1_name'][$i]) {
                                             // Child1 Date
-                                            $child1Dob = ($this->validateDate($request['child_1_date_of_birth'][$i]))?$request['child_1_date_of_birth'][$i]:null;
+                                            $child1Dob = ($this->validateDate($request['child_1_date_of_birth'][$i])) ? $request['child_1_date_of_birth'][$i] : null;
 
-                                            if($request['child_1_gender'][$i] == 'Male')
-                                            {
+                                            if ($request['child_1_gender'][$i] == 'Male') {
                                                 $child_1_gender = 1;
-                                            }
-                                            else{
+                                            } else {
                                                 $child_1_gender = 2;
                                             }
 
                                             $child1 = new StudentGuardian();
                                             $child1->type = $child_1_gender == 1 ? 7 : 8;
                                             $child1->gender = $child_1_gender;
-                                            $child1->first_name = $request['child_1_name'][$i] ;
-                                            $child1->date_of_birth = $child1Dob ;
+                                            $child1->first_name = $request['child_1_name'][$i];
+                                            $child1->date_of_birth = $child1Dob;
                                             $child1_store = $child1->save();
-                                            if($child1_store)
-                                            {
+                                            if ($child1_store) {
                                                 $parent_info = new StudentParent();
                                                 $parent_info->gud_id  = $child1->id;
                                                 $parent_info->emp_id  = $employeeInfo->id;
                                                 $parent_info->save();
                                             }
                                         }
-                                        if($request['child_2_name'][$i])
-                                        {
+                                        if ($request['child_2_name'][$i]) {
                                             // Child2 Date
-                                            $child2Dob = ($this->validateDate($request['child_2_date_of_birth'][$i]))?$request['child_2_date_of_birth'][$i]:null;
+                                            $child2Dob = ($this->validateDate($request['child_2_date_of_birth'][$i])) ? $request['child_2_date_of_birth'][$i] : null;
 
-                                            if($request['child_2_gender'][$i] == 'Male')
-                                            {
+                                            if ($request['child_2_gender'][$i] == 'Male') {
                                                 $child_2_gender = 1;
-                                            }
-                                            else{
+                                            } else {
                                                 $child_2_gender = 2;
                                             }
 
                                             $child2 = new StudentGuardian();
                                             $child2->type = $child_2_gender == 1 ? 7 : 8;
                                             $child2->gender = $child_2_gender;
-                                            $child2->first_name = $request['child_2_name'][$i] ;
-                                            $child2->date_of_birth = $child2Dob ;
+                                            $child2->first_name = $request['child_2_name'][$i];
+                                            $child2->date_of_birth = $child2Dob;
                                             $child2_store = $child2->save();
-                                            if($child2_store)
-                                            {
+                                            if ($child2_store) {
                                                 $parent_info = new StudentParent();
                                                 $parent_info->gud_id  = $child2->id;
                                                 $parent_info->emp_id  = $employeeInfo->id;
@@ -574,27 +542,23 @@ class EmployeeController extends Controller
                                             }
                                         }
 
-                                        if($request['child_3_name'][$i])
-                                        {
+                                        if ($request['child_3_name'][$i]) {
                                             // Child3 Date
-                                            $child3Dob = ($this->validateDate($request['child_3_date_of_birth'][$i]))?$request['child_3_date_of_birth'][$i]:null;
+                                            $child3Dob = ($this->validateDate($request['child_3_date_of_birth'][$i])) ? $request['child_3_date_of_birth'][$i] : null;
 
-                                            if($request['child_3_gender'][$i] == 'Male')
-                                            {
+                                            if ($request['child_3_gender'][$i] == 'Male') {
                                                 $child_3_gender = 1;
-                                            }
-                                            else{
+                                            } else {
                                                 $child_3_gender = 2;
                                             }
 
                                             $child_3 = new StudentGuardian();
                                             $child_3->type = $child_3_gender == 1 ? 7 : 8;
                                             $child_3->gender = $child_3_gender;
-                                            $child_3->first_name = $request['child_3_name'][$i] ;
-                                            $child_3->date_of_birth = $child3Dob ;
+                                            $child_3->first_name = $request['child_3_name'][$i];
+                                            $child_3->date_of_birth = $child3Dob;
                                             $child3_store = $child_3->save();
-                                            if($child3_store)
-                                            {
+                                            if ($child3_store) {
                                                 $parent_info = new StudentParent();
                                                 $parent_info->gud_id  = $child_3->id;
                                                 $parent_info->emp_id  = $employeeInfo->id;
@@ -602,16 +566,13 @@ class EmployeeController extends Controller
                                             }
                                         }
 
-                                        if($request['child_4_name'][$i])
-                                        {
+                                        if ($request['child_4_name'][$i]) {
                                             // Child4 Date
-                                            $child4Dob = ($this->validateDate($request['child_4_date_of_birth'][$i]))?$request['child_4_date_of_birth'][$i]:null;
+                                            $child4Dob = ($this->validateDate($request['child_4_date_of_birth'][$i])) ? $request['child_4_date_of_birth'][$i] : null;
 
-                                            if($request['child_4_gender'][$i] == 'Male')
-                                            {
+                                            if ($request['child_4_gender'][$i] == 'Male') {
                                                 $child_4_gender = 1;
-                                            }
-                                            else{
+                                            } else {
                                                 $child_4_gender = 2;
                                             }
 
@@ -619,11 +580,10 @@ class EmployeeController extends Controller
                                             $child4->type = $child_4_gender == 1 ? 7 : 8;
                                             $child4->gender = $child_4_gender;
                                             $child4->first_name = $request['child_4_name'][$i];
-                                            $child4->date_of_birth = $child4Dob ;
+                                            $child4->date_of_birth = $child4Dob;
                                             $child4_store = $child4->save();
 
-                                            if($child4_store)
-                                            {
+                                            if ($child4_store) {
                                                 $parent_info = new StudentParent();
                                                 $parent_info->gud_id  = $child4->id;
                                                 $parent_info->emp_id  = $employeeInfo->id;
@@ -632,19 +592,16 @@ class EmployeeController extends Controller
                                         }
                                     }
                                 }
-                                if($storeRecordID)
-                                {
+                                if ($storeRecordID) {
                                     array_push($totalRow, $i);
-
                                 }
                             }
-
                         }
                         if (sizeof($totalRow)) {
                             DB::commit();
-                            return ['status' => 'recordSuccessfull', 'msg' => 'Data record Successfully','recordData' => $totalRow];
+                            return ['status' => 'recordSuccessfull', 'msg' => 'Data record Successfully', 'recordData' => $totalRow];
                         }
-                    } catch (\Exception $e){
+                    } catch (\Exception $e) {
                         // Rollback
                         DB::rollback();
                         // throw exceptions
@@ -652,16 +609,14 @@ class EmployeeController extends Controller
                         return 420;
                     }
                 }
-
-
             }
         }
 
 
 
-//
-////        $data = Excel::toArray(new EmployeeImport(),$request->file('employee_list'));
-////        return view('employee::pages.employee-import.employee-import-list', compact('data'));
+        //
+        ////        $data = Excel::toArray(new EmployeeImport(),$request->file('employee_list'));
+        ////        return view('employee::pages.employee-import.employee-import-list', compact('data'));
     }
 
 
@@ -672,7 +627,11 @@ class EmployeeController extends Controller
         $instituteId = $this->academicHelper->getInstitute();
         // all department list
         $allDepartments = $this->department->where([
-            'campus_id'=>$campusId, 'institute_id'=>$instituteId, 'dept_type'=>0
+            'campus_id' => $campusId, 'institute_id' => $instituteId, 'dept_type' => 0
+        ])->orderBy('name', 'ASC')->get();
+        // all designation list
+        $allDesignations = $this->designation->where([
+            'campus_id' => $campusId, 'institute_id' => $instituteId
         ])->orderBy('name', 'ASC')->get();
         // all nationality
         $allNationality = $this->country->orderBy('nationality', 'ASC')->get(['id', 'nationality']);
@@ -681,7 +640,7 @@ class EmployeeController extends Controller
         // all roles
         $allRole = $this->role->orderBy('name', 'ASC')->whereNotIn('name', ['parent', 'student', 'admin'])->get();
 
-        return view('employee::pages.employee-add', compact('allDepartments', 'allRole', 'allNationality', 'allCampus'));
+        return view('employee::pages.employee-add', compact('allDepartments', 'allDesignations', 'allRole', 'allNationality', 'allCampus'));
     }
 
     // store employee function
@@ -691,10 +650,10 @@ class EmployeeController extends Controller
         $validator = Validator::make($request->all(), [
             'campus'            => 'required',
             'role'            => 'required',
-           // 'title'            => 'required',
+            // 'title'            => 'required',
             'first_name'       => 'required|max:100',
-           // 'last_name'        => 'required|max:100',
-           // 'alias'            => 'required|max:100',
+            // 'last_name'        => 'required|max:100',
+            // 'alias'            => 'required|max:100',
             'gender'           => 'required',
             'dob'              => 'required',
             //'doj'              => 'required',
@@ -702,8 +661,8 @@ class EmployeeController extends Controller
             'designation'      => 'required|numeric',
             'category'         => 'required|numeric',
             'email'            => 'required|email|max:100|unique:users',
-           // 'phone'            => 'required|max:20',
-           // 'marital_status'   => 'required',
+            // 'phone'            => 'required|max:20',
+            // 'marital_status'   => 'required',
             // 'nationality'      => 'required|numeric',
             // 'experience_year'  => 'required|numeric',
             // 'experience_month' => 'required|numeric',
@@ -718,13 +677,13 @@ class EmployeeController extends Controller
             // student user cration
             try {
 
-                $userFullName = $request->input('first_name')." ".$request->input('middle_name')." ".$request->input('last_name');
+                $userFullName = $request->input('first_name') . " " . $request->input('middle_name') . " " . $request->input('last_name');
                 // create user profile for student
                 // $manageUserProfile = $this->manageUserProfile($userId, $userData);
-                $userProfile = $this->manageUserProfile(0, ['name' =>$userFullName, 'email' => $request->input('email'), 'password'=> bcrypt(123456)]);
+                $userProfile = $this->manageUserProfile(0, ['name' => $userFullName, 'email' => $request->input('email'), 'password' => bcrypt(123456)]);
 
                 // checking user profile
-                if($userProfile){
+                if ($userProfile) {
                     $userInfoProfile = new $this->userInfo();
                     // add user details
                     $userInfoProfile->user_id = $userProfile->id;
@@ -775,21 +734,20 @@ class EmployeeController extends Controller
                 ]);
 
                 // Address Creation
-                if ($request->present_address){
+                if ($request->present_address) {
                     Address::create([
                         'user_id' => $userProfile->id,
                         'type' => 'EMPLOYEE_PRESENT_ADDRESS',
                         'address' => $request->present_address
                     ]);
                 }
-                if ($request->permanent_address){
+                if ($request->permanent_address) {
                     Address::create([
                         'user_id' => $userProfile->id,
                         'type' => 'EMPLOYEE_PERMANENT_ADDRESS',
                         'address' => $request->permanent_address
                     ]);
                 }
-
             } catch (ValidationException $e) {
                 // Rollback and then redirect
                 // back to form with errors
@@ -806,7 +764,6 @@ class EmployeeController extends Controller
             try {
                 // set employee role
                 $employeeRoleProfileAssignment =  $this->setEmpRole($request->input('role'), $userProfile);
-
             } catch (ValidationException $e) {
                 // Rollback and then redirect
                 // back to form with errors
@@ -843,12 +800,14 @@ class EmployeeController extends Controller
     public function manageEmployee()
     {
         // campus and institute id
-        $instituteId= $this->academicHelper->getInstitute();
+        $instituteId = $this->academicHelper->getInstitute();
         // employee departments
-        $allDepartments = $this->department->where(['institute_id'=>$instituteId, 'dept_type'=>0])->orderBy('name', 'ASC')->get();
+        $allDepartments = $this->department->where(['institute_id' => $instituteId, 'dept_type' => 0])->orderBy('name', 'ASC')->get();
+        // employee designations
+        $allDesignations = $this->designation->where(['institute_id' => $instituteId])->orderBy('name', 'ASC')->get();
         // // all inputs as objects
         // return view
-        return view('employee::pages.employee-manage', compact('allDepartments'));
+        return view('employee::pages.employee-manage', compact('allDepartments', 'allDesignations'));
     }
     public function imagePage()
     {
@@ -857,21 +816,21 @@ class EmployeeController extends Controller
 
     public function imageUpload(Request $request)
     {
-        $imageName="";
+        $imageName = "";
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-//            $file_name_timestamp = "ems";
+            //            $file_name_timestamp = "ems";
             foreach ($image as $files) {
-                $file_name_timestamp = "ems" .$files->getClientOriginalName().rand(1,10);
+                $file_name_timestamp = "ems" . $files->getClientOriginalName() . rand(1, 10);
                 //Image Info
-                $user_id=trim($files->getClientOriginalName(),'.'.$files->getClientOriginalExtension());
+                $user_id = trim($files->getClientOriginalName(), '.' . $files->getClientOriginalExtension());
                 //User Info
-                $userID=User::where('username',$user_id)->first();
+                $userID = User::where('username', $user_id)->first();
                 $user = $userID['id'];
-//                echo $user;
-//                echo '<br>';
+                //                echo $user;
+                //                echo '<br>';
                 $destinationPath = 'assets/users/images/';
-                $imageName = $file_name_timestamp. "." . $files->getClientOriginalExtension();
+                $imageName = $file_name_timestamp . "." . $files->getClientOriginalExtension();
                 $ext = $files->getClientOriginalExtension();
                 $files->move($destinationPath, $imageName);
                 $data[] = $imageName;
@@ -879,55 +838,49 @@ class EmployeeController extends Controller
                 //End Image Info
 
                 //Personal Info
-                $personalInfo = EmployeeInformation::where('user_id',$user)->first();
+                $personalInfo = EmployeeInformation::where('user_id', $user)->first();
                 $enrollment = $personalInfo->id;
-//                return $enrollment;
-//
-                $campus =$this->academicHelper->getCampus();
+                //                return $enrollment;
+                //
+                $campus = $this->academicHelper->getCampus();
                 $institute = $this->academicHelper->getInstitute();
-//                //Check Image Exist or not
-                $imageAttachmentUpdate = EmployeeAttachment::where('emp_id',$enrollment)->where('doc_type','PROFILE_PHOTO')->first();
+                //                //Check Image Exist or not
+                $imageAttachmentUpdate = EmployeeAttachment::where('emp_id', $enrollment)->where('doc_type', 'PROFILE_PHOTO')->first();
                 echo $imageAttachmentUpdate;
 
                 DB::beginTransaction();
-                if($imageAttachmentUpdate)
-                {
-                    try
-                    {
-                        $contentFind=Content::where('id',$imageAttachmentUpdate->doc_id)->first();
-                        $contentFind->name=$imageName;
-                        $contentFind->file_name=$imageName;
-                        $contentFind->path=$destinationPath;
-                        $contentFind->mime=$ext;
-                        $content_update=$contentFind->save();
-//
-////                        if($content_update)
-////                        {
-////                            $photoStore=new CadetPersonalPhoto;
-////                            $photoStore->image = $imageName;
-////                            $photoStore->date = date('Y-m-d');
-////                            $photoStore->cadet_no = $user;
-////                            $photoStore->student_id = $enrollment->std_id;
-////                            $photoStore->campus_id = $campus;
-////                            $photoStore->institute_id = $institute;
-////                            $photoStore->academics_year_id=$enrollment->academic_year;
-////                            $photoStore->section_id=$enrollment->section;
-////                            $photoStore->batch_id= $enrollment->batch;
-////                            $photoStorage=$photoStore->save();
-////                        }
+                if ($imageAttachmentUpdate) {
+                    try {
+                        $contentFind = Content::where('id', $imageAttachmentUpdate->doc_id)->first();
+                        $contentFind->name = $imageName;
+                        $contentFind->file_name = $imageName;
+                        $contentFind->path = $destinationPath;
+                        $contentFind->mime = $ext;
+                        $content_update = $contentFind->save();
+                        //
+                        ////                        if($content_update)
+                        ////                        {
+                        ////                            $photoStore=new CadetPersonalPhoto;
+                        ////                            $photoStore->image = $imageName;
+                        ////                            $photoStore->date = date('Y-m-d');
+                        ////                            $photoStore->cadet_no = $user;
+                        ////                            $photoStore->student_id = $enrollment->std_id;
+                        ////                            $photoStore->campus_id = $campus;
+                        ////                            $photoStore->institute_id = $institute;
+                        ////                            $photoStore->academics_year_id=$enrollment->academic_year;
+                        ////                            $photoStore->section_id=$enrollment->section;
+                        ////                            $photoStore->batch_id= $enrollment->batch;
+                        ////                            $photoStorage=$photoStore->save();
+                        ////                        }
                         DB::commit();
-                    }
-                    catch (\Exception $e)
-                    {
+                    } catch (\Exception $e) {
                         DB::rollback();
                         return redirect()->back($e->getMessage());
                     }
-//
-//
-//
-                }
-                else
-                {
+                    //
+                    //
+                    //
+                } else {
                     try {
                         $userDocument = new Content();
                         // storing user document
@@ -935,11 +888,10 @@ class EmployeeController extends Controller
                         $userDocument->file_name = $imageName;
                         $userDocument->path = $destinationPath;
                         $userDocument->mime = $ext;
-                        $insertDocument=$userDocument->save();
-//
-//
-                        if($insertDocument)
-                        {
+                        $insertDocument = $userDocument->save();
+                        //
+                        //
+                        if ($insertDocument) {
                             $studentAttachment = new EmployeeAttachment();
                             // storing student attachment
                             $studentAttachment->emp_id     = $enrollment;
@@ -949,38 +901,36 @@ class EmployeeController extends Controller
                             // save student attachment profile
                             $attachmentUploaded = $studentAttachment->save();
                         }
-////                        if($insertDocument)
-////                        {
-////                            $photoStore=new CadetPersonalPhoto;
-////                            $photoStore->image = $imageName;
-////                            $photoStore->date = date('Y-m-d');
-////                            $photoStore->cadet_no = $user;
-////                            $photoStore->student_id = $enrollment->std_id;
-////                            $photoStore->campus_id = $campus;
-////                            $photoStore->institute_id = $institute;
-////                            $photoStore->academics_year_id=$enrollment->academic_year;
-////                            $photoStore->section_id=$enrollment->section;
-////                            $photoStore->batch_id= $enrollment->batch;
-////                            $photoStorage=$photoStore->save();
-////                        }
-//                        if($insertDocument){
-//                            // If we reach here, then data is valid and working. Commit the queries!
-//                            DB::commit();
-                        }
-//
-//
+                        ////                        if($insertDocument)
+                        ////                        {
+                        ////                            $photoStore=new CadetPersonalPhoto;
+                        ////                            $photoStore->image = $imageName;
+                        ////                            $photoStore->date = date('Y-m-d');
+                        ////                            $photoStore->cadet_no = $user;
+                        ////                            $photoStore->student_id = $enrollment->std_id;
+                        ////                            $photoStore->campus_id = $campus;
+                        ////                            $photoStore->institute_id = $institute;
+                        ////                            $photoStore->academics_year_id=$enrollment->academic_year;
+                        ////                            $photoStore->section_id=$enrollment->section;
+                        ////                            $photoStore->batch_id= $enrollment->batch;
+                        ////                            $photoStorage=$photoStore->save();
+                        ////                        }
+                        //                        if($insertDocument){
+                        //                            // If we reach here, then data is valid and working. Commit the queries!
+                        //                            DB::commit();
+                    }
+                    //
+                    //
                     catch (ValidationException $e) {
                         // Rollback and then redirect
                         // back to form with errors
                         DB::rollback();
                         return redirect()->back($e->getMessage());
-
                     }
-//
+                    //
                 }
-
             }
-            $imageName="";
+            $imageName = "";
         }
         // return
         Session::flash('success', 'Employee Image Uploaded !!!');
@@ -992,13 +942,13 @@ class EmployeeController extends Controller
     public function manageTeacher()
     {
         // campus and institute id
-        $campusId= $this->academicHelper->getCampus();
-        $instituteId= $this->academicHelper->getInstitute();
+        $campusId = $this->academicHelper->getCampus();
+        $instituteId = $this->academicHelper->getInstitute();
 
         // employee designations
-        $allDesignaitons = $this->designation->where(['institute_id'=>$instituteId,])->orderBy('name', 'ASC')->get();
+        $allDesignaitons = $this->designation->where(['institute_id' => $instituteId,])->orderBy('name', 'ASC')->get();
         // employee departments
-        $allDepartments = $this->department->where(['institute_id'=>$instituteId, 'dept_type'=>0])->orderBy('name', 'ASC')->get();
+        $allDepartments = $this->department->where(['institute_id' => $instituteId, 'dept_type' => 0])->orderBy('name', 'ASC')->get();
         // return view
         return view('employee::pages.manage-teacher', compact('allDesignaitons', 'allDepartments'));
     }
@@ -1034,9 +984,9 @@ class EmployeeController extends Controller
         if ($empId) $allSearchInputs['id'] = $empId;
 
         // search result
-        $allEmployee = $this->employeeInformation->where($allSearchInputs)->orderBy('status','DESC')->orderBy('sort_order', 'ASC')->get();
+        $allEmployee = $this->employeeInformation->where($allSearchInputs)->orderBy('status', 'DESC')->orderBy('sort_order', 'ASC')->get();
         // return view with variable
-        return view('employee::pages.includes.teacher-list', compact('allEmployee','allSearchInputs'));
+        return view('employee::pages.includes.teacher-list', compact('allEmployee', 'allSearchInputs'));
     }
 
     // search employee
@@ -1057,13 +1007,13 @@ class EmployeeController extends Controller
         $allSearchInputs = array();
 
         // checking return type
-        if($returnType=="json"){
+        if ($returnType == "json") {
             // status
             $allSearchInputs['status'] = 1;
             // input institute and campus id
             $allSearchInputs['campus_id'] = $campusId;
             $allSearchInputs['institute_id'] = $instituteId;
-        }else{
+        } else {
             // input institute and campus id
             $allSearchInputs['campus_id'] = $this->academicHelper->getCampus();
             $allSearchInputs['institute_id'] = $this->academicHelper->getInstitute();
@@ -1074,29 +1024,28 @@ class EmployeeController extends Controller
         // check designation
         if ($designation) $allSearchInputs['designation'] = $designation;
         // check category
-        if (!empty($category)|| $category!=null) $allSearchInputs['category'] = $category;
+        if (!empty($category) || $category != null) $allSearchInputs['category'] = $category;
         // check email
         if ($email) $allSearchInputs['email'] = $email;
         // check empId
         if ($empId) $allSearchInputs['id'] = $empId;
 
         // search result
-        $allEmployee = $this->employeeInformation->where($allSearchInputs)->orderBy('status','DESC')->orderBy('sort_order', 'ASC')->get();
+        $allEmployee = $this->employeeInformation->where($allSearchInputs)->orderBy('status', 'DESC')->orderBy('sort_order', 'ASC')->get();
         // checking
-        if($returnType=="json"){
+        if ($returnType == "json") {
             // return with variables
             return $allEmployee;
-        }else{
+        } else {
             // checking
             if ($allEmployee) {
-                return view('employee::pages.includes.teacher-list', compact('allEmployee','allSearchInputs'));
+                return view('employee::pages.includes.teacher-list', compact('allEmployee', 'allSearchInputs'));
             } else {
                 Session::flash('warning', 'ubable to perform the action');
                 // return redirect
                 return redirect()->back();
             }
         }
-
     }
 
 
@@ -1132,7 +1081,7 @@ class EmployeeController extends Controller
         if ($empId) $allSearchInputs['id'] = $empId;
 
         // search result
-        $allEmployee = EmployeeInformation::where($allSearchInputs)->orderBy('status','DESC')->get();
+        $allEmployee = EmployeeInformation::where($allSearchInputs)->orderBy('status', 'DESC')->get();
         // checking
         // checking
         if ($allEmployee) {
@@ -1155,8 +1104,6 @@ class EmployeeController extends Controller
                     $sheet->loadView('employee::reports.employee_list');
                 });
             })->download('xlsx');
-
-
         } else {
             Session::flash('warning', 'ubable to perform the action');
             // return redirect
@@ -1171,9 +1118,9 @@ class EmployeeController extends Controller
     public function manageUserProfile($userId, $userData)
     {
         // userId checking
-        if($userId>0){
+        if ($userId > 0) {
             $userProfile = $this->user->findOrFail($userId)->update($userData);
-        }else{
+        } else {
             $userProfile = $this->user->create($userData);
         }
 
@@ -1183,16 +1130,15 @@ class EmployeeController extends Controller
         } else {
             return false;
         }
-
     }
 
     // create or update employee profile
     public function manageEmployeeProfile($empId, $empData)
     {
         // $empId checking
-        if($empId>0){
+        if ($empId > 0) {
             $employeeProfile = $this->employeeInformation->findOrFail($empId)->update($empId);
-        }else{
+        } else {
             $employeeProfile = $this->employeeInformation->create($empData);
         }
 
@@ -1221,7 +1167,7 @@ class EmployeeController extends Controller
         $result_same_sheet = array();
         $result = array();
 
-        for($i = 1 ; $i<count($emails); $i++) {
+        for ($i = 1; $i < count($emails); $i++) {
 
             $user = User::where('email', '=', $emails[$i])->get();
             if (empty($result_same_sheet[$emails[$i]])) {
@@ -1229,11 +1175,10 @@ class EmployeeController extends Controller
                 if ($user->count() > 0) {
                     $result[$i] = 0;
                 } else {
-                    $result_same_sheet[$emails[$i]] =1;
+                    $result_same_sheet[$emails[$i]] = 1;
                     $result[$i] = 1;
                 }
-            }
-            else{
+            } else {
                 $result[$i] = 0;
             }
         }
@@ -1248,45 +1193,44 @@ class EmployeeController extends Controller
         // employee id
         $position = $request->input('sort_order');
         // checking
-        if(!empty($empId) AND $empId>0 AND !empty($position) AND $position>0){
+        if (!empty($empId) and $empId > 0 and !empty($position) and $position > 0) {
             // employee profile
             $employeeProfile = $this->employeeInformation->find($empId);
             // update web position
             $employeeProfile->sort_order = (int)$position;
             // checking
-            if($employeeProfile->save()){
+            if ($employeeProfile->save()) {
                 // teacher list
                 return 'success';
-            }else{
+            } else {
                 return 'failed';
             }
-        }else{
+        } else {
             return 'failed';
         }
-
-
     }
 
 
-    public function  getAllEmployId(){
-//        return "test";
-        $attendaceDevice=AttendanceDevice::where('institute_id',13)->get();
-        return $registerEmplyeeId= $attendaceDevice->pluck('registration_id');
+    public function  getAllEmployId()
+    {
+        //        return "test";
+        $attendaceDevice = AttendanceDevice::where('institute_id', 13)->get();
+        return $registerEmplyeeId = $attendaceDevice->pluck('registration_id');
 
-        $emplyeeList=EmployeeInformation::wherenotin('id',$registerEmplyeeId)->where('institute_id',13)->get();
-        return $ids=  $emplyeeList->pluck('id');
+        $emplyeeList = EmployeeInformation::wherenotin('id', $registerEmplyeeId)->where('institute_id', 13)->get();
+        return $ids =  $emplyeeList->pluck('id');
     }
 
     //change emplyee status
-    public function changeEmployeeStatus($empID){
+    public function changeEmployeeStatus($empID)
+    {
         $employeeProfile = $this->employeeInformation->find($empID);
-        if($employeeProfile->status==1){
-            $employeeProfile->status=0;
-        }else {
-            $employeeProfile->status=1;
+        if ($employeeProfile->status == 1) {
+            $employeeProfile->status = 0;
+        } else {
+            $employeeProfile->status = 1;
         }
         $employeeProfile->save();
         return redirect()->back();
     }
-
 }

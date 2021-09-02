@@ -33,7 +33,7 @@ class EmployeeDesignationController extends Controller
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
         // all designation list
-        $allDesignations = $this->employeeDesignation->where(['institute_id'=>$instituteId])->orderBy('name', 'ASC')->get();
+        $allDesignations = $this->employeeDesignation->where(['institute_id' => $instituteId])->orderBy('name', 'ASC')->get();
         // return view with allDseignation variable
         return view('employee::pages.designation', compact('allDesignations'));
     }
@@ -43,10 +43,8 @@ class EmployeeDesignationController extends Controller
     {
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
-        // all department list
-        $allDepartments = $this->employeeDepartment->where(['institute_id'=>$instituteId])->orderBy('name', 'ASC')->get();
         // return view
-        return view('employee::pages.modals.designation-create', compact('allDepartments'));
+        return view('employee::pages.modals.designation-create');
     }
 
     // Store a newly created resource in storage.
@@ -56,7 +54,6 @@ class EmployeeDesignationController extends Controller
         $validator = Validator::make($request->all(), [
             'name'  => 'required',
             'alias' => 'required',
-            'department' => 'required',
         ]);
 
         // storing requesting input data
@@ -66,7 +63,6 @@ class EmployeeDesignationController extends Controller
             // input detils
             $designationProfile->name = $request->input('name');
             $designationProfile->alias = $request->input('alias');
-            $designationProfile->dept_id = $request->input('department');
             $designationProfile->campus_id = $this->academicHelper->getCampus();
             $designationProfile->institute_id = $this->academicHelper->getInstitute();
             // save designationProfile
@@ -102,12 +98,10 @@ class EmployeeDesignationController extends Controller
     {
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
-        // all department list
-        $allDepartments = $this->employeeDepartment->where(['institute_id'=>$instituteId])->orderBy('name', 'ASC')->get();
         // find designation
         $designationProfile = EmployeeDesignation::FindOrFail($id);
         // return view with designationProfile variable
-        return view('employee::pages.modals.designation-update', compact('designationProfile', 'allDepartments'));
+        return view('employee::pages.modals.designation-update', compact('designationProfile'));
     }
 
     // Update the specified resource in storage.
@@ -117,7 +111,6 @@ class EmployeeDesignationController extends Controller
         $validator = Validator::make($request->all(), [
             'name'  => 'required',
             'alias' => 'required',
-            'department' => 'required',
         ]);
 
         // storing requesting input data
@@ -127,7 +120,6 @@ class EmployeeDesignationController extends Controller
             // input detils
             $designationProfile->name = $request->input('name');
             $designationProfile->alias = $request->input('alias');
-            $designationProfile->dept_id = $request->input('department');
             // save designationProfile
             $designationProfileUpdated = $designationProfile->save();
             // checking
@@ -163,7 +155,7 @@ class EmployeeDesignationController extends Controller
                 // return redirect
                 return redirect()->back();
             } else {
-                Session::flash('warning', 'Uabale to delete department');
+                Session::flash('warning', 'Uabale to delete designation');
                 // return redirect
                 return redirect()->back();
             }
@@ -176,18 +168,19 @@ class EmployeeDesignationController extends Controller
 
 
     // find designation list with department id
-    public function findDesignationList($deptId){
+    public function findDesignationList($deptId)
+    {
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
         // response data
         $responseData = array();
         // find designation list with department id
         $designationList = $this->employeeDesignation->where([
-           'institute_id'=>$instituteId, 'dept_id'=>$deptId
+            'institute_id' => $instituteId, 'dept_id' => $deptId
         ])->get();
         // looping
         foreach ($designationList as $designation) {
-            $responseData[] = ['id'=>$designation->id,'name'=>$designation->name];
+            $responseData[] = ['id' => $designation->id, 'name' => $designation->name];
         }
 
         // return response data

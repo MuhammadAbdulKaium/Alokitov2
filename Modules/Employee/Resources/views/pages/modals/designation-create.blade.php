@@ -8,24 +8,6 @@
    <input type="hidden" name="_token" value="{{csrf_token()}}">
    <div class="modal-body">
                 <div class="row">
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                                    <label class="control-label" for="department">Department</label>
-                                    <select id="department" class="form-control" name="department">
-                                        <option value="" selected disabled>Select Department</option>
-                                        @if($allDepartments)
-                                            @foreach($allDepartments as $department)
-                                                <option value="{{$department->id}}" @if(old('department')==$department->id) selected="selected" @endif>{{$department->name}} </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                    <div class="help-block">
-                                        @if ($errors->has('department'))
-                                            <strong>{{ $errors->first('department') }}</strong>
-                                        @endif
-                                    </div>
-                                </div>
-                   </div>
                    <div class="col-sm-4">
                       <div class="form-group">
                          <label class="control-label" for="name">Designation</label>

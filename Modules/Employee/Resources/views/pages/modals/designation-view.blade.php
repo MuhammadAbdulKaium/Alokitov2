@@ -16,10 +16,6 @@
                  <td>{{$designationProfile->alias}}</td>
                </tr>
                <tr>
-                  <th style="width:150px">Department</th>
-                 <td>{{$designationProfile->department()->name}}</td>
-               </tr>
-               <tr>
                   <th style="width:150px">Created At</th>
                  <td>{{$designationProfile->created_at->format('d M, Y, H:i:s A')}}</td>
                </tr>

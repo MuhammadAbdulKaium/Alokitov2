@@ -76,6 +76,11 @@
                                     <label class="control-label" for="designation">Designation</label>
                                     <select id="designation" class="form-control designation" name="designation">
                                         <option value="">--- Select Designation ---</option>
+                                        @if($allDesignations)
+                                            @foreach($allDesignations as $designation)
+                                                <option value="{{$designation->id}}">{{$designation->name}} </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     <div class="help-block"></div>
                                 </div>
@@ -171,15 +176,8 @@
                     },
 
                     success:function(data){
-                        op+='<option value="" selected disabled>--- Select Designation ---</option>';
-                        for(var i=0;i<data.length;i++){
-                            op+='<option value="'+data[i].id+'">'+data[i].name+'</option>';
-                        }
                         // refresh attendance container row
                         $('#employee_list_container').html('');
-                        // set value to the academic batch
-                        $('.designation').html("");
-                        $('.designation').append(op);
                     },
                     error:function(){
                         // sweet alert
