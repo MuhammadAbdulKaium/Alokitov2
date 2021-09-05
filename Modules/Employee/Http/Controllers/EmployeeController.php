@@ -452,48 +452,55 @@ class EmployeeController extends Controller
                                             $employeeDocument->save();
                                         }
 
-                                        $father_info = new StudentGuardian();
-                                        $father_info->type = 1;
-                                        $father_info->gender = 1;
-                                        $father_info->first_name = $request['fathers_name'][$i];
-                                        $father_info_store = $father_info->save();
-                                        if ($father_info_store) {
-                                            $parent_info = new StudentParent();
-                                            $parent_info->gud_id  = $father_info->id;
-                                            $parent_info->emp_id  = $employeeInfo->id;
-                                            $parent_info->save();
+                                        if ($request['fathers_name'][$i]) {
+                                            $father_info = new StudentGuardian();
+                                            $father_info->type = 1;
+                                            $father_info->gender = 1;
+                                            $father_info->first_name = $request['fathers_name'][$i];
+                                            $father_info_store = $father_info->save();
+                                            if ($father_info_store) {
+                                                $parent_info = new StudentParent();
+                                                $parent_info->gud_id  = $father_info->id;
+                                                $parent_info->emp_id  = $employeeInfo->id;
+                                                $parent_info->save();
+                                            }
                                         }
 
-                                        $mothers_info = new StudentGuardian();
-                                        $mothers_info->type = 0;
-                                        $mothers_info->gender = 2;
-                                        $mothers_info->first_name = $request['mothers_name'][$i];
-                                        $mothers_info_store = $mothers_info->save();
-                                        if ($mothers_info_store) {
-                                            $parent_info = new StudentParent();
-                                            $parent_info->gud_id  = $mothers_info->id;
-                                            $parent_info->emp_id  = $employeeInfo->id;
-                                            $parent_info->save();
+                                        if ($request['mothers_name'][$i]) {
+                                            $mothers_info = new StudentGuardian();
+                                            $mothers_info->type = 0;
+                                            $mothers_info->gender = 2;
+                                            $mothers_info->first_name = $request['mothers_name'][$i];
+                                            $mothers_info_store = $mothers_info->save();
+                                            if ($mothers_info_store) {
+                                                $parent_info = new StudentParent();
+                                                $parent_info->gud_id  = $mothers_info->id;
+                                                $parent_info->emp_id  = $employeeInfo->id;
+                                                $parent_info->save();
+                                            }
                                         }
 
-                                        // Spouse Date
-                                        $spouseDob = ($this->validateDate($request['spouse_date_of_birth'][$i])) ? $request['spouse_date_of_birth'][$i] : null;
+                                        if ($request['spouse_name'][$i]) {
+                                            // Spouse Date
+                                            $spouseDob = ($this->validateDate($request['spouse_date_of_birth'][$i])) ? $request['spouse_date_of_birth'][$i] : null;
 
-                                        $spouse_details = new StudentGuardian();
-                                        $spouse_details->type = 6;
-                                        $spouse_details->gender = 2;
-                                        $spouse_details->first_name = $request['spouse_name'][$i];
-                                        $spouse_details->occupation = $request['spouse_occupation'][$i];
-                                        $spouse_details->mobile = $request['spouse_mobile'][$i];
-                                        $spouse_details->nid_number = $request['spouse_nid'][$i];
-                                        $spouse_details->date_of_birth = $spouseDob;
-                                        $spouse_details_save = $spouse_details->save();
-                                        if ($spouse_details_save) {
-                                            $parent_info = new StudentParent();
-                                            $parent_info->gud_id  = $spouse_details->id;
-                                            $parent_info->emp_id  = $employeeInfo->id;
-                                            $parent_info->save();
+                                            $spouse_details = new StudentGuardian();
+                                            $spouse_details->type = 6;
+                                            $spouse_details->gender = 2;
+                                            $spouse_details->first_name = $request['spouse_name'][$i];
+                                            $spouse_details->occupation = $request['spouse_occupation'][$i];
+                                            $spouse_details->mobile = $request['spouse_mobile'][$i];
+                                            $spouse_details->nid_number = $request['spouse_nid'][$i];
+                                            $spouse_details->date_of_birth = $spouseDob;
+                                            $spouse_details_save = $spouse_details->save();
+                                            if ($spouse_details_save) {
+                                                $parent_info = new StudentParent();
+                                                $parent_info->gud_id  = $spouse_details->id;
+                                                $parent_info->emp_id  = $employeeInfo->id;
+                                                $parent_info->save();
+                                            }
                                         }
+
 
                                         if ($request['child_1_name'][$i]) {
                                             // Child1 Date

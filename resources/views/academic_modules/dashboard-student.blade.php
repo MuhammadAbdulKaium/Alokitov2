@@ -200,7 +200,7 @@
 
                                 @role(['student', 'admin'])
                                 <li class="pull-right flip">
-                                    <a href="#stu-notice" id="4" data-toggle="tab">{{trans('dashboard/index.student')}}</a>
+                                    <a href="#stu-notice" id="4" data-toggle="tab">Student</a>
                                 </li>
                                 @endrole
 

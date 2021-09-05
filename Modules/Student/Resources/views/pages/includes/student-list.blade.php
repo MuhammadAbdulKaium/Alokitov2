@@ -7,11 +7,11 @@
 				<h3 class="box-title"><i class="fa fa-search"></i> View Student List @if($searchData) ({{sizeof($searchData)}}) @endif</h3>
 			</div>
 		</div>
-		<div class="card">
+		<div class="box-body">
 			@if(isset($searchData))
 				@if($searchData->count()>0)
 					@php $i=1; @endphp
-					<table class="table">
+					<table class="table" id="student-table">
 						<thead>
 						<tr>
 							<th>SL</th>
@@ -25,8 +25,8 @@
 							<th>Batch</th>
 							<th>Academic Year</th>
 							<th>Class</th>
-							<th>Form</th>
-							<th>Fees</th>
+							<th>Section</th>
+							<th>Roll</th>
 							<th>Guardian</th>
 							<th>Mobile</th>
 							<th>Action</th>
@@ -57,8 +57,8 @@
 								<td> @if($data->batch()) {{$data->batch()->batch_name}} {{($data->batch()->get_division())?'- '.$data->batch()->get_division()->name:''}} @endif</td>
 								<td> @if($data->section()) {{$data->section()->section_name}} @endif</td>
 								<td>
-								@if($data->student()->tuitionFees)
-									{{$data->student()->tuitionFees->fees}}
+								@if($data->gr_no)
+									{{$data->gr_no}}
 									@endif
 								</td>
 								<td>
@@ -107,14 +107,8 @@
 
 <script>
 	$(function () {
-		$("#example2").DataTable();
-		$('#example1').DataTable({
-			"paging": false,
-			"lengthChange": false,
-			"searching": true,
-			"ordering": false,
-			"info": false,
-			"autoWidth": false
+		$("#student-table").DataTable({
+			"pageLength": 50
 		});
 
 		// paginating

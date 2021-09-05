@@ -457,7 +457,7 @@ class StudentImportController extends Controller
                             $information = new StudentInformation();
                             $information->user_id = $insertedId;
                             $information->type = $studentType;
-                            $information->title = 'Cadet';
+                            $information->title = '';
                             $information->first_name = $request['first_name'][$i];
                             $information->last_name = $request['last_name'][$i];
                             $information->gender = $gender;

@@ -8,29 +8,15 @@
 					<img class="center-block img-circle img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-default.png')}}" alt="No Image" style="width:100px;height:100px">
 				@endif
 				<a class="btn center-block" href="/student/profile/photo/{{$personalInfo->id}}" title="Change Profile Picture" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-sm"><i class = "fa fa-pencil-square" aria-hidden="true"></i> Change Picture</a>
-
-			</div>
-			<div class="col-md-2">
-				@if(isset($instInfo))
-					@foreach($instInfo as $inst)
-						<h4 class="text-center">{{$inst->institute_name}}</h4>
-					@endforeach
-				@endif
-				@if(isset($campusInfo))
-					@foreach($campusInfo as $campus)
-						<p class="text-center">{{$campus->name}}</p>
-					@endforeach
-						<hr>
-				@endif
-
 				<h4 class="profile-username text-center">{{ $personalInfo->title." ".$personalInfo->first_name." ".$personalInfo->middle_name." ".$personalInfo->last_name }}</h4>
-{{--				<p class="text-muted text-center text-bold">({{$personalInfo->user()->roles()->count()>0?$personalInfo->user()->roles()->first()->display_name:'No Role'}})</p>--}}
-				<h5 class="text-center"><span class="label label-success">ACTIVE</span></h5>
-				{{--student enrollment--}}
-				@php $enrollment = $personalInfo->enroll(); @endphp
+				{{--				<p class="text-muted text-center text-bold">({{$personalInfo->user()->roles()->count()>0?$personalInfo->user()->roles()->first()->display_name:'No Role'}})</p>--}}
+								{{-- <h5 class="text-center"><span class="label label-success">ACTIVE</span></h5> --}}
+								{{--student enrollment--}}
+								@php $enrollment = $personalInfo->enroll(); @endphp
 			</div>
+			<div class="col-sm-1"></div>
 			<div class="col-md-2">
-				<strong>Merit Position</strong>
+				<strong>Roll No.</strong>
 				<p class="text-muted">{{$enrollment->gr_no}}</p>
 				@php $division = null; @endphp
 				@if($divisionInfo = $enrollment->batch()->get_division())
@@ -42,7 +28,7 @@
 					<strong>Class: </strong> @if($enrollment->batch()) {{$enrollment->batch()->batch_name.$division}} @endif <br/>
 					<strong>Form: </strong> @if($enrollment->section()) {{$enrollment->section()->section_name}} @endif </p>
 			</div>
-
+			
 			<div class="col-md-2">
 				@if($personalInfo->getWaiverList()->count()>0)
 					<strong>Waiver Details</strong>
@@ -80,6 +66,9 @@
 				<strong>Identification Mark</strong>
 				<p class="text-muted">{{$personalInfo->identification_mark}}</p>
 			</div>
+			<div class="col-md-1">
+				
+			</div>
 			<div class="col-md-4">
 
 
@@ -87,9 +76,6 @@
 					<div style="width: 100%;" class="progress-bar progress-bar-green"></div>
 				</div>
 				<strong> Reports: </strong> <br/>
-				<a id="student_profile_report" class="btn btn-app" href="/student/report/profile/{{$personalInfo->id}}" target="_blank">
-					<i class="fa fa-file-pdf-o"></i> Profile PDF
-				</a>
 				<a class="btn btn-app" href="/student/report/profile/search/{{$personalInfo->id}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">
 					<i class="fa fa-hand-o-up"></i> Attendance
 				</a>

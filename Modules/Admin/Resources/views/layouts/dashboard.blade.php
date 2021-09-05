@@ -70,7 +70,7 @@
 					</div>
 					<div class="icon-containt-wrap">
 						<h1 class="text-center">{{$stdCount}}</h1>
-						<p class="text-center">{{trans('dashboard/index.student')}}</p>
+						<p class="text-center">Student</p>
 					</div>
 				</a>
 			</div>

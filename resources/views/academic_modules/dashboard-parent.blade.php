@@ -71,6 +71,7 @@
 						<div class="col-md-{{$divCount}}" style="padding: 0px; border: 1px solid grey;">
 							<p class="text-center bg-green text-bold">About Parent</p>
 							<div class="row">
+								<div class="col-md-1"></div>
 								<div class="col-sm-3" style="padding: 0px; margin-top: 10px">
 									@if($photo)
 										<img class="center-block img-thumbnail img-circle img-responsive" src="{{URL::asset('assets/users/images/'.$photo->singleContent()->name)}}" alt="No Image" style="width:75px;height:75px">
@@ -79,7 +80,8 @@
 									@endif
 									<h2 class="text-success" style="text-align: center"><b>{{$user->username}}</b></h2>
 								</div>
-								<div class="col-sm-9" style="padding:0px 0px 0px 5px; margin-top: 10px">
+								<div class="col-md-1"></div>
+								<div class="col-sm-7" style="padding:0px 0px 0px 5px; margin-top: 10px">
 									<p>
 										Name: {{$parentInfo->first_name." ".$parentInfo->last_name}}<br/>
 										Parent ID: {{$user->username}}<br/>
@@ -97,9 +99,10 @@
 							@php $stdPhoto = $stdInfo->singelAttachment("PROFILE_PHOTO"); @endphp
 
 							<div class="col-md-{{$divCount}}" style="padding: 0px; border: 1px solid gray; border-left: none">
-								<p class="text-center bg-green text-bold">About Cadet</p>
+								<p class="text-center bg-green text-bold">About Student</p>
 
 								<div class="row">
+									<div class="col-md-1"></div>
 									<div class="col-sm-3" style="padding: 0px; margin-top: 10px">
 										@if($stdPhoto)
 											<img class="center-block img-thumbnail img-circle img-responsive" src="{{URL::asset('assets/users/images/'.$stdPhoto->singleContent()->name)}}" alt="No Image" style="width:75px;height:75px">
@@ -108,7 +111,8 @@
 										@endif
 										<h2 class="text-success"><b>{{$stdInfo->user()->username}}</b></h2>
 									</div>
-									<div class="col-sm-9" style="padding:0px 0px 0px 5px; margin-top: 10px">
+									<div class="col-md-1"></div>
+									<div class="col-sm-7" style="padding:0px 0px 0px 5px; margin-top: 10px">
 										@php $division = null; @endphp
 										@if ($myDivison = $stdEnroll->batch()->get_division())
 											@php $division = " (".$myDivison->name.") "; @endphp

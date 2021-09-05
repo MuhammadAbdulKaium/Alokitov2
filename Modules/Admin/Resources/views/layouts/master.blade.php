@@ -9,6 +9,7 @@
     <meta id="token" name="token" value="{{ csrf_token() }}">
     <link rel="manifest" href="site.webmanifest">
     <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="{{URL::asset('assets/users/images/venus-logo.png')}}" type="image/gif" sizes="16x16">
     <!-- Place favicon.ico in the root directory -->
     <link href="{{ URL::asset('template-2/css/normalize.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ URL::asset('template-2/css/main.css') }}" rel="stylesheet" type="text/css"/>
@@ -94,12 +95,11 @@
         <div class="container-fluid">
             <div class="col-md-2" style="text-align: center">
                 <a href="{{URL::to('/')}}">
-                    <img src="{{URL::asset('assets/users/images/cadet-logo.png')}}" style="height: 70px" width="70px" align="center" class="brand-logo" alt="Alokito logo">
+                    <img src="{{URL::asset('assets/users/images/venus-logo.png')}}" style="height: 100px" width="70px" align="center" class="brand-logo" alt="Alokito logo">
                 </a>
             </div>
             <div class="col-md-4"><h2 class="school-name">Alokito ERP</h2></div>
-            <div class="col-md-3"><h2 class="school-name">Alokito ERP SOP</h2>
-            <p>Knowledge, Morality, Patriotism</p></div>
+            
             @include('admin::layouts._header-custom-menu')
 
         </div><!--Logo wrap container End-->
