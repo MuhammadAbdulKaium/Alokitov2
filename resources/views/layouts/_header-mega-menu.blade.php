@@ -462,7 +462,7 @@ background:#0b460b !important;
                      </ul>
 
                   </li>
-                  <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Administration <span class="caret"></span></a>
+                  {{-- <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Administration <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
@@ -502,7 +502,7 @@ background:#0b460b !important;
                         <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
                      </ul>
 
-                  </li>
+                  </li> --}}
                   <li><a href="#"><span class="fa fa-wrench icon-margin"></span> House <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">
@@ -633,7 +633,7 @@ background:#0b460b !important;
                      </ul>
 
                   </li>
-                  <li><a href="#"><span class="fa fa-file-text icon-margin"></span> Document <span class="caret"></span></a>
+                  {{-- <li><a href="#"><span class="fa fa-file-text icon-margin"></span> Document <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
@@ -666,7 +666,7 @@ background:#0b460b !important;
                         <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
                      </ul>
 
-                  </li>
+                  </li> --}}
                   <li><a href=""><span class="fa fa-university icon-margin"> </span>Library<span class="caret"></span></a>
 
                      <ul class="dropdown-menus">

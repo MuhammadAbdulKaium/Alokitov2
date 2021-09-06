@@ -109,7 +109,7 @@
 										@else
 											<img class="center-block img-circle img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-default.png')}}" alt="No Image" style="width:75px;height:75px">
 										@endif
-										<h2 class="text-success"><b>{{$stdInfo->user()->username}}</b></h2>
+										<h2 class="text-success" style="text-align: center"><b>{{$stdInfo->user()->username}}</b></h2>
 									</div>
 									<div class="col-md-1"></div>
 									<div class="col-sm-7" style="padding:0px 0px 0px 5px; margin-top: 10px">

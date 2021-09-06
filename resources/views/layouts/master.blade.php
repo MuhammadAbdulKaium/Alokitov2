@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>CCIS</title>
+    <title>Alokito ERP</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta id="token" name="token" value="{{ csrf_token() }}">
@@ -150,8 +150,7 @@ border-top: 3px solid {{ $headerBgColor->attribute_value }} !important;
                 </h2>
                 <span class="label label-success" style="padding: 6px">@isset($campusName->name) {{$campusName->name}} @endisset</span>
             </div>
-            <div class="col-md-3"><h2 class="school-name">Alokito ERP SOP</h2>
-                <p>Knowledge, Morality, Patriotism</p></div>
+            <div class="col-md-3"><h2 class="school-name">Alokito ERP</h2></div>
             {{--<div class="col-md-2"><h4 class="campus-name">@isset($campusName->name) {{getCampusProfile()->name}} @endisset</h4></div>--}}
 
             @include('layouts._header-custom-menu')

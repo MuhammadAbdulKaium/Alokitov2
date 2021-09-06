@@ -86,7 +86,7 @@
                                         <th>Gender:</th>
                                         <td>{{$stdInfo->gender }}</td>
                                         <th>Date of Birth:</th>
-                                        <td>{{ date('d M, Y', strtotime($stdInfo->dob)) }}</td>
+                                        <td>@if ($stdInfo->dob) {{ date('d M, Y', strtotime($stdInfo->dob)) }} @endif</td>
                                         <th>Bloodgroup:</th>
                                         <td>{{ $stdInfo->blood_group }}</td>
                                     </tr>

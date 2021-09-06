@@ -409,7 +409,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
                         </ul>
 
                      </li>
-                     <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Administration <span class="caret"></span></a>
+                     {{-- <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Administration <span class="caret"></span></a>
 
                         <ul class="dropdown-menus">
                            <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
@@ -449,7 +449,7 @@ background:{{ $headerBgColor->attribute_value }} !important;
                            <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
                         </ul>
 
-                     </li>
+                     </li> --}}
                      <li><a href="#"><span class="fa fa-wrench icon-margin"></span> House <span class="caret"></span></a>
 
 <ul class="dropdown-menus">

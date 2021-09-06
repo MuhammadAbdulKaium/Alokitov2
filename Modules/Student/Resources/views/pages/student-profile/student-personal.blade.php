@@ -29,7 +29,7 @@
 	                              <td>{{$personalInfo->gender }}</td>
 
 	                              <th>Date of Birth</th>
-	                              <td>{{ date('d M, Y', strtotime($personalInfo->dob)) }}</td>
+	                              <td>@if($personalInfo->dob){{ date('d M, Y', strtotime($personalInfo->dob)) }}@endif</td>
 	                           </tr>
 	                           <tr>
 	                              <th>Nationality</th>

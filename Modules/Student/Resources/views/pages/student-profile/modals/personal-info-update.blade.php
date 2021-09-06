@@ -138,7 +138,7 @@
          <div class="col-sm-4">
             <div class="form-group {{ $errors->has('dob') ? ' has-error' : '' }}">
                <label class="control-label" for="dob">Date of Birth <span class="text-red">*</span></label>
-               <input id="dob" class="form-control" name="dob" value="{{date('Y-m-d', strtotime($personalInfo->dob))}}" size="10" type="text" readonly>
+               <input id="dob" class="form-control" name="dob" value="@if($personalInfo->dob){{date('Y-m-d', strtotime($personalInfo->dob))}}@endif" size="10" type="text" readonly>
                <div class="help-block">
                   @if ($errors->has('dob'))
                      <strong>{{ $errors->first('dob') }}</strong>
