@@ -1,4 +1,3 @@
-
 {{-- @php  print_r($allEnrollments) @endphp --}}
 
 <div class="col-md-12">

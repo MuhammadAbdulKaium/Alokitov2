@@ -24,77 +24,107 @@
             </div>
         </div>
     </div>
-    <div class="box-body">
+    <div class="box-body table-responsive">
         @if(!empty($allEmployee) AND $allEmployee->count()>0)
-            <table id="example2" class="table table-striped table-bordered table-responsive text-center">
-                <thead>
+        <table id="example2" class="table table-striped table-bordered text-center">
+            <thead>
+            <tr>
+                <th>SL</th>
+                <th>Photo</th>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+                <th>Married</th>
+                <th>DoB-DoJ-DoR</th>
+                <th>Contact</th>
+                <th>Emergency</th>
+                <th>Blood</th>
+                <th>Category</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Position</th>
+                <th>Appointment</th>
+                <th>Class Entitlement</th>
+                <th>Status</th>
+                <th>Child</th>
+                <th>Activity</th>
+                <th>Schedule</th>
+                <th>Payroll</th>
+                <th>Leave</th>
+                <th>Ration</th>
+                <th>History</th>
+            </tr>
+            </thead>
+            <tbody id="table">
+            @foreach($allEmployee as $index => $employee)
                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Nick Name</th>
-                    <th>Email/Login Id</th>
-                    <th>Department</th>
-                    <th>Designation</th>
-
-                    <th width="100px">
-                        {{--<input type="checkbox" id="emp_sort_order">  --}}
-                        Position
-                    </th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody id="table">
-                @foreach($allEmployee as $index=>$employee)
-                    <tr>
-                        <td>{{($index+1)}}</td>
-                        <td><a href="{{url('/employee/profile/personal/'.$employee->id)}}">{{$employee->first_name." ".$employee->middle_name." ".$employee->last_name}}</a></td>
-                        <td>{{$employee->alias}}</td>
-                        <td><a href="{{url('/employee/profile/personal/'.$employee->id)}}">{{$employee->email}}</a></td>
-                        <td>
-                            @if(!empty($employee->department()))
+                    <td>{{($index+1)}}</td>
+                    <td>
+                        @if($employee->singelAttachment("PROFILE_PHOTO"))
+                            <img class="center-block img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/'.$employee->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}" alt="No Image" style="width:60px;height:auto">
+                        @elseif($employee->category == 1)
+                            <img class="center-block img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-teaching.png')}}" alt="No Image" style="width:60px;height:auto">
+                        @elseif($employee->category == 2)
+                            <img class="center-block img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-non-teaching.png')}}" alt="No Image" style="width:60px;height:auto">
+                        @endif
+                    </td>
+                    <td>{{$employee->user()->username}}</td>
+                    <td><a href="{{url('/employee/profile/personal/'.$employee->id)}}">{{$employee->first_name." ".$employee->middle_name." ".$employee->last_name}} @if($employee->alias) ({{$employee->alias}}) @endif</a></td>
+                    <td>@if($employee->marital_status == 'MARRIED') Yes @else No @endif</td>
+                    <td>
+                        <b>DoB</b>:{{date('d/m/Y', strtotime($employee->dob))}} <br>
+                        <b>DoJ</b>:{{date('d/m/Y', strtotime($employee->doj))}} <br>
+                        <b>DoR</b>:{{date('d/m/Y', strtotime($employee->dor))}}
+                    </td>
+                    <td>
+                        @if($employee->phone){{$employee->phone}} <br>@endif
+                        @if($employee->alt_mobile){{$employee->alt_mobile}} <br>@endif
+                        @if($employee->email){{$employee->email}}@endif
+                    </td>
+                    <td></td>
+                    <td>@if($employee->blood_group) {{$employee->blood_group}} @endif</td>
+                    <td>
+                        @if($employee->category == 1)
+                            Teaching
+                        @elseif($employee->category == 2)
+                            Non Teaching
+                        @endif
+                    </td>
+                    <td>
+                        @if(!empty($employee->department()))
                             {{$employee->department()->name}}
-                                @endif
-
-                        </td>
-                        <td>
-                            @if(!empty($employee->designation()))
-                                {{$employee->designation()->name}}
-                            @endif
-
-                        </td>
-                        <td>
-                            {{--Checking Status--}}
-                            @if($employee->status==1)
-                            <div class="form-group">
-                                <input id="{{$employee->id}}" class="form-control text-center sort_order" name="sort_order" placeholder="Web Position" type="text" value="{{$employee->sort_order==999?0:$employee->sort_order}}" readonly required>
-                                <div class="help-block"></div>
-                            </div>
-                            @else
-                                <span class="label label-warning">N/A</span>
-                            @endif
-                        </td>
-                        <td>
-                            {{--Checking Status--}}
-                            @if($employee->status==1)
-                                <span class="label label-success">ACTIVE</span>
-                            @else
-                                <span class="label label-warning">Retired</span>
-                            @endif
-                        </td>
-                        <td>
-
-                            @if($employee->status!=1)
-                                <a href="{{URL::to('employee/employee-status/change',$employee->id)}}" title="" data-confirm="Are you sure you want to delete this item?" data-method="get"><button class="btn btn-primary">Active</button> </a>
-
-                            @else
-                                <a href="{{URL::to('employee/employee-status/change',$employee->id)}}" title="" data-confirm="Are you sure you want to delete this item?" data-method="get"><button class="btn btn-primary">Deactive</button> </a>
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+                        @endif
+                    </td>
+                    <td>
+                        @if(!empty($employee->designation()))
+                            {{$employee->designation()->name}}
+                        @endif
+                    </td>
+                    <td>{{$employee->position_serial}}</td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        {{--Checking Status--}}
+                        @if($employee->status==1)
+                            <span class="label label-success">ACTIVE</span>
+                        @else
+                            <span class="label label-warning">Retired</span>
+                        @endif
+                    </td>
+                    <td>
+                        <a href="{{url('/employee/show/childs/'.$employee->id)}}"
+                           data-target="#globalModal" data-toggle="modal"
+                           data-modal-size="modal-sm">C</a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
         @else
             <div id="w0-success-0" class="alert-warning alert-auto-hide alert fade in" style="opacity: 423.642;">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
