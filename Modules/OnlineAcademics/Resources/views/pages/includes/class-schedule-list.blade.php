@@ -258,7 +258,7 @@
 
                                                             @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
                                                             $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] < $currentDate)
-                                                                Class didn't ended
+                                                                Class is not ended
 
                                                             @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
                                                             $scheduledData[$subjectProfile->id][11] == 6)
