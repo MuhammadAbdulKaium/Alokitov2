@@ -69,7 +69,7 @@
                 <div class="col-sm-3">
                     <div class="row" style="padding-right: 0px">
                         
-                        <div class="col-sm-5">
+                        <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label ">Academic Level</label>
                                     <select id="level" class="form-control academicLevel" name="level" required>
@@ -82,9 +82,9 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-5">
+                        <div class="col-sm-6">
                             <div class="form-group">
-                                <label class="control-label label-margin50">Class</label>
+                                <label class="control-label">Class</label>
                                 <select id="batch" class="form-control academicBatch" name="batch" required>
                                     <option value="" selected="true">--Select Class--</option>
                                     @if(isset($topic_info->academic_class_id))
@@ -97,11 +97,11 @@
 
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="input-group">
-                                <label class="control-label label-margin50">Section</label>
+                                <label class="control-label">Section</label>
                                     <select id="section" class="form-control academicSection" name="section" required>
                                     <option value="" selected="true">--Select Section--</option>
                                     @if(isset($topic_info->academic_section_id))
@@ -114,7 +114,7 @@
 
                         <div class="col-sm-4">
                             <div class="input-group">
-                                <label class="control-label label-margin50">Shift</label>
+                                <label class="control-label">Shift</label>
                                     <select id="shift" class="form-control academicShift" name="shift" required>
                                         <option value="" selected>--Select Shift--</option>
                                         <option value="0">Day</option>
@@ -126,7 +126,7 @@
 
                         <div class="col-sm-4">
                             <div class="input-group">
-                                <label class="control-label label-margin50">Subject</label>
+                                <label class="control-label">Subject</label>
                                 <select id="subject" class="form-control academicSubject" name="subject">
                                 <option value="">--Select Subject--</option>
                                 @if(isset($topic_info->class_subject_id))
@@ -142,7 +142,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="control-label label-margin30">Teacher</label>
+                                <label class="control-label">Teacher</label>
                                 <select id="teacher_id" class="form-control academicTeacher" name="teacher_id">
                                     <option value="">--Select Teacher--</option>
                                     @foreach($empList as $emp)
@@ -163,29 +163,25 @@
                         </div> --}}
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <div class="row" style="margin: 0; padding: 0;">
-                        <div class="col-sm-12 label-margin50">
-                            <span><strong>Online Class Date</strong></span>
-                        </div>
-                    </div>
+                <div class="col-sm-2">
                     <div class="row" style="margin: 0; padding: 0;">     
-                        <div class="col-sm-6" style="margin: 0; padding: 0;">
+                        <div class="col-sm-12" style="margin: 0; padding: 0;">
+                            <label class="control-label">Online Class Date</label>
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
                                   <input type="text" class="form-control sdate" name="start_date" value="{{ date('m/d/Y') }}" required="" readonly="" aria-required="true" placeholder="Start Date">
                                 <div class="help-block"></div>
                             </div>  
                         </div>
-                        <div class="col-sm-6" style="margin: 0;">
+                        {{-- <div class="col-sm-6" style="margin: 0;">
                             <div class="form-group field-feespaymenttransactionsearch-fp_sdate required">
                                 <input type="text" value="{{ date('m/d/Y') }}" class="form-control sdate" name="end_date" required="" readonly="" aria-required="true" placeholder="End Date">
                                 <div class="help-block"></div>
                             </div>  
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
-                <div class="col-sm-2" >
+                <div class="col-sm-1" >
                     <div class="input-group">
                         <label class="control-label">Status</label>
                         <select id="status" class="form-control" name="status">
@@ -196,13 +192,16 @@
                             <option value="4">Completed</option>
                             <option value="5">Class Time Over</option>
                         </select>
-                        <span class="input-group-btn">
-                            <button id="class_schedule_list_search_btn" class="btn search-button" style="margin-top: 20px" type="submit">
-                                <i class="fa fa-search font-size22"></i>
-                            </button>
-                        </span>
                         <div class="help-block"></div>
                     </div>
+                </div>
+
+                <div class="col-sm-1">
+                    <span class="input-group-btn">
+                        <button id="class_schedule_list_search_btn" class="btn search-button" style="margin-top: 23px" type="submit">
+                            <i class="fa fa-search font-size22"></i>
+                        </button>
+                    </span>
                 </div>
                 </form>
             </div>

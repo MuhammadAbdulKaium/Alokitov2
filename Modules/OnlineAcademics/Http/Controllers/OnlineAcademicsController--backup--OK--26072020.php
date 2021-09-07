@@ -709,14 +709,14 @@ class OnlineAcademicsController extends Controller
         $timestamp = strtotime($request->input('start_date'));
         $day1 = date('l', $timestamp);
 
-        $timestamp2 = strtotime($request->input('end_date'));
+        $timestamp2 = strtotime($request->input('start_date'));
         $day2 = date('l', $timestamp2);
         //var_dump($day1,$day2);
 
 
 
         $start_date = strtotime($request->input('start_date')); // or your date as well
-        $end_date   = strtotime($request->input('end_date'));
+        $end_date   = strtotime($request->input('start_date'));
         $datediff   = $start_date - $end_date;
 
         //echo round($datediff / (60 * 60 * 24));
@@ -756,7 +756,7 @@ class OnlineAcademicsController extends Controller
         $teacher_id                 = $request->input('teacher_id');
         $subject_class_topic        = $request->input('subject_class_topic');
         $start_date                 = date("m-d-Y", strtotime($request->input('start_date')));
-        $end_date                   = date("m-d-Y", strtotime($request->input('end_date')));
+        $end_date                   = date("m-d-Y", strtotime($request->input('start_date')));
         $status                     = $request->input('status');
 
         //die();

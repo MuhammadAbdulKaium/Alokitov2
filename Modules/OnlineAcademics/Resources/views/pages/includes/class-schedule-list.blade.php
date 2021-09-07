@@ -257,11 +257,11 @@
                                                             {{ 'Completed' }}
 
                                                             @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                                            $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] > $currentDate)
+                                                            $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] < $currentDate)
                                                                 Class didn't ended
 
                                                             @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                                            $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] == $currentDate)
+                                                            $scheduledData[$subjectProfile->id][11] == 6)
 
 
                                                             <form method="post" action="" id="forms{{ $subjectProfile->id }}">
