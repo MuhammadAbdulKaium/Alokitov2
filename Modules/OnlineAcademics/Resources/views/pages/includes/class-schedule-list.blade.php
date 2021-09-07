@@ -201,141 +201,146 @@
                                                 @php
                                                 $currentTime = date('h:i');
                                                 @endphp
-
-
-
                                                 <br />
 
                                                 @if(isset($scheduledData) && $timetableCount>0)
+                                                    @if(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                    $scheduledData[$subjectProfile->id][11] == 2 && $scheduledData[$subjectProfile->id][9]
+                                                    == $date)
 
-                                                @if(isset($scheduledData[$subjectProfile->id][0]) &&
-                                                $scheduledData[$subjectProfile->id][11] == 2 && $scheduledData[$subjectProfile->id][9]
-                                                == $date)
+                                                        @if (isset($scheduledData[$subjectProfile->id][9]) &&
+                                                        $scheduledData[$subjectProfile->id][9] >$currentDate &&
+                                                        $scheduledData[$subjectProfile->id][11] == 2)
+                                                        @php echo "Schedule But Date is not appper";
+                                                        @endphp
 
-                                                @if (isset($scheduledData[$subjectProfile->id][9]) &&
-                                                $scheduledData[$subjectProfile->id][9] >$currentDate &&
-                                                $scheduledData[$subjectProfile->id][11] == 2)
-                                                @php echo "Schedule But Date is not appper";
-                                                @endphp
+                                                        @elseif (isset($scheduledData[$subjectProfile->id][9]) &&
+                                                        $scheduledData[$subjectProfile->id][9] < $currentDate &&
+                                                            $scheduledData[$subjectProfile->id][11] == 2)
 
-                                                @elseif (isset($scheduledData[$subjectProfile->id][9]) &&
-                                                $scheduledData[$subjectProfile->id][9] < $currentDate &&
-                                                    $scheduledData[$subjectProfile->id][11] == 2)
-
-                                                    @php echo "Schedule But Date is Over"; @endphp
-
+                                                            @php echo "Scheduled But Date is Over"; @endphp
 
 
-                                                    {{-- @elseif (isset($scheduledData[$subjectProfile->id][9])    &&  $scheduledData[$subjectProfile->id][9] >$currentDate && $scheduledData[$subjectProfile->id][11] == 2) --}}
-                                                    @elseif ($scheduledData[$subjectProfile->id][9])
-                                                    @role(['super-admin','admin','teacher'])
-                                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
-                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-                                                        @if(isset($scheduledData[$subjectProfile->id][23]))
-                                                        <input type="hidden" name="class_scheduled_id"
-                                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
-                                                        @else
-                                                        <input type="hidden" name="class_scheduled_id" value="">
+
+                                                            {{-- @elseif (isset($scheduledData[$subjectProfile->id][9])    &&  $scheduledData[$subjectProfile->id][9] >$currentDate && $scheduledData[$subjectProfile->id][11] == 2) --}}
+                                                            @elseif ($scheduledData[$subjectProfile->id][9])
+                                                            @role(['super-admin','admin','teacher'])
+                                                            <form method="post" action="" id="forms{{ $subjectProfile->id }}">
+                                                                <input type="hidden" name="_token" value="{{csrf_token()}}">
+                                                                @if(isset($scheduledData[$subjectProfile->id][23]))
+                                                                <input type="hidden" name="class_scheduled_id"
+                                                                    value="{{ $scheduledData[$subjectProfile->id][23] }}">
+                                                                @else
+                                                                <input type="hidden" name="class_scheduled_id" value="">
+                                                                @endif
+                                                                <span>
+                                                                    <i class="icon-eye-open"> </i>
+                                                                </span>
+                                                                <button type="button" id="online_class_{{ $subjectProfile->id }}"
+                                                                    onclick="GointScheduledClass({{ $subjectProfile->id }});">Ongoing</button>
+
+                                                            </form>
+
+
+                                                            @endrole
+
+                                                            @role(['student'])
+                                                            <span style="color: red">
+                                                                Tecaher Did not start the class
+                                                            </span>
+                                                            @endrole
+                                                            @endif
+
+                                                            @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                            $scheduledData[$subjectProfile->id][11] == 4)
+
+                                                            {{ 'Completed' }}
+
+                                                            @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                            $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] > $currentDate)
+                                                                Class didn't ended
+
+                                                            @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
+                                                            $scheduledData[$subjectProfile->id][11] == 6 && $scheduledData[$subjectProfile->id][9] == $currentDate)
+
+
+                                                            <form method="post" action="" id="forms{{ $subjectProfile->id }}">
+                                                                <input type="hidden" name="_token" value="{{csrf_token()}}">
+                                                                @if(isset($scheduledData[$subjectProfile->id][23]))
+                                                                <input type="hidden" name="class_scheduled_id"
+                                                                    value="{{ $scheduledData[$subjectProfile->id][23] }}">
+                                                                @else
+                                                                <input type="hidden" name="class_scheduled_id" value="">
+                                                                @endif
+                                                                <span><i class="icon-eye-open"></i></span>
+                                                                <button type="button" id="online_class_{{ $subjectProfile->id }}"
+                                                                    onclick="GointScheduledClass({{ $subjectProfile->id }});">Started</button>
+
+                                                            </form>
+
+                                                            @else
+                                                            @role(['super-admin','admin','teacher'])
+                                                            @if ($currentDate <= $date)
+                                                                <form method="post" action="" id="formq{{ $subjectProfile->id }}">
+                                                                    <input type="hidden" name="_token" value="{{csrf_token()}}">
+
+                                                                    <input type="hidden" name="class_opening_date" value="{{ $date }}">
+                                                                    <input type="hidden" name="class_opening_day" value="{{ $key }}">
+                                                                    <input type="hidden" name="class_routine_time"
+                                                                        value="{{ $PeriodList[$loop->index] }}">
+
+                                                                    <input type="hidden" name="campus_id" value="{{ $subjectProfile->campus }}">
+                                                                    <input type="hidden" name="institute_id"
+                                                                        value="{{ $subjectProfile->institute }}">
+
+                                                                    @if($timetableCount>0)
+                                                                    <input type="hidden" name="class_subject"
+                                                                        value="{{ $subjectProfile->subject_name }}">
+                                                                    <input type="hidden" name="class_subject_id" value="{{ $subjectProfile->id }}">
+                                                                    @else
+                                                                    <input type="hidden" name="class_subject" value="">
+                                                                    <input type="hidden" name="class_subject_id" value="">
+                                                                    @endif
+
+                                                                    <input type="hidden" name="academic_level_id"
+                                                                        value="{{ $ClassName->academics_level_id }}">
+
+
+                                                                    <input type="hidden" name="academic_section_id" value="{{ $SectionName->id }}">
+                                                                    <input type="hidden" name="academic_section"
+                                                                        value="{{ $SectionName->section_name }}">
+
+                                                                    @if($timetableCount>0)
+                                                                    <input type="hidden" name="class_teacher_id" value="{{$teacherProfile->id}}">
+                                                                    <input type="hidden" name="class_teacher_name"
+                                                                        value='{{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}'>
+                                                                    @else
+                                                                    <input type="hidden" name="class_teacher_id" value="">
+                                                                    <input type="hidden" name="class_teacher_name" value=''>
+                                                                    @endif
+                                                                    <input type="hidden" name="class_total_student" value='{{ $studentList }}'>
+                                                                    <input type="hidden" name="class_status" value='2'>
+                                                                    <input type="hidden" name="academic_shift_id" value='{{ $shift }}'>
+                                                                    <input type="hidden" name="academic_class" value="{{ $ClassName->batch_name }}">
+                                                                    <input type="hidden" name="academic_class_id" value="{{ $ClassName->id }}">
+
+                                                                    @if(isset($topicNameList[$subjectProfile->id]) && $timetableCount>0)
+                                                                    <input type="hidden" name="class_topic_name"
+                                                                        value="{{ $topicNameList[$subjectProfile->id] }}">
+                                                                    @else
+                                                                    <input type="hidden" name="class_topic_name" value="">
+                                                                    @endif
+
+
+
+                                                                    <button type="button" id="schedule_status_update_{{ $subjectProfile->id }}"
+                                                                        onclick="addFunction({{ $subjectProfile->id }});">UnScheduled</button>
+                                                                </form>
+                                                            @else
+                                                                Date is over
+                                                            @endif
+                                                        
                                                         @endif
-                                                        <span>
-                                                            <i class="icon-eye-open"> </i>
-                                                        </span>
-                                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
-                                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Ongoing</button>
-
-                                                    </form>
-
-
-                                                    @endrole
-
-                                                    @role(['student'])
-                                                    <span style="color: red">
-                                                        Tecaher Did not start the class
-                                                    </span>
-                                                    @endrole
-                                                    @endif
-
-                                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                                    $scheduledData[$subjectProfile->id][11] == 4)
-
-                                                    {{ 'Completed' }}
-
-                                                    @elseif(isset($scheduledData[$subjectProfile->id][0]) &&
-                                                    $scheduledData[$subjectProfile->id][11] == 6)
-
-
-                                                    <form method="post" action="" id="forms{{ $subjectProfile->id }}">
-                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-                                                        @if(isset($scheduledData[$subjectProfile->id][23]))
-                                                        <input type="hidden" name="class_scheduled_id"
-                                                            value="{{ $scheduledData[$subjectProfile->id][23] }}">
-                                                        @else
-                                                        <input type="hidden" name="class_scheduled_id" value="">
-                                                        @endif
-                                                        <span><i class="icon-eye-open"></i></span>
-                                                        <button type="button" id="online_class_{{ $subjectProfile->id }}"
-                                                            onclick="GointScheduledClass({{ $subjectProfile->id }});">Started</button>
-
-                                                    </form>
-
-                                                    @else
-                                                    @role(['super-admin','admin','teacher'])
-                                                    <form method="post" action="" id="formq{{ $subjectProfile->id }}">
-                                                        <input type="hidden" name="_token" value="{{csrf_token()}}">
-
-                                                        <input type="hidden" name="class_opening_date" value="{{ $date }}">
-                                                        <input type="hidden" name="class_opening_day" value="{{ $key }}">
-                                                        <input type="hidden" name="class_routine_time"
-                                                            value="{{ $PeriodList[$loop->index] }}">
-
-                                                        <input type="hidden" name="campus_id" value="{{ $subjectProfile->campus }}">
-                                                        <input type="hidden" name="institute_id"
-                                                            value="{{ $subjectProfile->institute }}">
-
-                                                        @if($timetableCount>0)
-                                                        <input type="hidden" name="class_subject"
-                                                            value="{{ $subjectProfile->subject_name }}">
-                                                        <input type="hidden" name="class_subject_id" value="{{ $subjectProfile->id }}">
-                                                        @else
-                                                        <input type="hidden" name="class_subject" value="">
-                                                        <input type="hidden" name="class_subject_id" value="">
-                                                        @endif
-
-                                                        <input type="hidden" name="academic_level_id"
-                                                            value="{{ $ClassName->academics_level_id }}">
-
-
-                                                        <input type="hidden" name="academic_section_id" value="{{ $SectionName->id }}">
-                                                        <input type="hidden" name="academic_section"
-                                                            value="{{ $SectionName->section_name }}">
-
-                                                        @if($timetableCount>0)
-                                                        <input type="hidden" name="class_teacher_id" value="{{$teacherProfile->id}}">
-                                                        <input type="hidden" name="class_teacher_name"
-                                                            value='{{$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name}}'>
-                                                        @else
-                                                        <input type="hidden" name="class_teacher_id" value="">
-                                                        <input type="hidden" name="class_teacher_name" value=''>
-                                                        @endif
-                                                        <input type="hidden" name="class_total_student" value='{{ $studentList }}'>
-                                                        <input type="hidden" name="class_status" value='2'>
-                                                        <input type="hidden" name="academic_shift_id" value='{{ $shift }}'>
-                                                        <input type="hidden" name="academic_class" value="{{ $ClassName->batch_name }}">
-                                                        <input type="hidden" name="academic_class_id" value="{{ $ClassName->id }}">
-
-                                                        @if(isset($topicNameList[$subjectProfile->id]) && $timetableCount>0)
-                                                        <input type="hidden" name="class_topic_name"
-                                                            value="{{ $topicNameList[$subjectProfile->id] }}">
-                                                        @else
-                                                        <input type="hidden" name="class_topic_name" value="">
-                                                        @endif
-
-
-
-                                                        <button type="button" id="schedule_status_update_{{ $subjectProfile->id }}"
-                                                            onclick="addFunction({{ $subjectProfile->id }});">UnScheduled</button>
-                                                    </form>
-                                                    @endif
                                                     @endif
                                                     @endrole
 
