@@ -34,7 +34,7 @@
         <div class="progress sm" style="background-color:#efefef">
             <div style="width: 100%;" class="progress-bar progress-bar-green"></div>
         </div>
-        <a id="export-pdf" class="btn btn-app" href="/employee/report/profile/{{$employeeInfo->id}}" target="_blank"><i class="fa fa-file-pdf-o"></i> Profile PDF</a>
+        {{-- <a id="export-pdf" class="btn btn-app" href="/employee/report/profile/{{$employeeInfo->id}}" target="_blank"><i class="fa fa-file-pdf-o"></i> Profile PDF</a> --}}
         <a class="btn btn-app" href="#" target="_blank"><i class="fa fa-hand-o-up"></i> Attendance</a>
         {{--<a class="btn btn-app" href="{{url('academics/timetable/teacherTimeTable/report/'.$employeeInfo->id)}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"><i class="fa fa-calendar-o"></i> Timetable</a>--}}
         {{--<a class="btn btn-app" target="_blank" href="{{url('academics/timetable/teacherTimeTable/report/'.$employeeInfo->id)}}"><i class="fa fa-calendar-o"></i> Timetable</a>--}}
