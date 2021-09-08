@@ -27,6 +27,7 @@ use Redirect;
 use Session;
 use Validator;
 use App\Models\Role;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
@@ -826,119 +827,139 @@ class EmployeeController extends Controller
         $imageName = "";
         if ($request->hasFile('image')) {
             $image = $request->file('image');
+            $missingStdIds = [];
+
             //            $file_name_timestamp = "ems";
             foreach ($image as $files) {
-                $file_name_timestamp = "ems" . $files->getClientOriginalName() . rand(1, 10);
-                //Image Info
                 $user_id = trim($files->getClientOriginalName(), '.' . $files->getClientOriginalExtension());
+                $file_name_timestamp = "ems" . $user_id . '-' . Carbon::now()->timestamp;
+                //Image Info
                 //User Info
                 $userID = User::where('username', $user_id)->first();
-                $user = $userID['id'];
-                //                echo $user;
-                //                echo '<br>';
-                $destinationPath = 'assets/users/images/';
-                $imageName = $file_name_timestamp . "." . $files->getClientOriginalExtension();
-                $ext = $files->getClientOriginalExtension();
-                $files->move($destinationPath, $imageName);
-                $data[] = $imageName;
 
-                //End Image Info
+                if ($userID) {
+                    $user = $userID['id'];
+                    //                echo $user;
+                    //                echo '<br>';
+                    $destinationPath = 'assets/users/images/';
+                    $imageName = $file_name_timestamp . "." . $files->getClientOriginalExtension();
+                    $ext = $files->getClientOriginalExtension();
+                    $files->move($destinationPath, $imageName);
+                    $data[] = $imageName;
 
-                //Personal Info
-                $personalInfo = EmployeeInformation::where('user_id', $user)->first();
-                $enrollment = $personalInfo->id;
-                //                return $enrollment;
-                //
-                $campus = $this->academicHelper->getCampus();
-                $institute = $this->academicHelper->getInstitute();
-                //                //Check Image Exist or not
-                $imageAttachmentUpdate = EmployeeAttachment::where('emp_id', $enrollment)->where('doc_type', 'PROFILE_PHOTO')->first();
-                echo $imageAttachmentUpdate;
+                    //End Image Info
 
-                DB::beginTransaction();
-                if ($imageAttachmentUpdate) {
-                    try {
-                        $contentFind = Content::where('id', $imageAttachmentUpdate->doc_id)->first();
-                        $contentFind->name = $imageName;
-                        $contentFind->file_name = $imageName;
-                        $contentFind->path = $destinationPath;
-                        $contentFind->mime = $ext;
-                        $content_update = $contentFind->save();
-                        //
-                        ////                        if($content_update)
-                        ////                        {
-                        ////                            $photoStore=new CadetPersonalPhoto;
-                        ////                            $photoStore->image = $imageName;
-                        ////                            $photoStore->date = date('Y-m-d');
-                        ////                            $photoStore->cadet_no = $user;
-                        ////                            $photoStore->student_id = $enrollment->std_id;
-                        ////                            $photoStore->campus_id = $campus;
-                        ////                            $photoStore->institute_id = $institute;
-                        ////                            $photoStore->academics_year_id=$enrollment->academic_year;
-                        ////                            $photoStore->section_id=$enrollment->section;
-                        ////                            $photoStore->batch_id= $enrollment->batch;
-                        ////                            $photoStorage=$photoStore->save();
-                        ////                        }
-                        DB::commit();
-                    } catch (\Exception $e) {
-                        DB::rollback();
-                        return redirect()->back($e->getMessage());
-                    }
+                    //Personal Info
+                    $personalInfo = EmployeeInformation::where('user_id', $user)->first();
+                    $enrollment = $personalInfo->id;
+                    //                return $enrollment;
                     //
-                    //
-                    //
-                } else {
-                    try {
-                        $userDocument = new Content();
-                        // storing user document
-                        $userDocument->name = $imageName;
-                        $userDocument->file_name = $imageName;
-                        $userDocument->path = $destinationPath;
-                        $userDocument->mime = $ext;
-                        $insertDocument = $userDocument->save();
-                        //
-                        //
-                        if ($insertDocument) {
-                            $studentAttachment = new EmployeeAttachment();
-                            // storing student attachment
-                            $studentAttachment->emp_id     = $enrollment;
-                            $studentAttachment->doc_id     = $userDocument->id;
-                            $studentAttachment->doc_type   = "PROFILE_PHOTO";
-                            $studentAttachment->doc_status = 0;
-                            // save student attachment profile
-                            $attachmentUploaded = $studentAttachment->save();
+                    $campus = $this->academicHelper->getCampus();
+                    $institute = $this->academicHelper->getInstitute();
+                    //                //Check Image Exist or not
+                    $imageAttachmentUpdate = EmployeeAttachment::where('emp_id', $enrollment)->where('doc_type', 'PROFILE_PHOTO')->first();
+                    echo $imageAttachmentUpdate;
+
+                    DB::beginTransaction();
+                    if ($imageAttachmentUpdate) {
+                        try {
+                            $contentFind = Content::where('id', $imageAttachmentUpdate->doc_id)->first();
+                            $contentFind->name = $imageName;
+                            $contentFind->file_name = $imageName;
+                            $contentFind->path = $destinationPath;
+                            $contentFind->mime = $ext;
+                            $content_update = $contentFind->save();
+                            //
+                            ////                        if($content_update)
+                            ////                        {
+                            ////                            $photoStore=new CadetPersonalPhoto;
+                            ////                            $photoStore->image = $imageName;
+                            ////                            $photoStore->date = date('Y-m-d');
+                            ////                            $photoStore->cadet_no = $user;
+                            ////                            $photoStore->student_id = $enrollment->std_id;
+                            ////                            $photoStore->campus_id = $campus;
+                            ////                            $photoStore->institute_id = $institute;
+                            ////                            $photoStore->academics_year_id=$enrollment->academic_year;
+                            ////                            $photoStore->section_id=$enrollment->section;
+                            ////                            $photoStore->batch_id= $enrollment->batch;
+                            ////                            $photoStorage=$photoStore->save();
+                            ////                        }
+                            DB::commit();
+                        } catch (\Exception $e) {
+                            DB::rollback();
+                            return redirect()->back($e->getMessage());
                         }
-                        ////                        if($insertDocument)
-                        ////                        {
-                        ////                            $photoStore=new CadetPersonalPhoto;
-                        ////                            $photoStore->image = $imageName;
-                        ////                            $photoStore->date = date('Y-m-d');
-                        ////                            $photoStore->cadet_no = $user;
-                        ////                            $photoStore->student_id = $enrollment->std_id;
-                        ////                            $photoStore->campus_id = $campus;
-                        ////                            $photoStore->institute_id = $institute;
-                        ////                            $photoStore->academics_year_id=$enrollment->academic_year;
-                        ////                            $photoStore->section_id=$enrollment->section;
-                        ////                            $photoStore->batch_id= $enrollment->batch;
-                        ////                            $photoStorage=$photoStore->save();
-                        ////                        }
-                        //                        if($insertDocument){
-                        //                            // If we reach here, then data is valid and working. Commit the queries!
-                        //                            DB::commit();
+                        //
+                        //
+                        //
+                    } else {
+                        try {
+                            $userDocument = new Content();
+                            // storing user document
+                            $userDocument->name = $imageName;
+                            $userDocument->file_name = $imageName;
+                            $userDocument->path = $destinationPath;
+                            $userDocument->mime = $ext;
+                            $insertDocument = $userDocument->save();
+                            //
+                            //
+                            if ($insertDocument) {
+                                $studentAttachment = new EmployeeAttachment();
+                                // storing student attachment
+                                $studentAttachment->emp_id     = $enrollment;
+                                $studentAttachment->doc_id     = $userDocument->id;
+                                $studentAttachment->doc_type   = "PROFILE_PHOTO";
+                                $studentAttachment->doc_status = 0;
+                                // save student attachment profile
+                                $attachmentUploaded = $studentAttachment->save();
+                                DB::commit();
+                            }
+                            ////                        if($insertDocument)
+                            ////                        {
+                            ////                            $photoStore=new CadetPersonalPhoto;
+                            ////                            $photoStore->image = $imageName;
+                            ////                            $photoStore->date = date('Y-m-d');
+                            ////                            $photoStore->cadet_no = $user;
+                            ////                            $photoStore->student_id = $enrollment->std_id;
+                            ////                            $photoStore->campus_id = $campus;
+                            ////                            $photoStore->institute_id = $institute;
+                            ////                            $photoStore->academics_year_id=$enrollment->academic_year;
+                            ////                            $photoStore->section_id=$enrollment->section;
+                            ////                            $photoStore->batch_id= $enrollment->batch;
+                            ////                            $photoStorage=$photoStore->save();
+                            ////                        }
+                            //                        if($insertDocument){
+                            //                            // If we reach here, then data is valid and working. Commit the queries!
+                            //                            DB::commit();
+                        }
+                        //
+                        //
+                        catch (ValidationException $e) {
+                            // Rollback and then redirect
+                            // back to form with errors
+                            DB::rollback();
+                            return redirect()->back($e->getMessage());
+                        }
+                        //
                     }
-                    //
-                    //
-                    catch (ValidationException $e) {
-                        // Rollback and then redirect
-                        // back to form with errors
-                        DB::rollback();
-                        return redirect()->back($e->getMessage());
-                    }
-                    //
+                } else {
+                    array_push($missingStdIds, $user_id);
                 }
             }
             $imageName = "";
         }
+
+        if (sizeof($missingStdIds) > 0) {
+            $str = '';
+            foreach ($missingStdIds as $missingId) {
+                $str .= $missingId . ", ";
+            }
+
+            Session::flash('warning', 'No Employees found with these ids- ' . $str . '! All other photos are uploaded.');
+            // receiving page action
+            return redirect()->back();
+        }
+
         // return
         Session::flash('success', 'Employee Image Uploaded !!!');
         // receiving page action

@@ -50,23 +50,19 @@
                             <div class="col-sm-12 col-xs-12">
                                 <div class="callout callout-info">
                                     <h4><i class="fa fa-bullhorn" aria-hidden="true"></i> Instructions :</h4>
-{{--                                    <ol>--}}
-{{--                                        --}}{{--<li><b>The field with red color are required.</b></li>--}}
-{{--                                        <li>All date must be enter <strong>DD-MM-YYYY</strong> format.</li>--}}
-{{--                                        --}}{{--<li>Student ID is auto generated.</li>--}}
-{{--                                        <li>Birth date must be less than current date.</li>--}}
-{{--                                        <li>Email ID should be in valid email format and unique in the system.</li>--}}
-{{--                                        <li>Max upload records limit is <strong>300</strong>.</li>--}}
-{{--                                        <li>Student import data must match with current application language.</li>--}}
-{{--                                    </ol>--}}
-                                    <h4>
+                                    <ol>
+                                        <li><b>Single / Multiple Image(s) can be uploaded.</b></li>
+                                        <li><b>Image must be in .jpg format.</b></li>
+                                        <li><b>Image must be below 50KB.</b></li>
+                                    </ol>
+                                    {{-- <h4>
                                         <strong>
                                             <a href="{{asset("/download/student_import.xlsx")}}" target="_blank">
                                                 Click here to download
                                             </a>
                                         </strong>
                                         sample format of import data in <b>XLSX</b> format.
-                                    </h4>
+                                    </h4> --}}
                                 </div><!--./callout-->
                             </div><!--./col-->
                         </div><!--./row-->
