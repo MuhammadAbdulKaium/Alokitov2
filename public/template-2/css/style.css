@@ -21,7 +21,7 @@ html, body {
 
     .login-warp{
         min-height:657px;
-        background-size:cover;
+        background-size:cover !important;
     }
 }
 img.all-cadet-img {
@@ -31,7 +31,7 @@ img.all-cadet-img {
 .media-screen-inner{display: none;}
 .login-warp{
     min-height:969px;
-    background-size:cover;
+    background-size:cover !important;
 }
 
 .login-bg {
