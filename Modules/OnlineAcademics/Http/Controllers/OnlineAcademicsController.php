@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Subject;
 use App\OnlineClassTopic;
+use DateTimeZone;
 use Redirect;
 use Session;
 use Validator;
@@ -83,7 +84,6 @@ class OnlineAcademicsController extends Controller
     {
         // all academics levels
 
-
         $empList        = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
 
 
@@ -94,8 +94,8 @@ class OnlineAcademicsController extends Controller
         $topic_name = (isset($topic_name) ? $topic_name : "classtopic");
 
         switch ($topic_name) {
-            case 'classtopic':
 
+            case 'classtopic':
                 $qry = [
                     'institute_id' => $this->academicHelper->getInstitute(),
                     'campus_id' => $this->academicHelper->getCampus()
@@ -104,7 +104,7 @@ class OnlineAcademicsController extends Controller
                 $academicYears  = $this->academicsYear->where($qry)->get();
                 $subjectList    = $this->subject->get();
 
-                $topic_list     = $this->OnlineClassTopic->where($qry)->get();
+                $topic_list     = $this->OnlineClassTopic->get();
 
                 return view('onlineacademics::pages.classtopic', compact('topic_name', 'academicYears', 'subjectList', 'topic_list', 'allAcademicsLevel'))->with('page');
                 break;
@@ -117,9 +117,11 @@ class OnlineAcademicsController extends Controller
                 // all academics year
                 $academicYears  = $this->academicsYear->where($qry)->get();
 
+
+
                 $subjectList    = $this->subject->get();
 
-                $topic_list     = $this->OnlineClassTopic->where($qry)->get();
+                $topic_list     = $this->OnlineClassTopic->get();
 
                 $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
 
@@ -138,7 +140,7 @@ class OnlineAcademicsController extends Controller
 
                 $subjectList    = $this->subject->get();
 
-                $topic_list     = $this->OnlineClassTopic->get();
+                $topic_list     = $this->OnlineClassTopic->where($qry)->get();
 
                 $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
 
@@ -248,6 +250,8 @@ class OnlineAcademicsController extends Controller
             ->where('campus_id', $campus_id)
             ->where('id', $assign_teacher_id)
             ->first();
+
+
 
 
         $UpdateInfo = DB::table('online_class_topics')->where('id', $updateId)->first();
@@ -383,13 +387,12 @@ class OnlineAcademicsController extends Controller
 
                     if (isset($CheckTopic)) {
 
+                        $topic_list     = $this->OnlineClassTopic->get();
 
                         $qry = [
                             'institute_id' => $this->academicHelper->getInstitute(),
                             'campus_id' => $this->academicHelper->getCampus()
                         ];
-
-                        $topic_list     = $this->OnlineClassTopic->where($qry)->get();
                         // all academics year
                         $academicYears  = $this->academicsYear->where($qry)->get();
 
@@ -492,7 +495,7 @@ class OnlineAcademicsController extends Controller
                         ];
                         // all academics year
                         $academicYears  = $this->academicsYear->where($qry)->get();
-                        $topic_list     = $this->OnlineClassTopic->where($qry)->get();
+                        $topic_list     = $this->OnlineClassTopic->get();
                         $topic_name     = "classtopic";
                         return view('onlineacademics::pages.classtopic', compact('academicYears', 'topic_list', 'topic_name', 'allAcademicsLevel'))->with('page');
                     }
@@ -590,18 +593,15 @@ class OnlineAcademicsController extends Controller
             }
         } else {
 
-            $qry = [
-                'institute_id' => $this->academicHelper->getInstitute(),
-                'campus_id' => $this->academicHelper->getCampus()
-            ];
-
-            $topic_list     = $this->OnlineClassTopic->where($qry)->get();
+            $topic_list     = $this->OnlineClassTopic->get();
             Session::flash('warning', 'Invalid Information. please try with correct Information');
             return view('onlineacademics::pages.classtopic', compact('topic_list', 'topic_name', 'allAcademicsLevel'))->with('page')->withErrors($validator);
         }
     }
+
     public function findtopic(Request $request)
     {
+
         //dd($request->all());
         $institute_id   =   $this->academicHelper->getInstitute();
         $campus_id      =   $this->academicHelper->getCampus();
@@ -706,19 +706,17 @@ class OnlineAcademicsController extends Controller
 
     public function ClassHistory(Request $request)
     {
-        //dd($request->all());
-
         $timestamp = strtotime($request->input('start_date'));
         $day1 = date('l', $timestamp);
 
-        $timestamp2 = strtotime($request->input('end_date'));
+        $timestamp2 = strtotime($request->input('start_date'));
         $day2 = date('l', $timestamp2);
         //var_dump($day1,$day2);
 
 
 
         $start_date = strtotime($request->input('start_date')); // or your date as well
-        $end_date   = strtotime($request->input('end_date'));
+        $end_date   = strtotime($request->input('start_date'));
         $datediff   = $start_date - $end_date;
 
         //echo round($datediff / (60 * 60 * 24));
@@ -730,6 +728,8 @@ class OnlineAcademicsController extends Controller
             $total_Day_Date[$day] =  $date; //date("m-d-Y", $i);
             //$totalDay[]  =  date('l', $i);  
         }
+
+
 
         $topic_name = "ClassHistory";
         // all academics levels
@@ -756,7 +756,7 @@ class OnlineAcademicsController extends Controller
         $teacher_id                 = $request->input('teacher_id');
         $subject_class_topic        = $request->input('subject_class_topic');
         $start_date                 = date("m-d-Y", strtotime($request->input('start_date')));
-        $end_date                   = date("m-d-Y", strtotime($request->input('end_date')));
+        $end_date                   = date("m-d-Y", strtotime($request->input('start_date')));
         $status                     = $request->input('status');
 
         //die();
@@ -772,6 +772,7 @@ class OnlineAcademicsController extends Controller
             ->where('section_id', $request->input('section_id'))
             ->where('id', $request->input('subject_id'))
             ->value('subject_id');
+
 
         $class_schedule_list = $this->OnlineClassSchedule
             ->when($institute_id, function ($query, $institute_id) {
@@ -802,10 +803,10 @@ class OnlineAcademicsController extends Controller
                 return $query->where('class_topic_id', $subject_class_topic);
             })
             ->when($start_date, function ($query, $start_date) {
-                return $query->where('class_opening_date', $start_date);
+                return $query->where('class_opening_date', '>=', $start_date);
             })
             ->when($end_date, function ($query, $end_date) {
-                return $query->where('class_opening_date', $end_date);
+                return $query->where('class_opening_date', '<=', $end_date);
             })
             ->when($status, function ($query, $status) {
                 return $query->where('class_status', $status);
@@ -832,7 +833,7 @@ class OnlineAcademicsController extends Controller
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_teacher_remarks;
 
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_total_student;
-            $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_present;
+            $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->presentStudents;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_absent;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->student_leave;
             $scheduledData[$scheduledList->class_subject_id][] = $scheduledList->class_conduct_time;
@@ -846,19 +847,19 @@ class OnlineAcademicsController extends Controller
         }
 
 
-
-
         /* New Search Part Integration Start 02/07/2020 */
 
         // all timetables
         $allTimetables = $this->timeTable->where([
-            'batch' => $batch,
-            'section' => $section,
-            'shift' => $shift,
-            //'academic_year'=>$academicYear,
-            'campus' => $campus_id,
-            'institute' => $institute_id
+            ['batch', $batch],
+            ['section', $section],
+            ['shift', $shift],
+            ['subject', 'LIKE', "%$subject%"],
+            ['teacher', 'LIKE', "%$teacher_id%"],
+            ['campus', $campus_id],
+            ['institute', $institute_id],
         ])->get();
+
 
         // batch section assigned period id
         $batchSectionPeriodId = $this->getBatchSectionPeriodCategoryId($institute_id, $campus_id, null, $level, $batch, $section, $shift);
@@ -935,12 +936,12 @@ class OnlineAcademicsController extends Controller
 
         $ClassName = $this->batch->where(['academics_level_id' => $level, 'campus' => $campus_id, 'institute' => $institute_id, 'id' => $batch])->first();
 
-        $SectionName = $this->section->where(['batch_id' => $batch, 'institute' => $institute_id])->first();
+        $SectionName = $this->section->where('id', $section)->first();
+
+        // $SectionName = $this->section->where(['batch_id' => $batch, 'institute' => $institute_id])->first();
 
 
         $topic_info = OnlineClassTopic::where(['academic_level_id' => $level, 'academic_class_id' => $batch, 'academic_section_id' => $section])->get();
-
-
 
         $topicList = [];
         if (isset($topic_info) && !empty($topic_info) && is_array($topic_info)) {
@@ -1209,7 +1210,6 @@ class OnlineAcademicsController extends Controller
 
     public function StoreClassTopic(Request $request)
     {
-
         if (isset($request->topiclist)) {
 
             $topiclist = implode(",", $request->topiclist);
@@ -1266,6 +1266,7 @@ class OnlineAcademicsController extends Controller
     ///////// Student Module Ajax Request  function /////////
     public function findBatch(Request $request)
     {
+
         $academicLevelId    = $request->input('id');
         $campusId           = $request->input('campus', $this->academicHelper->getCampus());
         $instituteId        = $request->input('institute', $this->academicHelper->getInstitute());
@@ -1351,6 +1352,7 @@ class OnlineAcademicsController extends Controller
 
     public function findTeacher(Request $request)
     {
+
         $class_id   = $request->input('class_id');
         $section_id = $request->input('section_id');
         $subject_id = $request->input('subject_id');
@@ -1370,6 +1372,7 @@ class OnlineAcademicsController extends Controller
 
     public function ajax_teacher_topic(Request $request)
     {
+
         $class_id   = $request->input('class_id');
         $section_id = $request->input('section_id');
         $subject_id = $request->input('subject_id');
@@ -1433,7 +1436,7 @@ class OnlineAcademicsController extends Controller
 
     public function ClassSchedule(Request $request)
     {
-        // dd($request->all());
+        //dd($request->all());
         $institute_id               = $request->input('institute_id');
         $campus_id                  = $request->input('campus_id');
         $academic_level_id          = $request->input('academic_level_id');
@@ -1483,18 +1486,6 @@ class OnlineAcademicsController extends Controller
             ->where('id', $academic_level_id)
             ->value('level_name');
 
-
-        // echo $institute_id;
-        // echo $campus_id;
-        // echo $academic_level_id;
-        // echo "ssssssss" ;    
-        // echo $academic_class_id;
-
-        // echo $academic_section_id;
-        // exit;
-        // echo $institute_id;
-        // echo $institute_id;
-
         $ClassSubjectTopic = $this->OnlineClassTopic
             ->where('institute_id', $institute_id)
             ->where('campus_id', $campus_id)
@@ -1504,18 +1495,8 @@ class OnlineAcademicsController extends Controller
             ->where('class_topic', 'LIKE', '%' . $class_topic_name . '%')
             ->first();
 
-        // print_r($ClassSubjectTopic);
-        // exit;
-
-        // if($ClassSubjectTopic){
         $class_topic_id = $ClassSubjectTopic->id;
 
-        // print_r($class_topic_id );
-        // exit;
-        // }
-        // else{
-        //      $class_topic_id=0;
-        // }
 
 
         $CheckScheduled = DB::table('online_class_schedule')
@@ -1580,6 +1561,7 @@ class OnlineAcademicsController extends Controller
                     'attendance_status' => 0,
                     'created_at' =>  date("Y-m-d H:i:s")
                 );
+
                 DB::table('online_attandences')->insert($studentbatch_wise);
             }
 
@@ -1615,9 +1597,6 @@ class OnlineAcademicsController extends Controller
 
     public function LiveClassScheduled($scheduledId)
     {
-
-
-
         $scheduledId = (isset($scheduledId) ? $scheduledId : "");
 
         $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->first();
@@ -1640,65 +1619,17 @@ class OnlineAcademicsController extends Controller
 
 
         $studentList = $this->studentProfileView
-            ->join('online_attandences', 'student_manage_view.std_id', '=', 'online_attandences.std_id')
-            ->where('online_class_id', $ScheduledData->id)
+
             ->where('batch', $ScheduledData->academic_class_id)
             ->where('section', $ScheduledData->academic_section_id)
             ->where('academic_level', $ScheduledData->academic_level_id)
             ->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')
             ->get();
 
-
         $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
 
-        $campusid = $this->academicHelper->getCampus();
-
-        return view('onlineacademics::pages.onlineclass', compact('topic_name', 'academicYears', 'subjectList', 'topic_list', 'empList', 'allAcademicsLevel', 'ScheduledData', 'scheduledId', 'studentList', 'campusid'))->with('page');
+        return view('onlineacademics::pages.onlineclass', compact('topic_name', 'academicYears', 'subjectList', 'topic_list', 'empList', 'allAcademicsLevel', 'ScheduledData', 'scheduledId', 'studentList'))->with('page');
     }
-
-
-    public function LiveClassScheduledbroadcast($scheduledId)
-    {
-
-
-
-        $scheduledId = (isset($scheduledId) ? $scheduledId : "");
-
-        $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->first();
-
-        // all academics levels
-        $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
-
-        $topic_name = "onlineclass";
-
-
-        $qry = [
-            'institute_id' => $this->academicHelper->getInstitute(),
-            'campus_id' => $this->academicHelper->getCampus()
-        ];
-        // all academics year
-        $academicYears  = $this->academicsYear->where($qry)->get();
-        $subjectList    = $this->subject->get();
-
-        $topic_list     = $this->OnlineClassTopic->where(['institute_id' => $ScheduledData->institute_id, 'campus_id' => $ScheduledData->campus_id, 'academic_level_id' => $ScheduledData->academic_level_id, 'academic_class_id' => $ScheduledData->academic_class_id, 'academic_section_id' => $ScheduledData->academic_section_id, 'class_subject_id' => $ScheduledData->class_subject_id])->get();
-
-
-        $studentList = $this->studentProfileView
-            ->join('online_attandences', 'student_manage_view.std_id', '=', 'online_attandences.std_id')
-            ->where('online_class_id', $ScheduledData->id)
-            ->where('batch', $ScheduledData->academic_class_id)
-            ->where('section', $ScheduledData->academic_section_id)
-            ->where('academic_level', $ScheduledData->academic_level_id)
-            ->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')
-            ->get();
-
-
-        $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
-
-
-        return view('onlineacademics::pages.onlineclassbroadcasting', compact('topic_name', 'academicYears', 'subjectList', 'topic_list', 'empList', 'allAcademicsLevel', 'ScheduledData', 'scheduledId', 'studentList'))->with('page');
-    }
-
 
     public function onlineclass_condduct(Request $request)
     {
@@ -1709,13 +1640,18 @@ class OnlineAcademicsController extends Controller
 
             $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->where(['class_teacher_id' => $teacher_id])->update([
                 'class_status' => 6,
-                'class_conduct_time' => date("Y-m-d H:i:s"),
-                // 'conduct_teacher'=>Auth::user()->id,
+                'class_conduct_time' => date("Y-m-d h:i:sa"),
             ]);
-        }
 
-        $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->first();
-        return view('onlineacademics::pages.updateclassstatus', compact('ScheduledData'));
+            if ($ScheduledData) {
+
+                // echo "Hello";
+                $ScheduledData = $this->OnlineClassSchedule->where(['class_scheduled_id' => $scheduledId])->first();
+                return view('onlineacademics::pages.updateclassstatus', compact('ScheduledData'));
+            } else {
+                echo "Do Not Update ";
+            }
+        }
     }
 
     public function onlineclass_condduct_std_teach(Request $request)

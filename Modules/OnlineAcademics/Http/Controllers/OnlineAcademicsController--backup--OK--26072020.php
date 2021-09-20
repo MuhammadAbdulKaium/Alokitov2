@@ -936,7 +936,9 @@ class OnlineAcademicsController extends Controller
 
         $ClassName = $this->batch->where(['academics_level_id' => $level, 'campus' => $campus_id, 'institute' => $institute_id, 'id' => $batch])->first();
 
-        $SectionName = $this->section->where(['batch_id' => $batch, 'institute' => $institute_id])->first();
+        $SectionName = $this->section->where('id', $section)->first();
+
+        // $SectionName = $this->section->where(['batch_id' => $batch, 'institute' => $institute_id])->first();
 
 
         $topic_info = OnlineClassTopic::where(['academic_level_id' => $level, 'academic_class_id' => $batch, 'academic_section_id' => $section])->get();
