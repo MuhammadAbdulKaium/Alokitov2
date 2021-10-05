@@ -24,5 +24,8 @@
     "HealthCare": true,
     "CadetInventoryProductHistory": true,
     "Mess": true,
-    "CadetFees": true
+    "CadetFees": true,
+    "Model": true,
+    "FeesStructureDetails": true,
+    "Website": true
 }

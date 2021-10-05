@@ -1,0 +1,13 @@
+{
+    "name": "FeesStructureDetails",
+    "alias": "feesstructuredetails",
+    "description": "",
+    "keywords": [],
+    "order": 0,
+    "providers": [
+        "Modules\\FeesStructureDetails\\Providers\\FeesStructureDetailsServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

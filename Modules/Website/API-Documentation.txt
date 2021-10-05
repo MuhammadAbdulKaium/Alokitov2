@@ -1,0 +1,91 @@
+Documentation Format:
+
+Menu Name
+Purpose
+API Route
+JSON Content
+
+
+~~~Information
+It includes School's basic information (Logo, School Name, Phone, Email, FB Link,
+Address, Contact Person, History, Mission and Vision, Structure)
+website/api_get_information/
+campus_id, institute_id
+
+
+~~~Committee
+Information of committee members (Image, Name, Designation, Email, Phone, Speech)
+website/api_get_committee/
+campus_id, institute_id
+
+
+~~~Image
+All the Slider images and Albums will be created from here (multitple photos)
+website/api_get_image/
+campus_id, institute_id
+
+
+~~~Facility
+The list of facilities the school provides with single image
+website/api_get_extras/
+campus_id, institute_id, type = 1
+
+
+~~~Rules & Regulations
+Rules for Students, Teachers and Parents
+website/api_get_rules/
+campus_id, institute_id
+
+
+~~~Public Exam Results
+Results of previous year Public Exams (PSC, JSC, SSC, HSC)
+website/api_get_public_exam_result/
+campus_id, institute_id
+
+
+~~~Online Admission Form Duration
+Starting date, Ending date and Status of the Online admission Duration
+website/api_get_online_form_duration/
+campus_id, institute_id
+
+
+~~~Text Book & Syllabus
+Class name, Book List(PDF), Syllabus(PDF)
+website/api_get_extras/
+campus_id, institute_id, type = 5
+
+
+~~~Publications
+Title and the PDF of the publication
+website/api_get_extras/
+campus_id, institute_id, type = 2
+
+
+~~~Extra Curricular Activities
+Single image, Type(Club, Event), Title, Description
+website/api_get_extras/
+campus_id, institute_id, type = 4
+
+
+~~~Job Circular
+Title, Circular (PDF) and Result (PDF)
+website/api_get_extras/
+campus_id, institute_id, type = 3
+
+
+~~~Teacher List
+Shows Teacher Information
+/api/get-employee-list
+institute, campus, category = 1, return_type = json
+
+
+~~~Staff List
+Shows Staff Information
+/api/get-employee-list
+institute, campus, return_type = json
+
+
+~~~Class Topper
+Shows Topper of each class
+/api/get-class-topper-list
+campus_id, institute_id
