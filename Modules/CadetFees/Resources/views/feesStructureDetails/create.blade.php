@@ -1,4 +1,4 @@
-<form>
+<form id="fees-structure-details-form">
     <input type="hidden" name="_token" value="<?php echo e(csrf_token()); ?>">
     <input type="hidden" value="{{$structureName->id}}" name="structureID">
     <div class="modal-header">
@@ -22,11 +22,11 @@
                 @foreach($feesHeads as $feesHead)
                     <tr>
                         {{$feesHead->id}}
-                        <td><input type="checkbox" name="checkbox[]" id="selectHead_{{$feesHead->id}}" onclick="selectHead({{$feesHead->id}})" value="{{$feesHead->id}}"></td>
+                        <td><input type="checkbox" name="checkbox[]" class="fees-head-check" value="{{$feesHead->id}}"></td>
                         <td>{{$feesHead->fees_head}}</td>
                         <td>
                             <div class="form-group">
-                                <input type="number" class="form-control" id="headAmount_{{$feesHead->id}}" name="amount[]">
+                                <input type="number" class="form-control fees-head-amount" name="amount[]" disabled required>
                             </div>
                         </td>
                     </tr>
@@ -41,28 +41,36 @@
     </div>
 </form>
 <script>
-    var selectedData = [];
-    function selectHead(id)
-    {
-        if($('#selectHead_'+id).is(":checked"))
-        {
-            console.log($('#headAmount_'+id).val())
-            var head = $('#selectHead_'+id).val();
-            var amount = $('#headAmount_'+id).val();
-            var jsonData = JSON.parse('{"head":"'+head+'", "amount" : "'+amount+'" }');
-            selectedData.push(jsonData);
-        }
-        else
-        {
-            var index = 0;
-            for (index = selectedData.length - 1; index >= 0; --index) {
-                console.log(selectedData[index]);
-                if (selectedData[index].head == id) {
-                    selectedData.splice(index, 1);
-                }
-            }
-        }
-    }
+    // var selectedData = [];
+    // function selectHead(id)
+    // {
+    //     if($('#selectHead_'+id).is(":checked"))
+    //     {
+    //         // console.log($('#headAmount_'+id).val())
+    //         var head = $('#selectHead_'+id).val();
+    //         var amount = $('#headAmount_'+id).val();
+    //         var jsonData = JSON.parse('{"head":"'+head+'", "amount" : "'+amount+'" }');
+    //         selectedData.push(jsonData);
+    //     }
+    //     else
+    //     {
+    //         var index = 0;
+    //         for (index = selectedData.length - 1; index >= 0; --index) {
+    //             // console.log(selectedData[index]);
+    //             if (selectedData[index].head == id) {
+    //                 selectedData.splice(index, 1);
+    //             }
+    //         }
+    //     }
+    // }
+    //
+    // function refreshData(){
+    //     $allCheckBox = $('.fees-head-check');
+    //
+    //     $allCheckBox.each((index, value) => {
+    //         selectHead($(value).data('head-id'));
+    //     });
+    // }
 
     $(function () {
         $("#selectAll").click(function () {
@@ -70,11 +78,17 @@
         });
 
         $("input[type=checkbox]").click(function () {
+            var parent = $(this).parent().parent();
+            var amount = parent.find('.fees-head-amount');
+
             if (!$(this).prop("checked")) {
-                $("#selectAll").prop("checked", false);
+                amount.attr('disabled', 'disabled');
+                // $("#selectAll").prop("checked", false);
+            } else {
+                amount.removeAttr('disabled');
             }
         });
-        $("#submitData").click(function (e) {
+        $("#fees-structure-details-form").submit(function (e) {
             e.preventDefault();
 
             // ajax request
@@ -82,8 +96,7 @@
                 url: "/cadetfees/fees/structure/details/store/",
                 type: 'POST',
                 cache: false,
-                data: {"_token": "{{ csrf_token() }}",
-                    "selectedData":selectedData},
+                data: $("#fees-structure-details-form").serialize(),
                 datatype: 'application/json',
 
 
@@ -93,11 +106,12 @@
                 },
 
                 success:function(data){
-
+                    waitingDialog.hide();
                     console.log(data);
                 },
 
                 error:function(data){
+                    waitingDialog.hide();
                     alert(JSON.stringify(data));
                 }
             });
