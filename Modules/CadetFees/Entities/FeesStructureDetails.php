@@ -6,5 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class FeesStructureDetails extends Model
 {
-    protected $fillable = [];
+    protected $fillable = ['head_amount'];
+    protected $table = 'fees_structure_details';
 }

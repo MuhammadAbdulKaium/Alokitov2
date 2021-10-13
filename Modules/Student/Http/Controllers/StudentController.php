@@ -13,6 +13,8 @@ use Modules\Academics\Entities\ClassSubStudent;
 use Modules\Academics\Entities\Section;
 use Illuminate\Support\Facades\Log;
 use Modules\CadetFees\Entities\CadetFeesAssign;
+use Modules\CadetFees\Entities\FeesStructure;
+use Modules\CadetFees\Entities\FeesStructureDetails;
 use Modules\Setting\Entities\CadetPerformanceType;
 use Modules\Student\Entities\CadetAssesment;
 use Modules\Student\Entities\StudentActivityDirectoryActivity;
@@ -472,9 +474,8 @@ class StudentController extends Controller
         $username         = $request->input('std_username');
         $returnType    = $request->input('return_type', 'view');
         $pageType    = $request->input('page_type', 'manage_std');
-        $amount        = $request->amount;
-        $fine     = $request->fine;
-        $fineType     = $request->fine_type;
+        $feesStructure        = $request->feesStructure;
+
         $categoryActivity = $request->categoryActivity;
 
         // qry
@@ -513,15 +514,21 @@ class StudentController extends Controller
         $academicYearProfile = AcademicsYear::where(['campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
             'status'=>'1'])->first();
-        $checkFeesAssign = CadetFeesAssign::where(['campus_id' => $this->academicHelper->getCampus(),
-            'instittute_id' => $this->academicHelper->getInstitute(),
-            'academic_year'=>$academicYearProfile->id,
-            'academic_level'=>$academicLevel,
-            'batch'=>$batch,
-            'section'=>$section
-        ])->get();
+//        $checkFeesAssign = CadetFeesAssign::where(['campus_id' => $this->academicHelper->getCampus(),
+//            'instittute_id' => $this->academicHelper->getInstitute(),
+//            'academic_year'=>$academicYearProfile->id,
+//            'academic_level'=>$academicLevel,
+//            'batch'=>$batch,
+//            'section'=>$section
+//        ])->get();
         }
-        $stdListView = view('student::pages.includes.student-list-fees', compact('searchData','checkFeesAssign','amount','fine','fineType'))->render();
+        $feesStructureList =FeesStructure::where(['campus_id' => $this->academicHelper->getCampus(),
+        'institute_id' => $this->academicHelper->getInstitute()
+        ])->get();
+        $feesStructureDetailsList =FeesStructureDetails::join('fees_head','fees_structure_details.head_id','fees_head.id')->where('structure_id',$feesStructure)
+            ->select('fees_structure_details.*','fees_head.fees_head')->get();
+
+        $stdListView = view('student::pages.includes.student-list-fees', compact('academicYearProfile','feesStructureDetailsList','searchData','feesStructure','feesStructureList'))->render();
         return ['status' => 'success', 'msg' => 'Student List found', 'html' => $stdListView];
     }
     public function searchCadetFeesGenerate(Request $request)

@@ -16,6 +16,7 @@ use Modules\Academics\Entities\Batch;
 use Modules\CadetFees\Entities\CadetFeesAssign;
 use Modules\CadetFees\Entities\CadetFeesGenerate;
 use Modules\CadetFees\Entities\CadetFeesPayment;
+use Modules\CadetFees\Entities\FeesStructure;
 use Modules\RoleManagement\Entities\User;
 use Modules\Student\Entities\StudentEnrollment;
 use DateTime;
@@ -109,67 +110,72 @@ class CadetFeesController extends Controller
             'institute_id' => $this->academicHelper->getInstitute(),
             'campus_id' => $this->academicHelper->getCampus()
         ])->get();
+        $structureNames= FeesStructure::where([
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus()
+        ])->get();
         $allInputs = array('year' => null, 'level' => null, 'batch' => null, 'section' => null, 'gr_no' => null, 'email' => null);
 
-        return view('cadetfees::index',compact('academicLevels','allInputs'))->with('allEnrollments', null);
+        return view('cadetfees::index',compact('academicLevels','allInputs','structureNames'))->with('allEnrollments', null);
 
     }
     public function assignCadetFees(Request $request)
     {
-        $academicYearProfile = AcademicsYear::where(['campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute(),
-            'status'=>'1'])->first();
         DB::beginTransaction();
         try {
-            for($i=0;$i<count($request->std_id);$i++){
-                $checkFeesAssign = CadetFeesAssign::where(['campus_id' => $this->academicHelper->getCampus(),
-                    'instittute_id' => $this->academicHelper->getInstitute(),
-                    'academic_year'=>$academicYearProfile->id,
-                    'academic_level'=>$request['academic_level'][$i],
-                    'batch'=>$request['batch'][$i],
-                    'section'=>$request['section'][$i],
-                    'std_id'=>$request['std_id'][$i]
-                    ])->first();
-                if(!$checkFeesAssign)
-                {
-                    $cadetFeesAssign=new CadetFeesAssign();
-                    $cadetFeesAssign->std_id = $request['std_id'][$i];
-                    $cadetFeesAssign->academic_year = $academicYearProfile->id;
-                    $cadetFeesAssign->fees = $request['amount'][$i];
-                    $cadetFeesAssign->late_fine = $request['fine'][$i];
-                    $cadetFeesAssign->academic_level = $request['academic_level'][$i];
-                    $cadetFeesAssign->batch = $request['batch'][$i];
-                    $cadetFeesAssign->section = $request['section'][$i];
-                    $cadetFeesAssign->fine_type = $request['fine_type'][$i];
-                    $cadetFeesAssign->campus_id = $this->academicHelper->getCampus();
-                    $cadetFeesAssign->instittute_id = $this->academicHelper->getInstitute();
-                    $cadetFeesAssign->created_by = Auth::user()->id;
-                    $assignDataStore=$cadetFeesAssign->save();
-                    if ($assignDataStore) {
-                        Session::flash('message', 'Success!Data has been saved successfully.');
-//                        return redirect()->back();
-                    } else {
-                        Session::flash('message', 'Success!Data has not been saved successfully.');
-                        return redirect()->back();
+            $requestedHead = $request->head_amount_id;
+            $studentIds = $request->std_id;
+            $headIds = [];
+            $totalFees = [];
+            $feesDetails = [];
 
+            foreach ($request->head_amount_id as $key => $amount) {
+                array_push($headIds, $key);
+            }
+
+            if (sizeof($headIds) > 0) {
+                foreach ($studentIds as $studentId) {
+                    $totalFees[$studentId] = 0;
+                    $feesDetails[$studentId] = [];
+                }
+
+                foreach ($studentIds as $key => $value) {
+                    foreach ($headIds as $headId) {
+                        $totalFees[$studentIds[$key]] += $requestedHead[$headId][$key];
+                        $feesDetails[$studentIds[$key]][$headId] = $requestedHead[$headId][$key];
                     }
                 }
 
-                if($checkFeesAssign)
-                {
-                    if(count($request->std_id) == $checkFeesAssign->count()){
-//                    echo " Result";
-//                    echo $checkFeesAssign;
-                        Session::flash('message', 'All Ready all student Fees assigned.');
-                        return redirect()->back();
-                    }
-                }
+            }
+            foreach ($request->std_id as $key => $std) {
+                $studentFees = new CadetFeesAssign();
+                $studentFees->std_id = $std;
+                $studentFees->total_fees = $totalFees[$std];
+                $studentFees->fees_details = json_encode($feesDetails[$std]);
+                $studentFees->structure_id = $request->structure_id[$key];
+                $studentFees->batch = $request->batch[$key];
+                $studentFees->batch = $request->batch[$key];
+                $studentFees->section = $request->section[$key];
+                $studentFees->academic_level = $request->academic_level[$key];
+                $studentFees->academic_year = $request->academic_year[$key];
+                $studentFees->created_by = Auth::user()->id;
+                $feesAssignDone = $studentFees->save();
 
+            }
+            DB::commit();
+            if ($feesAssignDone) {
+                Session::flash('message', 'Success!Data has been saved successfully.');
+                return redirect()->back();
+            } else {
+                Session::flash('message', 'Success!Data has not been saved successfully.');
+                return redirect()->back();
+
+            }
         }
-        } catch (\Exception $e) {
-            DB::rollback();
-            Session::flash('errorMessage', 'Error! Error creating house.');
-            return redirect()->back();
+                 catch (\Exception $e) {
+                DB::rollback();
+                Session::flash('errorMessage', 'Error! Error creating house.');
+                return redirect()->back();
         }
 
     }

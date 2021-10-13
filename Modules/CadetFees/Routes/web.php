@@ -30,6 +30,7 @@
 
 //    Fees Structure Details
     Route::get('/fees/structure/details/create/{id}', 'FeesStructureDetailsController@create');
+    Route::get('/fees/structure/details/delete/{id}', 'FeesStructureDetailsController@destroy');
     Route::post('/fees/structure/details/store/', 'FeesStructureDetailsController@store');
 
 

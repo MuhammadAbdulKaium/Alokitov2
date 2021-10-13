@@ -21,12 +21,11 @@
                 <tbody>
                 @foreach($feesHeads as $feesHead)
                     <tr>
-                        {{$feesHead->id}}
-                        <td><input type="checkbox" name="checkbox[]" class="fees-head-check" value="{{$feesHead->id}}"></td>
+                        <td><input type="checkbox" name="checkbox[]" class="fees-head-check" value="{{$feesHead->id}}" @isset($structureDetails[$feesHead->id]) checked @endisset></td>
                         <td>{{$feesHead->fees_head}}</td>
                         <td>
                             <div class="form-group">
-                                <input type="number" class="form-control fees-head-amount" name="amount[]" disabled required>
+                                <input type="number" class="form-control fees-head-amount" name="amount[]" value="@isset($structureDetails[$feesHead->id]){{$structureDetails[$feesHead->id]->head_amount}}@endisset" @if (!isset($structureDetails[$feesHead->id])) disabled @endif" required>
                             </div>
                         </td>
                     </tr>
@@ -107,7 +106,9 @@
 
                 success:function(data){
                     waitingDialog.hide();
-                    console.log(data);
+                    $('#globalModal').modal('hide');
+                    location.reload();
+                    // console.log(data);
                 },
 
                 error:function(data){

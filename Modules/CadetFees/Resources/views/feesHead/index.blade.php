@@ -92,7 +92,7 @@
                                         <td>
                                             <a class="btn btn-primary btn-sm" href="/cadetfees/fees/structure/edit/{{$structure->id}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"><i class="fa fa-plus-square"></i> Edit</a>
                                             <a class="btn btn-success btn-sm" href="/cadetfees/fees/structure/details/create/{{$structure->id}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"><i class="fa fa-plus-square"></i> Structure</a>
-                                            <a class="btn btn-danger btn-sm" href="" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
+                                            <a class="btn btn-danger btn-sm" href="/cadetfees/fees/structure/details/delete/{{$structure->id}}" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
                                         </td>
                                     </tr>
                                 @endforeach

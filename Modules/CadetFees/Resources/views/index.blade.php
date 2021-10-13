@@ -78,22 +78,12 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">Amount</label>
-                                    <input type="number" class="form-control" name="amount">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Delay Fine</label>
-                                    <input type="number" class="form-control" name="fine">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Fine Type</label>
-                                    <select name="fine_type" id="" class="form-control">
-                                        <option value="1">Per day</option>
-                                        <option value="2">Fixed</option>
+                                    <label class="control-label" for="section">Fees Structure</label>
+                                    <select id="feesStructure" class="form-control" name="feesStructure">
+                                        <option value="" selected>--- Select Structure ---</option>
+                                        @foreach($structureNames as $structure)
+                                            <option value="{{$structure->id}}">{{$structure->structure_name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

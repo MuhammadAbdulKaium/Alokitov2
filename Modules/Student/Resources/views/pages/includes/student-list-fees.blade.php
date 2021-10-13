@@ -17,62 +17,62 @@
 						<thead>
 						<tr>
 							<th>SL</th>
-							<th>Photo</th>
-							<th>Student Number</th>
+							<th>Student ID</th>
 							<th>Name</th>
+							<th>Academic Year</th>
+							<th>Academic Level</th>
 							<th>Class</th>
 							<th>Form</th>
 							<th>Roll</th>
-							<th>Fees</th>
-							<th>Delay Fine</th>
-							<th>Fine Type</th>
+							<th>Fees Structure</th>
+							@foreach($feesStructureDetailsList as $list)
+								<th>{{$list->fees_head}}</th>
+							@endforeach
 						</tr>
 
 						</thead>
 
 						<tbody>
-
 						@foreach($searchData as $key=>$data)
 							<tr>
-								<td>{{$i}}</td>
-								<td>
-									@if($data->singelAttachment("PROFILE_PHOTO"))
-										<img class="center-block img-circle img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/'.$data->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}" alt="No Image" style="width:50px;height:50px">
-									@else
-										<img class="center-block img-circle img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-default.png')}}" alt="No Image" style="width:50px;height:50px">
-									@endif
-								</td>
+								<td>{{$i++}}</td>
 								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->email}}</a></td>
 								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->first_name}} {{$data->last_name}}</a></td>
+								<td>@if($data->year()) {{$data->year()->year_name}} @endif</td>
+								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->academic_level}}</a></td>
 								<td>{{$data->batch()->batch_name}} @if(isset($data->batch()->get_division()->name)) - {{$data->batch()->get_division()->name}}@endif</td>
 								<td>{{$data->section()->section_name}}</td>
 								<td>{{$data->gr_no}}</td>
 								<td>
 									<input type="hidden" id="cad_{{$data->std_id}}" name="std_id[]" value="{{$data->std_id}}">
+									<input type="hidden" name="structure_id[]" value="{{$feesStructure}}">
 									<input type="hidden" id="batch_{{$data->batch()->id}}" name="batch[]" value="{{$data->batch()->id}}">
 									<input type="hidden" id="section_{{$data->section()->id}}" name="section[]" value="{{$data->section()->id}}">
 									<input type="hidden" id="academic_level_{{$data->academic_level}}" name="academic_level[]" value="{{$data->academic_level}}">
-									@foreach($checkFeesAssign as $key=>$fees)
-										@if($data->std_id == $fees->std_id)
-											<input type="number" value="{{$fees->fees}}" name="old_amount[]" class="form-control" readonly>
+									<input type="hidden" name="academic_year[]" value="{{$academicYearProfile->id}}">
+{{--									@foreach($checkFeesAssign as $key=>$fees)--}}
+{{--										@if($data->std_id == $fees->std_id)--}}
+{{--											<input type="number" value="{{$fees->fees}}" name="old_amount[]" class="form-control" readonly>--}}
+{{--										@endif--}}
+{{--									@endforeach--}}
+{{--									<input type="number" id="amount_{{$data->std_id}}" name="amount[]" value="{{$amount}}" class="form-control">--}}
+									@foreach($feesStructureList as $structure)
+										@if($structure->id == $feesStructure)
+											{{$structure->structure_name}}
 										@endif
 									@endforeach
-									<input type="number" id="amount_{{$data->std_id}}" name="amount[]" value="{{$amount}}" class="form-control">
 								</td>
-								<td>
-									@foreach($checkFeesAssign as $key=>$fees)
-										@if($data->std_id == $fees->std_id)
-											<input type="number" value="{{$fees->late_fine}}" name="old_late_fine[]" class="form-control" readonly>
-										@endif
-									@endforeach
-									<input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">
-								</td>
-								<td>
-									<select name="fine_type[]" id="fine_type_{{$data->std_id}}" class="form-control">
-										<option value="1" {{ 1 == $fineType ? 'selected' : '' }}>Per day</option>
-										<option value="2" {{ 2 == $fineType ? 'selected' : '' }}>Fixed</option>
-									</select>
-								</td>
+								@foreach($feesStructureDetailsList as $list)
+									<td><input type="number" value="{{$list->head_amount}}" name="head_amount_id[{{$list->head_id}}][]" class="form-control" required></td>
+								@endforeach
+{{--								<td>--}}
+{{--									@foreach($checkFeesAssign as $key=>$fees)--}}
+{{--										@if($data->std_id == $fees->std_id)--}}
+{{--											<input type="number" value="{{$fees->late_fine}}" name="old_late_fine[]" class="form-control" readonly>--}}
+{{--										@endif--}}
+{{--									@endforeach--}}
+{{--									<input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">--}}
+{{--								</td>--}}
 							</tr>
 						@endforeach
 						</tbody>
