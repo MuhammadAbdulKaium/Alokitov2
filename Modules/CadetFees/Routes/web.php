@@ -41,6 +41,9 @@
     Route::get('/generate/fees', 'CadetFeesController@generateCadetFees');
     Route::post('/generate/cadet/fees', 'CadetFeesController@storeGenerateCadetFees');
 
+//   Fees Collection
+    Route::get('/fees/collection', 'CadetFeesCollectionController@index');
+
 //    Manual Payment
     Route::get('/manual/fees', 'CadetFeesController@manualCadetFees');
     Route::post('/manage/search/fees/manually', 'CadetFeesController@searchCadetFeesManually');

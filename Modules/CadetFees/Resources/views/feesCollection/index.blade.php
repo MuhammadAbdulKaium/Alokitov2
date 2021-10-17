@@ -15,12 +15,12 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                <i class="fa fa-th-list"></i> Fees Generate | <small>Student</small>
+                <i class="fa fa-th-list"></i> Fees Collection | <small>Student</small>
             </h1>
             <ul class="breadcrumb">
                 <li><a href="{{URL::to('/home')}}"><i class="fa fa-home"></i>Home</a></li>
                 <li class="active">Fees</li>
-                <li class="active">Generate</li>
+                <li class="active">Collection</li>
             </ul>
         </section>
         <section class="content">
@@ -76,7 +76,17 @@
                                     <div class="help-block"></div>
                                 </div>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Year</label>
+                                    <select name="year" class="form-control">
+                                        <option value="{{$years}}">{{$years}}</option>
+                                        <option value="{{$years-1}}">{{$years-1}}</option>
+                                        <option value="{{$years+1}}">{{$years+1}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Month</label>
                                     <select name="month_name" class="form-control">
@@ -95,27 +105,16 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-1">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Fine<span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" name="late_fine" required>
-                                </div>
-                            </div>
+
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">Fine Type</label>
-                                    <select name="fine_type" class="form-control">
-                                        <option value="1">Per day</option>
-                                        <option value="2">Fixed</option>
+                                    <label for="exampleInputEmail1">Fees Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="0">Pending</option>
+                                        <option value="1">Paid</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label class="control-label" for="payment_last_date">Payment Last Date<span class="text-danger">*</span></label>
-                                    <input type="date" name="payment_last_date" class="form-control" required>
-                                </div>
-                                </div>
                         </div>
                     </div>
                     <!-- ./box-body -->
@@ -163,7 +162,6 @@
         </div>
     </div>
 @endsection
-
 @section('scripts')
     <!-- DataTables -->
     <script src="{{ URL::asset('js/datatables/jquery.dataTables.min.js') }}"></script>
@@ -182,7 +180,7 @@
                 e.preventDefault();
                 // ajax request
                 $.ajax({
-                    url: "/student/manage/search/fees/generate",
+                    url: "/student/manage/search/fees/details",
                     type: 'POST',
                     cache: false,
                     data: $('form#std_manage_search_form').serialize(),

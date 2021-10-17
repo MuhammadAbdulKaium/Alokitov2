@@ -14,7 +14,9 @@ use Modules\Academics\Entities\AcademicsLevel;
 use Modules\Academics\Entities\AcademicsYear;
 use Modules\Academics\Entities\Batch;
 use Modules\CadetFees\Entities\CadetFeesAssign;
+use Modules\CadetFees\Entities\CadetFeesAssignHistory;
 use Modules\CadetFees\Entities\CadetFeesGenerate;
+use Modules\CadetFees\Entities\CadetFeesGenerateHistory;
 use Modules\CadetFees\Entities\CadetFeesPayment;
 use Modules\CadetFees\Entities\FeesStructure;
 use Modules\RoleManagement\Entities\User;
@@ -160,10 +162,25 @@ class CadetFeesController extends Controller
                 $studentFees->academic_year = $request->academic_year[$key];
                 $studentFees->created_by = Auth::user()->id;
                 $feesAssignDone = $studentFees->save();
+                if($feesAssignDone)
+                {
+                    $studentFees = new CadetFeesAssignHistory();
+                    $studentFees->std_id = $std;
+                    $studentFees->total_fees = $totalFees[$std];
+                    $studentFees->fees_details = json_encode($feesDetails[$std]);
+                    $studentFees->structure_id = $request->structure_id[$key];
+                    $studentFees->batch = $request->batch[$key];
+                    $studentFees->batch = $request->batch[$key];
+                    $studentFees->section = $request->section[$key];
+                    $studentFees->academic_level = $request->academic_level[$key];
+                    $studentFees->academic_year = $request->academic_year[$key];
+                    $studentFees->created_by = Auth::user()->id;
+                    $feesAssignHistoryDone = $studentFees->save();
+                }
 
             }
             DB::commit();
-            if ($feesAssignDone) {
+            if ($feesAssignHistoryDone) {
                 Session::flash('message', 'Success!Data has been saved successfully.');
                 return redirect()->back();
             } else {
@@ -190,55 +207,71 @@ class CadetFeesController extends Controller
     }
     public function storeGenerateCadetFees(Request $request)
     {
-        $academicYearProfile = AcademicsYear::where(['campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute(),
-            'status' => '1'])->first();
+        $alreadyHas = 0;
+        $missing = 0;
+
         for ($i = 0; $i < count($request->std_id); $i++) {
 
-            $checkFeesAssign = CadetFeesGenerate::where(['campus_id' => $this->academicHelper->getCampus(),
-                'instittute_id' => $this->academicHelper->getInstitute(),
-                'academic_year' => $academicYearProfile->id,
+            $checkFeesAssign = CadetFeesGenerate::where([
+                'academic_year' => $request['academic_year'][$i],
                 'academic_level' => $request['academic_level'][$i],
                 'batch' => $request['batch'][$i],
                 'section' => $request['section'][$i],
                 'std_id' => $request['std_id'][$i],
                 'month_name' => $request['month_name'][$i]
             ])->first();
+
             if (!$checkFeesAssign) {
+                $missing++;
                 $cadetFeesAssign = new CadetFeesGenerate();
                 $cadetFeesAssign->std_id = $request['std_id'][$i];
-                $cadetFeesAssign->academic_year = $academicYearProfile->id;
+                $cadetFeesAssign->academic_year = $request['academic_year'][$i];
                 $cadetFeesAssign->fees = $request['amount'][$i];
                 $cadetFeesAssign->late_fine = $request['fine'][$i];
+                $cadetFeesAssign->structure_id = $request['structure_id'][$i];
                 $cadetFeesAssign->academic_level = $request['academic_level'][$i];
                 $cadetFeesAssign->batch = $request['batch'][$i];
                 $cadetFeesAssign->section = $request['section'][$i];
                 $cadetFeesAssign->fine_type = $request['fine_type'][$i];
-                $cadetFeesAssign->campus_id = $this->academicHelper->getCampus();
-                $cadetFeesAssign->instittute_id = $this->academicHelper->getInstitute();
                 $cadetFeesAssign->month_name = $request['month_name'][$i];
                 $cadetFeesAssign->payment_last_date = $request['payment_last_date'][$i];
+                $cadetFeesAssign->year = Carbon::now()->format('Y');
                 $cadetFeesAssign->created_by = Auth::user()->id;
                 $assignDataStore = $cadetFeesAssign->save();
-                if ($assignDataStore) {
-                    Session::flash('message', 'Success!Data has been Generate successfully.');
-                } else {
-                    Session::flash('message', 'Success!Data has not been Generate successfully.');
-                    return redirect()->back();
 
-                }
+                $cadetFeesAssign = new CadetFeesGenerateHistory();
+                $cadetFeesAssign->std_id = $request['std_id'][$i];
+                $cadetFeesAssign->academic_year = $request['academic_year'][$i];
+                $cadetFeesAssign->fees = $request['amount'][$i];
+                $cadetFeesAssign->late_fine = $request['fine'][$i];
+                $cadetFeesAssign->structure_id = $request['structure_id'][$i];
+                $cadetFeesAssign->academic_level = $request['academic_level'][$i];
+                $cadetFeesAssign->batch = $request['batch'][$i];
+                $cadetFeesAssign->section = $request['section'][$i];
+                $cadetFeesAssign->fine_type = $request['fine_type'][$i];
+                $cadetFeesAssign->month_name = $request['month_name'][$i];
+                $cadetFeesAssign->payment_last_date = $request['payment_last_date'][$i];
+                $cadetFeesAssign->year = Carbon::now()->format('Y');
+                $cadetFeesAssign->created_by = Auth::user()->id;
+                $assignDataHistoryStore = $cadetFeesAssign->save();
+            }else{
+                $alreadyHas++;
             }
-//            return redirect()->back();
-
-            if($checkFeesAssign)
-            {
-                if(count($request->std_id) == $checkFeesAssign->count()){
-                    Session::flash('message', 'All Ready all student Fees Generate.');
-                    return redirect()->back();
-                }
-            }
-
         }
+            if(count($request->std_id) == $alreadyHas){
+                    Session::flash('message', 'Already all student Fees Generate.');
+                    return redirect()->back();
+            }
+
+            if ($alreadyHas == 0) {
+                Session::flash('message', 'Success!Data has been Generate successfully.');
+                return redirect()->back();
+            }
+            else{
+                Session::flash('message', 'Success!'.$missing.' Data has been Generate successfully.');
+                return redirect()->back();
+            }
+
 
         }
 

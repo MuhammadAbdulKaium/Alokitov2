@@ -11,6 +11,7 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace
     Route::post('/manage/search', 'StudentController@searchStudent');
     Route::post('/manage/search/fees', 'StudentController@searchCadetFees');
     Route::post('/manage/search/fees/generate', 'StudentController@searchCadetFeesGenerate');
+    Route::post('/manage/search/fees/details', 'StudentController@searchCadetFeesDetails');
     Route::post('/manage/alumni/search', 'StudentController@searchStudentAlumni');
     Route::post('/manage/download/excel/pdf', 'StudentController@searchStudentDownload');
     Route::post('/manage/alumni/download/excel', 'StudentController@searchAlumniStudentDownload');

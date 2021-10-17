@@ -55,17 +55,17 @@
                                         <input type="hidden" id="amount_{{$data->std_id}}" name="amount[]" value="{{$data->total_fees}}" class="form-control">
                                     <td> {{$data->total_fees}}</td>
                                     <td>
-                                        <input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">
+{{--                                        <input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">--}}
                                     </td>
                                     <td>
-                                        <select name="fine_type[]" class="form-control" readonly>
-                                            <option value="1" {{ 1 == $fine_type ? 'selected' : '' }}>Per day</option>
-                                            <option value="2" {{ 2 == $fine_type ? 'selected' : '' }}>Fixed</option>
-                                        </select>
+{{--                                        <select name="fine_type[]" class="form-control" readonly>--}}
+{{--                                            <option value="1" {{ 1 == $fine_type ? 'selected' : '' }}>Per day</option>--}}
+{{--                                            <option value="2" {{ 2 == $fine_type ? 'selected' : '' }}>Fixed</option>--}}
+{{--                                        </select>--}}
                                     </td>
                                     <td>
-                                        <input type="hidden" value="{{$month_name}}" class="form-control" name="month_name[]" readonly>
-                                        <input type="date" value="{{$payment_last_date}}" class="form-control" name="payment_last_date[]" readonly>
+{{--                                        <input type="hidden" value="{{$month_name}}" class="form-control" name="month_name[]" readonly>--}}
+{{--                                        <input type="date" value="{{$payment_last_date}}" class="form-control" name="payment_last_date[]" readonly>--}}
                                     </td>
                                 </tr>
                             @endforeach
