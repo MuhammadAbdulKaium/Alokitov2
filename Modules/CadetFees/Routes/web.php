@@ -43,6 +43,7 @@
 
 //   Fees Collection
     Route::get('/fees/collection', 'CadetFeesCollectionController@index');
+    Route::post('/fees/collection/store', 'CadetFeesCollectionController@store');
 
 //    Manual Payment
     Route::get('/manual/fees', 'CadetFeesController@manualCadetFees');

@@ -67,7 +67,7 @@
                                     <div class="help-block"></div>
                                 </div>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                 <div class="form-group">
                                     <label class="control-label" for="section">Form</label>
                                     <select id="section" class="form-control academicSection" name="section">
@@ -76,13 +76,23 @@
                                     <div class="help-block"></div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Year</label>
                                     <select name="year" class="form-control">
                                         <option value="{{$years}}">{{$years}}</option>
                                         <option value="{{$years-1}}">{{$years-1}}</option>
                                         <option value="{{$years+1}}">{{$years+1}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Structure</label>
+                                    <select name="structure_id" class="form-control">
+                                        @foreach($feesStructureList as $structure)
+                                            <option value="{{$structure->id}}">{{$structure->structure_name}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -110,8 +120,10 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Fees Status</label>
                                     <select name="status" class="form-control">
+                                        <option value="">All</option>
                                         <option value="0">Pending</option>
                                         <option value="1">Paid</option>
+                                        <option value="2">Partially Paid</option>
                                     </select>
                                 </div>
                             </div>
@@ -119,7 +131,7 @@
                     </div>
                     <!-- ./box-body -->
                     <div class="box-footer">
-                        <button type="submit" class="btn btn-info pull-right">Search</button>
+                        <button type="submit" class="btn btn-info pull-right main-search-bar">Search</button>
                         <button type="reset" class="btn btn-default">Reset</button>
                     </div>
                 </form>
@@ -174,43 +186,79 @@
             });
         });
         var host = window.location.origin;
+        function searchFeesTable(){
+            $.ajax({
+                url: "/student/manage/search/fees/details",
+                type: 'POST',
+                cache: false,
+                data: $('form#std_manage_search_form').serialize(),
+                datatype: 'application/json',
+
+                beforeSend: function() {
+                    // show waiting dialog
+                    // waitingDialog.show('Loading...');
+                },
+
+                success:function(data){
+                    console.log('Console Log');
+                    // hide waiting dialog
+                    // waitingDialog.hide();
+                    // checking
+                    if(data.status=='success'){
+                        var std_list_container_row = $('#std_list_container_row');
+                        std_list_container_row.html('');
+                        std_list_container_row.append(data.html);
+                    }else{
+//                            alert(data.msg)
+                    }
+                },
+
+                error:function(data){
+                    // waitingDialog.hide();
+                    alert(JSON.stringify(data));
+                }
+            });
+        }
         $(function () {
             // request for parent list using batch section id
             $('form#std_manage_search_form').on('submit', function (e) {
                 e.preventDefault();
                 // ajax request
-                $.ajax({
-                    url: "/student/manage/search/fees/details",
-                    type: 'POST',
-                    cache: false,
-                    data: $('form#std_manage_search_form').serialize(),
-                    datatype: 'application/json',
-
-                    beforeSend: function() {
-                        // show waiting dialog
-                        // waitingDialog.show('Loading...');
-                    },
-
-                    success:function(data){
-                        console.log(data);
-                        // hide waiting dialog
-                        waitingDialog.hide();
-                        // checking
-                        if(data.status=='success'){
-                            var std_list_container_row = $('#std_list_container_row');
-                            std_list_container_row.html('');
-                            std_list_container_row.append(data.html);
-                        }else{
-//                            alert(data.msg)
-                        }
-                    },
-
-                    error:function(data){
-//                        alert(JSON.stringify(data));
-                    }
-                });
+                searchFeesTable();
             });
+            $(document).on('submit', 'form#fees-collection-form', function (e) {
+            e.preventDefault();
 
+            // ajax request
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "/cadetfees/fees/collection/store/",
+                type: 'POST',
+                cache: false,
+                data: $('form#fees-collection-form').serialize(),
+                datatype: 'application/json',
+
+
+                beforeSend: function() {
+                    // show waiting dialog
+                    waitingDialog.show('Loading...');
+                },
+
+                success: function (data) {
+                    waitingDialog.hide();
+                    $('.main-search-bar').click();
+                },
+
+                error: function (data) {
+                    waitingDialog.hide();
+                    alert(JSON.stringify(data));
+                }
+            });
+        });
 
         });
 

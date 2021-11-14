@@ -123,8 +123,9 @@ class CadetFeesController extends Controller
     }
     public function assignCadetFees(Request $request)
     {
-        DB::beginTransaction();
-        try {
+
+//        DB::beginTransaction();
+//        try {
             $requestedHead = $request->head_amount_id;
             $studentIds = $request->std_id;
             $headIds = [];
@@ -149,61 +150,87 @@ class CadetFeesController extends Controller
                 }
 
             }
+            $alreadyHas = 0;
+            $missing = 0;
             foreach ($request->std_id as $key => $std) {
-                $studentFees = new CadetFeesAssign();
-                $studentFees->std_id = $std;
-                $studentFees->total_fees = $totalFees[$std];
-                $studentFees->fees_details = json_encode($feesDetails[$std]);
-                $studentFees->structure_id = $request->structure_id[$key];
-                $studentFees->batch = $request->batch[$key];
-                $studentFees->batch = $request->batch[$key];
-                $studentFees->section = $request->section[$key];
-                $studentFees->academic_level = $request->academic_level[$key];
-                $studentFees->academic_year = $request->academic_year[$key];
-                $studentFees->created_by = Auth::user()->id;
-                $feesAssignDone = $studentFees->save();
-                if($feesAssignDone)
-                {
-                    $studentFees = new CadetFeesAssignHistory();
-                    $studentFees->std_id = $std;
-                    $studentFees->total_fees = $totalFees[$std];
-                    $studentFees->fees_details = json_encode($feesDetails[$std]);
-                    $studentFees->structure_id = $request->structure_id[$key];
-                    $studentFees->batch = $request->batch[$key];
-                    $studentFees->batch = $request->batch[$key];
-                    $studentFees->section = $request->section[$key];
-                    $studentFees->academic_level = $request->academic_level[$key];
-                    $studentFees->academic_year = $request->academic_year[$key];
-                    $studentFees->created_by = Auth::user()->id;
-                    $feesAssignHistoryDone = $studentFees->save();
-                }
+                $feesAssignCheck=CadetFeesAssign::where('structure_id',$request->structure_id[$key])->where('std_id',$std)->first();
+                    if(!$feesAssignCheck) {
+                        $missing++;
+                        $studentFees = new CadetFeesAssign();
+                        $studentFees->std_id = $std;
+                        $studentFees->total_fees = $totalFees[$std];
+                        $studentFees->fees_details = json_encode($feesDetails[$std]);
+                        $studentFees->structure_id = $request->structure_id[$key];
+                        $studentFees->batch = $request->batch[$key];
+                        $studentFees->batch = $request->batch[$key];
+                        $studentFees->section = $request->section[$key];
+                        $studentFees->academic_level = $request->academic_level[$key];
+                        $studentFees->academic_year = $request->academic_year[$key];
+                        $studentFees->created_by = Auth::user()->id;
+                        $feesAssignDone = $studentFees->save();
+                        if ($feesAssignDone) {
+                            $studentFees = new CadetFeesAssignHistory();
+                            $studentFees->std_id = $std;
+                            $studentFees->total_fees = $totalFees[$std];
+                            $studentFees->fees_details = json_encode($feesDetails[$std]);
+                            $studentFees->structure_id = $request->structure_id[$key];
+                            $studentFees->batch = $request->batch[$key];
+                            $studentFees->batch = $request->batch[$key];
+                            $studentFees->section = $request->section[$key];
+                            $studentFees->academic_level = $request->academic_level[$key];
+                            $studentFees->academic_year = $request->academic_year[$key];
+                            $studentFees->created_by = Auth::user()->id;
+                            $feesAssignHistoryDone = $studentFees->save();
+                        }
+                    }
+                    else{
+                        $alreadyHas++;
+                    }
 
             }
-            DB::commit();
-            if ($feesAssignHistoryDone) {
-                Session::flash('message', 'Success!Data has been saved successfully.');
+            if(count($request->std_id) == $alreadyHas){
+                Session::flash('message', 'Already all student Fees Generate.');
                 return redirect()->back();
-            } else {
-                Session::flash('message', 'Success!Data has not been saved successfully.');
-                return redirect()->back();
-
             }
-        }
-                 catch (\Exception $e) {
-                DB::rollback();
-                Session::flash('errorMessage', 'Error! Error creating house.');
+
+            if ($alreadyHas == 0) {
+                Session::flash('message', 'Success!Data has been Assign successfully.');
                 return redirect()->back();
-        }
+            }
+            else{
+                Session::flash('message', 'Success!'.$missing.' Data has been Assign successfully.');
+                return redirect()->back();
+            }
+//            DB::commit();
+//            if ($feesAssignHistoryDone) {
+//                Session::flash('message', 'Success!Data has been saved successfully.');
+//                return redirect()->back();
+//            } else {
+//                Session::flash('message', 'Success!Data has not been saved successfully.');
+//                return redirect()->back();
+//
+//            }
+//        }
+//                 catch (\Exception $e) {
+//                DB::rollback();
+//                Session::flash('errorMessage', 'Error! Error Assign Student.');
+//                return redirect()->back();
+//        }
 
     }
     public function generateCadetFees()
     {
+        $structureNames= FeesStructure::where([
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus()
+        ])->get();
         $academicLevels = $this->academicsLevel->where([
             'institute_id' => $this->academicHelper->getInstitute(),
             'campus_id' => $this->academicHelper->getCampus()
         ])->get();
+
         $allInputs = array('year' => null, 'level' => null, 'batch' => null, 'section' => null, 'gr_no' => null, 'email' => null);
-        return view('cadetfees::generate',compact('academicLevels','allInputs'));
+        return view('cadetfees::generate',compact('academicLevels','allInputs','structureNames'));
     }
     public function storeGenerateCadetFees(Request $request)
     {
@@ -216,17 +243,20 @@ class CadetFeesController extends Controller
                 'academic_year' => $request['academic_year'][$i],
                 'academic_level' => $request['academic_level'][$i],
                 'batch' => $request['batch'][$i],
+                'structure_id' => $request['structure_id'][$i],
                 'section' => $request['section'][$i],
                 'std_id' => $request['std_id'][$i],
                 'month_name' => $request['month_name'][$i]
             ])->first();
 
             if (!$checkFeesAssign) {
+                $inv_id ="INV-".$request['month_name'][$i].$request['std_id'][$i].$request['assign_id'][$i];
                 $missing++;
                 $cadetFeesAssign = new CadetFeesGenerate();
                 $cadetFeesAssign->std_id = $request['std_id'][$i];
                 $cadetFeesAssign->academic_year = $request['academic_year'][$i];
                 $cadetFeesAssign->fees = $request['amount'][$i];
+                $cadetFeesAssign->inv_id = $inv_id;
                 $cadetFeesAssign->late_fine = $request['fine'][$i];
                 $cadetFeesAssign->structure_id = $request['structure_id'][$i];
                 $cadetFeesAssign->academic_level = $request['academic_level'][$i];
@@ -243,6 +273,7 @@ class CadetFeesController extends Controller
                 $cadetFeesAssign->std_id = $request['std_id'][$i];
                 $cadetFeesAssign->academic_year = $request['academic_year'][$i];
                 $cadetFeesAssign->fees = $request['amount'][$i];
+                $cadetFeesAssign->inv_id = $inv_id;
                 $cadetFeesAssign->late_fine = $request['fine'][$i];
                 $cadetFeesAssign->structure_id = $request['structure_id'][$i];
                 $cadetFeesAssign->academic_level = $request['academic_level'][$i];

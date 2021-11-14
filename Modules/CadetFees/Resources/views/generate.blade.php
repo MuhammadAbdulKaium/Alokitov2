@@ -67,7 +67,7 @@
                                     <div class="help-block"></div>
                                 </div>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-1">
                                 <div class="form-group">
                                     <label class="control-label" for="section">Form</label>
                                     <select id="section" class="form-control academicSection" name="section">
@@ -95,13 +95,23 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Structure</label>
+                                    <select name="structure_id" class="form-control">
+                                        @foreach($structureNames as $structure)
+                                        <option value="{{$structure->id}}">{{$structure->structure_name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Fine<span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" name="late_fine" required>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Fine Type</label>
                                     <select name="fine_type" class="form-control">

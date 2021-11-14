@@ -11,331 +11,100 @@
 @endsection
 
 @section('profile-content')
-
 				<h4> Fees Invoice </h4>
-						  @if($studentFeesInvoiceList->count()>0)
-					      <div class="table-responsive">
-							  <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%">
-								  <thead>
-								  <tr>
-									  <th>Invoice ID</th>
-									  <th><a  data-sort="sub_master_code">Fee Name</a></th>
-									  <th><a  data-sort="sub_master_code">Fees Type</a></th>
-									  <th><a  data-sort="sub_master_alias">Fees</a></th>
-									  <th><a  data-sort="sub_master_alias">Discount</a></th>
-									  <th><a  data-sort="sub_master_alias">Due Fine</a></th>
-									  <th><a  data-sort="sub_master_alias">Total Amount</a></th>
-									  <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
-									  <th><a  data-sort="sub_master_alias">Status</a></th>
-									  {{--<th><a  data-sort="sub_master_alias">Waiver</a></th>--}}
-									  <th><a>Action</a></th>
-								  </tr>
+		  @if($generatedFees->count()>0)
+		  <div class="table-responsive">
+			  <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%">
+				  <thead>
+				  <tr>
+					  <th>Invoice ID</th>
+					  <th><a  data-sort="sub_master_code">Month Name</a></th>
+					  <th><a  data-sort="sub_master_code">Year</a></th>
+					  <th><a  data-sort="sub_master_code">Structure Name</a></th>
+					  <th><a  data-sort="sub_master_alias">Fees</a></th>
+					  <th><a  data-sort="sub_master_alias">Fine</a></th>
+					  <th><a  data-sort="sub_master_alias">Fine Type</a></th>
+					  <th><a  data-sort="sub_master_alias">Last Date of Payment</a></th>
+					  <th><a  data-sort="sub_master_alias">Status</a></th>
+					  {{--<th><a  data-sort="sub_master_alias">Waiver</a></th>--}}
+					  <th><a>Action</a></th>
+				  </tr>
+				  </thead>
 
-								  </thead>
-								  <tbody>
-								  @php
-
-									  $i = 1;$getAttendFine=0; $sumTotalAmount=0; $getDueFine=0; $sumTotalPaymentAmount=0; $sumSubTotal=0;$sumTotalDiscount=0; $sumTotalDueFine=0;
-								  @endphp
-								  @foreach($studentFeesInvoiceList as $invoice)
-
-									  {{-- attendance and due fine amount--}}
-
-									  @if($invoice->due_fine_amount())
-										  @php $due_fine_amount=$invoice->due_fine_amount()->fine_amount; @endphp
-									  @else
-										  @php $due_fine_amount=0;
-										  @endphp
+				  <tbody>
+					  @foreach($generatedFees as $invoice)
+						  <tr>
+							  <td>{{$invoice->inv_id}}</td>
+							  <td>
+								  @foreach($month_list as $key=>$month)
+									  @if($key==$invoice->month_name)
+										{{$month}}
 									  @endif
-									  @php   $std=$invoice->payer(); @endphp
-
-									  <tr class="gradeX">
-											  <td>{{$invoice->id}}</td>
-											  @php
-												  $fees=$invoice->fees();
-
-											  @endphp
-											  <td>{{$fees->fee_name}}</td>
-											  <td>
-												  <span  class="label label-success">F</span>
-											  </td>
-
-
-											  @php $subtotal=0; $totalAmount=0; $totalDiscount=0; @endphp
-											  @foreach($fees->feesItems() as $amount)
-												  @php $subtotal += $amount->rate*$amount->qty;@endphp
-
-											  @endforeach
-
-
-
-											  {{--Due Fine Amount--}}
-											  @php
-												  $dueFinePaid=$invoice->invoice_payment_summary();
-                                                  $var_dueFine=0;
-                                                  if($dueFinePaid){
-                                                      $var_dueFine = json_decode($dueFinePaid->summary);
-                                                  }
-											  @endphp
-
-											  @if($invoice->invoice_status=="1")
-												  @if(!empty($var_dueFine))
-													  @php $getDueFine=$var_dueFine->due_fine->amount; @endphp
-												  @endif
-											  @else
-												  @if(!empty($invoice->findReduction()))
-													  @php $getDueFine=$invoice->findReduction()->due_fine; @endphp
-												  @else
-													  @php $getDueFine=get_fees_day_amount($invoice->fees()->due_date) @endphp
-												  @endif
-											  @endif
-
-											  @if($discount = $invoice->fees()->discount())
-												  @php $discountPercent=$discount->discount_percent;
-                                                    $totalDiscount=(($subtotal*$discountPercent)/100);
-                                                    $totalAmount=$subtotal-$totalDiscount
-												  @endphp
-											  @else
-												  @php
-													  $totalAmount=$subtotal;
-												  @endphp
-
-											  @endif
-
-
-											  {{--waiver Check --}}
-											  @if($invoice->waiver_type=="1")
-												  @php $totalWaiver=(($totalAmount*$invoice->waiver_fees)/100);
-                                                 $totalAmount=$totalAmount-$totalWaiver
-												  @endphp
-											  @elseif($invoice->waiver_type=="2")
-												  @php $totalWaiver=$invoice->waiver_fees;
-                                                 $totalAmount=$totalAmount-$totalWaiver
-												  @endphp
-
-											  @endif
-
-
-											  @if($discount = $invoice->fees()->discount())
-												  @php $totalDiscount=(($subtotal*$discountPercent)/100);@endphp
-											  @endif
-
-
-											  @if(!empty($invoice->waiver_fees))
-												  @php $totalDiscount=$totalDiscount+$totalWaiver @endphp
-											  @endif
-
-
-
-
-											  {{--<td>{{$subtotal+$getAttendFine+$getDueFine-$totalDiscount}}</td>--}}
-
-											  <td>{{$subtotal}}</td>
-
-										  	@php $sumSubTotal+=$subtotal @endphp
-
-											  <td>{{$totalDiscount}} </td>
-										  @php $sumTotalDiscount+=$totalDiscount @endphp
-
-											  <td>{{$getDueFine}}</td>
-
-										  @php $sumTotalDueFine+=$getDueFine @endphp
-										  @php $sumTotalAmount+=$subtotal+$getDueFine-$totalDiscount @endphp
-
-											  <td>{{$subtotal+$getDueFine-$totalDiscount}}</td>
-
-											  <td>
-												  @if ($invoice->invoice_status=="2")
-													  {{$invoice->totalPayment()}}
-												  @elseif ($invoice->invoice_status=="1")
-{{--													  {{$invoice->totalPayment()+$getDueFine}}--}}
-													  @php $sumTotalPaymentAmount+=$subtotal+$getDueFine-$totalDiscount @endphp
-													  {{$subtotal+$getDueFine-$totalDiscount}}
-												  @endif
-
-											  </td>
-
-											  <td>
-
-												  @if ($invoice->invoice_status=="2")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}"  class="label label-danger">Un-Paid</span>
-												  @elseif ($invoice->invoice_status=="1")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}"  class="label label-primary">Paid</span>
-												  @elseif ($invoice->invoice_status=="4")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}" class="label label-danger">Cancel</span>
-												  @elseif ($invoice->invoice_status=="3")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}" class="label label-success">Partial Payment</span>
-												  @endif
-
-												  <span id="cancelInvoiceStatus{{$invoice->id}}" class="label label-danger" style="display: none">Cancel</span>
-											  </td>
-											  {{--<td>--}}
-
-
-												  {{--@if(!empty($invoice->payer()->student_waiver()) && ($invoice->payer()->student_waiver()->end_date>date('Y-m-d')) && ($invoice->wf_status=='1'))--}}
-													  {{--<a  class="label label-primary"   href="/fees/invoice/add-waiver-modal/{{$invoice->id}}/" title="Add Waiver" data-pjax="0" data-target="#globalModal" data-toggle="modal"  class="btn btn-success btn-xs wf_status" >Available</a>--}}
-												  {{--@elseif(!empty($invoice->payer()->student_waiver()) && ($invoice->wf_status=='2'))--}}
-													  {{--<span class="label  label-default ">Applied</span>--}}
-												  {{--@endif</td>--}}
-											  <td>
-												  @php
-													  $getUrl=Request::fullUrl();
-                                                      $currentUrl=str_replace('/','+',$getUrl);
-                                                      $currentUrl=str_replace('?','>>',$currentUrl);
-                                                      $currentUrl=str_replace('%','-',$currentUrl);
-												  @endphp
-
-												  {{--                            {{$currentUrl}}--}}
-												  {{-- {{urlencode(strtolower(url()->current()))}}
-           --}}
-
-
-												  <a href="/fees/invoice/show/{{$invoice->id}}/{{$currentUrl}}" class="btn btn-info btn-xs"><i class="fa fa-eye"></i></a>
-												  {{--<a href="" id="batch_edit_{{$invoice->id}}" onclick="modalLoadEdit(this.id)" class="btn btn-primary btn-xs" data-target="#globalModalEdit"  data-toggle="modal" data-placement="top" data-content="update"><i class="fa fa-edit"></i></a>--}}
-											  </td>
-									  </tr>
-
-
-									  @endforeach
-
-								  <tfoot style="background: limegreen; color: #FFF">
-								  <tr>
-									  <td colspan="3">Total</td>
-									  <td>{{$sumSubTotal}}</td>
-									  <td>{{$sumTotalDiscount}}</td>
-									  <td>{{$sumTotalDueFine}}</td>
-									  <td>{{$sumTotalAmount}}</td>
-									  <td colspan="3">{{$sumTotalPaymentAmount}}</td>
-								  </tr>
-								  </tfoot>
-
-
-								  </tbody>
-							  </table>
-							  @else
-
-					         <div class="alert bg-warning text-warning">
-					            <i class="fa fa-warning"></i> No record found.        
-					         </div>
-							  @endif
-				 </div>
-						  <hr>
-
-
-	{{--===============================Attendacne Invocie =================--}}
-
-						  <h4> Attendance Invoice </h4>
-						  @if($studentAttendanceInvoiceList->count()>0)
-							  <div class="table-responsive">
-
-								  <table  id="AtttendanceInvoiceTables" class="table table-striped table-bordered" style="width: 100%">
-									  <thead>
-									  <tr>
-										  <th>Invoice ID</th>
-										  <th><a  data-sort="sub_master_code">Fee Name</a></th>
-										  <th><a  data-sort="sub_master_code">Fees Type</a></th>
-										  <th><a  data-sort="sub_master_alias">Fees</a></th>
-										  <th><a  data-sort="sub_master_alias">Discount</a></th>
-										  {{--<th><a  data-sort="sub_master_alias">Due Fine</a></th>--}}
-										  <th><a  data-sort="sub_master_alias">Total Amount</a></th>
-										  <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
-										  <th><a  data-sort="sub_master_alias">Status</a></th>
-										  <th><a>Action</a></th>
-									  </tr>
-
-									  </thead>
-									  <tbody>
-									  @php
-
-										  $i = 1;$getAttendFine=0; $getDueFine=0; $totalInvoiceAmount=0; $paidAttendanceFine=0;
-									  @endphp
-									  @foreach($studentAttendanceInvoiceList as $invoice)
-
-										  {{-- attendance and due fine amount--}}
-
-										  @if($invoice->due_fine_amount())
-											  @php $due_fine_amount=$invoice->due_fine_amount()->fine_amount; @endphp
-										  @else
-											  @php $due_fine_amount=0;
-                                         $std=$invoice->payer()
-											  @endphp
-										  @endif
-
-										  <tr class="gradeX">
-											  <td>{{$invoice->id}}</td>
-											  <td>Attendance Fine</td>
-											  <td>
-												  <span  class="label label-primary">A</span>
-											  </td>
-											  <td>{{$invoice->invoice_amount}}</td>
-											  @php $totalInvoiceAmount+=$invoice->invoice_amount @endphp
-											  {{--<td>0</td>--}}
-											  <td>0</td>
-											  <td> 													  {{$invoice->invoice_amount}}
-											  </td>
-											  <td>
-												  @if ($invoice->invoice_status=="1")
-													  {{$invoice->invoice_amount}}
-													  @php $paidAttendanceFine+=$invoice->invoice_amount @endphp
-												  @else
-													  0
-												  @endif
-											  </td>
-											  <td>
-
-												  @if ($invoice->invoice_status=="2")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}"  class="label label-danger">Un-Paid</span>
-												  @elseif ($invoice->invoice_status=="1")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}"  class="label label-primary">Paid</span>
-												  @elseif ($invoice->invoice_status=="4")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}" class="label label-danger">Cancel</span>
-												  @elseif ($invoice->invoice_status=="3")
-													  <span id="unPainInvoiceStatus{{$invoice->id}}" class="label label-success">Partial Payment</span>
-												  @endif
-
-												  <span id="cancelInvoiceStatus{{$invoice->id}}" class="label label-danger" style="display: none">Cancel</span>
-											  </td>
-											  <td>
-												  @php
-													  $getUrl=Request::fullUrl();
-                                                      $currentUrl=str_replace('/','+',$getUrl);
-                                                      $currentUrl=str_replace('?','>>',$currentUrl);
-                                                      $currentUrl=str_replace('%','-',$currentUrl);
-												  @endphp
-
-												  {{--                            {{$currentUrl}}--}}
-												  {{-- {{urlencode(strtolower(url()->current()))}}
-           --}}
-
-
-												  <a href="/fees/invoice/show/{{$invoice->id}}/{{$currentUrl}}" class="btn btn-info btn-xs"><i class="fa fa-eye"></i></a>
-											  </td>
-
-
-									  @endforeach
-
-
-									  <tfoot style="background: limegreen; color: #FFF">
-									  <tr>
-										  <td colspan="3">Total</td>
-										  <td>{{$totalInvoiceAmount}}</td>
-										  {{--<td>0</td>--}}
-										  <td>0</td>
-										  <td>{{$totalInvoiceAmount}}</td>
-										  <td colspan="3">{{$paidAttendanceFine}}</td>
-									  </tr>
-									  </tfoot>
-									  </tbody>
-								  </table>
-								  @else
-
-									  <div class="alert bg-warning text-warning">
-										  <i class="fa fa-warning"></i> No record found.
-									  </div>
-								  @endif
+								  @endforeach
+							  </td>
+							  <td>{{$invoice->year}}</td>
+							  <td>{{$invoice->structure_name}}</td>
+							  <td>{{$invoice->fees}}</td>
+							  <td>{{$invoice->late_fine}}</td>
+							  <td>{{$invoice->fine_type}}</td>
+							  <td>{{$invoice->payment_last_date}}</td>
+							  <td>{{$invoice->status==1?'Paid':($invoice->status==2?'Partially Paid':'Pending')}}</td>
+							  <td>
+								  <a class="btn btn-primary" href="{{url('student/fees/invoice/'.$invoice->id)}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg">Invoice</a>
+							  </td>
+						  </tr>
+					  @endforeach
+				  </tbody>
+			  </table>
+		  @endif
+			  <h4> Fees Collection </h4>
+			  @if($feesCollection->count()>0)
+				  <table class="table table-bordered">
+					  <thead>
+					  <tr>
+						  <th>Invoice ID</th>
+						  <th>Fees Amount</th>
+						  <th>Fine Amount</th>
+						  <th>Total Payable</th>
+						  <th>Paid Amount</th>
+						  <th>Paid Date</th>
+						  <th>Total Due</th>
+						  <th>Payment Type</th>
+						  <th>Status</th>
+					  </tr>
+					  </thead>
+					  <tbody>
+					  @foreach($feesCollection as $collection)
+						  <tr>
+							  <td>{{$collection->inv_id}}</td>
+							  <td>{{$collection->fees_amount}}</td>
+							  <td>{{$collection->fine_amount}}</td>
+							  <td>{{$collection->total_payable}}</td>
+							  <td>{{$collection->paid_amount}}</td>
+							  <td>{{$collection->pay_date}}</td>
+							  <td>{{$collection->total_dues}}</td>
+							  <td>{{$collection->payment_type==1?'Manual':($collection->payment_type==2?'Online':'N/A')}}</td>
+							  <td>{{$collection->status==1?'Paid':($collection->status==2?'Partially Paid':'Pending')}}</td>
+						  </tr>
+					  @endforeach
+					  </tbody>
+				  </table>
+			  @endif
+	  <!-- global modal -->
+		  <div aria-hidden="true" aria-labelledby="esModalLabel" class="modal" id="globalModal" role="dialog" tabindex="-1">
+			  <div class="modal-dialog">
+				  <div class="modal-content">
+					  <div class="modal-body">
+						  <div class="loader">
+							  <div class="es-spinner">
+								  <i class="fa fa-spinner fa-pulse fa-5x fa-fw">
+								  </i>
 							  </div>
-
-
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
 
 @endsection
 

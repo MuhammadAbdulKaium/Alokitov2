@@ -31,7 +31,6 @@
                             </thead>
 
                             <tbody>
-
                             @foreach($searchData as $key=>$data)
                                 <tr>
                                     <td>{{$i++}}</td>
@@ -47,6 +46,7 @@
                                         @endforeach
                                     </td>
                                         <input type="hidden" name="structure_id[]" value="{{$data->structure_id}}">
+                                        <input type="hidden" name="assign_id[]" value="{{$data->id}}">
                                         <input type="hidden" name="academic_year[]" value="{{$data->academic_year}}">
                                         <input type="hidden" id="cad_{{$data->std_id}}" name="std_id[]" value="{{$data->std_id}}">
                                         <input type="hidden"  name="batch[]" value="{{$data->batch}}">

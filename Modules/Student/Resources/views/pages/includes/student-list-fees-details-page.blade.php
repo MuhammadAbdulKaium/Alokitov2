@@ -7,8 +7,8 @@
                 <h3 class="box-title"><i class="fa fa-search"></i> View Student List</h3>
             </div>
         </div>
-        <div class="card">
-            <form method="post" action="/cadetfees/generate/cadet/fees/">
+        <div class="card table-responsive">
+            <form method="post" id="fees-collection-form">
                 @csrf
                 @if(isset($searchData))
                     @if($searchData->count()>0)
@@ -16,7 +16,8 @@
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>SL</th>
+                                <th><input type="checkbox" id="checkAll"></th>
+                                <th>INV</th>
                                 <th>Student Number</th>
                                 <th>Name</th>
                                 <th>Roll</th>
@@ -26,16 +27,35 @@
                                 <th>Delay Fine</th>
                                 <th>Fine Type</th>
                                 <th>Last Payment Date</th>
+                                <th>Paid</th>
+                                <th>Previous Due</th>
+                                <th>Total Payable</th>
+                                <th>Current Pay. Amt</th>
+                                <th>Discount</th>
+                                <th>C.F. Dues</th>
+                                <th>Status</th>
+                                <th>Pay Date</th>
+                                <th>Payment Type</th>
+                                <th>Payment Mood</th>
+                                <th>Transaction ID</th>
+                                <th>Paid By</th>
+                                <th>Action</th>
                             </tr>
 
                             </thead>
 
                             <tbody>
-
                             @foreach($searchData as $key=>$data)
-                                <tr>
-                                    <td>{{$i++}}</td>
-                                    <td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->email}}</a></td>
+                                @php
+                                    if(isset($data->total_dues))
+                                        {
+                                             $previous_due= $feesCollections[$data->std_id]->sum('total_dues');
+                                        }
+                                @endphp
+                                <tr class="@if($data->status==1) bg-success @endif">
+                                    <td><input type="checkbox" name="checkbox[]" class="fees-gen-check @if($data->status==1)green @endif" value="{{$data->id}}" @if($data->status==1)disabled @endif></td>
+                                    <td>{{$data->inv_id}}</td>
+                                    <td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->std_id}}</a></td>
                                     <td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->first_name}} {{$data->last_name}}</a></td>
                                     <td>{{$data->gr_no}}</td>
                                     <td>{{$data->structure_name}}</td>
@@ -46,37 +66,64 @@
                                             @endif
                                         @endforeach
                                     </td>
-                                        <input type="hidden" name="structure_id[]" value="{{$data->structure_id}}">
-                                        <input type="hidden" name="academic_year[]" value="{{$data->academic_year}}">
-                                        <input type="hidden" id="cad_{{$data->std_id}}" name="std_id[]" value="{{$data->std_id}}">
-                                        <input type="hidden"  name="batch[]" value="{{$data->batch}}">
-                                        <input type="hidden"  name="section[]" value="{{$data->section}}">
-                                        <input type="hidden" id="academic_level_{{$data->academic_level}}" name="academic_level[]" value="{{$data->academic_level}}">
-                                        <input type="hidden" id="amount_{{$data->std_id}}" name="amount[]" value="{{$data->total_fees}}" class="form-control">
-                                    <td> {{$data->total_fees}}</td>
+                                        <input type="hidden" name="std_id[]" value="{{$data->std_id}}">
+                                        <input type="hidden" id="amount_{{$data->std_id}}"  value="{{$data->total_fees}}" class="form-control">
                                     <td>
-{{--                                        <input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">--}}
+                                        <input type="hidden" class="gen-fees"  value="{{$data->fees}}">
+                                        <input type="hidden" class="late-fine"  value="{{$data->late_fine}}">
+                                        <input type="hidden" class="payment-date"  value="{{$data->payment_last_date}}">
+                                        <input type="hidden" class="paid"  value="{{$data->paid_amount}}">
+                                        {{$data->fees}}
                                     </td>
                                     <td>
-{{--                                        <select name="fine_type[]" class="form-control" readonly>--}}
-{{--                                            <option value="1" {{ 1 == $fine_type ? 'selected' : '' }}>Per day</option>--}}
-{{--                                            <option value="2" {{ 2 == $fine_type ? 'selected' : '' }}>Fixed</option>--}}
-{{--                                        </select>--}}
+                                        {{$data->late_fine}}
                                     </td>
                                     <td>
-{{--                                        <input type="hidden" value="{{$month_name}}" class="form-control" name="month_name[]" readonly>--}}
-{{--                                        <input type="date" value="{{$payment_last_date}}" class="form-control" name="payment_last_date[]" readonly>--}}
+                                        {{ 1 == $data->fine_type ? 'Per day' : 'Fixed' }}
+                                    </td>
+                                    <td>
+                                        {{$data->payment_last_date}}
+                                    </td>
+                                    <td class="total-paid">
+                                        {{$data->paid_amount}}
+                                    </td>
+                                    <td>
+                                    @isset($data->total_dues)
+                                        {{$previous_due}}
+                                            <input type="hidden" class="previous-due" value="{{$previous_due}}">
+                                    @endisset
+                                    </td>
+                                    <td class="total-payable"></td>
+                                    <td><input type="number" class="form-control fees-current-pay" name="current_pay[]" disabled required></td>
+                                    <td><input type="number" class="form-control fees-discount" name="discount[]" disabled required></td>
+                                    <td class="cf-dues"></td>
+                                    <td>
+                                        <input type="hidden" class="status" value="{{$data->status}}">
+                                        @foreach($statuses as $key=>$status)
+                                            @if($key==$data->status)
+                                                {{$status}}
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                    <td>{{$data->pay_date}}</td>
+                                    <td>@isset($data->payment_type) {{($data->payment_type==1) ? 'Manual':( ($data->payment_type==2)?'Online' : 'N/A')}} @endisset</td>
+                                    <td>{{$data->payment_mode}}</td>
+                                    <td>{{$data->transaction_id}}</td>
+                                    <td>{{$data->paid_by}}</td>
+                                    <td>
+                                        <button type="submit" class="btn btn-primary payData" @if($data->status==1)disabled @endif>Pay</button>
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
+                        <button type="submit" class="btn btn-primary payData">Pay</button>
                         @php $i++; @endphp
                     @else
-                        <h5 class="text-center"> <b>Sorry!!! No Result Found</b></h5>
+                        <h5 class="text-center"> <b>Sorry!!! No Fees Generated for this class. Please Generate First</b></h5>
                     @endif
                 @endif
-                <button type="submit" class="btn btn-primary" id="assignData">Generate</button>
+
             </form>
         </div>
     </div>
@@ -84,190 +131,136 @@
 
 <script>
     $(function () {
-        $("#selectAll").click(function () {
-            $("input[type=checkbox]").prop("checked", $(this).prop("checked"));
-
+        $("#checkAll").click(function(){
+            $(".fees-gen-check").click();
         });
 
         $("input[type=checkbox]").click(function () {
+            var parent = $(this).parent().parent();
+            var amount = parent.find('.fees-current-pay');
+            var discount = parent.find('.fees-discount');
+            var fees = parent.find('.gen-fees');
+            var generate_id = parent.find('.fees-gen-check');
+            var paid = parent.find('.paid');
+            var fine = parent.find('.late-fine');
+            var paymentDate = parent.find('.payment-date');
+            var totalPayable = parent.find('.total-payable');
+            var previousDue = parent.find('.previous-due');
+            var cfDues = parent.find('.cf-dues');
+            var utc = new Date().toJSON().slice(0,10).replace(/-/g,'-');
+
+            const date1 = new Date(paymentDate.val());
+            const date2 = new Date(utc);
+            const diffTime = Math.abs(date2 - date1);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            function totalCalculatio()
+            {
+                var discountValue=discount.val()?parseInt(discount.val()):0;
+                var previousDueValue=previousDue.val()?parseInt(previousDue.val()):0;
+                if(date1<date2){
+                    if(paid.val()>0){
+                        var total=parseInt(fees.val()) +(fine.val() * diffDays)-parseInt(paid.val()) -discountValue+previousDueValue;
+                        if(amount.val()>0)
+                        {
+                            var cfDue=total-amount.val();
+                        }
+                    }
+                    else{
+                        var total=parseInt(fees.val()) +(fine.val() * diffDays) - discountValue + previousDueValue;
+                        if(amount.val()>0)
+                        {
+                            var cfDue=total-amount.val();
+                        }
+                    }
+
+                }
+                else{
+                    var total=parseInt(fees.val())-discountValue + previousDueValue;
+                    if(amount.val()>0)
+                    {
+                        var cfDue=total-amount.val();
+                    }
+                }
+                totalPayable.text(total);
+            }
+            // For uncheck checkbox
             if (!$(this).prop("checked")) {
-                $("#selectAll").prop("checked", false);
+                amount.attr('disabled', 'disabled');
+                discount.attr('disabled', 'disabled');
+                discount.val('');
+                totalPayable.text('');
+            }
+            // for checkbox enable
+            else {
+                amount.removeAttr('disabled');
+                discount.removeAttr('disabled');
+                discount.val(0);
+                $('.fees-discount').keyup(function (){
+                    totalCalculatio();
+                })
+                totalCalculatio();
+
+                // cfDues.text(cfDue);
+                // console.log(fees.val());
+                // console.log(fine.val());
+                // console.log(amount);
+                // console.log(cfDue);
+                // console.log(utc);
             }
         });
 
-        $('form#cad_assign_submit_form').on('submit', function (e) {
-            e.preventDefault();
-            // ajax request
-            $.ajax({
-                url: "/cadetfees/assign/cadet/fees/generate/",
-                type: 'POST',
-                cache: false,
-                data: $('form#cad_assign_submit_form').serialize(),
-                datatype: 'application/json',
-
-
-                beforeSend: function() {
-                    // show waiting dialog
-                    waitingDialog.show('Loading...');
-                },
-
-                success: function (data) {
-                    waitingDialog.hide();
-                    console.log(data);
-                },
-
-                error: function (data) {
-                    alert(JSON.stringify(data));
-                }
-            });
-        });
-    })
-    // var selectedData = [];
-    // function selectCadet(id)
-    // {
-    // 	if($('#selectCad_'+id).is(":checked"))
-    // 	{
-    // 		var cad = $('#cad_'+id).val();
-    // 		var amount = $('#amount_'+id).val();
-    // 		var fine = $('#fine_'+id).val();
-    // 		var fine_type = $('#fine_type_'+id).val();
-    // 		var jsonData = JSON.parse('{"cad":"'+cad+'", "amount" : "'+amount+'" ,"fine" : "'+fine+'","fine_type" : "'+fine_type+'"}');
-    // 		selectedData.push(jsonData);
-    // 	}
-    // 	else
-    // 	{
-    // 		var index = 0;
-    // 		for (index = selectedData.length - 1; index >= 0; --index) {
-    // 			console.log(selectedData[index]);
-    // 			if (selectedData[index].cad == id) {
-    // 				selectedData.splice(index, 1);
-    // 			}
-    // 		}
-    // 	}
-    // }
-    {{--$(function (){--}}
-    {{--	$("#assignData").click(function (e) {--}}
-    {{--		e.preventDefault();--}}
-
-    {{--		// ajax request--}}
-    {{--		$.ajax({--}}
-    {{--			url: "/cadetfees/assign/cadet/fees/",--}}
-    {{--			type: 'POST',--}}
-    {{--			cache: false,--}}
-    {{--			data: {"_token": "{{ csrf_token() }}",--}}
-    {{--				"selectedData":selectedData},--}}
-    {{--			datatype: 'application/json',--}}
-
-
-    {{--			beforeSend: function() {--}}
-    {{--				// show waiting dialog--}}
-    {{--				waitingDialog.show('Loading...');--}}
-    {{--			},--}}
-
-    {{--			success:function(data){--}}
-
-    {{--				console.log(data);--}}
-    {{--				waitingDialog.hide();--}}
-    {{--			},--}}
-
-    {{--			error:function(data){--}}
-    {{--				alert(JSON.stringify(data));--}}
-    {{--			}--}}
-    {{--		});--}}
-    {{--	});--}}
-    {{--});--}}
-
-    // for single checkbox end
-    // for select all checkbox
-
-
-
-
-    $(function () {
-        $("#example2").DataTable();
-        $('#example1').DataTable({
-            "paging": false,
-            "lengthChange": false,
-            "searching": true,
-            "ordering": false,
-            "info": false,
-            "autoWidth": false
-        });
-
-        // paginating
-        $('.pagination a').on('click', function (e) {
-            e.preventDefault();
-            var url = $(this).attr('href').replace('store', 'find');
-            loadRolePermissionList(url);
-            // window.history.pushState("", "", url);
-            // $(this).removeAttr('href');
-        });
-        // loadRole-PermissionList
-        function loadRolePermissionList(url) {
-            $.ajax({
-                url: url,
-                type: 'POST',
-                cache: false,
-                beforeSend: function() {
-                    // show waiting dialog
-                    waitingDialog.show('Loading...');
-                },
-                success:function(data){
-                    // hide waiting dialog
-                    waitingDialog.hide();
-                    // checking
-                    if(data.status=='success'){
-                        var std_list_container_row = $('#std_list_container_row');
-                        std_list_container_row.html('');
-                        std_list_container_row.append(data.html);
-                    }else{
-                        alert(data.msg)
-                    }
-                },
-                error:function(data){
-                    alert(JSON.stringify(data));
-                }
-            });
-        }
-
-
-        // downlaod student report
-
-//		$('.download').click(function () {
-//		    var download_type=$(this).attr("id");
-////			alert(download_type);
-//
-//            $.ajax({
-//
-//                url: '/student/manage/download/excel/pdf',
-//                type: 'POST',
-//                cache: false,
-//                data: $('form#downlaodStdExcelPDF').serialize()+ "&download_type=" + download_type,
-//                datatype: 'json/application',
-//
-//                beforeSend: function () {
-//                    // alert($('form#class_section_form').serialize());
-//                    // show waiting dialog
-////                    waitingDialog.show('Loading...');
-//                },
-//
-//                success: function (data) {
-//                    // hide waiting dialog
-////                    waitingDialog.hide();
-//					console.log(data);
-//
-//                },
-//
-//                error: function (data) {
-//                    alert('error');
-//                }
-//            });
-//
-//
-//        })
-
-
-
-
+        // $('form#cad_assign_submit_form').on('submit', function (e) {
     });
+
+
+
+
+    // $(function () {
+    //     $("#example2").DataTable();
+    //     $('#example1').DataTable({
+    //         "paging": false,
+    //         "lengthChange": false,
+    //         "searching": true,
+    //         "ordering": false,
+    //         "info": false,
+    //         "autoWidth": false
+    //     });
+    //
+    //     // paginating
+    //     $('.pagination a').on('click', function (e) {
+    //         e.preventDefault();
+    //         var url = $(this).attr('href').replace('store', 'find');
+    //         loadRolePermissionList(url);
+    //         // window.history.pushState("", "", url);
+    //         // $(this).removeAttr('href');
+    //     });
+    //     // loadRole-PermissionList
+    //     function loadRolePermissionList(url) {
+    //         $.ajax({
+    //             url: url,
+    //             type: 'POST',
+    //             cache: false,
+    //             beforeSend: function() {
+    //                 // show waiting dialog
+    //                 waitingDialog.show('Loading...');
+    //             },
+    //             success:function(data){
+    //                 // hide waiting dialog
+    //                 waitingDialog.hide();
+    //                 // checking
+    //                 if(data.status=='success'){
+    //                     var std_list_container_row = $('#std_list_container_row');
+    //                     std_list_container_row.html('');
+    //                     std_list_container_row.append(data.html);
+    //                 }else{
+    //                     alert(data.msg)
+    //                 }
+    //             },
+    //             error:function(data){
+    //                 waitingDialog.hide();
+    //                 alert(JSON.stringify(data));
+    //             }
+    //         });
+    //     }
+    // });
 </script>
