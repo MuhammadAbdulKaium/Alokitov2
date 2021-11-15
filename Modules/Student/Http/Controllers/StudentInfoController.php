@@ -17,6 +17,7 @@ use Modules\CadetFees\Entities\CadetFeesAssign;
 use Modules\CadetFees\Entities\CadetFeesGenerate;
 use Modules\CadetFees\Entities\FeesHead;
 use Modules\CadetFees\Entities\FeesStructureDetails;
+use Modules\CadetFees\Entities\StudentFeesCollctionHistory;
 use Modules\CadetFees\Entities\StudentFeesCollection;
 use Modules\Setting\Entities\Campus;
 use Modules\Setting\Entities\Institute;
@@ -811,6 +812,18 @@ class StudentInfoController extends Controller
         $institute = Institute::findOrFail($this->academicHelper->getInstitute());
         $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
         return view('student::pages.student-profile.modals.collected-fees-invoice',compact('feesHeadDetails','feesHeads','month_list','feeCollection','institute','personalInfo','studentFeesAssign'));
+
+    }
+    public function getStudentFeesCollectionHistory($id,$genId)
+    {
+
+        $feeCollections = StudentFeesCollctionHistory::join('cadet_fees_generate','student_fees_collection_history.fees_generate_id','cadet_fees_generate.id')
+            ->where('student_fees_collection_history.std_id',$id)->where('student_fees_collection_history.fees_generate_id',$genId)
+            ->select('cadet_fees_generate.status','cadet_fees_generate.inv_id','cadet_fees_generate.structure_id','student_fees_collection_history.*','cadet_fees_generate.month_name')->get();
+//        $studentFeesAssign= CadetFeesAssign::where('structure_id',$feeCollection->structure_id)
+//            ->where('std_id',$feeCollection->std_id)->first();
+        $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
+        return view('student::pages.student-profile.modals.collected-fees-history',compact('month_list','feeCollections'));
 
     }
     public function getStudentFeesCollectionInvoicePdf($id)

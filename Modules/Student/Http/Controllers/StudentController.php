@@ -688,7 +688,7 @@ class StudentController extends Controller
                         'cadet_fees_generate.section' => $section,
                         'cadet_fees_generate.structure_id' => $structure_id,
                         'cadet_fees_generate.month_name' => $month_name])
-                    ->select('cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
+                    ->select('student_fees_collection.discount','cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
                         'student_fees_collection.transaction_id','student_fees_collection.payment_mode','student_fees_collection.payment_type','student_fees_collection.fine_amount',
                         'student_manage_view.std_id','student_manage_view.first_name','student_manage_view.last_name','student_manage_view.gr_no','student_manage_view.std_id','cadet_fees_generate.payment_last_date',
                         'cadet_fees_generate.structure_id','cadet_fees_generate.fine_type','cadet_fees_generate.late_fine',

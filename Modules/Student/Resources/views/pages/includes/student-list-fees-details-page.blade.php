@@ -29,6 +29,7 @@
                                 <th>Last Payment Date</th>
                                 <th>Paid</th>
                                 <th>Previous Due</th>
+                                <th>Discount</th>
                                 <th>Total Payable</th>
                                 <th>Current Pay. Amt</th>
                                 <th>Discount</th>
@@ -42,7 +43,6 @@
                             </tr>
 
                             </thead>
-
                             <tbody>
                             @foreach($searchData as $key=>$data)
                                 @php
@@ -72,6 +72,8 @@
                                         <input type="hidden" class="late-fine"  value="{{$data->late_fine}}">
                                         <input type="hidden" class="payment-date"  value="{{$data->payment_last_date}}">
                                         <input type="hidden" class="paid"  value="{{$data->paid_amount}}">
+                                        <input type="hidden" class="fine-type"  value="{{$data->fine_type}}">
+                                        <input type="hidden" class="discount-value"  value="{{$data->discount}}">
                                         {{$data->fees}}
                                     </td>
                                     <td>
@@ -92,6 +94,7 @@
                                             <input type="hidden" class="previous-due" value="{{$previous_due}}">
                                     @endisset
                                     </td>
+                                    <td>{{$data->discount}}</td>
                                     <td class="total-payable"></td>
                                     <td><input type="number" class="form-control fees-current-pay" name="current_pay[]" disabled required></td>
                                     <td><input type="number" class="form-control fees-discount" name="discount[]" disabled required></td>
@@ -137,10 +140,12 @@
             var parent = $(this).parent().parent();
             var amount = parent.find('.fees-current-pay');
             var discount = parent.find('.fees-discount');
+            var discountDBValue = parent.find('.discount-value');
             var fees = parent.find('.gen-fees');
             var generate_id = parent.find('.fees-gen-check');
             var paid = parent.find('.paid');
             var fine = parent.find('.late-fine');
+            var fineType = parent.find('.fine-type');
             var paymentDate = parent.find('.payment-date');
             var totalPayable = parent.find('.total-payable');
             var previousDue = parent.find('.previous-due');
@@ -155,31 +160,43 @@
             {
                 var discountValue=discount.val()?parseInt(discount.val()):0;
                 var previousDueValue=previousDue.val()?parseInt(previousDue.val()):0;
-                if(date1<date2){
-                    if(paid.val()>0){
-                        var total=parseInt(fees.val()) +(fine.val() * diffDays)-parseInt(paid.val()) -discountValue+previousDueValue;
-                        if(amount.val()>0)
-                        {
-                            var cfDue=total-amount.val();
+                var previousDiscountValue=discountDBValue.val()?parseInt(discountDBValue.val()):0;
+                var total = null;
+                if(previousDue.val()>0)
+                {
+                    if(date1<date2) {
+                        if(fineType.val()==1){
+                            total=parseInt(fees.val())-parseInt(paid.val()) +(fine.val() * diffDays) - discountValue-previousDiscountValue;
+                        }
+                        else{
+                            total=parseInt(fees.val())-parseInt(paid.val()) - discountValue-previousDiscountValue;
                         }
                     }
-                    else{
-                        var total=parseInt(fees.val()) +(fine.val() * diffDays) - discountValue + previousDueValue;
-                        if(amount.val()>0)
-                        {
-                            var cfDue=total-amount.val();
-                        }
-                    }
-
                 }
                 else{
-                    var total=parseInt(fees.val())-discountValue + previousDueValue;
-                    if(amount.val()>0)
-                    {
-                        var cfDue=total-amount.val();
+                    if(date1<date2){
+                        if(fineType.val()==1)
+                        {
+                            if(paid.val()>0){
+                                total=parseInt(fees.val()) +(fine.val() * diffDays) - discountValue - parseInt(paid.val())-previousDiscountValue;
+                            } else {
+                                total=parseInt(fees.val()) +(fine.val() * diffDays) - discountValue-previousDiscountValue;
+                            }
+
+                        }
+                        else
+                        {
+                            total=parseInt(fees.val()) +(fine.val()) - discountValue - parseInt(paid.val())-previousDiscountValue;
+                        }
+
+                    }
+                    else{
+                        total=parseInt(fees.val())-discountValue + previousDueValue-previousDiscountValue;
                     }
                 }
+
                 totalPayable.text(total);
+                console.log(total);
             }
             // For uncheck checkbox
             if (!$(this).prop("checked")) {
