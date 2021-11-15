@@ -7,6 +7,9 @@
 			overflow-x: hidden;
 			overflow-y: hidden;
 		}
+		.full-with-modal{
+			width: 80%;
+		}
 	</style>
 @endsection
 
@@ -71,6 +74,7 @@
 						  <th>Total Due</th>
 						  <th>Payment Type</th>
 						  <th>Status</th>
+						  <th>Action</th>
 					  </tr>
 					  </thead>
 					  <tbody>
@@ -85,6 +89,9 @@
 							  <td>{{$collection->total_dues}}</td>
 							  <td>{{$collection->payment_type==1?'Manual':($collection->payment_type==2?'Online':'N/A')}}</td>
 							  <td>{{$collection->status==1?'Paid':($collection->status==2?'Partially Paid':'Pending')}}</td>
+							  <td>
+								  <a class="btn btn-primary" href="{{url('student/fees/collection/invoice/'.$collection->id)}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg">Invoice</a>
+							  </td>
 						  </tr>
 					  @endforeach
 					  </tbody>
@@ -92,7 +99,7 @@
 			  @endif
 	  <!-- global modal -->
 		  <div aria-hidden="true" aria-labelledby="esModalLabel" class="modal" id="globalModal" role="dialog" tabindex="-1">
-			  <div class="modal-dialog">
+			  <div class="modal-dialog full-with-modal">
 				  <div class="modal-content">
 					  <div class="modal-body">
 						  <div class="loader">

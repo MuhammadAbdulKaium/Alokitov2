@@ -153,6 +153,9 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace
 
     /////  student profile address /////
     Route::get('/profile/fees/{id}', 'StudentInfoController@getStudentFees')->middleware('std-profile-permission'); //home
+    Route::get('/fees/collection/invoice/{id}', 'StudentInfoController@getStudentFeesCollectionInvoice')->middleware('std-profile-permission'); //home
+    Route::get('/fees/collection/invoice/pdf/{id}', 'StudentInfoController@getStudentFeesCollectionInvoicePdf')->middleware('std-profile-permission'); //home
+
     Route::get('/demoreport', 'StudentReportController@indexReport'); //home
 
 

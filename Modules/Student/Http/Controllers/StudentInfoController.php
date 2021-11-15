@@ -19,6 +19,7 @@ use Modules\CadetFees\Entities\FeesHead;
 use Modules\CadetFees\Entities\FeesStructureDetails;
 use Modules\CadetFees\Entities\StudentFeesCollection;
 use Modules\Setting\Entities\Campus;
+use Modules\Setting\Entities\Institute;
 use Modules\Student\Entities\CadetPersonalPhoto;
 use Modules\Student\Entities\StudentAttachment;
 use Modules\Student\Entities\StudentEnrollment;
@@ -784,17 +785,55 @@ class StudentInfoController extends Controller
         $studentFeesAssign= CadetFeesAssign::where('structure_id',$generatedFees->structure_id)
             ->where('std_id',$generatedFees->std_id)->first();
         $personalInfo = StudentProfileView::where('std_id',$generatedFees->std_id)->first();
-//        $personalInfo = $this->studentEnrollment::where('std_id',$generatedFees->std_id)->first();
         $feesHeadDetails=json_decode($studentFeesAssign->fees_details,1);
         $feesHeads=FeesHead::where([
             'institute_id' => $this->academicHelper->getInstitute(),
             'campus_id' => $this->academicHelper->getCampus()
         ])->get();
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
 
         $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
-        return view('student::pages.student-profile.modals.generated-fees-invoice',compact('personalInfo','feesHeads','feesHeadDetails','generatedFees','month_list'));
+        return view('student::pages.student-profile.modals.generated-fees-invoice',compact('institute','personalInfo','feesHeads','feesHeadDetails','generatedFees','month_list'));
     }
+    public function getStudentFeesCollectionInvoice($id)
+    {
+        $feesHeads=FeesHead::where([
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus()
+        ])->get();
 
+        $feeCollection = StudentFeesCollection::join('cadet_fees_generate','student_fees_collection.fees_generate_id','cadet_fees_generate.id')
+            ->where('student_fees_collection.id',$id)->select('cadet_fees_generate.status','cadet_fees_generate.inv_id','cadet_fees_generate.structure_id','student_fees_collection.*','cadet_fees_generate.month_name')->first();
+        $studentFeesAssign= CadetFeesAssign::where('structure_id',$feeCollection->structure_id)
+            ->where('std_id',$feeCollection->std_id)->first();
+        $feesHeadDetails=json_decode($studentFeesAssign->fees_details,1);
+        $personalInfo = StudentProfileView::where('std_id',$feeCollection->std_id)->first();
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+        $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
+        return view('student::pages.student-profile.modals.collected-fees-invoice',compact('feesHeadDetails','feesHeads','month_list','feeCollection','institute','personalInfo','studentFeesAssign'));
+
+    }
+    public function getStudentFeesCollectionInvoicePdf($id)
+    {
+        $feesHeads=FeesHead::where([
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus()
+        ])->get();
+
+        $feeCollection = StudentFeesCollection::join('cadet_fees_generate','student_fees_collection.fees_generate_id','cadet_fees_generate.id')
+            ->where('student_fees_collection.id',$id)->select('cadet_fees_generate.status','cadet_fees_generate.inv_id','cadet_fees_generate.structure_id','student_fees_collection.*','cadet_fees_generate.month_name')->first();
+        $studentFeesAssign= CadetFeesAssign::where('structure_id',$feeCollection->structure_id)
+            ->where('std_id',$feeCollection->std_id)->first();
+        $feesHeadDetails=json_decode($studentFeesAssign->fees_details,1);
+        $personalInfo = StudentProfileView::where('std_id',$feeCollection->std_id)->first();
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+        $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
+
+        $pdf = App::make('dompdf.wrapper');
+
+        $pdf->loadView('student::pages.student-profile.modals.collected-fees-invoice-pdf',compact('feesHeadDetails','feesHeads','month_list','feeCollection','institute','personalInfo','studentFeesAssign'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
 
     public function  getStudentFeesInfo($id){
 
