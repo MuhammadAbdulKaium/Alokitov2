@@ -90,6 +90,7 @@
 							  <td>{{$collection->payment_type==1?'Manual':($collection->payment_type==2?'Online':'N/A')}}</td>
 							  <td>{{$collection->status==1?'Paid':($collection->status==2?'Partially Paid':'Pending')}}</td>
 							  <td>
+								  <a class="btn btn-primary" href="{{url('student/fees/collection/history/'.$collection->std_id.'/'.$collection->fees_generate_id)}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg">History</a>
 								  <a class="btn btn-primary" href="{{url('student/fees/collection/invoice/'.$collection->id)}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg">Invoice</a>
 							  </td>
 						  </tr>
