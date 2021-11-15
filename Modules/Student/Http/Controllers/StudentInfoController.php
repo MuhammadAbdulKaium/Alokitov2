@@ -795,6 +795,30 @@ class StudentInfoController extends Controller
         $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
         return view('student::pages.student-profile.modals.generated-fees-invoice',compact('institute','personalInfo','feesHeads','feesHeadDetails','generatedFees','month_list'));
     }
+
+    //by dev9
+    public function getStudentFeesInvoicePdf($id)
+    {
+        $generatedFees = CadetFeesGenerate::join('fees_structure','cadet_fees_generate.structure_id','fees_structure.id')
+            ->where('cadet_fees_generate.id',$id)->select('cadet_fees_generate.*','fees_structure.structure_name')->first();
+        $studentFeesAssign= CadetFeesAssign::where('structure_id',$generatedFees->structure_id)
+            ->where('std_id',$generatedFees->std_id)->first();
+        $personalInfo = StudentProfileView::where('std_id',$generatedFees->std_id)->first();
+        $feesHeadDetails=json_decode($studentFeesAssign->fees_details,1);
+        $feesHeads=FeesHead::where([
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus()
+        ])->get();
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+
+        $month_list = array(1 => 'Jan.', 2 => 'Feb.', 3 => 'Mar.', 4 => 'Apr.', 5 => 'May', 6 => 'Jun.', 7 => 'Jul.', 8 => 'Aug.', 9 => 'Sep.', 10 => 'Oct.', 11 => 'Nov.', 12 => 'Dec.');
+        $pdf = App::make('dompdf.wrapper');
+
+        $pdf->loadView('student::pages.student-profile.modals.generated-fees-invoice-pdf'
+            ,compact('institute','personalInfo','feesHeads','feesHeadDetails','generatedFees','month_list'))
+            ->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
     public function getStudentFeesCollectionInvoice($id)
     {
         $feesHeads=FeesHead::where([
@@ -833,6 +857,8 @@ class StudentInfoController extends Controller
 
         $pdf->loadView('student::pages.student-profile.modals.collected-fees-invoice-pdf',compact('feesHeadDetails','feesHeads','month_list','feeCollection','institute','personalInfo','studentFeesAssign'))->setPaper('a4', 'portrait');
         return $pdf->stream();
+        return view('student::pages.student-profile.modals.collected-fees-invoice-pdf',compact('feesHeadDetails','feesHeads','month_list','feeCollection','institute','personalInfo','studentFeesAssign'));
+
     }
 
     public function  getStudentFeesInfo($id){

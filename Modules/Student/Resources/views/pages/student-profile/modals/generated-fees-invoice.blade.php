@@ -88,6 +88,7 @@
          }
      </style>
      <div class="container">
+         <a href="{{url('/student/fees/invoice/pdf/'.$generatedFees->id)}}">Print</a>
          <div class="row">
              <div class="row prescription-rows">
                  <div class="col-sm-12" style="text-align: center">

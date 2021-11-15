@@ -161,6 +161,7 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace
 
     Route::get('/profile/fees_info/{id}', 'StudentInfoController@getStudentFeesInfo')->middleware('std-profile-permission');
     Route::get('/fees/invoice/{id}', 'StudentInfoController@getStudentFeesInvoice')->middleware('std-profile-permission');
+    Route::get('/fees/invoice/pdf/{id}', 'StudentInfoController@getStudentFeesInvoicePdf')->middleware('std-profile-permission');
     Route::get('/profile/fees_info/download/{id}', 'StudentInfoController@getStudentFeesInfoReportById')->middleware('std-profile-permission');
     Route::get('/profile/fees-new/{id}', 'StudentInfoController@getStudentNewFeesInfo')->middleware('std-profile-permission');
     //    Student Remsarks

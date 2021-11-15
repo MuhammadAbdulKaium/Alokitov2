@@ -102,13 +102,12 @@
 </head>
 <body>
 <div class="">
-
     <div class=" clearfix" style="padding: 0;margin: 0;width: 100%;">
 
         <div class="row">
             <div class="row prescription-rows" style="position: relative">
                 <div class="col-sm-12" style="text-align:center ;width: 100%">
-                    <h3 class="invoice-number text-light-blue">Invoice: {{$feeCollection->inv_id}} </h3>
+                    <h3 class="invoice-number text-light-blue">Invoice: {{$generatedFees->inv_id}} </h3>
                 </div>
 
                 <div class="col-sm-1 logo">
@@ -128,161 +127,44 @@
             </div>
 
             <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%;position:relative;margin-top: 80px">
-                <thead>
+
+            <thead>
                 <tr>
                     <th><a  data-sort="sub_master_code">Invoice ID</a></th>
                     <th><a  data-sort="sub_master_code">Month Name</a></th>
-                    {{--                     <th><a  data-sort="sub_master_code">Structure Name</a></th>--}}
-                    <th><a  data-sort="sub_master_alias">Fees Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Fine Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Total Payable</a></th>
-                    <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Due Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Date of Payment</a></th>
-                    <th><a  data-sort="sub_master_alias">Payment Type</a></th>
+                    <th><a  data-sort="sub_master_code">Year</a></th>
+                    <th><a  data-sort="sub_master_code">Structure Name</a></th>
+                    <th><a  data-sort="sub_master_alias">Fees</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine Type</a></th>
+                    <th><a  data-sort="sub_master_alias">Last Date of Payment</a></th>
                     <th><a  data-sort="sub_master_alias">Status</a></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td>{{$feeCollection->inv_id}}</td>
+                    <td>{{$generatedFees->inv_id}}</td>
                     <td>
                         @foreach($month_list as $key=>$month)
-                            @if($key==$feeCollection->month_name)
+                            @if($key==$generatedFees->month_name)
                                 {{$month}}
                             @endif
                         @endforeach
                     </td>
-                    {{--                     <td>{{$feeCollection->structure_name}}</td>--}}
-                    <td>{{$feeCollection->fees_amount}}</td>
-                    <td>{{$feeCollection->fine_amount}}</td>
-                    <td>{{$feeCollection->total_payable}}</td>
-                    <td>{{$feeCollection->paid_amount}}</td>
-                    <td>{{$feeCollection->total_dues}}</td>
-                    <td>{{$feeCollection->pay_date}}</td>
-                    <td>{{$feeCollection->payment_type==1?'Manual':($feeCollection->payment_type==2?'Online':'N/A')}}</td>
-                    <td>{{$feeCollection->status==1?'Paid':($feeCollection->status==2?'Partially Paid':'Pending')}}</td>
+                    <td>{{$generatedFees->year}}</td>
+                    <td>{{$generatedFees->structure_name}}</td>
+                    <td>{{$generatedFees->fees}}</td>
+                    <td>{{$generatedFees->late_fine}}</td>
+                    <td>{{$generatedFees->fine_type==1?'Daily':'Fixed'}}</td>
+                    <td>{{$generatedFees->payment_last_date}}</td>
+                    <td>{{$generatedFees->status==1?'Paid':($generatedFees->status==2?'Partially Paid':'Pending')}}</td>
                 </tr>
                 </tbody>
             </table>
             <div class="col-md-6" style="position: relative;right: 20px;bottom: 40px">
-                @if($feeCollection->status==1)
+                @if($generatedFees->status==1)
                     <img src="{{ public_path('/assets/stamp/paid-stamp.png') }}" class="stamp">
-                @elseif($feeCollection->status==2)
-                    <img src="{{ public_path('/assets/stamp/partially-paid-stamp.png') }}" class="stamp">
-                @else
-                    <img src="{{ public_path('/assets/stamp/pending-rectangle.png') }}" class="stamp">
-                @endif
-            </div>
-            <div class="col-md-6">
-                <table class="table table-bordered" style="table-layout: fixed">
-                    <thead>
-                    <tr>
-                        <th colspan="2" style="border: none;background: white"></th>
-                        <th>Head</th>
-                        <th>Amount</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($feesHeadDetails as $key=>$head)
-                        <tr>
-                            <td colspan="2"></td>
-                            <td>
-                                @isset($key)
-                                    @foreach($feesHeads as $feesHead)
-                                        @if(($feesHead->id == $key))
-                                            {{$feesHead->fees_head}}
-                                        @endif
-                                    @endforeach
-                                @endisset()
-                            </td>
-                            <td>
-                                {{$head}}
-                            </td>
-                        </tr>
-
-                    @endforeach
-                    <tr style="border: none">
-                        <td ></td>
-                    </tr>
-                    </tbody>
-
-
-                </table>
-            </div>
-            <div class="border"></div>
-        </div>
-
-
-    </div>
-
-    <div class=" clearfix" style="padding: 0;margin: 0;width: 100%;">
-
-        <div class="row">
-            <div class="row prescription-rows" style="position: relative">
-                <div class="col-sm-12" style="text-align:center ;width: 100%">
-                    <h3 class="invoice-number text-light-blue">Invoice: {{$feeCollection->inv_id}} </h3>
-                </div>
-
-                <div class="col-sm-1 logo">
-                    <img src="{{ public_path('/assets/users/images/'.$institute->logo) }}" alt="" style="width:70px;object-fit: cover" height="80px">
-                </div>
-                <div class="col-sm-6"  style="position: absolute;top: 55px">
-                    <h5><b>{{ $institute->institute_name }}</b></h5>
-                    <h5 style="margin-top: 0px;">{{ $institute->address2 }}</h5>
-                    <br>
-                </div>
-                <div class="col-sm-5" style="text-align: right;position: absolute;top: 50px;right: 4px">
-                    <br><span class="invoice-type">Office Copy
-</span> <br>
-                    <span>{{$personalInfo->first_name}} {{$personalInfo->last_name}} ({{$personalInfo->email}} ) <br>
-                        Roll: {{$personalInfo->gr_no}}</span>
-                    <span><strong>Level:</strong> {{$personalInfo->level()->level_name}} <br> <strong>Class: </strong>{{$personalInfo->batch()->batch_name}} <strong>Section: </strong>{{$personalInfo->section()->section_name}}</span>
-                </div>
-            </div>
-
-            <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%;position:relative;margin-top: 80px">
-                <thead>
-                <tr>
-                    <th><a  data-sort="sub_master_code">Invoice ID</a></th>
-                    <th><a  data-sort="sub_master_code">Month Name</a></th>
-                    {{--                     <th><a  data-sort="sub_master_code">Structure Name</a></th>--}}
-                    <th><a  data-sort="sub_master_alias">Fees Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Fine Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Total Payable</a></th>
-                    <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Due Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Date of Payment</a></th>
-                    <th><a  data-sort="sub_master_alias">Payment Type</a></th>
-                    <th><a  data-sort="sub_master_alias">Status</a></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>{{$feeCollection->inv_id}}</td>
-                    <td>
-                        @foreach($month_list as $key=>$month)
-                            @if($key==$feeCollection->month_name)
-                                {{$month}}
-                            @endif
-                        @endforeach
-                    </td>
-                    {{--                     <td>{{$feeCollection->structure_name}}</td>--}}
-                    <td>{{$feeCollection->fees_amount}}</td>
-                    <td>{{$feeCollection->fine_amount}}</td>
-                    <td>{{$feeCollection->total_payable}}</td>
-                    <td>{{$feeCollection->paid_amount}}</td>
-                    <td>{{$feeCollection->total_dues}}</td>
-                    <td>{{$feeCollection->pay_date}}</td>
-                    <td>{{$feeCollection->payment_type==1?'Manual':($feeCollection->payment_type==2?'Online':'N/A')}}</td>
-                    <td>{{$feeCollection->status==1?'Paid':($feeCollection->status==2?'Partially Paid':'Pending')}}</td>
-                </tr>
-                </tbody>
-            </table>
-            <div class="col-md-6" style="position: relative;right: 20px;bottom: 40px">
-                @if($feeCollection->status==1)
-                    <img src="{{ public_path('/assets/stamp/paid-stamp.png') }}" class="stamp">
-                @elseif($feeCollection->status==2)
+                @elseif($generatedFees->status==2)
                     <img src="{{ public_path('/assets/stamp/partially-paid-stamp.png') }}" class="stamp">
                 @else
                     <img src="{{ public_path('/assets/stamp/pending-rectangle.png') }}" class="stamp">
@@ -334,19 +216,19 @@
         <div class="row">
             <div class="row prescription-rows" style="position: relative">
                 <div class="col-sm-12" style="text-align:center ;width: 100%">
-                    <h3 class="invoice-number text-light-blue">Invoice: {{$feeCollection->inv_id}} </h3>
+                    <h3 class="invoice-number text-light-blue">Invoice: {{$generatedFees->inv_id}} </h3>
                 </div>
 
                 <div class="col-sm-1 logo">
                     <img src="{{ public_path('/assets/users/images/'.$institute->logo) }}" alt="" style="width:70px;object-fit: cover" height="80px">
                 </div>
                 <div class="col-sm-6"  style="position: absolute;top: 55px">
-                    <h5><b>{{ $institute->institute_name }}</b></h5>
+                    <h4><b>{{ $institute->institute_name }}</b></h4>
                     <h5 style="margin-top: 0px;">{{ $institute->address2 }}</h5>
                     <br>
                 </div>
-                <div class="col-sm-5" style="text-align: right;position: absolute;top: 50px;right: 4px">
-                    <br><span class="invoice-type">Bank Copy</span> <br>
+                <div class="col-sm-5" style="text-align: right;position: absolute;top: 50px;right: 4px;font-size: small">
+                    <br><span class="invoice-type" >Office Copy</span> <br>
                     <span>{{$personalInfo->first_name}} {{$personalInfo->last_name}} ({{$personalInfo->email}} ) <br>
                         Roll: {{$personalInfo->gr_no}}</span>
                     <span><strong>Level:</strong> {{$personalInfo->level()->level_name}} <br> <strong>Class: </strong>{{$personalInfo->batch()->batch_name}} <strong>Section: </strong>{{$personalInfo->section()->section_name}}</span>
@@ -354,47 +236,44 @@
             </div>
 
             <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%;position:relative;margin-top: 80px">
+
                 <thead>
                 <tr>
                     <th><a  data-sort="sub_master_code">Invoice ID</a></th>
                     <th><a  data-sort="sub_master_code">Month Name</a></th>
-                    {{--                     <th><a  data-sort="sub_master_code">Structure Name</a></th>--}}
-                    <th><a  data-sort="sub_master_alias">Fees Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Fine Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Total Payable</a></th>
-                    <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Due Amount</a></th>
-                    <th><a  data-sort="sub_master_alias">Date of Payment</a></th>
-                    <th><a  data-sort="sub_master_alias">Payment Type</a></th>
+                    <th><a  data-sort="sub_master_code">Year</a></th>
+                    <th><a  data-sort="sub_master_code">Structure Name</a></th>
+                    <th><a  data-sort="sub_master_alias">Fees</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine Type</a></th>
+                    <th><a  data-sort="sub_master_alias">Last Date of Payment</a></th>
                     <th><a  data-sort="sub_master_alias">Status</a></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td>{{$feeCollection->inv_id}}</td>
+                    <td>{{$generatedFees->inv_id}}</td>
                     <td>
                         @foreach($month_list as $key=>$month)
-                            @if($key==$feeCollection->month_name)
+                            @if($key==$generatedFees->month_name)
                                 {{$month}}
                             @endif
                         @endforeach
                     </td>
-                    {{--                     <td>{{$feeCollection->structure_name}}</td>--}}
-                    <td>{{$feeCollection->fees_amount}}</td>
-                    <td>{{$feeCollection->fine_amount}}</td>
-                    <td>{{$feeCollection->total_payable}}</td>
-                    <td>{{$feeCollection->paid_amount}}</td>
-                    <td>{{$feeCollection->total_dues}}</td>
-                    <td>{{$feeCollection->pay_date}}</td>
-                    <td>{{$feeCollection->payment_type==1?'Manual':($feeCollection->payment_type==2?'Online':'N/A')}}</td>
-                    <td>{{$feeCollection->status==1?'Paid':($feeCollection->status==2?'Partially Paid':'Pending')}}</td>
+                    <td>{{$generatedFees->year}}</td>
+                    <td>{{$generatedFees->structure_name}}</td>
+                    <td>{{$generatedFees->fees}}</td>
+                    <td>{{$generatedFees->late_fine}}</td>
+                    <td>{{$generatedFees->fine_type==1?'Daily':'Fixed'}}</td>
+                    <td>{{$generatedFees->payment_last_date}}</td>
+                    <td>{{$generatedFees->status==1?'Paid':($generatedFees->status==2?'Partially Paid':'Pending')}}</td>
                 </tr>
                 </tbody>
             </table>
             <div class="col-md-6" style="position: relative;right: 20px;bottom: 40px">
-                @if($feeCollection->status==1)
+                @if($generatedFees->status==1)
                     <img src="{{ public_path('/assets/stamp/paid-stamp.png') }}" class="stamp">
-                @elseif($feeCollection->status==2)
+                @elseif($generatedFees->status==2)
                     <img src="{{ public_path('/assets/stamp/partially-paid-stamp.png') }}" class="stamp">
                 @else
                     <img src="{{ public_path('/assets/stamp/pending-rectangle.png') }}" class="stamp">
@@ -441,8 +320,117 @@
 
 
     </div>
+    <div class=" clearfix" style="padding: 0;margin: 0;width: 100%;">
 
+        <div class="row">
+            <div class="row prescription-rows" style="position: relative">
+                <div class="col-sm-12" style="text-align:center ;width: 100%">
+                    <h3 class="invoice-number text-light-blue">Invoice: {{$generatedFees->inv_id}} </h3>
+                </div>
+
+                <div class="col-sm-1 logo">
+                    <img src="{{ public_path('/assets/users/images/'.$institute->logo) }}" alt="" style="width:70px;object-fit: cover" height="80px">
+                </div>
+                <div class="col-sm-6"  style="position: absolute;top: 55px">
+                    <h4><b>{{ $institute->institute_name }}</b></h4>
+                    <h5 style="margin-top: 0px;">{{ $institute->address2 }}</h5>
+                    <br>
+                </div>
+                <div class="col-sm-5" style="text-align: right;position: absolute;top: 50px;right: 4px;font-size: small">
+                    <br><span class="invoice-type" >Bank Copy</span> <br>
+                    <span>{{$personalInfo->first_name}} {{$personalInfo->last_name}} ({{$personalInfo->email}} ) <br>
+                        Roll: {{$personalInfo->gr_no}}</span>
+                    <span><strong>Level:</strong> {{$personalInfo->level()->level_name}} <br> <strong>Class: </strong>{{$personalInfo->batch()->batch_name}} <strong>Section: </strong>{{$personalInfo->section()->section_name}}</span>
+                </div>
+            </div>
+
+            <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%;position:relative;margin-top: 80px">
+
+                <thead>
+                <tr>
+                    <th><a  data-sort="sub_master_code">Invoice ID</a></th>
+                    <th><a  data-sort="sub_master_code">Month Name</a></th>
+                    <th><a  data-sort="sub_master_code">Year</a></th>
+                    <th><a  data-sort="sub_master_code">Structure Name</a></th>
+                    <th><a  data-sort="sub_master_alias">Fees</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine</a></th>
+                    <th><a  data-sort="sub_master_alias">Fine Type</a></th>
+                    <th><a  data-sort="sub_master_alias">Last Date of Payment</a></th>
+                    <th><a  data-sort="sub_master_alias">Status</a></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{$generatedFees->inv_id}}</td>
+                    <td>
+                        @foreach($month_list as $key=>$month)
+                            @if($key==$generatedFees->month_name)
+                                {{$month}}
+                            @endif
+                        @endforeach
+                    </td>
+                    <td>{{$generatedFees->year}}</td>
+                    <td>{{$generatedFees->structure_name}}</td>
+                    <td>{{$generatedFees->fees}}</td>
+                    <td>{{$generatedFees->late_fine}}</td>
+                    <td>{{$generatedFees->fine_type==1?'Daily':'Fixed'}}</td>
+                    <td>{{$generatedFees->payment_last_date}}</td>
+                    <td>{{$generatedFees->status==1?'Paid':($generatedFees->status==2?'Partially Paid':'Pending')}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="col-md-6" style="position: relative;right: 20px;bottom: 40px">
+                @if($generatedFees->status==1)
+                    <img src="{{ public_path('/assets/stamp/paid-stamp.png') }}" class="stamp">
+                @elseif($generatedFees->status==2)
+                    <img src="{{ public_path('/assets/stamp/partially-paid-stamp.png') }}" class="stamp">
+                @else
+                    <img src="{{ public_path('/assets/stamp/pending-rectangle.png') }}" class="stamp">
+                @endif
+            </div>
+            <div class="col-md-6">
+                <table class="table table-bordered" style="table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="border: none;background: white"></th>
+                        <th>Head</th>
+                        <th>Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($feesHeadDetails as $key=>$head)
+                        <tr>
+                            <td colspan="2"></td>
+                            <td>
+                                @isset($key)
+                                    @foreach($feesHeads as $feesHead)
+                                        @if(($feesHead->id == $key))
+                                            {{$feesHead->fees_head}}
+                                        @endif
+                                    @endforeach
+                                @endisset()
+                            </td>
+                            <td>
+                                {{$head}}
+                            </td>
+                        </tr>
+
+                    @endforeach
+                    <tr style="border: none">
+                        <td ></td>
+                    </tr>
+                    </tbody>
+
+
+                </table>
+            </div>
+            <div class="border"></div>
+        </div>
+
+
+    </div>
 </div>
+
 </body>
 </html>
 
