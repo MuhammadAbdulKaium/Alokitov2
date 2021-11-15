@@ -32,7 +32,6 @@
                                 <th>Total Payable</th>
                                 <th>Current Pay. Amt</th>
                                 <th>Discount</th>
-                                <th>C.F. Dues</th>
                                 <th>Status</th>
                                 <th>Pay Date</th>
                                 <th>Payment Type</th>
@@ -96,7 +95,6 @@
                                     <td class="total-payable"></td>
                                     <td><input type="number" class="form-control fees-current-pay" name="current_pay[]" disabled required></td>
                                     <td><input type="number" class="form-control fees-discount" name="discount[]" disabled required></td>
-                                    <td class="cf-dues"></td>
                                     <td>
                                         <input type="hidden" class="status" value="{{$data->status}}">
                                         @foreach($statuses as $key=>$status)
