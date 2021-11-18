@@ -300,7 +300,9 @@ background:#0b460b !important;
                                     <li><a href="/cadetfees/fees/head"><i class="fa fa-bank"></i> Fees Head</a></li>
                                     <li><a href="/cadetfees/create/fees"><i class="fa fa-bank"></i> Fees Assign</a></li>
                                     <li><a href="/cadetfees/generate/fees"><i class="fa fa-bank"></i> Fees Generate</a></li>
-{{--                                    Menu--}}
+                                    <li><a href="/cadetfees/fees/collection"><i class="fa fa-bank"></i> Fees Collection</a></li>
+
+                                    {{--                                    Menu--}}
 {{--                                    <li><a href="/fees/invoice"><i class="fa fa-sort-alpha-asc"></i> Fees Invoice</a></li>--}}
 {{--                                    <li><a href="/fees/paymenttransaction"><i class="fa fa-sort-alpha-asc"></i> Payment Transaction</a></li>--}}
 {{--                                    <li><a href="/fees/addfees"><i class="fa fa-exchange"></i> Add Fees</a></li>--}}
