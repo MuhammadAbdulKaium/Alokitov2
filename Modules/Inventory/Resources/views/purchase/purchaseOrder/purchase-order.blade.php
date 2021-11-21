@@ -52,10 +52,10 @@
                             </div>
                             <div class="row" style="margin-bottom: 30px">
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="from_date_show" v-model="filter.from_date_show" placeholder="From Date" :format="filterFromDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.from_date" :config="dateOptions" style="width: 100%;" placeholder="From date"></v-date-picker>
                                 </div>  
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="to_date_show" v-model="filter.to_date_show" placeholder="To Date" :format="filterToDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.to_date" :config="dateOptions" style="width: 100%;" placeholder="To date"></v-date-picker>
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" name="search_key" placeholder="Search by keyword" class="form-control" v-model="filter.search_key" style="width: 100%;" autocomplete="off">
@@ -64,7 +64,7 @@
                                     <button class="btn btn-primary" @click="getResults(1)"><i class="fa fa-search"></i> Search</button>
                                 </div>
                                 <div class="col-sm-1" style="padding-left: 0">
-                                    <button class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
+                                    <button type="button" class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
                                 </div>
                             </div>
                         </form>
@@ -79,8 +79,10 @@
                                         <th class="sortable" v-bind:class="getSortingClass('vendor_id')" @click="sortingChanged('vendor_id')">Party Name</th>
                                         <th>Pur Qty</th>
                                         <th>Rate</th>
+                                        <th>Amount</th>
                                         <th class="sortable" v-bind:class="getSortingClass('date')" @click="sortingChanged('date')">Date</th>
                                         <th class="sortable" v-bind:class="getSortingClass('inventory_purchase_order_details.status')" @click="sortingChanged('inventory_purchase_order_details.status')">Status</th>
+                                        <th>Remarks</th>
                                         <th>Approved By</th>
                                         <th width="15%">Action</th>
                                     </tr>
@@ -94,6 +96,7 @@
                                             <td>@{{list.vendor_name}}</td>
                                             <td class="text-right">@{{parseFloat(list.pur_qty).toFixed(list.decimal_point_place)}}</td>
                                             <td class="text-right">@{{parseFloat(list.rate).toFixed(2)}}</td>
+                                            <td class="text-right">@{{parseFloat(list.total_amount).toFixed(2)}}</td>
                                             <td>@{{list.pur_date}}</td>
                                             <td>
                                                 <span v-if="list.status==0">Pending</span>
@@ -101,6 +104,7 @@
                                                 <span v-if="list.status==2">Partial Approved</span>
                                                 <span v-if="list.status==3">Reject</span>
                                             </td>
+                                            <td>@{{list.remarks}}</td>
                                             <td>@{{list.approved_text}}</td>
                                             <td>
                                                 <a v-if="list.has_approval=='yes'" class="btn btn-primary btn-xs" @click="voucherApproval('purchase-order-approval',list.id)"
@@ -116,7 +120,7 @@
                                     </template>
                                     <template v-else>
                                   <tr>
-                                    <td colspan="10" class="text-center">No Record found!</td>
+                                    <td colspan="12" class="text-center">No Record found!</td>
                                   </tr>
                                 </template>
                                 </tbody>
@@ -184,14 +188,14 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Voucher No <span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15">
-                                    <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="PUR-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.numbering">
+                                    <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="PUR-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.auto_voucher">
                                     <span class="error" v-if="$validator.errors.has('voucher_no')">@{{$validator.errors.first('voucher_no')}}</span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Date<span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15" v-if="formData.itemAdded=='no' && !formData.id">
-                                    <vuejs-datepicker name="date" data-vv-as="Date" v-validate="'required'" v-model="formData.date_show" placeholder="Date" :format="purchaseDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker name="date" data-vv-as="Date" v-validate="'required'" v-model="formData.date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy" @dp-change="dateChange"></v-date-picker>
                                     <span class="error" v-if="$validator.errors.has('date')">@{{$validator.errors.first('date')}}</span>
                                 </div>
                                 <div class="col-md-8 p-b-15" v-else>
@@ -202,7 +206,7 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Due Date <span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15" v-if="formData.itemAdded=='no' && !formData.id">
-                                    <vuejs-datepicker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date_show" placeholder="Due Date" :format="dueDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy" @dp-change="dateChange"></v-date-picker>
                                     <span class="error" v-if="$validator.errors.has('due_date')">@{{$validator.errors.first('due_date')}}</span>
                                 </div>
                                 <div class="col-md-8 p-b-15" v-else>
@@ -326,6 +330,7 @@
                                 <th width="10%">Vat type</th>
                                 <th>Net amount</th>
                                 <th>Reference</th>
+                                <th>Remarks</th>
                                 <th class="text-center" width="6%">Action</th>
                             </tr>
                         </thead>
@@ -355,7 +360,8 @@
                                         </select>
                                     </td> 
                                     <td valign="middle">@{{data.net_total}}</td>
-                                    <td valign="middle">@{{data.ref_voucher_name}}</td>     
+                                    <td valign="middle">@{{data.ref_voucher_name}}</td>
+                                    <td valign="middle">@{{data.remarks}}</td>        
                                     <td class="text-center" valign="middle">
                                         <button class="btn-xs btn-danger" title="Delete" @click="itemGridRemove($event, data)"><i class="fa fa-trash"></i></button>
                                     </td>   
@@ -364,17 +370,16 @@
                             </template>
                             <template v-else>
                                 <tr>
-                                    <td colspan="12" align="center">Nothing here</td>
+                                    <td colspan="13" align="center">Nothing here</td>
                                 </tr>
                             </template>
                             
                         </tbody>
                     </table>
                     <div class="form-group">
-                        <label class="col-md-3 control-label required">Comments <span class="text-danger">*</span></label>
+                        <label class="col-md-3 control-label required">Comments</label>
                         <div class="col-md-9 p-b-15">
-                            <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" data-vv-as="Comments" v-validate="'required'" maxlength="255"></textarea>
-                            <span class="error" v-if="$validator.errors.has('comments')">@{{$validator.errors.first('comments')}}</span>
+                            <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" maxlength="255"></textarea>
                         </div>
                     </div>
                    
@@ -472,6 +477,7 @@
                                     <th width="10%">Vat type</th>
                                     <th>Net amount</th>
                                     <th>Reference</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -496,7 +502,8 @@
                                         @{{data.vat_type}}
                                     </td> 
                                     <td valign="middle">@{{parseFloat(data.net_total).toFixed(2)}}</td>
-                                    <td valign="middle">@{{data.ref_voucher_name}}</td>     
+                                    <td valign="middle">@{{data.ref_voucher_name}}</td> 
+                                    <td valign="middle">@{{data.remarks}}</td>     
                                 </tr>
                             </tbody>
                             
@@ -541,19 +548,19 @@
 <script src="{{URL::asset('vuejs/vee-validate.js') }}"></script>
 <script src="{{URL::asset('vuejs/vue-toastr.umd.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/sweetalert2.all.min.js') }}"></script>
-<script src="{{URL::asset('vuejs/vuejs-datepicker.js') }}"></script>
 <script src="{{URL::asset('vuejs/mixin.js') }}"></script>
 <script src="{{URL::asset('vuejs/moment.min.js') }}"></script>
+<link href="{{ URL::asset('vuejs/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css"/>
+<script src="{{URL::asset('vuejs/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{URL::asset('vuejs/vue-bootstrap-datetimepicker.min.js') }}"></script>
 <script>
     axios.defaults.headers.common['X-CSRF-TOKEN'] = token; 
     Vue.use(VeeValidate);
     Vue.mixin(mixin);
     Vue.component('multiselect', window.VueMultiselect.default)
+    Vue.component('v-date-picker', VueBootstrapDatetimePicker)
     var app = new Vue({
       el: '#app',
-      components: {
-        vuejsDatepicker
-      },
       data: {
         filter:{
             item_id_model:'',
@@ -654,7 +661,6 @@
             }else{
                 alert('No reference are selected');
             }
-
         },
         getVoucherNo(event, purchase_category){
             event.preventDefault();
@@ -676,11 +682,13 @@
                                 status: 0,
                                 message: res.data.message
                             });
-                            _this.formData.voucher_int = 0;
+                            _this.formData.auto_voucher = true;
                             _this.formData.voucher_no = '';
+                            _this.$set(_this.formData, 'voucher_config_id', 0);
                         }else{
-                            _this.formData.voucher_int = res.data.voucher_int;
+                            _this.formData.auto_voucher = res.data.auto_voucher;
                             _this.formData.voucher_no = res.data.voucher_no;
+                            _this.$set(_this.formData, 'voucher_config_id', res.data.voucher_config_id);
                         }
                     }
                 })
@@ -695,71 +703,16 @@
 
             }else{
                 _this.formData.purchase_category = '';
-                _this.formData.voucher_int = 0;
+                _this.formData.auto_voucher = true;
                 _this.formData.voucher_no = '';
+                _this.$set(_this.formData, 'voucher_config_id', 0);
             }
 
         },
-        purchaseDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var pur_date = [day,month,year].join('/');
-            var dateA = moment(this.formData.date, "DD/MM/YYYY"); 
-            var dateB = moment(pur_date, "DD/MM/YYYY"); 
-            // if date are not same
-            if(dateA.diff(dateB) !=0){
-                this.refDataList = [];
-                this.$set(this.modalData, 'refItemList', []);
-                this.formData.reference_type='';
-            }
-            this.$set(this.formData, 'date', pur_date);
-            
-            return pur_date              
-        },
-        dueDateFormatter(date){
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var due_date = [day,month,year].join('/');
-            var dateA = moment(this.formData.due_date, "DD/MM/YYYY"); 
-            var dateB = moment(due_date, "DD/MM/YYYY"); 
-            // if date are not same
-            if(dateA.diff(dateB) !=0){
-                this.refDataList = [];
-                this.$set(this.modalData, 'refItemList', []);
-                this.formData.reference_type='';
-            }
-            this.$set(this.formData, 'due_date', due_date);
-            return due_date              
-        },
-        filterFromDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var from_date = [day,month,year].join('/');
-            this.$set(this.filter, 'from_date', from_date);
-            return from_date              
-        },
-        filterToDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var to_date = [day,month,year].join('/');
-            this.$set(this.filter, 'to_date', to_date);
-            return to_date              
+        dateChange(){
+            this.refDataList = [];
+            this.$set(this.modalData, 'refItemList', []);
+            this.formData.reference_type='';
         },
         selectFilterItem(item){
             if(item) this.filter.item_id = item.item_id;

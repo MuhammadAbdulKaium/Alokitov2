@@ -2,14 +2,14 @@
 
 namespace Modules\Inventory\Entities;
 
-use Modules\Inventory\Entities\BaseModel;
+use App\DeCentralizeBaseModel;
 use App\Helpers\InventoryHelper;
 
-class VendorModel extends BaseModel
+class VendorModel extends DeCentralizeBaseModel
 {
     use InventoryHelper;
     protected $table= 'inventory_vendor_info';
-    protected $guarded = ['id','campus_id','institute_id', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at', 'deleted_by', 'valid'];
+    protected $guarded = ['id', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at', 'deleted_by'];
 
     public static function boot()
     {
@@ -21,8 +21,6 @@ class VendorModel extends BaseModel
         return $query->where('inventory_vendor_info.campus_id', self::getCampusId())->where('inventory_vendor_info.institute_id', self::getInstituteId());
 
     }
-    public function scopeValid($query)
-    {
-        return $query->where('inventory_vendor_info.valid', 1);
-    }
+
+    
 }

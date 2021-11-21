@@ -17,11 +17,14 @@ use Modules\Inventory\Entities\InventoryStoreCategory;
 use Modules\Inventory\Entities\StockCategory;
 use Modules\Inventory\Entities\StockGroup;
 use Modules\Inventory\Entities\StockUOM;
+use Modules\Setting\Entities\Institute;
 use Modules\Setting\Entities\Campus;
 use App\Helpers\InventoryHelper;
 use File;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use DNS2D;
+use DNS1D;
 
 
 class InventoryController extends Controller
@@ -105,7 +108,6 @@ class InventoryController extends Controller
 
     public function updateNewStockGroup(Request $request, $id)
     {
-
         $campus_id = $this->academicHelper->getCampus();
         $institute_id = $this->academicHelper->getInstitute();
         $validated = $request->validate([
@@ -167,7 +169,6 @@ class InventoryController extends Controller
 
     public function storeNewStockGroup(Request $request)
     {
-
         $campus_id = $this->academicHelper->getCampus();
         $institute_id = $this->academicHelper->getInstitute();
         $validated = $request->validate([
@@ -393,7 +394,6 @@ class InventoryController extends Controller
 
     public function storeUnitOfMeasurement(Request $request)
     {
-
         $campus_id = $this->academicHelper->getCampus();
         $institute_id = $this->academicHelper->getInstitute();
         $validated = $request->validate([
@@ -444,7 +444,6 @@ class InventoryController extends Controller
 
     public function updateUnitOfMeasurement(Request $request, $id)
     {
-
         $campus_id = $this->academicHelper->getCampus();
         $institute_id = $this->academicHelper->getInstitute();
         $validated = $request->validate([
@@ -516,21 +515,26 @@ class InventoryController extends Controller
     public function addNewStore()
     {
         $storeCategory = InventoryStoreCategory::all();
-        $campusList = Campus::where('institute_id', $this->academicHelper->getInstitute())->get();
-        return view('inventory::store.modal.add-new-store', compact('storeCategory', 'campusList'));
+        return view('inventory::store.modal.add-new-store', compact('storeCategory'));
     }
 
     public function storeNewStore(Request $request)
     {
-
+        $campus_id = $this->academicHelper->getCampus();
+        $institute_id = $this->academicHelper->getInstitute();
         $validated = $request->validate([
-            'store_name' => 'required|unique:cadet_inventory_store|max:255',
+            'store_name' => [
+                'required',
+                'max:255',
+                Rule::unique('cadet_inventory_store')->where(function ($query) use($campus_id, $institute_id) {
+                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id);
+                })
+            ],
             'store_address_1' => 'required',
             'store_address_2' => 'required',
             'store_phone' => 'required',
             'store_fax' => 'required',
             'store_city' => 'required',
-            'campus_id' => 'required',
             'category_id' => 'required',
         ]);
         DB::beginTransaction();
@@ -543,8 +547,8 @@ class InventoryController extends Controller
             $store->store_fax = $request->store_fax;
             $store->store_city = $request->store_city;
             $store->category_id = $request->category_id;
-            $store->campus_id = $request->campus_id;
-            $store->institute_id = $this->academicHelper->getInstitute();
+            $store->campus_id = $campus_id;
+            $store->institute_id = $institute_id;
             $store->created_by = Auth::user()->id;
             $storeSave = $store->save();
             if ($storeSave) {
@@ -565,24 +569,40 @@ class InventoryController extends Controller
     public function editStore($id)
     {
         $storeCategory = InventoryStoreCategory::all();
-        $campusList = Campus::where('institute_id', $this->academicHelper->getInstitute())->get();
         $storeDetails = InventoryStore::where('id', '=', $id)->first();
-        return view('inventory::store.modal.edit-store', compact('storeDetails', 'storeCategory', 'campusList'));
+        return view('inventory::store.modal.edit-store', compact('storeDetails', 'storeCategory'));
     }
 
     public function updateStore(Request $request, $id)
     {
+        $campus_id = $this->academicHelper->getCampus();
+        $institute_id = $this->academicHelper->getInstitute();
+        $validated = $request->validate([
+            'store_name' => [
+                'required',
+                'max:255',
+                Rule::unique('cadet_inventory_store')->where(function ($query) use($campus_id, $institute_id) {
+                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id);
+                })->ignore($id, 'id')
+            ],
+            'store_address_1' => 'required',
+            'store_address_2' => 'required',
+            'store_phone' => 'required',
+            'store_fax' => 'required',
+            'store_city' => 'required',
+            'category_id' => 'required',
+        ]);
+
         $storeDetails = InventoryStore::where('id', '=', $id)->first();
         DB::beginTransaction();
         try {
             $store_trans_check = true; 
-            if($storeDetails->store_name != $request->store_name || $storeDetails->campus_id != $request->campus_id || $storeDetails->category_id != $request->category_id){
-                $store_wise_item  = DB::table('inventory_store_wise_item')->where('store_id', $id)->where('institute_id', $this->academicHelper->getInstitute())->first();
+            if($storeDetails->store_name != $request->store_name || $storeDetails->category_id != $request->category_id){
+                $store_wise_item  = DB::table('inventory_store_wise_item')->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('store_id', $id)->first();
                 if(!empty($store_wise_item)){
                     $store_trans_check=false;
                 }
             }
-
             if($store_trans_check){
                 $storeDetails->store_name = $request->store_name;
                 $storeDetails->store_address_1 = $request->store_address_1;
@@ -591,7 +611,6 @@ class InventoryController extends Controller
                 $storeDetails->store_fax = $request->store_fax;
                 $storeDetails->store_city = $request->store_city;
                 $storeDetails->category_id = $request->category_id;
-                $storeDetails->campus_id = $request->campus_id;
                 $storeDetails->updated_by = Auth::user()->id;
                 $storeUpdate = $storeDetails->save();
 
@@ -625,18 +644,138 @@ class InventoryController extends Controller
     //    Stock List
     public function stockList()
     {
-        $data['stores'] = InventoryStore::module()->get()->keyBy('id')->all();
-        $data['stocks'] = CadetInventoryProduct::module()
+        return view('inventory::stock.stock-list');
+    }
+
+    public function stockListData(Request $request){
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Total records
+        $totalRecords = CadetInventoryProduct::module()->select('count(*) as allcount')->count();
+        $totalRecordswithFilter = CadetInventoryProduct::module()->select('count(*) as allcount')
             ->join('cadet_inventory_stock_group', 'cadet_stock_products.stock_group', 'cadet_inventory_stock_group.id')
             ->join('cadet_inventory_stock_category', 'cadet_stock_products.category_id', 'cadet_inventory_stock_category.id')
-            ->select('cadet_stock_products.*', 'cadet_inventory_stock_group.stock_group_name', 'cadet_inventory_stock_category.stock_category_name')->get();
+            ->where(function($query)use($searchValue){
+                $query->where('product_name', 'like', '%' .$searchValue . '%')
+                      ->orWhere('stock_group_name', 'like', '%' .$searchValue . '%')
+                      ->orWhere('sku', 'like', '%' .$searchValue . '%')
+                      ->orWhere('alias', 'like', '%' .$searchValue . '%')
+                      ->orWhere('stock_category_name', 'like', '%' .$searchValue . '%');
+            })
+            ->count();
 
-           $stock_item_ids = $data['stocks']->pluck('id')->all(); 
-           $user_id = Auth::user()->id;
-           $AccessStore = self::UserAccessStore($user_id);
+        // Fetch records
+        $records = CadetInventoryProduct::module()->orderBy($columnName,$columnSortOrder)
+            ->join('cadet_inventory_stock_group', 'cadet_stock_products.stock_group', 'cadet_inventory_stock_group.id')
+            ->join('cadet_inventory_stock_category', 'cadet_stock_products.category_id', 'cadet_inventory_stock_category.id')
+            ->select('cadet_stock_products.*','cadet_inventory_stock_group.stock_group_name','cadet_inventory_stock_category.stock_category_name')
+            ->where(function($query)use($searchValue){
+                $query->where('product_name', 'like', '%' .$searchValue . '%')
+                      ->orWhere('stock_group_name', 'like', '%' .$searchValue . '%')
+                      ->orWhere('sku', 'like', '%' .$searchValue . '%')
+                      ->orWhere('alias', 'like', '%' .$searchValue . '%')
+                      ->orWhere('stock_category_name', 'like', '%' .$searchValue . '%');
+            })
+            
+            /*->whereRaw('(SELECT CASE item_type 
+                    WHEN "1" THEN "General Goods"
+                    ELSE "Finished Goods"
+                END as custome_col from cadet_stock_products) like"%"'.$searchValue.'"%"')*/
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
+
+        $stores = InventoryStore::module()->get()->keyBy('id')->all();
+
+        $stock_item_ids = $records->pluck('id')->all(); 
+        $stocks_items_keyBy = $records->keyBy('id')->all();
+        $user_id = Auth::user()->id;
+        $AccessStore = self::UserAccessStore($user_id);
+        if(!empty(self::getInstituteId()) && !empty(self::getCampusId())){
            $params = (object)['AccessStore'=>$AccessStore, 'campus_id'=>self::getCampusId(), 'institute_id'=>self::getInstituteId()];
-           $data['itemWiseStockInfo'] = self::itemWiseStock($params, $stock_item_ids);
-        return view('inventory::stock.stock-list', $data);
+           $itemWiseStockInfo = self::itemWiseStock($params, $stock_item_ids);
+        }else{
+            $params = (object)['AccessStore'=>$AccessStore];
+            $itemWiseCentralStockInfo = self::centralItemWiseStock($params, $stock_item_ids);
+            $stocItemData = [];
+            foreach($itemWiseCentralStockInfo as $v){
+                if(array_key_exists($v->item_id, $stocks_items_keyBy)){
+                    $itemInfo = $stocks_items_keyBy[$v->item_id];
+                    $current_stock = round($v->totalCurrentStock, $itemInfo->decimal_point_place);
+                    $avg_price = ($current_stock>0)? round($v->totalCostPrice/$current_stock,6):0;
+                    $itemData = ['item_id'=>$v->item_id, 'current_stock'=>$current_stock,'avg_cost_price'=>$avg_price];
+                    $stocItemData[$v->item_id] = $itemData;
+                }
+            }
+
+           $itemWiseStockInfo =  $stocItemData; 
+        }
+
+   
+        $data_arr = array();
+        $sno = $start+1;
+        foreach($records as $record){
+            $store_sl=0; $store_html="";
+            foreach($record->store_tagging as $tag){
+                $store_html.='<b class="text-info">'.@$stores[$tag]->store_name;
+                $store_html.= (++$store_sl==count($record->store_tagging))?'':',';
+                $store_html.='</b>';
+            }
+            $decimal_point_place = (!empty($record->decimal_point_place))?$record->decimal_point_place:0;
+            $sku = (!empty($record->sku))?$record->sku:'';
+            if(array_key_exists($record->id,$itemWiseStockInfo)){
+                $itemStock = $itemWiseStockInfo[$record->id];
+                $current_stock = $itemStock['current_stock'];
+                $avg_cost_price = $itemStock['avg_cost_price']+0;
+                $current_value = round($current_stock*$avg_cost_price, $decimal_point_place);
+            }else{
+                $current_stock = 0;
+                $avg_cost_price = 0;
+                $current_value = 0;
+            }
+                                            
+            $data_arr[] = array(
+                "id" => $sno++,
+                "product_name" => $record->product_name,
+                "sku" => $sku,
+                "barcode" => '<img src="data:image/png;base64,'.DNS1D::getBarcodePNG($record->barcode, 'C39',1,33,array(0,0,0), true).'" alt="barcode" width="90" height="30" />',
+                "qrcode" => DNS2D::getBarcodeHTML($record->qrcode, 'QRCODE',2,2),
+                "alias" => $record->alias,
+                "stock_group_name" => $record->stock_group_name,
+                "stock_category_name" => $record->stock_category_name,
+                "current_stock" => $current_stock,
+                "avg_cost_price" => $avg_cost_price,
+                "current_value" => $current_value,
+                "min_stock" => $record->min_stock,
+                "reorder_qty" => $record->reorder_qty,
+                "item_type" => ($record->item_type==1)?'General Goods':'Finished Goods',
+                "decimal_point_place" => $decimal_point_place,
+                "store_name" => $store_html,
+                "history" => '<a class="btn btn-success btn-sm" href="/inventory/show/history/stock-product/'.$record->id.'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"><i class="fa fa-plus-square"></i> History </a>',
+                "action" => '<a class="btn btn-success btn-sm" href="/inventory/edit/inventory/stock-product/'.$record->id.'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"><i class="fa fa-plus-square"></i> Edit </a>',
+            );
+        }
+        $response = array(
+            "draw" => intval($draw),
+            "recordsTotal" => $totalRecords,
+            "recordsFiltered" => $totalRecordswithFilter,
+            "data" => $data_arr
+        ); 
+
+        echo json_encode($response);
+
     }
 
     public function addStockProduct()
@@ -660,7 +799,6 @@ class InventoryController extends Controller
                     return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id);
                 })
             ],
-
             'product_description' => 'required|max:255',
             'unit' => 'required|numeric',
             'has_fraction' => 'required',
@@ -690,7 +828,6 @@ class InventoryController extends Controller
             if($request->use_serial==1){
                 $rules['numeric_part'] = 'required';
                 $rules['prefix'] = 'required';
-                $rules['suffix'] = 'required';
                 $rules['separator_symbol'] = 'required';
             }
         }
@@ -760,14 +897,11 @@ class InventoryController extends Controller
                     ];
                     DB::table('inventory_store_wise_item')->insert($storeData);
                 }
-                
                 if ($stockSave) {
                     $itemHistory = new CadetInventoryProductHistory();
                     $itemHistory->product_id = $stockItem->id;
                     $itemHistory->remarks = 'Product Insert';
                     $itemHistory->created_by = Auth::user()->id;
-                    $itemHistory->campus_id = $this->academicHelper->getCampus();
-                    $itemHistory->institute_id = $this->academicHelper->getInstitute();
                     $historyDataSave = $itemHistory->save();
                 }
                 if ($historyDataSave) {
@@ -793,7 +927,7 @@ class InventoryController extends Controller
         $stockGroup = StockGroup::module()->where('has_child',0)->get();
         $category = StockCategory::module()->where('has_child',0)->get();
         $storeList = InventoryStore::module()->get();        
-        $product=CadetInventoryProduct::where('id','=',$id)->first();
+        $product = CadetInventoryProduct::module()->where('id','=',$id)->first();
         return view('inventory::stock.modal.edit-stock-product', compact('product','uoms','stockGroup','category','storeList'));
     }
 
@@ -837,7 +971,6 @@ class InventoryController extends Controller
             if($request->use_serial==1){
                 $rules['numeric_part'] = 'required';
                 $rules['prefix'] = 'required';
-                $rules['suffix'] = 'required';
                 $rules['separator_symbol'] = 'required';
             }
         }
@@ -925,18 +1058,21 @@ class InventoryController extends Controller
                     }
                     $stockSave = $stockItem->save();
                     // store wise item save
-                    foreach ($newStore as $key => $value) {
-                        $storeData = [
-                            'item_id'=>$stockItem->id,
-                            'store_id'=>$value,
-                            'institute_id'=>$this->academicHelper->getInstitute(),
-                            'campus_id'=>$this->academicHelper->getCampus(),
-                            'created_by'=>Auth::user()->id,
-                            'created_at'=>date('Y-m-d H:i:s')
-                        ];
-                        DB::table('inventory_store_wise_item')->insert($storeData);
-                        $stockInfo  = InventoryStore::module()->find($value);
-                        $update_log[]='New store "'.$stockInfo->store_name.'" tagged';
+                    if(count($newStore)>0){
+                        foreach ($newStore as $key => $value) {
+                            $storeData = [
+                                'item_id'=>$stockItem->id,
+                                'store_id'=>$value,
+                                'institute_id'=>$this->academicHelper->getInstitute(),
+                                'campus_id'=>$this->academicHelper->getCampus(),
+                                'created_by'=>Auth::user()->id,
+                                'created_at'=>date('Y-m-d H:i:s')
+                            ];
+                            DB::table('inventory_store_wise_item')->insert($storeData);
+                            $stockInfo  = InventoryStore::module()->find($value);
+                            $update_log[]='New store "'.$stockInfo->store_name.'" tagged';
+                        }
+                        
                     }
                     // delete store item
                     if(count($delStore)>0){
@@ -946,7 +1082,7 @@ class InventoryController extends Controller
                                 'valid'=>0
                             ]);
                         foreach ($delStore as $del) {
-                            $stockInfo  = InventoryStore::module()->find($del);
+                            $stockInfo  = InventoryStore::find($del);
                             $update_log[]='Remove store tagged "'.$stockInfo->store_name.'"';
                         }
                     }
@@ -963,12 +1099,9 @@ class InventoryController extends Controller
                             $itemHistory->product_id = $stockItem->id;
                             $itemHistory->remarks = $update_history;
                             $itemHistory->created_by = Auth::user()->id;
-                            $itemHistory->campus_id = $this->academicHelper->getCampus();
-                            $itemHistory->institute_id = $this->academicHelper->getInstitute();
                             $historyDataSave = $itemHistory->save();
                         }
                     }
-                  
                     DB::commit();
                     Session::flash('message', 'Stock Item  update successfully.');
                 }else{
@@ -1004,19 +1137,19 @@ class InventoryController extends Controller
             $update_status=true;
         }
         if($stockItem->unit != $request->unit){
-            $previousUnit = StockUOM::module()->find($stockItem->unit);
-            $curentUnit = StockUOM::module()->find($request->unit);
+            $previousUnit = StockUOM::find($stockItem->unit);
+            $curentUnit = StockUOM::find($request->unit);
             $update_log[]='Unit change form "'.$previousUnit->symbol_name.'" to "'.$curentUnit->symbol_name.'"';
             $update_status=true;
         }
         if($stockItem->stock_group != $request->stock_group){
-            $previousStock = StockGroup::module()->find($stockItem->unit);
-            $curentStock = StockGroup::module()->find($request->stock_group);
+            $previousStock = StockGroup::find($stockItem->unit);
+            $curentStock = StockGroup::find($request->stock_group);
             $update_log[]='Group change form "'.$previousStock->stock_group_name.'" to "'.$curentStock->stock_group_name.'"';
             $update_status=true;
         }
         if($stockItem->min_stock != $request->min_stock){
-             $update_log[]='Min Stock change form "'.$stockItem->min_stock.'" to "'.$request->min_stock.'"';
+            $update_log[]='Min Stock change form "'.$stockItem->min_stock.'" to "'.$request->min_stock.'"';
         }
         if($stockItem->item_type != $request->item_type){
             $item_type_array = ['Non-Inventory Item', 'Inventory Item'];
@@ -1039,8 +1172,8 @@ class InventoryController extends Controller
         }
 
         if($stockItem->category_id != $request->category_id){
-            $previousStock = StockCategory::module()->find($stockItem->category_id);
-            $curentStock = StockCategory::module()->find($request->category_id);
+            $previousStock = StockCategory::find($stockItem->category_id);
+            $curentStock = StockCategory::find($request->category_id);
             $update_log[]='Category change form "'.$previousStock->stock_category_name.'" to "'.$curentStock->stock_category_name.'"';
             $update_status=true;
         }
@@ -1063,28 +1196,28 @@ class InventoryController extends Controller
     //    Voucher Config
     public function voucherConfigList()
     {
-        $campus = $this->academicHelper->getCampus();
-        $institute = $this->academicHelper->getInstitute();
-        $vouchers = CadetInventoryVoucher::where(['campus_id'=>$campus,'institute_id'=>$institute])->get();
+        $vouchers = CadetInventoryVoucher::module()->join('setting_institute', 'setting_institute.id', 'cadet_voucher_config.institute_id')
+            ->join('setting_campus', 'setting_campus.id', 'cadet_voucher_config.campus_id')
+            ->select('cadet_voucher_config.*','setting_institute.institute_name','setting_campus.name as campus_name')
+            ->orderBy('cadet_voucher_config.id', 'desc')
+            ->get();
         return view('inventory::voucher.voucher-config-list',compact('vouchers'));
     }
     public function addVoucherConfig()
     {
-        return view('inventory::voucher.modal.add-voucher-config');
+        $instititue_list = Institute::where('id', self::getInstituteId())->orderBy('institute_name', 'asc')->get();
+        return view('inventory::voucher.modal.add-voucher-config', compact('instititue_list'));
     }
     public function storeVoucherConfig(Request $request){
-        $campus_id = $this->academicHelper->getCampus();
-        $institute_id = $this->academicHelper->getInstitute();
+        $campus_id = $request->campus_id;
+        $campus_info = Campus::find($campus_id);
+        $institute_id = $campus_info->institute_id;
         $rules = [
+            'campus_id' => 'required',
             'voucher_name' => 'required',
             'type_of_voucher' => 'required',
-            'type_of_voucher' => [
-                'required',
-                Rule::unique('cadet_voucher_config')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id);
-                })
-            ],
             'numbering' => 'required',
+            'status' => 'required'
         ];
         if($request->numbering=='auto'){
             $rules['numeric_part'] = 'required';
@@ -1111,9 +1244,14 @@ class InventoryController extends Controller
                 $voucher->starting_number = null;
                 $voucher->prefix = null; 
             }
-            $voucher->campus_id = $this->academicHelper->getCampus();
-            $voucher->institute_id = $this->academicHelper->getInstitute();
+            $voucher->campus_id = $request->campus_id;
+            $voucher->institute_id = $institute_id;
+            $voucher->status = $request->status;
             $voucher->created_by = Auth::user()->id;
+            if($request->status==1){
+                CadetInventoryVoucher::where('institute_id',$institute_id)->where('campus_id',$request->campus_id)->where('type_of_voucher', $request->type_of_voucher)->update(['status'=>'0']);
+            }
+
             $voucherStore=$voucher->save();
             if ($voucherStore) {
                 DB::commit();
@@ -1132,22 +1270,21 @@ class InventoryController extends Controller
     }
     public function editVoucherConfig($id)
     {
-        $voucher=CadetInventoryVoucher::module()->where('id','=',$id)->first();
-        return view('inventory::voucher.modal.edit-voucher-config',compact('voucher'));
+        $voucher=CadetInventoryVoucher::where('id','=',$id)->first();
+        $instititue_list = Institute::where('id', self::getInstituteId())->orderBy('institute_name', 'asc')->get();
+        return view('inventory::voucher.modal.edit-voucher-config',compact('voucher','instititue_list'));
 
     }
     public function updateVoucherConfig(Request $request, $id)
     {
-        $campus_id = $this->academicHelper->getCampus();
-        $institute_id = $this->academicHelper->getInstitute();
+        $campus_id = $request->campus_id;
+        $campus_info = Campus::find($campus_id);
+        $institute_id = $campus_info->institute_id;
+
         $rules = [
+            'campus_id' => 'required',
             'voucher_name' => 'required',
-            'type_of_voucher' => [
-                'required',
-                Rule::unique('cadet_voucher_config')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id);
-                })->ignore($id, 'id')
-            ],
+            'type_of_voucher' => 'required',
             'numbering' => 'required',
         ];
         if($request->numbering=='auto'){
@@ -1157,12 +1294,12 @@ class InventoryController extends Controller
         }
         $validated = $request->validate($rules);
 
-        $voucher=CadetInventoryVoucher::module()->where('id','=',$id)->first();
+        $voucher=CadetInventoryVoucher::where('id','=',$id)->first();
         DB::beginTransaction();
         try {
             $checkUpdate = true;
-            if($voucher->type_of_voucher != $request->type_of_voucher || $voucher->numbering != $request->numbering || $voucher->voucher_name != $request->voucher_name || (($voucher->numbering == $request->numbering && $voucher->numbering=='auto') &&  $voucher->numeric_part != $request->numeric_part || $voucher->suffix != $request->suffix || $voucher->starting_number != $request->starting_number || $voucher->prefix != $request->prefix)){
-                $checkUpdate = self::checkVoucherTransaction($voucher->type_of_voucher);
+            if($voucher->campus_id != $request->campus_id || $voucher->type_of_voucher != $request->type_of_voucher || $voucher->numbering != $request->numbering || $voucher->voucher_name != $request->voucher_name || (($voucher->numbering == $request->numbering && $voucher->numbering=='auto') &&  $voucher->numeric_part != $request->numeric_part || $voucher->suffix != $request->suffix || $voucher->starting_number != $request->starting_number || $voucher->prefix != $request->prefix)){
+                $checkUpdate = self::checkVoucherTransaction($voucher->type_of_voucher,$voucher->campus_id, $voucher->institute_id);
             }
             if($checkUpdate){
                 $voucher->type_of_voucher = $request->type_of_voucher;
@@ -1179,8 +1316,14 @@ class InventoryController extends Controller
                     $voucher->starting_number = null;
                     $voucher->prefix = null;
                 }
+                $voucher->campus_id = $request->campus_id;
+                $voucher->institute_id = $institute_id;
+                $voucher->status = $request->status;
                 $voucher->updated_by = Auth::user()->id;
                 $voucherUpdate = $voucher->save();
+                if($request->status==1){
+                    CadetInventoryVoucher::where('institute_id',$institute_id)->where('campus_id',$request->campus_id)->where('type_of_voucher', $request->type_of_voucher)->where('id', '!=', $id)->update(['status'=>'0']);
+                }
                 if ($voucherUpdate) {
                     DB::commit();
                     Session::flash('message', 'Voucher Update successfully.');
@@ -1201,85 +1344,94 @@ class InventoryController extends Controller
 
     }
 
-    public static  function checkVoucherTransaction($type_of_voucher){
+    public static  function checkVoucherTransaction($type_of_voucher, $campus_id, $institute_id){
         $checkUpdate = true;
         if($type_of_voucher==1){
-            $newRequisitionInfo = DB::table('inventory_new_requisition_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $newRequisitionInfo = DB::table('inventory_new_requisition_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($newRequisitionInfo)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==2){
-            $inventoryIssue = DB::table('inventory_issue_from')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $inventoryIssue = DB::table('inventory_issue_from')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($inventoryIssue)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==3){
-            $storeTransferReq = DB::table('inventory_transfer_requisition')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $storeTransferReq = DB::table('inventory_transfer_requisition')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($storeTransferReq)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==4){
-            $storeTransfer = DB::table('inventory_transfer_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $storeTransfer = DB::table('inventory_transfer_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($storeTransfer)){
                 $checkUpdate = false;
             }
         }
 
         if($type_of_voucher==5){
-            $purchaseRequisitionInfo = DB::table('inventory_purchase_requisition_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $purchaseRequisitionInfo = DB::table('inventory_purchase_requisition_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($purchaseRequisitionInfo)){
                 $checkUpdate = false;
             }
         }
-        if($type_of_voucher==6){
-            $purchaseOrderInfo = DB::table('inventory_purchase_order_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+        if($type_of_voucher==14){
+            $comparativeStatementInfo = DB::table('inventory_comparative_statement_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
+            if(!empty($comparativeStatementInfo)){
+                $checkUpdate = false;
+            }
+        }
+        if($type_of_voucher==15 || $type_of_voucher==16){
+            $purchase_category = ($type_of_voucher==15)?'general':'lc';
+            $purchaseOrderInfo = DB::table('inventory_purchase_order_info')->where('purchase_category', $purchase_category)->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($purchaseOrderInfo)){
                 $checkUpdate = false;
             }
         }
+
+        
         if($type_of_voucher==7){
-            $purchaseReceiveInfo = DB::table('inventory_purchase_receive_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $purchaseReceiveInfo = DB::table('inventory_purchase_receive_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($purchaseReceiveInfo)){
                 $checkUpdate = false;
             }
         }
 
         if($type_of_voucher==8){
-            $purchaseReturnInfo = DB::table('inventory_purchase_return_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $purchaseReturnInfo = DB::table('inventory_purchase_return_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($purchaseReturnInfo)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==9){
-            $salesOrder = DB::table('inventory_sales_order_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $salesOrder = DB::table('inventory_sales_order_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($salesOrder)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==10){
-            $salesChallan = DB::table('inventory_sales_challan_delivery_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $salesChallan = DB::table('inventory_sales_challan_delivery_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($salesChallan)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==11){
-            $salesReturn = DB::table('inventory_sales_return_info')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $salesReturn = DB::table('inventory_sales_return_info')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($salesReturn)){
                 $checkUpdate = false;
             }
         }
         if($type_of_voucher==12){
-            $directStockIn = DB::table('inventory_direct_stock_in')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $directStockIn = DB::table('inventory_direct_stock_in')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($directStockIn)){
                 $checkUpdate = false;
             }
         }
 
         if($type_of_voucher==13){
-            $directStockOut = DB::table('inventory_direct_stock_out')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('valid', 1)->first();
+            $directStockOut = DB::table('inventory_direct_stock_out')->where('valid', 1)->where('campus_id',$campus_id)->where('institute_id',$institute_id)->first();
             if(!empty($directStockOut)){
                 $checkUpdate = false;
             }

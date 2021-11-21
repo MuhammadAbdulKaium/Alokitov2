@@ -25,14 +25,14 @@
                                 <div class="form-group">
                                     <label class="col-md-4 control-label required">Voucher No <span class="text-danger">*</span></label>
                                     <div class="col-md-8 p-b-15">
-                                        <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="REQ-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.numbering">
+                                        <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="CS-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.auto_voucher">
                                         <span class="error" v-if="$validator.errors.has('voucher_no')">@{{$validator.errors.first('voucher_no')}}</span>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-md-4 control-label required">Date <span class="text-danger">*</span></label>
                                     <div class="col-md-8 p-b-15" v-if="formData.itemAdded=='no'">
-                                        <vuejs-datepicker name="date" data-vv-as="Date" v-validate="'required'" v-model="formData.date_show" placeholder="Date" :format="dateFormatter"></vuejs-datepicker>
+                                        <v-date-picker name="date" data-vv-as="Date" v-validate="'required'" v-model="formData.date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy"></v-date-picker>
                                         <span class="error" v-if="$validator.errors.has('date')">@{{$validator.errors.first('date')}}</span>
                                     </div>
                                     <div class="col-md-8 p-b-15" v-else>
@@ -58,7 +58,7 @@
                                 <div class="form-group">
                                     <label class="col-md-4 control-label required">Due Date <span class="text-danger">*</span></label>
                                     <div class="col-md-8 p-b-15" v-if="formData.itemAdded=='no'">
-                                        <vuejs-datepicker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date_show" placeholder="Date" :format="dueDateFormatter"></vuejs-datepicker>
+                                        <v-date-picker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy"></v-date-picker>
                                         <span class="error" v-if="$validator.errors.has('due_date')">@{{$validator.errors.first('due_date')}}</span>
                                     </div>
                                     <div class="col-md-8 p-b-15" v-else>
@@ -150,7 +150,7 @@
                                 <table class="responsive table table-striped table-bordered" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th colspan="4"></th>
+                                            <th colspan="5"></th>
                                             <template v-for="(vendor, vi) in vendorData">
                                                 <th colspan="6" v-bind:key="vi">
                                                     <span style="float:left;">Vendor Name: @{{vendor.name}}</span>
@@ -163,6 +163,7 @@
                                             <th>Item SKU</th>
                                             <th>Qty</th>
                                             <th>UOM</th>
+                                            <th>Remarks</th>
 
                                             <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
                                                 <th>Rate</th>
@@ -180,7 +181,8 @@
                                                 <td valign="middle">@{{data.product_name}}</td>
                                                 <td valign="middle">@{{data.sku}}</td>          
                                                 <td class="text-right" valign="middle">@{{parseFloat(data.avail_qty).toFixed(data.decimal_point_place)}}</td> 
-                                                <td valign="middle">@{{data.uom}}</td>   
+                                                <td valign="middle">@{{data.uom}}</td>
+                                                <td valign="middle">@{{data.remarks}}</td>   
 
                                                 <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
                                                     <td valign="middle">@{{price_catalog_component_data['rate_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
@@ -194,14 +196,14 @@
                                         </template>
                                         <template v-else>
                                             <tr>
-                                                <td colspan="10" align="center">Nothing here</td>
+                                                <td colspan="11" align="center">Nothing here</td>
                                             </tr>
                                         </template>
                                         
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td rowspan="6" colspan="4"></td>
+                                            <td rowspan="6" colspan="5"></td>
                                             <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
                                                 <td colspan="6"></td>
                                             </template>
@@ -253,10 +255,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label class="col-md-3 control-label required">Comments <span class="text-danger">*</span></label>
+                                    <label class="col-md-3 control-label">Comments</label>
                                     <div class="col-md-9 p-b-15">
-                                        <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" data-vv-as="Comments" v-validate="'required'" maxlength="255"></textarea>
-                                        <span class="error" v-if="$validator.errors.has('comments')">@{{$validator.errors.first('comments')}}</span>
+                                        <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" maxlength="255"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -294,19 +295,20 @@
 <script src="{{URL::asset('vuejs/vee-validate.js') }}"></script>
 <script src="{{URL::asset('vuejs/vue-toastr.umd.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/sweetalert2.all.min.js') }}"></script>
-<script src="{{URL::asset('vuejs/vuejs-datepicker.js') }}"></script>
+
 <script src="{{URL::asset('vuejs/mixin.js') }}"></script>
 <script src="{{URL::asset('vuejs/moment.min.js') }}"></script>
+<link href="{{ URL::asset('vuejs/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css"/>
+<script src="{{URL::asset('vuejs/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{URL::asset('vuejs/vue-bootstrap-datetimepicker.min.js') }}"></script>
 <script>
      axios.defaults.headers.common['X-CSRF-TOKEN'] = token; 
     Vue.use(VeeValidate);
     Vue.mixin(mixin);
     Vue.component('multiselect', window.VueMultiselect.default)
+    Vue.component('v-date-picker', VueBootstrapDatetimePicker)
     var app = new Vue({
       el: '#app',
-      components: {
-        vuejsDatepicker
-      },
       data: {
         formData:{
             date:null,
@@ -443,28 +445,6 @@
                 }
             }
 
-        },
-        dateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var req_date = [day,month,year].join('/');
-            this.$set(this.formData, 'date', req_date);
-            return req_date              
-        },
-        dueDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var due_date = [day,month,year].join('/');
-            this.$set(this.formData, 'due_date', due_date);
-            return due_date              
         },
         selectCampus(campus){
             if(campus){

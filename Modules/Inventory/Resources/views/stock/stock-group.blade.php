@@ -59,9 +59,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            @foreach($stockGroup as $stock)
+                            @foreach($stockGroup as $k => $stock)
                                 <tr>
-                                    <td>#</td>
+                                    <td>{{$k+1}}</td>
                                     <td>{{$stock->stock_group_name}}</td>
                                     @if($stock->parent_group_id==0)
                                     <td>No Parent</td>

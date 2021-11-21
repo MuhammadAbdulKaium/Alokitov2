@@ -10,27 +10,22 @@
             <div class="col-md-6">
                 <div class="row" style="margin-bottom: 15px">
                     <div class="col-sm-4">
-                        <label for="">Type of Voucher: <span class="text-danger">*</span></label>
+                        <label for="">Campus: <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-8">
-                        <select name="type_of_voucher"  class="form-control" required>
-                            <option <?php if($voucher->type_of_voucher ==1) echo 'selected'; ?> value="1">New Requisition</option>
-                            <option <?php if($voucher->type_of_voucher ==2) echo 'selected'; ?> value="2">Issue From Inventory</option>
-                            <option <?php if($voucher->type_of_voucher ==3) echo 'selected'; ?> value="3">Store Transfer Requisition</option>
-                            <option <?php if($voucher->type_of_voucher ==4) echo 'selected'; ?> value="4">Store Transfer</option>
-                            <option <?php if($voucher->type_of_voucher ==5) echo 'selected'; ?> value="5">Purchase Requisition</option>
-                            <option <?php if($voucher->type_of_voucher ==14) echo 'selected'; ?> value="14">Comparative Statement</option>
-                            <option <?php if($voucher->type_of_voucher ==6) echo 'selected'; ?> value="6">Purchase Order</option>
-                            <option <?php if($voucher->type_of_voucher ==7) echo 'selected'; ?> value="7">Purchase Receive</option>
-                            <option <?php if($voucher->type_of_voucher ==8) echo 'selected'; ?> value="8">Purchase Return</option>
-                            <option <?php if($voucher->type_of_voucher ==9) echo 'selected'; ?> value="9">Sales Order</option>
-                            <option <?php if($voucher->type_of_voucher ==10) echo 'selected'; ?> value="10">Sales/Delivery Challan</option>
-                            <option <?php if($voucher->type_of_voucher ==11) echo 'selected'; ?> value="11">Sales Return</option>
-                            <option <?php if($voucher->type_of_voucher ==12) echo 'selected'; ?> value="12">Stock In</option>
-                             <option <?php if($voucher->type_of_voucher ==13) echo 'selected'; ?> value="12">Stock Out</option>
+                        <select name="campus_id" id="campus_id" class="form-control" required>
+                            <?php foreach ($instititue_list as $v){ ?>
+                            <optgroup label="{{$v->institute_name}}">
+                                <?php foreach($v->campus() as $campus){ ?>
+                                   <option value="{{$campus->id}}" <?php if($voucher->campus_id ==$campus->id) echo 'selected'; ?>>{{$campus->name}}</option>
+                                <?php } ?>
+                            </optgroup>
+                            <?php } ?>
                         </select>
                     </div>
                 </div>
+
+                
                 <div class="row" style="margin-bottom: 15px">
                     <div class="col-sm-4">
                         <label for="">Numbering: <span class="text-danger">*</span></label>
@@ -38,7 +33,7 @@
                     <div class="col-sm-8">
                         <select name="numbering" id="numbering"  class="form-control" required>
                             <option value="auto" selected>Auto</option>
-                            <option <?php if($voucher->numbering =='menual') echo 'selected'; ?>  value="menual">Menual</option>
+                            <option <?php if($voucher->numbering =='manual') echo 'selected'; ?>  value="manual">Manual</option>
                         </select>
                     </div>
                 </div>
@@ -57,16 +52,57 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="row numberingElement" style="margin-bottom: 15px; display: {{($voucher->numbering =='auto')?'block':'none'}}">
                     <div class="col-sm-4">
-                        <label for="">Suffix:</label>
+                        <label for="">Prefix: <span class="text-danger">*</span></label>
                     </div>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="suffix" maxlength="100" value="{{$voucher->suffix}}">
+                        <input type="text" class="form-control" name="prefix" maxlength="100" value="{{$voucher->prefix}}">
                     </div>
                 </div>
+
+                <div class="row" style="margin-bottom: 15px">
+                    <div class="col-sm-4">
+                        <label for="">Status: <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-sm-8">
+                        <select name="status"  class="form-control" required>
+                            <option <?php if($voucher->status ==1) echo 'selected'; ?> value="1">Active</option>
+                            <option <?php if($voucher->status ==0) echo 'selected'; ?> value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+
             </div>
             <div class="col-md-6">
+                <div class="row" style="margin-bottom: 15px">
+                    <div class="col-sm-4">
+                        <label for="">Type of Voucher: <span class="text-danger">*</span></label>
+                    </div>
+                    <div class="col-sm-8">
+                        <select name="type_of_voucher" id="type_of_voucher"  class="form-control" required>
+                            <option <?php if($voucher->type_of_voucher ==1) echo 'selected'; ?> value="1">New Requisition</option>
+                            <option <?php if($voucher->type_of_voucher ==2) echo 'selected'; ?> value="2">Issue From Inventory</option>
+                            <option <?php if($voucher->type_of_voucher ==3) echo 'selected'; ?> value="3">Store Transfer Requisition</option>
+                            <option <?php if($voucher->type_of_voucher ==4) echo 'selected'; ?> value="4">Store Transfer</option>
+                            <option <?php if($voucher->type_of_voucher ==5) echo 'selected'; ?> value="5">Purchase Requisition</option>
+                            <option <?php if($voucher->type_of_voucher ==14) echo 'selected'; ?> value="14">Comparative Statement</option>
+                            <option <?php if($voucher->type_of_voucher ==15) echo 'selected'; ?> value="15">General Purchase Order</option>
+                            <option <?php if($voucher->type_of_voucher ==16) echo 'selected'; ?> value="16">LC Purchase Order</option>
+                            <option <?php if($voucher->type_of_voucher ==7) echo 'selected'; ?> value="7">Purchase Receive</option>
+                            <option <?php if($voucher->type_of_voucher ==17) echo 'selected'; ?> value="17">Purchase Invoice</option>
+                            <option <?php if($voucher->type_of_voucher ==8) echo 'selected'; ?> value="8">Purchase Return</option>
+                            <option <?php if($voucher->type_of_voucher ==9) echo 'selected'; ?> value="9">Sales Order</option>
+                            <option <?php if($voucher->type_of_voucher ==10) echo 'selected'; ?> value="10">Sales/Delivery Challan</option>
+                            <option <?php if($voucher->type_of_voucher ==11) echo 'selected'; ?> value="11">Sales Return</option>
+                            <option <?php if($voucher->type_of_voucher ==12) echo 'selected'; ?> value="12">Stock In</option>
+                             <option <?php if($voucher->type_of_voucher ==13) echo 'selected'; ?> value="13">Stock Out</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="row" style="margin-bottom: 15px">
                     <div class="col-sm-4">
                         <label for="">Voucher Name: <span class="text-danger">*</span></label>
@@ -83,12 +119,13 @@
                         <input type="number" class="form-control" name="starting_number" value="{{$voucher->starting_number}}">
                     </div>
                 </div>
+                
                 <div class="row numberingElement" style="margin-bottom: 15px; display: {{($voucher->numbering =='auto')?'block':'none'}}">
                     <div class="col-sm-4">
-                        <label for="">Prefix: <span class="text-danger">*</span></label>
+                        <label for="">Suffix:</label>
                     </div>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="prefix" maxlength="100" value="{{$voucher->prefix}}">
+                        <input type="text" class="form-control" name="suffix" maxlength="100" value="{{$voucher->suffix}}">
                     </div>
                 </div>
             </div>
@@ -109,6 +146,10 @@
         }else{
             $('.numberingElement').css('display', 'none');
         }
+    });
+
+    $(document).ready(function (){
+        $('#type_of_voucher').select2();
     });
     
 </script>

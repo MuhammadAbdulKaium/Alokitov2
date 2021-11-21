@@ -57,22 +57,10 @@
         </div>
         <div class="row" style="margin-bottom: 15px">
             <div class="col-sm-4">
-                <label for="">Campus: <span class="text-danger">*</span></label>
-            </div>
-            <div class="col-sm-8">
-                <select class="form-control" name="campus_id" required>
-                    @foreach($campusList as $campus)
-                        <option value="{{$campus->id}}">{{$campus->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-        <div class="row" style="margin-bottom: 15px">
-            <div class="col-sm-4">
                 <label for="">Category: <span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-8">
-                <select name="category_id" class="form-control" required>
+                <select name="category_id" id="category_id" class="form-control" required>
                     @foreach($storeCategory as $category)
                         <option value="{{$category->id}}">{{$category->store_category_name}}</option>
                     @endforeach
@@ -86,4 +74,10 @@
         </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function (){
+        $('#category_id').select2();
+    });
+</script>
 

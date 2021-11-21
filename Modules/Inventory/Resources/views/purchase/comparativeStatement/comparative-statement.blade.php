@@ -53,10 +53,10 @@
                             </div>
                             <div class="row" style="margin-bottom: 30px">
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="from_date_show" v-model="filter.from_date_show" placeholder="From Date" :format="filterFromDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.from_date" :config="dateOptions" style="width: 100%;" placeholder="From date"></v-date-picker>
                                 </div>   
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="to_date_show" v-model="filter.to_date_show" placeholder="To Date" :format="filterToDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.to_date" :config="dateOptions" style="width: 100%;" placeholder="To date"></v-date-picker>
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" name="search_key" placeholder="Search by keyword" class="form-control" v-model="filter.search_key" style="width: 100%;" autocomplete="off">
@@ -65,7 +65,7 @@
                                     <button class="btn btn-primary" @click="getResults(1)"><i class="fa fa-search"></i> Search</button>
                                 </div>
                                 <div class="col-sm-1" style="padding-left: 0">
-                                    <button class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
+                                    <button type="button" class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
                                 </div>
                             </div>
                         </form>
@@ -79,6 +79,7 @@
                                         <th class="sortable" v-bind:class="getSortingClass('item_id')" @click="sortingChanged('item_id')">Item Name</th>
                                         <th class="sortable" v-bind:class="getSortingClass('date')" @click="sortingChanged('date')">Date</th>
                                         <th class="sortable" v-bind:class="getSortingClass('inventory_comparative_statement_details_info.status')" @click="sortingChanged('inventory_comparative_statement_details_info.status')">Status</th>
+                                        <th>Remarks</th>
                                         <th>Approved By</th>
                                         <th width="15%">Action</th>
                                     </tr>
@@ -96,6 +97,7 @@
                                                 <span v-if="list.status==2">Partial Approved</span>
                                                 <span v-if="list.status==3">Reject</span>
                                             </td>
+                                            <td>@{{list.remarks}}</td>
                                             <td>@{{list.approved_text}}</td>
                                             <td>
                                                 <a v-if="list.has_approval=='yes'" class="btn btn-primary btn-xs" @click="voucherApproval('comparative-statement-approval',list.id)"
@@ -110,7 +112,7 @@
                                     </template>
                                     <template v-else>
                                   <tr>
-                                    <td colspan="7" class="text-center">No Record found!</td>
+                                    <td colspan="8" class="text-center">No Record found!</td>
                                   </tr>
                                 </template>
                                 </tbody>
@@ -133,8 +135,6 @@
           <p class="loading-text">Loading</p>
         </div>
     </div>
-
-    
 
     <div class="modal" id="detailsForm" tabindex="-1" role="dialog" aria-labelledby="esModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -204,6 +204,7 @@
                                     <th>VAT</th>
                                     <th>VAT Type</th>
                                     <th>Net Amt.</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -219,6 +220,7 @@
                                     <td class="text-right" valign="middle">@{{list.vat_per}}</td>
                                     <td class="text-right" valign="middle">@{{list.vat_type}}</td> 
                                     <td class="text-right" valign="middle">@{{parseFloat(list.net_amount).toFixed(2)}}</td>
+                                    <td valign="middle">@{{list.remarks}}</td>   
                                 </tr>
                             </tbody>
                         </table>
@@ -258,18 +260,19 @@
 <script src="{{URL::asset('vuejs/vee-validate.js') }}"></script>
 <script src="{{URL::asset('vuejs/vue-toastr.umd.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/sweetalert2.all.min.js') }}"></script>
-<script src="{{URL::asset('vuejs/vuejs-datepicker.js') }}"></script>
+<script src="{{URL::asset('vuejs/moment.min.js') }}"></script>
+<link href="{{ URL::asset('vuejs/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css"/>
+<script src="{{URL::asset('vuejs/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{URL::asset('vuejs/vue-bootstrap-datetimepicker.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/mixin.js') }}"></script>
 <script>
      axios.defaults.headers.common['X-CSRF-TOKEN'] = token; 
     Vue.use(VeeValidate);
     Vue.mixin(mixin);
     Vue.component('multiselect', window.VueMultiselect.default)
+    Vue.component('v-date-picker', VueBootstrapDatetimePicker)
     var app = new Vue({
       el: '#app',
-      components: {
-        vuejsDatepicker
-      },
       data: {
         filter:{
             item_id_model:'',
@@ -291,28 +294,6 @@
         this.getResults(1);
       },
       methods:{        
-        filterFromDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var from_date = [day,month,year].join('/');
-            this.$set(this.filter, 'from_date', from_date);
-            return from_date              
-        },
-        filterToDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var to_date = [day,month,year].join('/');
-            this.$set(this.filter, 'to_date', to_date);
-            return to_date              
-        },
         selectFilterItem(item){
             if(item) this.filter.item_id = item.item_id;
             else this.filter.item_id = 0; 

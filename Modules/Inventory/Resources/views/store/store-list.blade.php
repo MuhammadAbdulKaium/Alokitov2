@@ -60,9 +60,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            @foreach($storeList as $store)
+                            @foreach($storeList as $k => $store)
                                 <tr>
-                                    <td>#</td>
+                                    <td>{{$k+1}}</td>
                                     <td>{{$store->store_name}}</td>
                                     <td>{{$store->store_address_1}}</td>
                                     <td>{{$store->store_category_name}}</td>

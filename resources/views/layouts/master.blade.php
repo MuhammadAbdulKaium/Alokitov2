@@ -40,7 +40,7 @@
     {{--    for chart --}}
 
    {{--    for inventory --}}
-   @if(Request::segment(1)=='inventory')
+   @if(Request::segment(1)=='inventory' || Request::segment(1)=='accounts')
     <link href="{{ URL::asset('css/loader.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ URL::asset('css/custom.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ URL::asset('vuejs/css/vue-multiselect.min.css') }}" rel="stylesheet" type="text/css"/>

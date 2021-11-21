@@ -13,6 +13,7 @@
 	use Modules\Inventory\Entities\ComparativeStatementInfoModel;
 	use Modules\Inventory\Entities\PurchaseOrderInfoModel;
 	use Modules\Inventory\Entities\PurchaseReceiveInfoModel;
+	use Modules\Inventory\Entities\PurchaseInvoiceModel;
 	use DB;
 	use App\User;
 	use App\UserInfo;
@@ -149,10 +150,26 @@
    				}else{
    					$current_stock = collect($itemList)->sum('current_stock');
    				}
-   				$itemData = ['item_id'=>$item_id, 'current_stock'=>$current_stock,'avg_cost_price'=>$itemInfo->avg_cost_price];
+   				$avg_cost_price = collect($itemList)->sum('avg_cost_price');
+   				$itemData = ['item_id'=>$item_id, 'current_stock'=>$current_stock,'avg_cost_price'=>$avg_cost_price];
    				$stocItemData[$item_id] = $itemData;
    			}
    			return $stocItemData;
+   		}
+
+
+   		public static function centralItemWiseStock($that, $item_ids){
+   			$stockItemList = StoreWiseItemModel::valid()
+   				->select('inventory_store_wise_item.item_id', DB::raw('ifnull(sum(avg_cost_price*current_stock), 0) as totalCostPrice, ifnull(sum(current_stock), 0) as totalCurrentStock'))
+   				->whereIn('inventory_store_wise_item.item_id', $item_ids)
+   				->where(function($query)use($that){
+   					if(count($that->AccessStore)>0){
+		        		$query->whereIn('inventory_store_wise_item.store_id', $that->AccessStore);
+		        	}
+   				})
+   				->groupBy('item_id')
+   				->get();
+   			return $stockItemList;
    		}
 
 
@@ -227,7 +244,7 @@
                     $privoiusAmount = $item_store_current_stock*$avg_cost_price_db;
                     $totalAmount = $privoiusAmount+$approvalData->amount;
                     $current_stock = $item_store_current_stock+$approvalData->qty;
-                    $avg_price = $totalAmount/$current_stock;
+                    $avg_price = round($totalAmount/$current_stock,6);
                 }
             }
 
@@ -509,13 +526,37 @@
             ];
    		}
 
-
+   		public function checkInvVoucher($type){
+   			$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', $type)->where('status',1)->first();
+   			if(!empty($voucherConfig)){
+   				$voucher_config_id = $voucherConfig->id;
+   				$voucher_conf = true;
+   				if($voucherConfig->numbering=='auto'){
+   					$voucher_no='Auto';
+   					$auto_voucher=true;
+   				}else{
+   					$voucher_no='';
+   					$auto_voucher=false;
+   				}
+   			}else{
+   				$voucher_conf = false;
+   				$voucher_no = '';
+   				$auto_voucher = false;
+   				$voucher_config_id = 0;
+   			}
+   			return [
+				'voucher_no' => $voucher_no,
+				'auto_voucher' =>$auto_voucher,
+				'voucher_conf' =>$voucher_conf,
+				'voucher_config_id'=>$voucher_config_id
+			];
+   		}
 
 		public static function getVoucherNo($type){
 			if($type=='newreq'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 1)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 1)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = NewRequisitionInfoModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = NewRequisitionInfoModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -523,23 +564,23 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id'=>0
 					];
 				}
 			}else if($type=='issueFromInventory'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 2)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 2)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = IssueFromInventoryModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = IssueFromInventoryModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -547,23 +588,23 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 			}else if($type=='stockIn'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 12)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 12)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = StockInModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = StockInModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -571,24 +612,24 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 
 			}else if($type=='stockOut'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 13)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 13)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = StockOutModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = StockOutModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -596,24 +637,24 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 
 			}else if($type=='purReq'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 5)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 5)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = PurchaseRequisitionInfoModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = PurchaseRequisitionInfoModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -621,23 +662,23 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 			}else if($type=='cs'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 14)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 14)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = ComparativeStatementInfoModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = ComparativeStatementInfoModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -645,17 +686,17 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 			}else if($type=='general' || $type=='lc'){
@@ -666,9 +707,9 @@
 		        }else{
 		            $type_of_voucher = 0;
 		        }
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', $type_of_voucher)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', $type_of_voucher)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = PurchaseOrderInfoModel::module()->where('purchase_category', $type)->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = PurchaseOrderInfoModel::module()->where('purchase_category', $type)->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -676,24 +717,24 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
 					];
 				}
 
 			}else if($type=='purReceive'){
-				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 7)->first();
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 7)->where('status', 1)->where('numbering', 'auto')->first();
 				if(!empty($voucherConfig)){
-					$checkVoucher = PurchaseReceiveInfoModel::module()->valid()->orderBy('voucher_int', 'desc')->first();
+					$checkVoucher = PurchaseReceiveInfoModel::module()->valid()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
 					if(!empty($checkVoucher)){
 						$voucher_int = $checkVoucher->voucher_int+1;
 					}else{
@@ -701,17 +742,42 @@
 					}
 					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
 					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
-					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucher_no;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
 					return [
 						'voucher_no' => $voucher_no,
 						'voucher_int' =>$voucher_int,
-						'numbering' => ($voucherConfig->numbering=='auto')?true:false
+						'voucher_config_id'=>$voucherConfig->id
 					];
 				}else{
 					return [
 						'voucher_no' => false,
 						'voucher_int' =>false,
-						'numbering' =>false
+						'voucher_config_id' =>0
+					];
+				}
+
+			}else if($type=='purInvoice'){
+				$voucherConfig = CadetInventoryVoucher::module()->where('type_of_voucher', 17)->where('status', 1)->where('numbering', 'auto')->first();
+				if(!empty($voucherConfig)){
+					$checkVoucher = PurchaseInvoiceModel::module()->where('voucher_config_id', $voucherConfig->id)->orderBy('voucher_int', 'desc')->first();
+					if(!empty($checkVoucher)){
+						$voucher_int = $checkVoucher->voucher_int+1;
+					}else{
+						$voucher_int = $voucherConfig->starting_number;
+					}
+					$voucher_int_fill = str_pad($voucher_int,$voucherConfig->numeric_part,"0", STR_PAD_LEFT);
+					$voucher_no = $voucherConfig->prefix.$voucher_int_fill;
+					if(!empty($voucherConfig->suffix)) $voucher_no .= $voucherConfig->suffix;
+					return [
+						'voucher_no' => $voucher_no,
+						'voucher_int' =>$voucher_int,
+						'voucher_config_id'=>$voucherConfig->id
+					];
+				}else{
+					return [
+						'voucher_no' => false,
+						'voucher_int' =>false,
+						'voucher_config_id' =>0
 					];
 				}
 
@@ -719,7 +785,7 @@
 			return [
 				'voucher_no' => false,
 				'voucher_int' =>false,
-				'numbering' =>false
+				'voucher_config_id' =>0
 			];
 
 		}
@@ -727,71 +793,65 @@
 		public static function itemUpdateDependencyCheck($item_id, $delStore){
 			$update_check_status = true; $msg='Sorry item has data dependency';
 
-			$inventoryStockIn = DB::table('inventory_all_stock_item_in')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$inventoryStockIn = DB::table('inventory_all_stock_item_in')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($inventoryStockIn)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
-			$inventoryDirrectStockIn = DB::table('inventory_direct_stock_in_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$inventoryDirrectStockIn = DB::table('inventory_direct_stock_in_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($inventoryDirrectStockIn)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
 
-			$newRequisitionDetails = DB::table('inventory_new_requisition_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$newRequisitionDetails = DB::table('inventory_new_requisition_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($newRequisitionDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
-			$issueFromInventoryDetails = DB::table('inventory_issue_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$issueFromInventoryDetails = DB::table('inventory_issue_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($issueFromInventoryDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
-			$storeTransferRequisitionDetails = DB::table('inventory_transfer_requisition_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
-			if(!empty($storeTransferRequisitionDetails)){
-				$update_check_status=false;
-				return ['status'=>$update_check_status, 'msg'=>$msg];
-			}
 
-			$storeTransferDetails = DB::table('inventory_transfer_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
-			if(!empty($storeTransferDetails)){
-				$update_check_status=false;
-				return ['status'=>$update_check_status, 'msg'=>$msg];
-			}
-
-			$puchaseRequisitionDetails = DB::table('inventory_purchase_requisition_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$puchaseRequisitionDetails = DB::table('inventory_purchase_requisition_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($puchaseRequisitionDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
-			$puchaseOrderDetails = DB::table('inventory_purchase_order_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$puchaseOrderDetails = DB::table('inventory_purchase_order_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($puchaseOrderDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
-			$puchaseReceiveDetails = DB::table('inventory_purchase_receive_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
+			$puchaseReceiveDetails = DB::table('inventory_purchase_receive_details')->where('item_id', $item_id)->where('valid', 1)->first();
 			if(!empty($puchaseReceiveDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
-
-			$puchaseReturnDetails = DB::table('inventory_purchase_return_details')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->where('valid', 1)->first();
-			if(!empty($puchaseReturnDetails)){
+			
+			$comparativeStatementDetails = DB::table('inventory_comparative_statement_details_info')->where('item_id', $item_id)->where('valid', 1)->first();
+			if(!empty($comparativeStatementDetails)){
 				$update_check_status=false;
 				return ['status'=>$update_check_status, 'msg'=>$msg];
 			}
 
 			// store checking
 			if(count($delStore)>0){
+				$checkItemStock = StoreWiseItemModel::valid()->select(DB::raw('ifnull(sum(current_stock), 0) as totalCurrentStock'))->where('item_id',$item_id)->whereIn('store_id', $delStore)->first();
+				if(!empty($inventoryStockIn) && $checkItemStock->totalCurrentStock>0){
+					$update_check_status=false;
+					return ['status'=>$update_check_status, 'msg'=>$msg];
+				}
 
-				$inventoryStockIn = DB::table('inventory_all_stock_item_in')->where('institute_id', self::getInstituteId())->where('campus_id', self::getCampusId())->where('item_id', $item_id)->whereIn('store_id', $delStore)->where('valid', 1)->first();
+				$inventoryStockIn = DB::table('inventory_all_stock_item_in')->where('item_id', $item_id)->whereIn('store_id', $delStore)->where('valid', 1)->first();
 				if(!empty($inventoryStockIn)){
 					$update_check_status=false;
 					return ['status'=>$update_check_status, 'msg'=>$msg];
@@ -800,7 +860,7 @@
 				$inventoryDirrectStockIn = DB::table('inventory_direct_stock_in_details')
 					->join('inventory_direct_stock_in', 'inventory_direct_stock_in_details.stock_in_id', 'inventory_direct_stock_in.id')
 					->select('inventory_direct_stock_in_details.*')
-					->where('inventory_direct_stock_in_details.institute_id', self::getInstituteId())->where('inventory_direct_stock_in_details.campus_id', self::getCampusId())->where('inventory_direct_stock_in_details.item_id', $item_id)->whereIn('inventory_direct_stock_in.store_id', $delStore)->where('inventory_direct_stock_in_details.valid', 1)->first();
+					->where('inventory_direct_stock_in_details.item_id', $item_id)->whereIn('inventory_direct_stock_in.store_id', $delStore)->where('inventory_direct_stock_in_details.valid', 1)->first();
 				if(!empty($inventoryDirrectStockIn)){
 					$update_check_status=false;
 					return ['status'=>$update_check_status, 'msg'=>$msg];
@@ -809,52 +869,49 @@
 				$issueFromInventoryDetails = DB::table('inventory_issue_details')
 					->join('inventory_issue_from', 'inventory_issue_details.issue_id', 'inventory_issue_from.id')
 					->select('inventory_issue_details.*')
-					->where('inventory_issue_details.institute_id', self::getInstituteId())->where('inventory_issue_details.campus_id', self::getCampusId())->where('inventory_issue_details.item_id', $item_id)->whereIn('inventory_issue_from.store_id', $delStore)->where('inventory_issue_details.valid', 1)->first();
+					->where('inventory_issue_details.item_id', $item_id)->whereIn('inventory_issue_from.store_id', $delStore)->where('inventory_issue_details.valid', 1)->first();
 				if(!empty($issueFromInventoryDetails)){
 					$update_check_status=false;
 					return ['status'=>$update_check_status, 'msg'=>$msg];
 				}
-
-
-				$storeTransferRequisitionDetails = DB::table('inventory_transfer_requisition_details')
-					->join('inventory_transfer_requisition', 'inventory_transfer_requisition_details.requisition_id', 'inventory_transfer_requisition.id')
-					->select('inventory_transfer_requisition_details.*')
-					->where('inventory_transfer_requisition_details.institute_id', self::getInstituteId())->where('inventory_transfer_requisition_details.campus_id', self::getCampusId())->where('inventory_transfer_requisition_details.item_id', $item_id)->whereIn('inventory_transfer_requisition.store_id', $delStore)->where('inventory_transfer_requisition_details.valid', 1)->first();
-				if(!empty($storeTransferRequisitionDetails)){
-					$update_check_status=false;
-					return ['status'=>$update_check_status, 'msg'=>$msg];
-				}
-
-				$storeTransferDetails = DB::table('inventory_transfer_details')
-					->join('inventory_transfer_info', 'inventory_transfer_details.transfer_id', 'inventory_transfer_info.id')
-					->select('inventory_transfer_details.*')
-					->where('inventory_transfer_details.institute_id', self::getInstituteId())->where('inventory_transfer_details.campus_id', self::getCampusId())->where('inventory_transfer_details.item_id', $item_id)
-					->where(function($query)use($delStore){
-						$query->whereIn('inventory_transfer_info.from_store_id', $delStore)
-							  ->orWhereIn('inventory_transfer_info.to_store_id', $delStore);
-					})
-					->where('inventory_transfer_details.valid', 1)->first();
-				if(!empty($storeTransferDetails)){
-					$update_check_status=false;
-					return ['status'=>$update_check_status, 'msg'=>$msg];
-				}
-
-
+				
+				
 				$purchaseReceiveDetails = DB::table('inventory_purchase_receive_details')
 					->join('inventory_purchase_receive_info', 'inventory_purchase_receive_details.pur_receive_id', 'inventory_purchase_receive_info.id')
 					->select('inventory_purchase_receive_details.*')
-					->where('inventory_purchase_receive_details.institute_id', self::getInstituteId())->where('inventory_purchase_receive_details.campus_id', self::getCampusId())->where('inventory_purchase_receive_details.item_id', $item_id)->whereIn('inventory_purchase_receive_info.store_id', $delStore)->where('inventory_purchase_receive_details.valid', 1)->first();
+					->where('inventory_purchase_receive_details.item_id', $item_id)->whereIn('inventory_purchase_receive_info.store_id', $delStore)->where('inventory_purchase_receive_details.valid', 1)->first();
 				if(!empty($purchaseReceiveDetails)){
 					$update_check_status=false;
 					return ['status'=>$update_check_status, 'msg'=>$msg];
 				}
-
-
 			}
-
-
 
 			return ['status'=>$update_check_status, 'msg'=>$msg];
 
+		}
+
+		public static function vendorDeleteDependencyCheck($vendor_id){
+			$delete_check_status = true; $msg='Sorry! vendor has data dependency';
+			$checkPurchaseOrderInfo = DB::table('inventory_purchase_order_info')->where('vendor_id', $vendor_id)->where('valid', 1)->first();
+			if(!empty($checkPurchaseOrderInfo)){
+				$delete_check_status = false;
+				return ['status'=>$delete_check_status, 'msg'=>$msg];
+			}
+			$checkPurchaseReceiveInfo = DB::table('inventory_purchase_receive_info')->where('vendor_id', $vendor_id)->where('valid', 1)->first();
+			if(!empty($checkPurchaseReceiveInfo)){
+				$delete_check_status = false;
+				return ['status'=>$delete_check_status, 'msg'=>$msg];
+			}
+			$checkPurchaseInvoiceInfo = PurchaseInvoiceModel::where('vendor_id', $vendor_id)->first();
+			if(!empty($checkPurchaseInvoiceInfo)){
+				$delete_check_status = false;
+				return ['status'=>$delete_check_status, 'msg'=>$msg];
+			}
+			$checkComparativeStatemetnInfo = DB::table('inventory_comparative_statement_info')->where('vendor_id', $vendor_id)->where('valid', 1)->first();
+			if(!empty($checkComparativeStatemetnInfo)){
+				$delete_check_status = false;
+				return ['status'=>$delete_check_status, 'msg'=>$msg];
+			}
+			return ['status'=>$delete_check_status, 'msg'=>""];
 		}
 	}

@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Inventory\Entities\StockItemSerialModel;
 use Modules\Inventory\Entities\CadetInventoryProduct;
 use Modules\Inventory\Entities\StockItemSerialDetailsModel;
+use Modules\Setting\Entities\Campus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\InventoryHelper;
@@ -77,7 +78,12 @@ class StockItemSerialNumberController extends Controller
                                 $serial_code_list = [];
                                 for ($i=$serial_from; $i <= $serial_to; $i++) { 
                                     $serial = str_pad($i,$numeric_part,"0", STR_PAD_LEFT);
-                                    $serial_code = $prefix.$separator_symbol.$serial.$separator_symbol.$suffix;
+                                    if(!empty($suffix)){
+                                        $serial_code = $prefix.$separator_symbol.$serial.$separator_symbol.$suffix;
+                                    }else{
+                                        $serial_code = $prefix.$separator_symbol.$serial;
+                                    }
+                                    
                                     $serial_code_list[] = [
                                         'serial_code'=>$serial_code,
                                         'serial_int_no'=>$i,
@@ -158,8 +164,11 @@ class StockItemSerialNumberController extends Controller
                         $checkSerial = StockItemSerialDetailsModel::module()->valid()->where('item_id', $item_id)->whereBetween('serial_int_no', [$request->serial_from, $request->serial_to])->first(); 
                         if(empty($checkSerial)){
                             $data = $request->only('item_id','serial_from', 'serial_to');
+                            $data['created_by'] = Auth::user()->id;
+                            $data['created_at'] = date('Y-m-d H:i:s');
                             $stockSerial  = StockItemSerialModel::create($data);
                             $serialData = [];
+
                             foreach ($serial_code_list as $v) {
                                 $serialData[] = [
                                     'item_id'=>$request->item_id,
@@ -206,7 +215,11 @@ class StockItemSerialNumberController extends Controller
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_item_serial_info.item_id')
             ->select('inventory_item_serial_info.*', 'cadet_stock_products.product_name', 'cadet_stock_products.prefix', 'cadet_stock_products.suffix', 'cadet_stock_products.separator_symbol')
             ->find($id);
-        $serial_code_list = StockItemSerialDetailsModel::module()->valid()->where('serial_id', $id)->get();
+        $serial_code_list = StockItemSerialDetailsModel::module()->select('serial_code','barcode','qrcode')
+            ->valid()->where('serial_id', $id)
+            ->groupBy('serial_code','barcode','qrcode')
+            ->orderBy('serial_int_no','asc')
+            ->get();
         $data['serial_code_list'] = $serial_code_list; 
         return view('inventory::stockItemSerial.stock-item-serial-details', $data);
         //return response()->json($data);

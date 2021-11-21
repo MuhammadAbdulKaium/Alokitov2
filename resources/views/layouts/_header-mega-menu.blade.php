@@ -530,13 +530,15 @@ background:#0b460b !important;
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
 
                            <ul class="dropdown-menus">
-                              <li><a href="{{url('/inventory/batch-grid')}}"><i class="fa fa-sitemap"></i> Batch</a></li>
                               <li><a href="#"><i class="fa fa-building"></i> Stock<span class="caret"></span></a>
                                  <ul class="dropdown-menus">
                                     <li><a href="{{url('/inventory/stock-group-grid')}}"> Stock Group</a></li>
                                     <li><a href="{{url('/inventory/stock-category')}}"> Stock Category</a></li>
                                     <li><a href="{{url('/inventory/unit-of-measurement')}}"> Unit Of Measurement</a></li>
-                                    <li><a href="{{url('/inventory/stock-list')}}"> Stock List</a></li>
+                                    <li><a href="{{url('/inventory/stock-list')}}"> Stock Master</a></li>
+                                    @role(['super-admin'])
+                                       <li><a href="{{url('/inventory/stock-master-excel-import')}}"> Stock Master Excel Import</a></li>
+                                    @endrole
                                     <li><a href="{{url('/inventory/stock-item-serial')}}"> Stock Item Serial</a></li>
                                  </ul>
                               </li>
@@ -572,25 +574,26 @@ background:#0b460b !important;
                                  </ul>
                               </li>
                               <li><a href="{{url('/inventory/issue-inventory')}}"><i class="fa fa-building"></i> Issue from Inventory</a></li>
-                              <li><a href="{{url('/inventory/store-transfer-requisition')}}"><i class="fa fa-building"></i> Store Transfer Requisition</a></li>
-                              <li><a href="{{url('/inventory/store-transfer')}}"><i class="fa fa-building"></i> Store Transfer</a></li>
+                              <!-- <li><a href="{{url('/inventory/store-transfer-requisition')}}"><i class="fa fa-building"></i> Store Transfer Requisition</a></li>
+                              <li><a href="{{url('/inventory/store-transfer')}}"><i class="fa fa-building"></i> Store Transfer</a></li> -->
                               <li><a href="#"><i class="fa fa-building"></i> Purchase<span class="caret"></span></a>
                                  <ul class="dropdown-menus">
                                     <li><a href="{{url('/inventory/purchase-requisition')}}"> Purchase Requisition</a></li>
                                     <li><a href="{{url('/inventory/comparative-statement')}}">Comparative Statement</a></li>
                                     <li><a href="{{url('/inventory/purchase-order')}}"> Purchase order</a></li>
                                     <li><a href="{{url('/inventory/purchase-receive')}}"> Purchase Receive</a></li>
-                                    <li><a href="{{url('/inventory/purchase-return')}}"> Purchase Return</a></li>
+                                    <li><a href="{{url('/inventory/purchase-invoice')}}"> Purchase Invoice</a></li>
+                                    <!-- <li><a href="{{url('/inventory/purchase-return')}}"> Purchase Return</a></li> -->
                                  </ul>
                               </li>
 
-                              <li><a href="#"><i class="fa fa-building"></i> Sales<span class="caret"></span></a>
+                              <!-- <li><a href="#"><i class="fa fa-building"></i> Sales<span class="caret"></span></a>
                                  <ul class="dropdown-menus">
                                     <li><a href="{{url('/inventory/sales-order')}}"> Sales Order</a></li>
                                     <li><a href="{{url('/inventory/sales-challan')}}"> Sales Chalan</a></li>
                                  </ul>
                               </li>
-
+ -->
                               <li><a href="{{url('/inventory/stock-in')}}"><i class="fa fa-building"></i> Stock In</a></li>
 
                               <li><a href="{{url('/inventory/stock-out')}}"><i class="fa fa-building"></i> Stock Out</a></li>
@@ -602,6 +605,38 @@ background:#0b460b !important;
                      </ul>
 
                   </li>
+
+                  <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Accounts <span class="caret"></span></a>
+
+                     <ul class="dropdown-menus">
+                        <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              @role(['super-admin'])
+                              <li><a href="{{url('/accounts/accounts-configuration')}}"><i class="fa fa-sitemap"></i> Accounts Configuration</a></li>
+                              <li><a href="{{url('/accounts/fiscal-year')}}"><i class="fa fa-sitemap"></i> Fiscal Year</a></li>
+                              <li><a href="{{url('/accounts/voucher-config-list')}}"><i class="fa fa-sitemap"></i> Voucher Configuration</a></li>
+                              <li><a href="{{url('/accounts/chart-of-accounts')}}"><i class="fa fa-sitemap"></i> Chart of Accounts</a></li>
+                              @endrole
+                              <li><a href="{{url('/accounts/budget-allocation')}}"><i class="fa fa-sitemap"></i> Budget Allocation</a></li>
+                           </ul>
+                        </li>
+                        <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href=""><i class="fa fa-sitemap"></i> Voucher <span class="caret"></span></a>
+                                 <ul class="dropdown-menus">
+                                    <li><a href="{{url('/accounts/payment-voucher')}}"><i class="fa fa-link"></i> Payment Voucher</a></li>
+                                    <li><a href="{{url('/accounts/receive-voucher')}}"><i class="fa fa-link"></i> Receive Voucher</a></li>
+                                    <li><a href="{{url('/accounts/journal-voucher')}}"><i class="fa fa-link"></i> Journal Voucher</a></li>
+                                    <li><a href="{{url('/accounts/contra-voucher')}}"><i class="fa fa-link"></i> Contra Voucher</a></li>
+                                 </ul>
+                              </li>
+                           </ul>
+                        </li>
+                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
+                     </ul>
+
+                  </li>
+                  
                   <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Health Care <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">

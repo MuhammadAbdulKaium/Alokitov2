@@ -32,7 +32,18 @@ var mixin =  {
             current_item_info:{},
             serial_checkList : [],
             serial_all_check:0,
-            serial_all_select_text:''
+            serial_all_select_text:'',
+            numberWords:{
+                a: ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '],
+                b: ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety']
+            },
+            dateOptions: {
+                format: 'DD/MM/YYYY',
+                showClear:true,
+                showClose:true,
+                useCurrent: true,
+                showTodayButton:true
+            }   
         }
     },
     methods: {
@@ -298,8 +309,12 @@ var mixin =  {
             axios.get(URL, {
                 params: dataParams
             }).then(res => {
-                if (res.data.status == 'logout') {
-                    window.location.href = res.data.url;
+                if (res.data.status == 'logout' || res.data.status == 0) {
+                    if(res.data.status == 0){
+                        _this.showToster(res.data);
+                    }else{
+                        window.location.href = res.data.url;
+                    }
                 } else {
                     _this.dataList = res.data;
                     if(_this.listPerPage=='All'){
@@ -315,11 +330,11 @@ var mixin =  {
                             _this.previousPageTotal = 0;
                         }
                     }
-                    _this.pageLoader = false;
                     if (typeof res.data.filter !== 'undefined') {
                         _this.filter = res.data.filter;
                     }
                 }
+                _this.pageLoader = false;
             }).catch(error => {
                 _this.pageLoader = false;
                 _this.showToster({
@@ -506,7 +521,6 @@ var mixin =  {
             } else {
                 var URL = _this.baseUrl + '/' + _this.dataUrl() + '/' + dataId;
             }
-
             Swal.fire({
                 title: 'Are you sure..??',
                 text: 'Data will be delete Permanently??',
@@ -647,12 +661,18 @@ var mixin =  {
                 if (res.data.status == 'logout') {
                     window.location.href = res.data.url;
                 } else {
-                    if (typeof res.data.formData !== 'undefined') {
-                        _this.formData = res.data.formData;
-                    }
-                    _this.modalData = res.data;
                     _this.pageLoader = false;
-                    
+                    if(res.data.status==0){
+                        _this.showToster({
+                            status: 0,
+                            message: res.data.message
+                        });
+                    }else{
+                        if (typeof res.data.formData !== 'undefined') {
+                            _this.formData = res.data.formData;
+                        }
+                        _this.modalData = res.data;
+                    }
                 }
             })
             .catch(error => {
@@ -949,6 +969,7 @@ var mixin =  {
                     title: 'Success!',
                     msg: info.message,
                     preventDuplicates: true,
+                    position:'toast-top-center'
                 });
                 _this.errorsList = {};
             } else {
@@ -966,7 +987,8 @@ var mixin =  {
                 _this.$toastr.e({
                     title: 'Error!',
                     msg: msg,
-                    preventDuplicates: true
+                    preventDuplicates: true,
+                    position:'toast-top-center'
                 });
             }
 
@@ -1029,7 +1051,7 @@ var mixin =  {
             const _this = this;
             _this.formData = {};
             _this.gridData={};
-            _this.deleteIdList={};
+            _this.deleteIdList=[];
             Object.keys(_this.imageData).forEach((key) => {
                 _this.imageData[key] = '';
             });
@@ -1039,6 +1061,10 @@ var mixin =  {
             if (hardReset) { // hard reset is when all data is clear
                 this.modalData = [];
             }
+        },
+        emptyDatePicker(objName,model1,model2){
+            this[objName][model1] = null;
+            this[objName][model2] = '';
         },
         getOnChangeData(obj) {
             const _this = this;
@@ -1139,6 +1165,25 @@ var mixin =  {
         },
         isFloat(n){
             return Number(n) % 1 !== 0;
+        },
+        inWords (num) {
+            var a = this.numberWords.a;
+            var b = this.numberWords.b;
+
+            if ((num = num.toString()).length > 9) return 'overflow';
+            n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return; var str = '';
+            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'taka only. ' : '';
+            return str;
+        },
+        print (url){
+            const _this = this;
+            const URL = _this.baseUrl + '/print/' + url;
+            window.open(URL);
         }
     }
 }

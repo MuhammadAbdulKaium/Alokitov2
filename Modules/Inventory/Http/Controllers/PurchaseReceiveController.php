@@ -183,17 +183,17 @@ class PurchaseReceiveController extends Controller
      */
     public function create(Request $request)
     {
-        $voucherInfo = self::getVoucherNo('purReceive');
-        if($voucherInfo['voucher_no']){
+        $voucherInfo = self::checkInvVoucher(7);
+        if($voucherInfo['voucher_conf']){
             $data['representative_user_list'] = User::select('id', 'name')->module()->get();
             $representative_id_model=User::select('id', 'name')->where('id', Auth::user()->id)->first();
             $representative_name = $representative_id_model->name;
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
             $campus_name = $campus_id_model->name;
-            $data['vendor_list'] = VendorModel::select('id','name')->module()->valid()->get();
+            $data['vendor_list'] = VendorModel::select('id','name')->get();
             $data['store_list'] = InventoryStore::select('id','store_name')->access($this)->get();
-            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int'],'numbering'=>true, 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'),'due_date'=>date('Y-m-d'),'due_date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'vendor_id'=>0,'representative_id_model'=>$representative_id_model,'representative_id'=>Auth::user()->id,'representative_name'=>$representative_name,'store_id'=>0,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
+            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'),'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'vendor_id'=>0,'representative_id_model'=>$representative_id_model,'representative_id'=>Auth::user()->id,'representative_name'=>$representative_name,'store_id'=>0,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
         }
@@ -213,7 +213,7 @@ class PurchaseReceiveController extends Controller
             ->join('inventory_purchase_order_info', 'inventory_purchase_order_info.id','=', 'inventory_purchase_order_details.pur_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_purchase_order_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_purchase_order_details.id as reference_details_id','inventory_purchase_order_details.pur_id as reference_id','inventory_purchase_order_details.item_id','inventory_purchase_order_details.pur_qty','inventory_purchase_order_details.app_qty','inventory_purchase_order_details.rate','inventory_purchase_order_details.total_amount','inventory_purchase_order_details.vat_per','inventory_purchase_order_details.vat_type','inventory_purchase_order_details.vat_amount','inventory_purchase_order_details.discount','inventory_purchase_order_details.net_total',DB::raw("DATE_FORMAT(inventory_purchase_order_info.date,'%d/%m/%Y') AS pur_date, DATE_FORMAT(inventory_purchase_order_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_order_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+            ->select('inventory_purchase_order_details.id as reference_details_id','inventory_purchase_order_details.pur_id as reference_id','inventory_purchase_order_details.item_id','inventory_purchase_order_details.pur_qty','inventory_purchase_order_details.app_qty','inventory_purchase_order_details.rate','inventory_purchase_order_details.total_amount','inventory_purchase_order_details.vat_per','inventory_purchase_order_details.vat_type','inventory_purchase_order_details.vat_amount','inventory_purchase_order_details.discount','inventory_purchase_order_details.net_total','inventory_purchase_order_details.remarks',DB::raw("DATE_FORMAT(inventory_purchase_order_info.date,'%d/%m/%Y') AS pur_date, DATE_FORMAT(inventory_purchase_order_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_order_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
             ->where('inventory_purchase_order_info.vendor_id',$vendor_id)
             ->where('inventory_purchase_order_info.due_date','<=',$date)
             ->whereIn('inventory_purchase_order_details.ref_use',[0,1])
@@ -311,21 +311,14 @@ class PurchaseReceiveController extends Controller
         $campus_id = $request->campus_id;
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_direct_stock_in')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })->ignore($id, 'id')
-            ],
+            'voucher_no' => 'required|max:100',
             'vendor_id' => 'required',
             'representative_id' => 'required',
             'date' => 'required|date_format:d/m/Y',
             'due_date' => 'required|date_format:d/m/Y|after_or_equal:date',
             'store_id' => 'required',
             'campus_id' => 'required',
-            'reference_type' => 'required',
-            'comments' => 'required|max:255',
+            'reference_type' => 'required'
         ]);
 
         $date = DateTime::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');       
@@ -344,7 +337,7 @@ class PurchaseReceiveController extends Controller
                 $item_ids = collect($voucherDetailsData)->pluck('item_id')->all();
             }
             
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false; $has_qty=false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -395,8 +388,6 @@ class PurchaseReceiveController extends Controller
                 DB::beginTransaction();
                 try {
                     $data = [
-                        "voucher_no"=>$request->voucher_no,
-                        "voucher_int" => $request->voucher_int,
                         "vendor_id" => $request->vendor_id,
                         "representative_id" => $request->representative_id,
                         "date" => $date,
@@ -405,6 +396,7 @@ class PurchaseReceiveController extends Controller
                         "reference_type" => $request->reference_type,
                         "comments" => $request->comments
                     ];
+                    $auto_voucher = $request->auto_voucher;  // voucher type 
                     if(!empty($id)){
                         $pur_receive_id = $id;
                         $purRecInfo = PurchaseReceiveInfoModel::module()->valid()->findOrFail($id);
@@ -456,9 +448,31 @@ class PurchaseReceiveController extends Controller
                         }
 
                     }else{
-                        $save = PurchaseReceiveInfoModel::create($data);
-                        $pur_receive_id = $save->id; 
-
+                        if($auto_voucher){  // auto voucher configuration
+                            $voucherInfo = self::getVoucherNo('purReceive');
+                            if($voucherInfo['voucher_no']){
+                                $data['voucher_no'] = $voucherInfo['voucher_no'];
+                                $data['voucher_int'] = $voucherInfo['voucher_int'];
+                                $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
+                            }else{
+                                $flag=false;
+                                $msg = $voucherInfo['msg'];  
+                            }
+                        }else{  // menual voucher 
+                            $checkVoucher = PurchaseReceiveInfoModel::module()->valid()->where('voucher_no', $request->voucher_no)->first();
+                            if(empty($checkVoucher)){
+                                $data['voucher_no'] = $request->voucher_no;
+                                $data['voucher_int'] = 0;
+                                $data['voucher_config_id'] = $request->voucher_config_id;
+                            }else{
+                               $flag=false;
+                               $msg = "Voucher no already exists";   
+                            }
+                        }
+                        if($flag){
+                            $save = PurchaseReceiveInfoModel::create($data);
+                            $pur_receive_id = $save->id;
+                        } 
                     }
                     if($flag){
                         foreach ($voucherDetailsData as $v) {
@@ -479,6 +493,7 @@ class PurchaseReceiveController extends Controller
                                     'discount'=>(!empty($v['discount']))?$v['discount']:0,
                                     'net_total'=>(!empty($v['net_total']))?$v['net_total']:0,
                                     'has_serial'=>$v['use_serial'],
+                                    'remarks'=>$v['remarks']
                                 ];
                                 if($details_id>0){
                                     $pur_receive_details_id = $details_id;
@@ -603,10 +618,8 @@ class PurchaseReceiveController extends Controller
         $date = DateTime::createFromFormat('Y-m-d', $purchaseReceiveInfo->date)->format('d/m/Y');
         $due_date = DateTime::createFromFormat('Y-m-d', $purchaseReceiveInfo->due_date)->format('d/m/Y');
         $purchaseReceiveInfo->date = $date;
-        $purchaseReceiveInfo->date_show = $purchase_receive_date;
-        $purchaseReceiveInfo->numbering = true;
+        $purchaseReceiveInfo->auto_voucher = true;
         $purchaseReceiveInfo->due_date = $due_date;
-        $purchaseReceiveInfo->due_date_show = $purchase_receive_due_date;
         $data['representative_user_list'] = User::select('id', 'name')->module()->get();
         $representative_id_model=User::select('id', 'name')->where('id', Auth::user()->id)->first();
         $purchaseReceiveInfo->representative_name = $representative_id_model->name;
@@ -615,8 +628,8 @@ class PurchaseReceiveController extends Controller
         $purchaseReceiveInfo->campus_name = $campus_id_model->name;
         $purchaseReceiveInfo->campus_id_model = $campus_id_model;
 
-        $data['vendor_list'] = VendorModel::select('id','name')->module()->valid()->get();
-        $vendor_id_model = VendorModel::select('id', 'name')->module()->valid()->find($purchaseReceiveInfo->vendor_id);
+        $data['vendor_list'] = VendorModel::select('id','name')->get();
+        $vendor_id_model = VendorModel::select('id', 'name')->find($purchaseReceiveInfo->vendor_id);
         $vendor_name = $vendor_id_model->name;
         $purchaseReceiveInfo->vendor_id_model = $vendor_id_model;
         $purchaseReceiveInfo->vendor_name = $vendor_name;
@@ -647,7 +660,7 @@ class PurchaseReceiveController extends Controller
             ->join('inventory_purchase_order_info', 'inventory_purchase_order_info.id','=', 'inventory_purchase_order_details.pur_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_purchase_order_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_purchase_order_details.id as reference_details_id','inventory_purchase_order_details.pur_id as reference_id','inventory_purchase_order_details.item_id','inventory_purchase_order_details.pur_qty','inventory_purchase_order_details.app_qty','inventory_purchase_order_details.rate','inventory_purchase_order_details.total_amount','inventory_purchase_order_details.vat_per','inventory_purchase_order_details.vat_type','inventory_purchase_order_details.vat_amount','inventory_purchase_order_details.discount','inventory_purchase_order_details.net_total',DB::raw("DATE_FORMAT(inventory_purchase_order_info.date,'%d/%m/%Y') AS pur_date, DATE_FORMAT(inventory_purchase_order_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_order_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+            ->select('inventory_purchase_order_details.id as reference_details_id','inventory_purchase_order_details.pur_id as reference_id','inventory_purchase_order_details.item_id','inventory_purchase_order_details.pur_qty','inventory_purchase_order_details.app_qty','inventory_purchase_order_details.rate','inventory_purchase_order_details.total_amount','inventory_purchase_order_details.vat_per','inventory_purchase_order_details.vat_type','inventory_purchase_order_details.vat_amount','inventory_purchase_order_details.discount','inventory_purchase_order_details.net_total','inventory_purchase_order_details.remarks',DB::raw("DATE_FORMAT(inventory_purchase_order_info.date,'%d/%m/%Y') AS pur_date, DATE_FORMAT(inventory_purchase_order_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_order_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
             ->where('inventory_purchase_order_info.vendor_id',$purchaseReceiveInfo->vendor_id)
             ->where('inventory_purchase_order_info.due_date','<=',$purchase_receive_date)
             ->whereIn('inventory_purchase_order_details.ref_use',[0,1])
@@ -753,7 +766,7 @@ class PurchaseReceiveController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true;
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     $purchase_receive_reference_data = PurchaseOrderDetailsModel::module()->valid()->where('id', $approvalData->reference_details_id)->whereIn('ref_use',[0,1])->whereIn('status',[1,2])->first(); 
                                     if(!empty($purchase_receive_reference_data)){
@@ -826,6 +839,8 @@ class PurchaseReceiveController extends Controller
                                                         'hand_qty'=>$approvalData->qty,
                                                         'stock_in_from'=>"purchase_receive"
                                                     ]);
+                                                    // update master status base on all app
+                                                    self::masterVoucherUpdate($approvalData);
                                                 }else{
                                                     $output = ['status'=>0, 'message'=>$stockCalInfo['msg']]; 
                                                 }
@@ -863,8 +878,7 @@ class PurchaseReceiveController extends Controller
                                     'campus_id'=>self::getCampusId(),
                                 ]);
 
-                                // update master status base on all app
-                                self::masterVoucherUpdate($approvalData);
+                                
                                 DB::commit();
                                 $output = ['status'=>1, 'message'=>'Stock in item successfully approved'];
                             }
@@ -970,7 +984,7 @@ class PurchaseReceiveController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = PurchaseReceiveDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has purchase order qty approval';
                     }

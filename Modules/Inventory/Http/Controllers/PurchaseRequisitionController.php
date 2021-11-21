@@ -173,19 +173,18 @@ class PurchaseRequisitionController extends Controller
     public function create()
     {
 
-        $voucherInfo = self::getVoucherNo('purReq');
-        if($voucherInfo['voucher_no']){
+        $voucherInfo = self::checkInvVoucher(5); 
+        if($voucherInfo['voucher_conf']){
             $data['requisition_user_list'] = User::select('id', 'name')->module()->get();
             $requisition_by_model=User::select('id', 'name')->where('id', Auth::user()->id)->first();
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
-            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int'],'numbering'=>$voucherInfo['numbering'], 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'), 'due_date'=>date('Y-m-d'),'due_date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'requisition_by_model'=>$requisition_by_model,'requisition_by'=>Auth::user()->id, 'voucherDetailsData'=>[], 'itemAdded'=>'no', 'need_cs'=>0];
+            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'), 'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'requisition_by_model'=>$requisition_by_model,'requisition_by'=>Auth::user()->id, 'voucherDetailsData'=>[], 'itemAdded'=>'no', 'need_cs'=>0];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
         }
         return response()->json($data);
 
-        //return view('inventory::purchase.purchaseRequisition.modal.add-new-purchase-requisition');
     }
 
     /**
@@ -199,18 +198,11 @@ class PurchaseRequisitionController extends Controller
         $campus_id = self::getCampusId();
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_purchase_requisition_info')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })->ignore($id, 'id')
-            ],
+            'voucher_no' => 'required',
             'campus_id' => 'required',
             'requisition_by' => 'required',
             'date' => 'required|date_format:d/m/Y',
             'due_date' => 'required|date_format:d/m/Y|after_or_equal:date',
-            'comments' => 'required|max:255',
             'need_cs'=>'required'
         ]);
 
@@ -230,7 +222,7 @@ class PurchaseRequisitionController extends Controller
             }else{
                $item_ids = collect($voucherDetailsData)->pluck('item_id')->all(); 
             }
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -274,14 +266,14 @@ class PurchaseRequisitionController extends Controller
                 DB::beginTransaction();
                 try {
                     $data = [
-                        "voucher_no" => $request->voucher_no,
-                        "voucher_int" => $request->voucher_int,
                         "requisition_by" => $request->requisition_by,
                         "date" => $date,
                         "due_date" => $due_date,
                         "comments" => $request->comments,
                         "need_cs" => $request->need_cs
                     ];
+
+                    $auto_voucher = $request->auto_voucher;  // voucher type 
 
                     if(!empty($id)){
                         $req_id = $id;
@@ -330,8 +322,31 @@ class PurchaseRequisitionController extends Controller
                         }
 
                     }else{
-                        $save = PurchaseRequisitionInfoModel::create($data);
-                        $req_id = $save->id; 
+                        if($auto_voucher){  // auto voucher configuration
+                            $voucherInfo = self::getVoucherNo('purReq');
+                            if($voucherInfo['voucher_no']){
+                                $data['voucher_no'] = $voucherInfo['voucher_no'];
+                                $data['voucher_int'] = $voucherInfo['voucher_int'];
+                                $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
+                            }else{
+                                $flag=false;
+                                $msg = $voucherInfo['msg'];  
+                            }
+                        }else{  // menual voucher 
+                            $checkVoucher = PurchaseRequisitionInfoModel::module()->valid()->where('voucher_no', $request->voucher_no)->first();
+                            if(empty($checkVoucher)){
+                                $data['voucher_no'] = $request->voucher_no;
+                                $data['voucher_int'] = 0;
+                                $data['voucher_config_id'] = $request->voucher_config_id;
+                            }else{
+                               $flag=false;
+                               $msg = "Voucher no already exists";   
+                            }
+                        }
+                        if($flag){
+                            $save = PurchaseRequisitionInfoModel::create($data);
+                            $req_id = $save->id;
+                        } 
 
                     }
                     if($flag){
@@ -341,6 +356,7 @@ class PurchaseRequisitionController extends Controller
                                 'req_id'=>$req_id,
                                 'item_id'=>$v['item_id'],
                                 'req_qty'=>$v['req_qty'],
+                                'remarks'=>$v['remarks'],
                                 'need_cs' => $request->need_cs
                             ];
                             if($details_id>0){
@@ -426,7 +442,7 @@ class PurchaseRequisitionController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true;
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     $approvalData->update([
                                         'status'=>1,
@@ -519,8 +535,10 @@ class PurchaseRequisitionController extends Controller
         $item_list = self::getItemList($this);
         $item_ids = $item_list->pluck('item_id')->all();
         $voucherInfo = PurchaseRequisitionInfoModel::module()->valid()->find($id);
-        $voucherInfo->date_show = $voucherInfo->date;  
-        $voucherInfo->due_date_show = $voucherInfo->due_date;  
+        $date = DateTime::createFromFormat('Y-m-d', $voucherInfo->date)->format('d/m/Y');
+        $due_date = DateTime::createFromFormat('Y-m-d', $voucherInfo->due_date)->format('d/m/Y');
+        $voucherInfo->date = $date;  
+        $voucherInfo->due_date = $due_date;  
         if(!empty($voucherInfo)){
             $data['requisition_user_list'] = User::select('id', 'name')->module()->get();
             $requisition_by_model=User::select('id', 'name')->where('id', $voucherInfo->requisition_by)->first();
@@ -535,7 +553,7 @@ class PurchaseRequisitionController extends Controller
                 ->select('inventory_purchase_requisition_details.*','cadet_stock_products.product_name', 'cadet_inventory_uom.symbol_name as uom', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'))
                 ->where('req_id', $id)->get(); 
             if(count($voucherDetailsData)>0){
-                $voucherInfo->numbering = true;
+                $voucherInfo->auto_voucher = true;
                 $voucherInfo->voucherDetailsData = $voucherDetailsData;
                 $total_qty = 0;
                 foreach ($voucherDetailsData as $v) {
@@ -601,7 +619,7 @@ class PurchaseRequisitionController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = PurchaseRequisitionDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has stock in qty approval';
                     }

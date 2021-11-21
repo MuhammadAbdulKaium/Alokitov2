@@ -182,15 +182,15 @@ class IssueInventoryController extends Controller
     public function create()
     {
 
-        $voucherInfo = self::getVoucherNo('issueFromInventory');
-        if($voucherInfo['voucher_no']){
+        $voucherInfo = self::checkInvVoucher(2);
+        if($voucherInfo['voucher_conf']){
             $data['issue_user_list'] = self::getUserList();
             $issue_to_model='';
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
             $campus_name = $campus_id_model->name;
             $data['store_list'] = InventoryStore::select('id','store_name')->access($this)->get();
-            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int'],'numbering'=>$voucherInfo['numbering'], 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'store_id'=>0,'issue_to_model'=>$issue_to_model,'issue_to'=>0,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
+            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'store_id'=>0,'issue_to_model'=>$issue_to_model,'issue_to'=>0,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
             $data['store_item_list'] = [];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
@@ -211,7 +211,7 @@ class IssueInventoryController extends Controller
             ->join('inventory_new_requisition_info', 'inventory_new_requisition_info.id','=', 'inventory_new_requisition_details.new_req_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_new_requisition_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_new_requisition_details.id as reference_details_id','inventory_new_requisition_details.new_req_id as reference_id','inventory_new_requisition_details.item_id','inventory_new_requisition_details.req_qty','inventory_new_requisition_details.app_qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_new_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_new_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_new_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+            ->select('inventory_new_requisition_details.id as reference_details_id','inventory_new_requisition_details.new_req_id as reference_id','inventory_new_requisition_details.item_id','inventory_new_requisition_details.req_qty','inventory_new_requisition_details.app_qty as req_app_qty','inventory_new_requisition_details.remarks',DB::raw("DATE_FORMAT(inventory_new_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_new_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_new_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
             ->where('inventory_new_requisition_info.due_date','<=',$date)
             ->where('inventory_new_requisition_info.requisition_by',$issue_to)
             ->whereIn('inventory_new_requisition_details.status',[1,2,5])
@@ -262,19 +262,12 @@ class IssueInventoryController extends Controller
         $campus_id = self::getCampusId();
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_issue_from')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })->ignore($id, 'id')
-            ],
+            'voucher_no' => 'required',
             'date' => 'required|date_format:d/m/Y',
             'campus_id' => 'required',
             'store_id' => 'required',
             'issue_to' => 'required',
-            'reference_type'=>'required',
-            'comments' => 'required|max:255',
+            'reference_type'=>'required'
         ]);
 
         $date = DateTime::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
@@ -290,7 +283,7 @@ class IssueInventoryController extends Controller
             }else{
                $item_ids = collect($voucherDetailsData)->pluck('item_id')->all(); 
             }
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false; $has_qty=false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -338,15 +331,13 @@ class IssueInventoryController extends Controller
                 DB::beginTransaction();
                 try {
                     $data = [
-                        "voucher_no" => $request->voucher_no,
-                        "voucher_int" => $request->voucher_int,
                         "store_id" => $request->store_id,
                         "issue_to" => $request->issue_to,
                         "date" => $date,
                         "reference_type" => $request->reference_type,
                         "comments" => $request->comments
                     ];
-
+                    $auto_voucher = $request->auto_voucher;  // voucher type
                     if(!empty($id)){
                         $issue_id = $id;
                         $issueInfo = IssueFromInventoryModel::module()->valid()->findOrFail($id);
@@ -396,8 +387,31 @@ class IssueInventoryController extends Controller
                         }
 
                     }else{
-                        $save = IssueFromInventoryModel::create($data);
-                        $issue_id = $save->id; 
+                        if($auto_voucher){  // auto voucher configuration
+                            $voucherInfo = self::getVoucherNo('issueFromInventory');
+                            if($voucherInfo['voucher_no']){
+                                $data['voucher_no'] = $voucherInfo['voucher_no'];
+                                $data['voucher_int'] = $voucherInfo['voucher_int'];
+                                $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
+                            }else{
+                                $flag=false;
+                                $msg = $voucherInfo['msg'];  
+                            }
+                        }else{  // menual voucher 
+                            $checkVoucher = IssueFromInventoryModel::module()->valid()->where('voucher_no', $request->voucher_no)->first();
+                            if(empty($checkVoucher)){
+                                $data['voucher_no'] = $request->voucher_no;
+                                $data['voucher_int'] = 0;
+                                $data['voucher_config_id'] = $request->voucher_config_id;
+                            }else{
+                               $flag=false;
+                               $msg = "Voucher no already exists";   
+                            }
+                        }
+                        if($flag){
+                            $save = IssueFromInventoryModel::create($data);
+                            $issue_id = $save->id;
+                        } 
 
                     }
                     if($flag){
@@ -412,6 +426,7 @@ class IssueInventoryController extends Controller
                                     'reference_id'=>$v['reference_id'],
                                     'reference_details_id'=>$v['reference_details_id'],
                                     'has_serial'=>$v['use_serial'],
+                                    'remarks'=>$v['remarks']
                                 ];
                                 if($details_id>0){
                                     $issue_details_id = $details_id;
@@ -536,7 +551,6 @@ class IssueInventoryController extends Controller
         $issue_date = $issueInfo->date; 
         $date = DateTime::createFromFormat('Y-m-d', $issueInfo->date)->format('d/m/Y');
         $issueInfo->date = $date;
-        $issueInfo->date_show = $date;
         $issueInfo->numbering = true;
         $data['issue_user_list'] = self::getUserList();
         $issue_to_model=User::select('id', 'name')->where('id', $issueInfo->issue_to)->first();
@@ -558,7 +572,7 @@ class IssueInventoryController extends Controller
             ->join('inventory_new_requisition_details', 'inventory_new_requisition_details.id','=', 'inventory_issue_details.reference_details_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_new_requisition_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_issue_details.id','inventory_issue_details.item_id','inventory_issue_details.issue_qty','inventory_issue_details.reference_id','inventory_issue_details.reference_details_id','inventory_issue_details.has_serial', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of','cadet_stock_products.use_serial', 'inventory_new_requisition_info.voucher_no as ref_voucher_name','inventory_new_requisition_details.app_qty as req_app_qty')
+            ->select('inventory_issue_details.id','inventory_issue_details.item_id','inventory_issue_details.issue_qty','inventory_issue_details.reference_id','inventory_issue_details.reference_details_id','inventory_issue_details.has_serial','inventory_issue_details.remarks', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of','cadet_stock_products.use_serial', 'inventory_new_requisition_info.voucher_no as ref_voucher_name','inventory_new_requisition_details.app_qty as req_app_qty')
             ->where('inventory_issue_details.issue_id', $id)
             ->whereIn('inventory_issue_details.item_id', $item_ids)
             ->get();
@@ -570,7 +584,7 @@ class IssueInventoryController extends Controller
             ->join('inventory_new_requisition_info', 'inventory_new_requisition_info.id','=', 'inventory_new_requisition_details.new_req_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_new_requisition_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_new_requisition_details.id as reference_details_id','inventory_new_requisition_details.new_req_id as reference_id','inventory_new_requisition_details.item_id','inventory_new_requisition_details.req_qty','inventory_new_requisition_details.app_qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_new_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_new_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_new_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+            ->select('inventory_new_requisition_details.id as reference_details_id','inventory_new_requisition_details.new_req_id as reference_id','inventory_new_requisition_details.item_id','inventory_new_requisition_details.req_qty','inventory_new_requisition_details.app_qty as req_app_qty','inventory_new_requisition_details.remarks',DB::raw("DATE_FORMAT(inventory_new_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_new_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_new_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku','cadet_stock_products.use_serial', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
             ->where('inventory_new_requisition_info.due_date','<=',$issue_date)
             ->where('inventory_new_requisition_info.requisition_by',$issueInfo->issue_to)
             ->whereIn('inventory_new_requisition_details.status',[1,2,5])
@@ -663,9 +677,7 @@ class IssueInventoryController extends Controller
                 $v->serial_html = '';
                 $v->row_style = 'valid';
             }
-
         }
-
         $issueInfo->voucherDetailsData = $voucherDetailsData;
         $issueInfo->itemAdded = (count($voucherDetailsData)>0)?'yes':'no';
 
@@ -693,7 +705,7 @@ class IssueInventoryController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true; $msg = '';
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     $requisitionDetailsInfo = NewRequisitionDetailsModel::module()->where('id', $approvalData->reference_details_id)->whereIn('status',[1,2,5])->first();
                                     if(!empty($requisitionDetailsInfo)){
@@ -944,7 +956,7 @@ class IssueInventoryController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = IssueFromInventoryDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has issue from inventory qty approval';
                     }

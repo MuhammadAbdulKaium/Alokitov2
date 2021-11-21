@@ -146,7 +146,7 @@
                     </div>
                     <div class="row" style="margin-bottom: 15px">
                         <div class="col-sm-4">
-                            <label for="">Suffix <span class="text-danger">*</span></label>
+                            <label for="">Suffix</label>
                         </div>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" name="suffix">
@@ -189,6 +189,7 @@
                         <select name="code_type_id" id="" class="form-control" required>
                             <option value="1">General Goods</option>
                             <option value="2">Finished Goods</option>
+                            <option value="3">Pharmacy  Goods</option>
                         </select>
                     </div>
                 </div>

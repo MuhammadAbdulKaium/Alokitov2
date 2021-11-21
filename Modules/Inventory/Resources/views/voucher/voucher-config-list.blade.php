@@ -51,27 +51,31 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Name</th>
+                                    <th>Institute</th>
+                                    <th>Campus</th>
                                     <th>Width</th>
                                     <th>Prefix</th>
                                     <th>Suffix</th>
-                                    <th>Total</th>
                                     <th>Begining Number</th>
                                     <th>Numbering</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @if($vouchers)
-                                @foreach($vouchers as $voucher)
+                                @foreach($vouchers as $k => $voucher)
                                 <tr>
-                                    <td>#</td>
+                                    <td>{{$k+1}}</td>
                                     <td>{{$voucher->voucher_name}}</td>
+                                    <td>{{$voucher->institute_name}}</td>
+                                    <td>{{$voucher->campus_name}}</td>
                                     <td>{{$voucher->numeric_part}}</td>
                                     <td>{{$voucher->prefix}}</td>
                                     <td>{{$voucher->suffix}}</td>
-                                    <td></td>
                                     <td>{{$voucher->starting_number}}</td>
                                     <td>{{$voucher->numbering}}</td>
+                                    <td>{{($voucher->status==1)?'Active':'Inactive'}}</td>
                                     <td>
                                         <a id="update-guard-data" class="btn btn-success" href="/inventory/edit/voucher/{{$voucher->id}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"> Edit</a>
                                         <!-- <a href="/inventory/delete/voucher/{{$voucher->id}}" onclick="return confirm('Are you sure to Delete?')" data-placement="top" data-content="delete" class="btn btn-danger">Delete</a> -->

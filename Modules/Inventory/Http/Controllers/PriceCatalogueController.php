@@ -161,7 +161,7 @@ class PriceCatalogueController extends Controller
             }
 
 
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -535,7 +535,7 @@ class PriceCatalogueController extends Controller
                 $flag = true; $msg =[]; 
                 foreach($detailsData as $v){
                     if($v->status==1||$v->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($v->item_id);
+                        $itemInfo = CadetInventoryProduct::find($v->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has requisition qty approval';
                     }

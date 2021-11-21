@@ -72,7 +72,7 @@
                                             <div class="form-group">
                                                 <label for="inputEmail3" class="col-sm-3 control-label">GL Code</label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" name="gl_code" class="form-control" placeholder="GL Code" v-model="formData.gl_code" maxlength="100">
+                                                    <input type="text" name="gl_code" class="form-control" placeholder="Auto" v-model="formData.gl_code" maxlength="100" readonly>
                                                 </div>
                                             </div>
                                         </div>

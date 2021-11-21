@@ -178,14 +178,14 @@ class SotckInController extends Controller
      */
     public function create()
     {
-        $voucherInfo = self::getVoucherNo('stockIn');
-        if($voucherInfo['voucher_no']){
+        $voucherInfo = self::checkInvVoucher(12);
+        if($voucherInfo['voucher_conf']){
             $data['representative_user_list'] = User::select('id', 'name')->module()->get();
             $representative_id_model=User::select('id', 'name')->where('id', Auth::user()->id)->first();
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
             $data['store_list'] = InventoryStore::select('id','store_name')->access($this)->get();
-            $data['formData'] = ['category'=>'opening','voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int'],'numbering'=>$voucherInfo['numbering'], 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'store_id'=>0,'representative_id_model'=>$representative_id_model,'representative_id'=>Auth::user()->id, 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
+            $data['formData'] = ['category'=>'opening','voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'store_id'=>0,'representative_id_model'=>$representative_id_model,'representative_id'=>Auth::user()->id, 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
             $data['store_item_list'] = [];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
@@ -213,18 +213,11 @@ class SotckInController extends Controller
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
             'category' => 'required',
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_direct_stock_in')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })->ignore($id, 'id')
-            ],
+            'voucher_no' => 'required',
             'representative_id' => 'required',
             'date' => 'required|date_format:d/m/Y',
             'store_id' => 'required',
-            'campus_id' => 'required',
-            'comments' => 'required|max:255',
+            'campus_id' => 'required'
         ]);
 
         $date = DateTime::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');           
@@ -242,7 +235,7 @@ class SotckInController extends Controller
                 $item_ids = collect($voucherDetailsData)->pluck('item_id')->all();
             }
             
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false; $has_qty=false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -291,15 +284,13 @@ class SotckInController extends Controller
                 try {
                     $data = [
                         "category"=>$request->category,
-                        "voucher_no" => $request->voucher_no,
-                        "voucher_int" => $request->voucher_int,
                         "representative_id" => $request->representative_id,
                         "date" => $date,
                         "store_id" => $request->store_id,
                         "comments" => $request->comments
                     ];
                     // note campus id with auto insert 
-
+                     $auto_voucher = $request->auto_voucher;  // voucher type 
                     if(!empty($id)){
                         $stock_in_id = $id;
                         $stockInInfo = StockInModel::module()->valid()->findOrFail($id);
@@ -351,8 +342,31 @@ class SotckInController extends Controller
                         }
 
                     }else{
-                        $save = StockInModel::create($data);
-                        $stock_in_id = $save->id; 
+                        if($auto_voucher){  // auto voucher configuration
+                            $voucherInfo = self::getVoucherNo('stockIn');
+                            if($voucherInfo['voucher_no']){
+                                $data['voucher_no'] = $voucherInfo['voucher_no'];
+                                $data['voucher_int'] = $voucherInfo['voucher_int'];
+                                $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
+                            }else{
+                                $flag=false;
+                                $msg = $voucherInfo['msg'];  
+                            }
+                        }else{  // menual voucher 
+                            $checkVoucher = StockInModel::module()->valid()->where('voucher_no', $request->voucher_no)->first();
+                            if(empty($checkVoucher)){
+                                $data['voucher_no'] = $request->voucher_no;
+                                $data['voucher_int'] = 0;
+                                $data['voucher_config_id'] = $request->voucher_config_id;
+                            }else{
+                               $flag=false;
+                               $msg = "Voucher no already exists";   
+                            }
+                        }
+                        if($flag){
+                            $save = StockInModel::create($data);
+                            $stock_in_id = $save->id; 
+                        }
 
                     }
                     if($flag){
@@ -366,6 +380,7 @@ class SotckInController extends Controller
                                     'rate'=>$v['rate'],
                                     'amount'=>$v['amount'],
                                     'has_serial'=>$v['use_serial'],
+                                    'remarks'=>$v['remarks']
                                 ];
                                 if($details_id>0){
                                     $stock_in_details_id = $details_id;
@@ -491,12 +506,13 @@ class SotckInController extends Controller
         $item_list = self::getItemList($this);
         $item_ids = $item_list->pluck('item_id')->all();
         $voucherInfo = StockInModel::module()->valid()->find($id);
-        $voucherInfo->date_show = $voucherInfo->date;  
+        $date = DateTime::createFromFormat('Y-m-d', $voucherInfo->date)->format('d/m/Y');
+        $voucherInfo->date = $date;  
         if(!empty($voucherInfo)){
             $data['representative_user_list'] = User::select('id', 'name')->module()->get();
             $representative_id_model=User::select('id', 'name')->where('id', $voucherInfo->representative_id)->first();
             $voucherInfo->representative_id_model = $representative_id_model;
-            $store_info = InventoryStore::select('id','store_name')->module()->find($voucherInfo->store_id);
+            $store_info = InventoryStore::select('id','store_name')->find($voucherInfo->store_id);
             $voucherInfo->store_id_model = $store_info;
             $voucherInfo->store_name = $store_info->store_name;
             $voucherInfo->campus_id_model = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',$voucherInfo->campus_id)->first();
@@ -517,7 +533,7 @@ class SotckInController extends Controller
                     ->where('stock_in_id', $id)
                     ->get()->groupBy('stock_in_details_id')->all();
 
-                $voucherInfo->numbering = true;
+                $voucherInfo->auto_voucher = true;
                 $voucherInfo->voucherDetailsData = $voucherDetailsData;
                 $totalRate = 0; $totalAmount=0;
                 foreach ($voucherDetailsData as $v) {
@@ -583,7 +599,7 @@ class SotckInController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true;
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     $stockCalInfo  = self::storeStockIncrementAndCostPrice($itemInfo,$approvalData);
                                     $flag = $stockCalInfo['flag'];
@@ -628,7 +644,6 @@ class SotckInController extends Controller
                                                     'stock_in_date'=>date('Y-m-d')
                                                 ]);
                                             }
-
                                             // update store wise stock
                                             StoreWiseItemModel::module()->where('item_id', $approvalData->item_id)->where('store_id', $approvalData->store_id)->update([
                                                 'current_stock'=>$current_stock,
@@ -782,7 +797,7 @@ class SotckInController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = StockInDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has stock in qty approval';
                     }

@@ -58,9 +58,9 @@
                             </thead>
                             <tbody>
                             @if($uom)
-                                @foreach($uom as $unit)
+                                @foreach($uom as $k => $unit)
                                 <tr>
-                                    <td>#</td>
+                                    <td>{{$k+1}}</td>
                                     <td>{{$unit->symbol_name}}</td>
                                     <td>{{$unit->formal_name}}</td>
                                     <td>

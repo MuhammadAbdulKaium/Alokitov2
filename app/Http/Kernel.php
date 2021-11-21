@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
         'access-permission' => \App\Http\Middleware\AccessPermission::class,
         'user-permission' => \App\Http\Middleware\UserPermission::class,
         'setting-permission' => \App\Http\Middleware\SettingAccessPermission::class,
+        'cadet-user-permission' => \App\Http\Middleware\CadetUserPermission::class,
         'cors' => \App\Http\Middleware\CORS::class,
 
     ];

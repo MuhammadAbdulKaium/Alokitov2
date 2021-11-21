@@ -17,5 +17,6 @@ class StockCategory extends Model
         return $query->where('cadet_inventory_stock_category.campus_id', self::getCampusId())->where('cadet_inventory_stock_category.institute_id', self::getInstituteId());
 
     }
+
     
 }

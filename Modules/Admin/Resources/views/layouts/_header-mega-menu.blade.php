@@ -7,7 +7,7 @@
       @if(!empty($headerBgColor->attribute_value))
 background:{{ $headerBgColor->attribute_value }} !important;
       @else
-	  background:#0b460b;
+     background:#0b460b;
    @endif
 </style>
 
@@ -467,39 +467,8 @@ background:{{ $headerBgColor->attribute_value }} !important;
 </ul>
 
 </li>
-<li><a href="#"><span class="fa fa-wrench icon-margin"></span> Inventory <span class="caret"></span></a>
+    
 
-<ul class="dropdown-menus">
-   <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
-
-      <ul class="dropdown-menus">
-         <li><a href="{{url('/inventory/batch-grid')}}"><i class="fa fa-sitemap"></i> Batch</a></li>
-         <li><a href="#"><i class="fa fa-building"></i> Stock<span class="caret"></span></a>
-            <ul class="dropdown-menus">
-               <li><a href="{{url('/inventory/stock-group-grid')}}"> Stock Group</a></li>
-               <li><a href="{{url('/inventory/stock-category')}}"> Stock Category</a></li>
-               <li><a href="{{url('/inventory/unit-of-measurement')}}"> Unit Of Measurement</a></li>
-               <li><a href="{{url('/inventory/stock-list')}}"> Stock List</a></li>
-            </ul>
-         </li>
-         <li><a href="#"><i class="fa fa-building"></i> Store<span class="caret"></span></a>
-            <ul class="dropdown-menus">
-               <li><a href="{{url('/inventory/store')}}"> Store</a></li>
-            </ul>
-         </li>
-         <li><a href="#"><i class="fa fa-building"></i> Requisition<span class="caret"></span></a>
-            <ul class="dropdown-menus">
-               <li><a href="{{url('/inventory/new/requisition')}}"> New Requisition</a></li>
-            </ul>
-         </li>
-      </ul>
-
-   </li>
-   <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a></li>
-   <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
-</ul>
-
-</li>
 <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Health Care <span class="caret"></span></a>
 
 <ul class="dropdown-menus">

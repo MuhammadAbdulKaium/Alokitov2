@@ -34,21 +34,15 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                      <input type="text" name="search_key" v-model="filter.search_key" class="form-control" placeholder="Search by keyword" style="width:100%">
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                      <div class="input-group">
-                                        <vuejs-datepicker name="from_date_show" v-model="filter.from_date_show" placeholder="From Date" :format="filterFromDateFormatter"></vuejs-datepicker>
-                                        <div class="input-group-btn">
-                                          <btn>To</btn>
-                                        </div>
-                                        <vuejs-datepicker name="to_date_show" v-model="filter.to_date_show" placeholder="To Date" :format="filterToDateFormatter"></vuejs-datepicker>
-                                      </div>
-                                      
-                                    </div>
-                                </div>  
+                                <div class="col-sm-2">
+                                    <vuejs-datepicker name="from_date_show" v-model="filter.from_date_show" placeholder="From Date" :format="filterFromDateFormatter" :clear-button="true"></vuejs-datepicker>
+                                </div>
+                                <div class="col-sm-2">
+                                    <vuejs-datepicker name="to_date_show" v-model="filter.to_date_show" placeholder="To Date" :format="filterToDateFormatter" :clear-button="true"></vuejs-datepicker>
+                                </div>
 
                                 <div class="col-sm-1">
                                     <button class="btn btn-primary" @click="getResults(1)"><i class="fa fa-search"></i> Search</button>
@@ -437,6 +431,18 @@
       },
       created(){
         this.getResults(1);
+      },
+      watch: {
+        'filter.from_date_show': function (val, oldVal) {
+            if(val==null){
+                this.filter.from_date=null;
+            }
+        },
+        'filter.to_date_show': function (val, oldVal) {
+            if(val==null){
+                this.filter.to_date=null;
+            }
+        }
       },
       methods:{
         applicableFromDateFormatter(date) {

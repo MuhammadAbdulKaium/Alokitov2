@@ -182,15 +182,15 @@ class ComparativeStatementController extends Controller
     }
 
     public function comparativeStatementCreateData(){
-        $voucherInfo = self::getVoucherNo('cs');
-        if($voucherInfo['voucher_no']){
+        $voucherInfo = self::checkInvVoucher(14);
+        if($voucherInfo['voucher_conf']){
             $data['instruction_user_list'] = User::select('id', 'name')->module()->get();
             $instruction_of_model=User::select('id', 'name')->where('id', Auth::user()->id)->first();
             $instruction_name = $instruction_of_model->name;
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
             $campus_name = $campus_id_model->name;
-            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int'],'numbering'=>$voucherInfo['numbering'], 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'), 'due_date'=>date('Y-m-d'),'due_date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no','generateCS'=>'no','check_mandatory'=>0, 'vendor_id'=>0];
+            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'), 'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no','generateCS'=>'no','check_mandatory'=>0, 'vendor_id'=>0];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
         }
@@ -206,7 +206,7 @@ class ComparativeStatementController extends Controller
             ->join('inventory_purchase_requisition_info', 'inventory_purchase_requisition_info.id','=', 'inventory_purchase_requisition_details.req_id')
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_purchase_requisition_details.item_id')
             ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-            ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+            ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty','inventory_purchase_requisition_details.remarks',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
             ->where('inventory_purchase_requisition_info.due_date','<=',$date)
             ->whereIn('inventory_purchase_requisition_details.ref_use',[0,1])
             ->whereIn('inventory_purchase_requisition_details.status',[1,2])
@@ -267,8 +267,7 @@ class ComparativeStatementController extends Controller
             endif;
         endforeach;
         $cat_unique_id  = collect($catalogue_uniq_id)->unique()->values()->all();
-        $vendorInfo = VendorModel::module()->valid()
-            ->select('id','name', 'gl_code', 'credit_limit', 'credit_priod', 'price_cate_id')
+        $vendorInfo = VendorModel::select('id','name', 'gl_code', 'credit_limit', 'credit_priod', 'price_cate_id')
             ->whereIn('price_cate_id', $cat_unique_id)->get();
         $vendorData = []; $price_catalog_component_data = [];
         if(count($vendorInfo)>0){
@@ -403,18 +402,11 @@ class ComparativeStatementController extends Controller
         $campus_id = self::getCampusId();
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_comparative_statement_info')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })
-            ],
+            'voucher_no' => 'required|max:100',
             'campus_id' => 'required',
             'instruction_of' => 'required',
             'date' => 'required|date_format:d/m/Y',
             'due_date' => 'required|date_format:d/m/Y|after_or_equal:date',
-            'comments' => 'required|max:255',
             'reference_type'=>'required'
         ]);
 
@@ -426,8 +418,6 @@ class ComparativeStatementController extends Controller
             DB::beginTransaction();
             try {
                 $data = [
-                    "voucher_no" => $request->voucher_no,
-                    "voucher_int" => $request->voucher_int,
                     "instruction_of" => $request->instruction_of,
                     "date" => $date,
                     "due_date" => $due_date,
@@ -435,87 +425,115 @@ class ComparativeStatementController extends Controller
                     "reference_type" => $request->reference_type,
                     "vendor_id" => $vendor_id
                 ];
-
-                $save = ComparativeStatementInfoModel::create($data);
-                $cs_id = $save->id; 
-                $vendorInfo = VendorModel::valid()->find($vendor_id);
-
-                foreach($voucherDetailsData as $ref):   // check item qty wise price catalogue and collect catalog id
-                    $catalog_data = PriceCatelogueDetailsModel::module()->valid()
-                        ->where('catalogue_uniq_id', $vendorInfo->price_cate_id)
-                        ->where('item_id', $ref['item_id'])
-                        ->where('applicable_from', '<=',$date)
-                        ->where('from_qty','<=', $ref['avail_qty'])
-                        ->where('to_qty','>=', $ref['avail_qty'])
-                        ->where('status',1)
-                        ->orderBy('applicable_from', 'desc')->first();
-                    if(!empty($catalog_data)){
-                        // price calculation
-                        if($ref['has_fraction']==1 && self::isFloat($ref['avail_qty'])){
-                            $calInfo = (object)['has_fraction'=>$ref['has_fraction'],'round_of'=>$ref['round_of'],'decimal_point_place'=>$ref['decimal_point_place'],'qty'=>$ref['avail_qty'], 'rate'=>$catalog_data->rate];
-                            $amount = self::rateQtyMultiply($calInfo);
-                        }else{
-                            $amount = $ref['avail_qty'] * $catalog_data->rate;
-                        }
-                        $net_amount = $amount;
-                        if(!empty($catalog_data->vat_per)){
-                            $vat_per = $catalog_data->vat_per;
-                            if($catalog_data->vat_type=='fixed'){
-                                $vat_amount = $catalog_data->vat_per; 
-                            }else{
-                                $vat_amount_cal = ($amount/100)*$catalog_data->vat_per;
-                                $vat_amount = round($vat_amount_cal,6);
-                            }
-                            $net_amount +=  $vat_amount;
-                        }else{
-                            $vat_amount = 0;
-                            $vat_per = 0;
-                        }
-                        if(!empty($catalog_data->discount)){
-                            $net_amount -=  $catalog_data->discount;
-                            $discount = $catalog_data->discount;
-                        }else{
-                            $discount = 0;
-                        }
-                        $cs_details_data = [
-                            'cs_id'=>$cs_id,
-                            'vendor_id'=>$vendor_id,
-                            'item_id'=>$ref['item_id'],
-                            'qty'=>$ref['avail_qty'],
-                            'rate'=>$catalog_data->rate,
-                            'amount'=>$amount,
-                            'discount'=>$discount,
-                            'vat_per'=>$vat_per,
-                            'vat_type'=>$catalog_data->vat_type,
-                            'vat_amount'=>$vat_amount,
-                            'net_amount'=>$net_amount,
-                            'reference_type'=>$request->reference_type,
-                            'reference_id'=>$ref['reference_id'],
-                            'reference_details_id'=>$ref['reference_details_id'],
-                        ];
-                        
+                $auto_voucher = $request->auto_voucher;  // voucher type
+                $flag=true;
+                if($auto_voucher){  // auto voucher configuration
+                    $voucherInfo = self::getVoucherNo('cs');
+                    if($voucherInfo['voucher_no']){
+                        $data['voucher_no'] = $voucherInfo['voucher_no'];
+                        $data['voucher_int'] = $voucherInfo['voucher_int'];
+                        $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
                     }else{
-                        $cs_details_data = [
-                            'cs_id'=>$cs_id,
-                            'vendor_id'=>$vendor_id,
-                            'item_id'=>$ref['item_id'],
-                            'qty'=>$ref['avail_qty'],
-                            'rate'=>0,
-                            'amount'=>0,
-                            'discount'=>0,
-                            'vat_per'=>0,
-                            'vat_type'=>'fixed',
-                            'vat_amount'=>0,
-                            'net_amount'=>0,
-                            'reference_type'=>$request->reference_type,
-                            'reference_id'=>$ref['reference_id'],
-                            'reference_details_id'=>$ref['reference_details_id'],
-                        ];  
+                        $flag=false;
+                        $msg = $voucherInfo['msg'];  
                     }
-                    ComparativeStatementDetailsModel::create($cs_details_data);
-                endforeach;
-                $output = ['status'=>1,'message'=>'Comparative Statement successfully saved'];
-                DB::commit();
+                }else{  // menual voucher 
+                    $checkVoucher = ComparativeStatementInfoModel::module()->valid()->where('voucher_no', $request->voucher_no)->first();
+                    if(empty($checkVoucher)){
+                        $data['voucher_no'] = $request->voucher_no;
+                        $data['voucher_int'] = 0;
+                        $data['voucher_config_id'] = $request->voucher_config_id;
+                    }else{
+                       $flag=false;
+                       $msg = "Voucher no already exists";   
+                    }
+                } 
+                if($flag){
+                    $save = ComparativeStatementInfoModel::create($data);
+                    $cs_id = $save->id; 
+                    $vendorInfo = VendorModel::find($vendor_id);
+
+                    foreach($voucherDetailsData as $ref):   // check item qty wise price catalogue and collect catalog id
+                        $catalog_data = PriceCatelogueDetailsModel::module()->valid()
+                            ->where('catalogue_uniq_id', $vendorInfo->price_cate_id)
+                            ->where('item_id', $ref['item_id'])
+                            ->where('applicable_from', '<=',$date)
+                            ->where('from_qty','<=', $ref['avail_qty'])
+                            ->where('to_qty','>=', $ref['avail_qty'])
+                            ->where('status',1)
+                            ->orderBy('applicable_from', 'desc')->first();
+                        if(!empty($catalog_data)){
+                            // price calculation
+                            if($ref['has_fraction']==1 && self::isFloat($ref['avail_qty'])){
+                                $calInfo = (object)['has_fraction'=>$ref['has_fraction'],'round_of'=>$ref['round_of'],'decimal_point_place'=>$ref['decimal_point_place'],'qty'=>$ref['avail_qty'], 'rate'=>$catalog_data->rate];
+                                $amount = self::rateQtyMultiply($calInfo);
+                            }else{
+                                $amount = $ref['avail_qty'] * $catalog_data->rate;
+                            }
+                            $net_amount = $amount;
+                            if(!empty($catalog_data->vat_per)){
+                                $vat_per = $catalog_data->vat_per;
+                                if($catalog_data->vat_type=='fixed'){
+                                    $vat_amount = $catalog_data->vat_per; 
+                                }else{
+                                    $vat_amount_cal = ($amount/100)*$catalog_data->vat_per;
+                                    $vat_amount = round($vat_amount_cal,6);
+                                }
+                                $net_amount +=  $vat_amount;
+                            }else{
+                                $vat_amount = 0;
+                                $vat_per = 0;
+                            }
+                            if(!empty($catalog_data->discount)){
+                                $net_amount -=  $catalog_data->discount;
+                                $discount = $catalog_data->discount;
+                            }else{
+                                $discount = 0;
+                            }
+                            $cs_details_data = [
+                                'cs_id'=>$cs_id,
+                                'vendor_id'=>$vendor_id,
+                                'item_id'=>$ref['item_id'],
+                                'qty'=>$ref['avail_qty'],
+                                'rate'=>$catalog_data->rate,
+                                'amount'=>$amount,
+                                'discount'=>$discount,
+                                'vat_per'=>$vat_per,
+                                'vat_type'=>$catalog_data->vat_type,
+                                'vat_amount'=>$vat_amount,
+                                'net_amount'=>$net_amount,
+                                'reference_type'=>$request->reference_type,
+                                'reference_id'=>$ref['reference_id'],
+                                'reference_details_id'=>$ref['reference_details_id'],
+                                'remarks'=>$ref['remarks']
+                            ];
+                            
+                        }else{
+                            $cs_details_data = [
+                                'cs_id'=>$cs_id,
+                                'vendor_id'=>$vendor_id,
+                                'item_id'=>$ref['item_id'],
+                                'qty'=>$ref['avail_qty'],
+                                'rate'=>0,
+                                'amount'=>0,
+                                'discount'=>0,
+                                'vat_per'=>0,
+                                'vat_type'=>'fixed',
+                                'vat_amount'=>0,
+                                'net_amount'=>0,
+                                'reference_type'=>$request->reference_type,
+                                'reference_id'=>$ref['reference_id'],
+                                'reference_details_id'=>$ref['reference_details_id'],
+                                'remarks'=>$ref['remarks']
+                            ];  
+                        }
+                        ComparativeStatementDetailsModel::create($cs_details_data);
+                    endforeach;
+                    $output = ['status'=>1,'message'=>'Comparative Statement successfully saved'];
+                    DB::commit();
+                }else{
+                  $output = ['status'=>0,'message'=>$msg];  
+                }
             } catch (Throwable $e) {
                 DB::rollback();
                 throw $e;
@@ -545,7 +563,7 @@ class ComparativeStatementController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true;
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     $purchaseRequisitionDetailsInfo = PurchaseRequisitionDetailsModel::module()->valid()->where('id', $approvalData->reference_details_id)->whereIn('ref_use',[0,1])->first();
                                     if(!empty($purchaseRequisitionDetailsInfo)){ // update ref use
@@ -559,6 +577,8 @@ class ComparativeStatementController extends Controller
                                             'status'=>1,
                                             'approval_level'=>$step+1
                                         ]);
+                                        // update master status base on all app
+                                        self::masterVoucherUpdate($approvalData);
                                     }
 
                                 }else{
@@ -583,8 +603,6 @@ class ComparativeStatementController extends Controller
                                     'institute_id'=>self::getInstituteId(),
                                     'campus_id'=>self::getCampusId(),
                                 ]);
-                                // update master status base on all app
-                                self::masterVoucherUpdate($approvalData);
                                 DB::commit();
                                 $output = ['status'=>1, 'message'=>'Stock in item successfully approved'];
                             }
@@ -728,7 +746,7 @@ class ComparativeStatementController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = ComparativeStatementDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has stock in qty approval';
                     }

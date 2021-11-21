@@ -27,5 +27,6 @@
     "CadetFees": true,
     "Model": true,
     "FeesStructureDetails": true,
-    "Website": true
+    "Website": true,
+    "Accounts": true
 }

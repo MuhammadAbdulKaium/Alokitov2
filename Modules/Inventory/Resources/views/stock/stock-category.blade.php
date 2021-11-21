@@ -49,7 +49,7 @@
                         <table class="table table-striped table-bordered" id="dataTable">
                             <thead>
                                 <tr>
-                                    <th>Select</th>
+                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Parent</th>
                                     <th>Has Child</th>
@@ -58,9 +58,9 @@
                             </thead>
                             <tbody>
                             @if($stockCategory)
-                                @foreach($stockCategory as $category)
+                                @foreach($stockCategory as $k=> $category)
                                     <tr>
-                                        <td><input type="checkbox"></td>
+                                        <td>{{$k+1}}</td>
                                         <td>{{$category->stock_category_name}}</td>
                                         @if($category->stock_category_parent_id==0)
                                         <td>No Parent</td>

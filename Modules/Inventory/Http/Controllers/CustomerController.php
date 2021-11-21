@@ -37,7 +37,7 @@ class CustomerController extends Controller
         $search_key = $request->input('search_key');
         $order = $request->input('order');
         $sort = $request->input('sort');
-        $paginate_data_query = CustomerModel::module()->valid()
+        $paginate_data_query = CustomerModel::module()
             ->when($search_key, function($query, $search_key){
                 $query->where('name','LIKE','%'.$search_key.'%');
             })
@@ -77,7 +77,7 @@ class CustomerController extends Controller
             ->orderBy('price_label', 'asc')
             ->groupBy(['catalogue_uniq_id', 'price_label'])
             ->get();
-        $customerInfo  =  CustomerModel::module()->valid()->find($id);
+        $customerInfo  =  CustomerModel::find($id);
         if(!empty($customerInfo->price_cate_id)){
             $price_cate_id_model = PriceCatelogueInfoModel::select('catalogue_uniq_id', 'price_label')->module()->valid()->where('catalogue_uniq_id', $customerInfo->price_cate_id)->first();
             $customerInfo->price_cate_id_model = $price_cate_id_model;
@@ -139,7 +139,7 @@ class CustomerController extends Controller
             }
             if(!empty($id)){
                 $customer_id =  $id;
-                $customerInfo = CustomerModel::module()->valid()->find($customer_id); 
+                $customerInfo = CustomerModel::find($customer_id); 
                 if(!empty(@$imageName)){
                     if(!empty($customerInfo->image)){
                         $file_path = public_path().'/assets/inventory/customer_image' .'/'.$customerInfo->image;
@@ -180,7 +180,7 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        $data['customerInfo'] = CustomerModel::select('*', DB::raw("DATE_FORMAT(birth_date,'%d/%m/%Y') AS birth_date_show, DATE_FORMAT(anniversary,'%d/%m/%Y') AS anniversary_date"))->module()->valid()->find($id);
+        $data['customerInfo'] = CustomerModel::select('*', DB::raw("DATE_FORMAT(birth_date,'%d/%m/%Y') AS birth_date_show, DATE_FORMAT(anniversary,'%d/%m/%Y') AS anniversary_date"))->find($id);
         if(!empty($data['customerInfo']->price_cate_id)){
             $price_cate_info = PriceCatelogueInfoModel::select('catalogue_uniq_id', 'price_label')->module()->valid()->first();
             $data['customerInfo']->price_cate_name = $price_cate_info->price_label;
@@ -223,21 +223,15 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         try {
-            $checkSalesOrderInfo = DB::table('inventory_sales_order_info')->where('customer_id', $id)->first();
-            if(empty($checkSalesOrderInfo)){
-                $customerInfo = CustomerModel::module()->valid()->find($id);
-                if(!empty($customerInfo->image)){
-                    $file_path = public_path().'/assets/inventory/customer_image' .'/'.$customerInfo->image;
-                    if(file_exists($file_path)) unlink($file_path);
-                }
-                $customerInfo->delete();
-                DB::table('inventory_customer_terms_condition')->where('customer_id', $id)->delete();
-
-                $output = ['status'=>1,'message'=>'Customer successfully deleted'];
-                DB::commit();
-            }else{
-                $output = ['status'=>0,'message'=>'Sorry! Customer has sales order'];
+            $customerInfo = CustomerModel::find($id);
+            if(!empty($customerInfo->image)){
+                $file_path = public_path().'/assets/inventory/customer_image' .'/'.$customerInfo->image;
+                if(file_exists($file_path)) unlink($file_path);
             }
+            $customerInfo->delete();
+            DB::table('inventory_customer_terms_condition')->where('customer_id', $id)->delete();
+            $output = ['status'=>1,'message'=>'Customer successfully deleted'];
+            DB::commit();
         } catch (Throwable $e) {
             DB::rollback();
             throw $e;

@@ -53,10 +53,10 @@
                             </div>
                             <div class="row" style="margin-bottom: 30px">
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="from_date_show" v-model="filter.from_date_show" placeholder="From Date" :format="filterFromDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.from_date" :config="dateOptions" style="width: 100%;" placeholder="From date"></v-date-picker>
                                 </div>  
                                 <div class="col-sm-3">
-                                    <vuejs-datepicker name="to_date_show" v-model="filter.to_date_show" placeholder="To Date" :format="filterToDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker v-model="filter.to_date" :config="dateOptions" style="width: 100%;" placeholder="To date"></v-date-picker>
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" name="search_key" placeholder="Search by keyword" class="form-control" v-model="filter.search_key" style="width: 100%;" autocomplete="off">
@@ -65,7 +65,7 @@
                                     <button class="btn btn-primary" @click="getResults(1)"><i class="fa fa-search"></i> Search</button>
                                 </div>
                                 <div class="col-sm-1" style="padding-left: 0">
-                                    <button class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
+                                    <button type="button" class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
                                 </div>
                             </div>
                         </form>
@@ -80,6 +80,7 @@
                                         <th class="sortable" v-bind:class="getSortingClass('date')" @click="sortingChanged('date')">Date</th>
                                         <th class="sortable" v-bind:class="getSortingClass('inventory_purchase_requisition_details.status')" @click="sortingChanged('inventory_purchase_requisition_details.status')">Status</th>
                                         <th class="sortable" v-bind:class="getSortingClass('need_cs')" @click="sortingChanged('need_cs')">Need CS</th>
+                                        <th>Remarks</th>
                                         <th>Approved By</th>
                                         <th width="15%">Action</th>
                                     </tr>
@@ -101,6 +102,7 @@
                                                 <span v-if="list.need_cs==0">No</span>
                                                 <span v-if="list.need_cs==1">Yes</span>
                                             </td>
+                                            <td>@{{list.remarks}}</td>
                                             <td>@{{list.approved_text}}</td>
                                             <td>
                                                 <a v-if="list.has_approval=='yes'" class="btn btn-primary btn-xs" @click="voucherApproval('purchase-requisition-approval',list.id)"
@@ -116,7 +118,7 @@
                                     </template>
                                     <template v-else>
                                   <tr>
-                                    <td colspan="8" class="text-center">No Record found!</td>
+                                    <td colspan="9" class="text-center">No Record found!</td>
                                   </tr>
                                 </template>
                                 </tbody>
@@ -166,7 +168,7 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Voucher No <span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15">
-                                    <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="REQ-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.numbering">
+                                    <input type="text" name="voucher_no" v-model="formData.voucher_no"  class="form-control" required placeholder="PURREQ-001" data-vv-as="voucher name" v-validate="'required'" :readonly="formData.auto_voucher">
                                     <span class="error" v-if="$validator.errors.has('voucher_no')">@{{$validator.errors.first('voucher_no')}}</span>
                                 </div>
                             </div>
@@ -193,7 +195,7 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Req Date <span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15">
-                                    <vuejs-datepicker name="date" data-vv-as="Date" v-validate="'required'" v-model="formData.date_show" placeholder="Date" :format="reqDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker name="date" data-vv-as="Req Date" v-validate="'required'" v-model="formData.date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy"></v-date-picker>
                                     <span class="error" v-if="$validator.errors.has('date')">@{{$validator.errors.first('date')}}</span>
                                 </div>
                             </div>
@@ -201,7 +203,7 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label required">Due Date <span class="text-danger">*</span></label>
                                 <div class="col-md-8 p-b-15">
-                                    <vuejs-datepicker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date_show" placeholder="Date" :format="dueDateFormatter"></vuejs-datepicker>
+                                    <v-date-picker name="due_date" data-vv-as="Due Date" v-validate="'required'" v-model="formData.due_date" :config="dateOptions" style="width: 100%;" placeholder="dd/mm/yyyy"></v-date-picker>
                                     <span class="error" v-if="$validator.errors.has('due_date')">@{{$validator.errors.first('due_date')}}</span>
                                 </div>
                             </div>
@@ -225,6 +227,7 @@
                                 <th width="40%">Item Name</th>
                                 <th>UOM</th>
                                 <th>Quantity</th>
+                                <th>Remarks</th>
                                 <th class="text-center" width="15%">Action</th>
                             </tr>
                         </thead>
@@ -236,6 +239,9 @@
                                 <td>@{{gridData.uom}}</td>
                                 <td class="text-center" valign="middle">
                                     <input type="number" name="req_qty" v-model="gridData.req_qty" class="form-control" autocomplete="off" placeholder="Quantity" min="0">  
+                                </td>
+                                <td class="text-center" valign="middle">
+                                    <input type="text" name="remarks" v-model="gridData.remarks" class="form-control" autocomplete="off" placeholder="Remarks" maxlength="255">  
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-info table-input-redious" @click="itemGridAdd($event)">ADD</button>
@@ -253,6 +259,7 @@
                                 <th>Item Name</th>
                                 <th>UOM</th>
                                 <th>Qty</th>
+                                <th>Remarks</th>
                                 <th class="text-center" width="16%">Action</th>
                             </tr>
                         </thead>
@@ -260,9 +267,10 @@
                             <template v-if="formData.itemAdded=='yes'">
                                 <tr v-for="(data, index) in formData.voucherDetailsData" v-bind:key="index">
                                     <td valign="middle">@{{index+1}}</td>
-                                    <td valign="middle">@{{data.product_name}}.</td>          
+                                    <td valign="middle">@{{data.product_name}}</td>          
                                     <td valign="middle">@{{data.uom}}</td>              
                                     <td class="text-right" valign="middle">@{{parseFloat(data.req_qty).toFixed(data.decimal_point_place)}}</td> 
+                                    <td valign="middle">@{{data.remarks}}</td> 
                                     <td class="text-center" valign="middle">
                                         <button class="btn-info btn-xs" title="Edit" @click="itemGridEdit($event, data)"><i class="fa fa-pencil-square-o"></i></button>
                                         <button class="btn-xs btn-danger" title="Delete" @click="itemGridRemove($event, data)"><i class="fa fa-trash"></i></button>
@@ -271,25 +279,25 @@
                             </template>
                             <template v-else>
                                 <tr>
-                                    <td colspan="5" align="center">Nothing here</td>
+                                    <td colspan="6" align="center">Nothing here</td>
                                 </tr>
                             </template>
                             
                         </tbody>
-                        <tfoot>
+                        <!-- <tfoot>
                             <tr>
                                 <td colspan="3" class="text-right"><b>Total</b></td>
                                 <td class="text-right">@{{formData.totalQty}}</td>
                                 <td></td>
                             </tr>
-                        </tfoot>
+                        </tfoot> -->
                     </table>
 
                     <div class="form-group">
-                        <label class="col-md-3 control-label required">Comments <span class="text-danger">*</span></label>
+                        <label class="col-md-3 control-label required">Comments</label>
                         <div class="col-md-9 p-b-15">
-                            <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" data-vv-as="Comments" v-validate="'required'" maxlength="255"></textarea>
-                            <span class="error" v-if="$validator.errors.has('comments')">@{{$validator.errors.first('comments')}}</span>
+                            <textarea name="comments" v-model="formData.comments" placeholder="Comments" class="form-control" maxlength="255"></textarea>
+                           
                         </div>
                     </div>
                    
@@ -367,6 +375,7 @@
                                     <th>UOM</th>
                                     <th>Req. Qty</th>
                                     <th>App. Qty</th>
+                                    <th>Remarks</th>
                                     <th width="16%">Status</th>
                                 </tr>
                             </thead>
@@ -377,6 +386,7 @@
                                     <td valign="middle">@{{list.uom}}</td>                   
                                     <td class="text-right" valign="middle">@{{parseFloat(list.req_qty).toFixed(list.decimal_point_place)}}</td>
                                     <td class="text-right" valign="middle">@{{parseFloat((list.app_qty)?list.app_qty:0).toFixed(list.decimal_point_place)}}</td> 
+                                    <td valign="middle">@{{list.remarks}}</td> 
                                     <td valign="middle">
                                         <span v-if="list.status==0">Pending</span>
                                         <span v-if="list.status==1">Approved</span>
@@ -385,14 +395,14 @@
                                     </td>              
                                 </tr>
                             </tbody>
-                            <tfoot>
+                            <!-- <tfoot>
                                 <tr>
                                     <td colspan="3" class="text-right"><b>Total</b></td>
                                     <td class="text-right">@{{parseFloat(formData.totalReqQty).toFixed(2)}}</td>
                                     <td class="text-right">@{{parseFloat(formData.totalAppQty).toFixed(2)}}</td>
                                     <td class="text-right"></td>
                                 </tr>
-                            </tfoot>
+                            </tfoot> -->
                         </table>
                     </div>
 
@@ -430,18 +440,19 @@
 <script src="{{URL::asset('vuejs/vee-validate.js') }}"></script>
 <script src="{{URL::asset('vuejs/vue-toastr.umd.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/sweetalert2.all.min.js') }}"></script>
-<script src="{{URL::asset('vuejs/vuejs-datepicker.js') }}"></script>
+<script src="{{URL::asset('vuejs/moment.min.js') }}"></script>
+<link href="{{ URL::asset('vuejs/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css"/>
+<script src="{{URL::asset('vuejs/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{URL::asset('vuejs/vue-bootstrap-datetimepicker.min.js') }}"></script>
 <script src="{{URL::asset('vuejs/mixin.js') }}"></script>
 <script>
      axios.defaults.headers.common['X-CSRF-TOKEN'] = token; 
     Vue.use(VeeValidate);
     Vue.mixin(mixin);
     Vue.component('multiselect', window.VueMultiselect.default)
+    Vue.component('v-date-picker', VueBootstrapDatetimePicker)
     var app = new Vue({
       el: '#app',
-      components: {
-        vuejsDatepicker
-      },
       data: {
         filter:{
             item_id_model:'',
@@ -463,50 +474,6 @@
         this.getResults(1);
       },
       methods:{
-        reqDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var req_date = [day,month,year].join('/');
-            this.$set(this.formData, 'date', req_date);
-            return req_date              
-        },
-        dueDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var due_date = [day,month,year].join('/');
-            this.$set(this.formData, 'due_date', due_date);
-            return due_date              
-        },
-        filterFromDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var from_date = [day,month,year].join('/');
-            this.$set(this.filter, 'from_date', from_date);
-            return from_date              
-        },
-        filterToDateFormatter(date) {
-            var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            var to_date = [day,month,year].join('/');
-            this.$set(this.filter, 'to_date', to_date);
-            return to_date              
-        },
         selectFilterItem(item){
             if(item) this.filter.item_id = item.item_id;
             else this.filter.item_id = 0; 
@@ -543,7 +510,7 @@
         },
         itemGridAdd(event){
             event.preventDefault();
-            if(this.gridData.item_id && parseFloat(this.gridData.req_qty)>0){
+            if(this.gridData.item_id && parseFloat(this.gridData.req_qty)>0 && this.gridData.remarks){
                 var req_qty = parseFloat(this.gridData.req_qty);
                 var checkExists =  this.gridDataExist(this.formData.voucherDetailsData,this.gridData);
                 if(checkExists.length>0){ alert("You have already added the Item"); return false; }
@@ -561,8 +528,12 @@
             }else{
                 if(!this.gridData.item_id){
                     alert('Please select item');
-                }else{
+                }else if(!this.gridData.req_qty){
                     alert('Please enter qty');
+                }else if(this.gridData.req_qty<=0){
+                    alert('Please enter qty greater than zero');
+                }else{
+                    alert('Please enter remarks');
                 }
             }
         },

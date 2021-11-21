@@ -17,4 +17,6 @@ class StockUOM extends Model
         return $query->where('cadet_inventory_uom.campus_id', self::getCampusId())->where('cadet_inventory_uom.institute_id', self::getInstituteId());
 
     }
+
+    
 }

@@ -183,16 +183,23 @@ class PurchaseOrderController extends Controller
         $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
         $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
         $campus_name = $campus_id_model->name;
-        $data['vendor_list'] = VendorModel::select('id','name')->module()->valid()->get();
-        $data['formData'] = ['purchase_category'=>'','voucher_no'=>'','voucher_int'=>0,'numbering'=>true, 'date'=>date('Y-m-d'),'date_show'=>date('Y-m-d'),'due_date'=>date('Y-m-d'),'due_date_show'=>date('Y-m-d'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'vendor_id'=>0,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
+        $data['vendor_list'] = VendorModel::select('id','name')->get();
+        $data['formData'] = ['purchase_category'=>'','voucher_no'=>'','auto_voucher'=>true, 'date'=>date('d/m/Y'),'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'vendor_id'=>0,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no'];
         return response()->json($data);
     }
 
     public function getPurchaseVoucherNo(Request $request){
         $purchase_category = $request->purchase_category;
-        $voucherInfo = self::getVoucherNo($purchase_category);
-        if($voucherInfo['voucher_no']){
-            $data = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_int'=>$voucherInfo['voucher_int']];
+        if($purchase_category=='general'){
+            $type_of_voucher = 15;
+        }else if($purchase_category=='lc'){
+            $type_of_voucher = 16; 
+        }else{
+            $type_of_voucher = 0;
+        }
+        $voucherInfo = self::checkInvVoucher($type_of_voucher);
+        if($voucherInfo['voucher_conf']){
+            $data = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher']];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
         }
@@ -213,7 +220,7 @@ class PurchaseOrderController extends Controller
                 ->join('inventory_purchase_requisition_info', 'inventory_purchase_requisition_info.id','=', 'inventory_purchase_requisition_details.req_id')
                 ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_purchase_requisition_details.item_id')
                 ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-                ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+                ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty','inventory_purchase_requisition_details.remarks',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
                 ->where('inventory_purchase_requisition_info.due_date','<=',$date)
                 ->whereIn('inventory_purchase_requisition_details.ref_use',[0,1])
                 ->whereIn('inventory_purchase_requisition_details.status',[1,2])
@@ -243,7 +250,7 @@ class PurchaseOrderController extends Controller
                 ->join('inventory_comparative_statement_info', 'inventory_comparative_statement_info.id','=', 'inventory_comparative_statement_details_info.cs_id')
                 ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_comparative_statement_details_info.item_id')
                 ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-                ->select('inventory_comparative_statement_details_info.id as reference_details_id','inventory_comparative_statement_details_info.cs_id as reference_id','inventory_comparative_statement_details_info.item_id','inventory_comparative_statement_details_info.rate','inventory_comparative_statement_details_info.amount as total_amount','inventory_comparative_statement_details_info.discount','inventory_comparative_statement_details_info.vat_per','inventory_comparative_statement_details_info.vat_type','inventory_comparative_statement_details_info.vat_amount','inventory_comparative_statement_details_info.net_amount as net_total','inventory_comparative_statement_details_info.qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_comparative_statement_info.date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(inventory_comparative_statement_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_comparative_statement_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+                ->select('inventory_comparative_statement_details_info.id as reference_details_id','inventory_comparative_statement_details_info.cs_id as reference_id','inventory_comparative_statement_details_info.item_id','inventory_comparative_statement_details_info.rate','inventory_comparative_statement_details_info.amount as total_amount','inventory_comparative_statement_details_info.discount','inventory_comparative_statement_details_info.vat_per','inventory_comparative_statement_details_info.vat_type','inventory_comparative_statement_details_info.vat_amount','inventory_comparative_statement_details_info.net_amount as net_total','inventory_comparative_statement_details_info.qty as req_app_qty','inventory_comparative_statement_details_info.remarks',DB::raw("DATE_FORMAT(inventory_comparative_statement_info.date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(inventory_comparative_statement_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_comparative_statement_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
                 ->where('inventory_comparative_statement_info.due_date','<=',$date)
                 ->where('inventory_comparative_statement_info.vendor_id',$vendor_id)
                 ->whereIn('inventory_comparative_statement_details_info.ref_use',[0,1])
@@ -283,7 +290,7 @@ class PurchaseOrderController extends Controller
         $date = DateTime::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
         $refDataList = $request->refDataList;
         $institute_id = self::getInstituteId(); 
-        $vendorInfo = VendorModel::module()->valid()->find($vendor_id);
+        $vendorInfo = VendorModel::find($vendor_id);
         $voucherDetailsData = [];
         if(!empty($vendorInfo->price_cate_id)){
             $price_cate_id = $vendorInfo->price_cate_id;
@@ -372,21 +379,14 @@ class PurchaseOrderController extends Controller
         $campus_id = self::getCampusId();
         $institute_id = self::getInstituteId();
         $validated = $request->validate([
-            'voucher_no' => [
-                'required',
-                'max:100',
-                Rule::unique('inventory_purchase_order_info')->where(function ($query) use($campus_id, $institute_id) {
-                    return $query->where('campus_id', $campus_id)->where('institute_id', $institute_id)->where('valid',1);
-                })->ignore($id, 'id')
-            ],
+            'voucher_no' => 'required|max:100',
             'date' => 'required|date_format:d/m/Y',
             'due_date' => 'required|date_format:d/m/Y|after_or_equal:date',
             'campus_id' => 'required',
             'vendor_id' => 'required',
             'purchase_category' => 'required',
             'reference_type'=>'required',
-            'instruction_of'=>'required',
-            'comments' => 'required|max:255',
+            'instruction_of'=>'required'
         ]);
 
         $date = DateTime::createFromFormat('d/m/Y', $request->date)->format('Y-m-d');
@@ -403,7 +403,7 @@ class PurchaseOrderController extends Controller
             }else{
                $item_ids = collect($voucherDetailsData)->pluck('item_id')->all(); 
             }
-            $itemList = CadetInventoryProduct::module()->whereIn('id', $item_ids)->get()->keyBy('id')->all();
+            $itemList = CadetInventoryProduct::whereIn('id', $item_ids)->get()->keyBy('id')->all();
             $flag = true; $msg = []; $item_approval = false; $has_qty=false;
             // checking fraction, fraction length and if approved item change
             foreach ($voucherDetailsData as $v):
@@ -450,8 +450,6 @@ class PurchaseOrderController extends Controller
                 try {
                     $data = [
                         "purchase_category"=>$request->purchase_category,
-                        "voucher_no" => $request->voucher_no,
-                        "voucher_int" => $request->voucher_int,
                         "vendor_id" => $request->vendor_id,
                         "instruction_of" => $request->instruction_of,
                         "date" => $date,
@@ -459,6 +457,7 @@ class PurchaseOrderController extends Controller
                         "reference_type" => $request->reference_type,
                         "comments" => $request->comments
                     ];
+                    $auto_voucher = $request->auto_voucher;  // voucher type 
                     if(!empty($id)){
                         $pur_id = $id;
                         $purInfo = PurchaseOrderInfoModel::module()->valid()->findOrFail($id);
@@ -502,9 +501,31 @@ class PurchaseOrderController extends Controller
                         }
 
                     }else{
-                        $save = PurchaseOrderInfoModel::create($data);
-                        $pur_id = $save->id; 
-
+                        if($auto_voucher){  // auto voucher configuration
+                            $voucherInfo = self::getVoucherNo($request->purchase_category);
+                            if($voucherInfo['voucher_no']){
+                                $data['voucher_no'] = $voucherInfo['voucher_no'];
+                                $data['voucher_int'] = $voucherInfo['voucher_int'];
+                                $data['voucher_config_id'] = $voucherInfo['voucher_config_id'];
+                            }else{
+                                $flag=false;
+                                $msg = $voucherInfo['msg'];  
+                            }
+                        }else{  // menual voucher 
+                            $checkVoucher = PurchaseOrderInfoModel::module()->valid()->where('purchase_category', $request->purchase_category)->where('voucher_no', $request->voucher_no)->first();
+                            if(empty($checkVoucher)){
+                                $data['voucher_no'] = $request->voucher_no;
+                                $data['voucher_int'] = 0;
+                                $data['voucher_config_id'] = $request->voucher_config_id;
+                            }else{
+                               $flag=false;
+                               $msg = "Voucher no already exists";   
+                            }
+                        }
+                        if($flag){
+                            $save = PurchaseOrderInfoModel::create($data);
+                            $pur_id = $save->id; 
+                        }
                     }
                     if($flag){
                         foreach ($voucherDetailsData as $v) {
@@ -524,6 +545,7 @@ class PurchaseOrderController extends Controller
                                     'vat_type'=>(!empty($v['vat_type']))?$v['vat_type']:NULL,
                                     'discount'=>$v['discount'],
                                     'net_total'=>$v['net_total'],
+                                    'remarks'=>$v['remarks']
                                 ];
                                 if($details_id>0){
                                     PurchaseOrderDetailsModel::module()->valid()->find($details_id)->update($detailsData);;
@@ -607,10 +629,8 @@ class PurchaseOrderController extends Controller
         $date = DateTime::createFromFormat('Y-m-d', $purchaseOrderInfo->date)->format('d/m/Y');
         $due_date = DateTime::createFromFormat('Y-m-d', $purchaseOrderInfo->due_date)->format('d/m/Y');
         $purchaseOrderInfo->date = $date;
-        $purchaseOrderInfo->date_show = $purchase_date;
-        $purchaseOrderInfo->numbering = true;
+        $purchaseOrderInfo->auto_voucher = true;
         $purchaseOrderInfo->due_date = $due_date;
-        $purchaseOrderInfo->due_date_show = $purchase_due_date;
         $data['instruction_user_list'] = User::select('id', 'name')->module()->get();
         $instruction_of_model=User::select('id', 'name')->where('id', $purchaseOrderInfo->instruction_of)->first();
         $instruction_name = $instruction_of_model->name;
@@ -622,8 +642,8 @@ class PurchaseOrderController extends Controller
         $purchaseOrderInfo->campus_name = $campus_id_model->name;
         $purchaseOrderInfo->campus_id_model = $campus_id_model;
 
-        $data['vendor_list'] = VendorModel::select('id','name')->module()->valid()->get();
-        $vendor_id_model = VendorModel::select('id', 'name')->module()->valid()->find($purchaseOrderInfo->vendor_id);
+        $data['vendor_list'] = VendorModel::select('id','name')->get();
+        $vendor_id_model = VendorModel::select('id', 'name')->find($purchaseOrderInfo->vendor_id);
         $vendor_name = $vendor_id_model->name;
         $purchaseOrderInfo->vendor_id_model = $vendor_id_model;
         $purchaseOrderInfo->vendor_name = $vendor_name;
@@ -657,7 +677,7 @@ class PurchaseOrderController extends Controller
                 ->join('inventory_purchase_requisition_info', 'inventory_purchase_requisition_info.id','=', 'inventory_purchase_requisition_details.req_id')
                 ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_purchase_requisition_details.item_id')
                 ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-                ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+                ->select('inventory_purchase_requisition_details.id as reference_details_id','inventory_purchase_requisition_details.req_id as reference_id','inventory_purchase_requisition_details.item_id','inventory_purchase_requisition_details.req_qty','inventory_purchase_requisition_details.app_qty as req_app_qty','inventory_purchase_requisition_details.remarks',DB::raw("DATE_FORMAT(inventory_purchase_requisition_info.date,'%d/%m/%Y') AS req_date, DATE_FORMAT(inventory_purchase_requisition_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_purchase_requisition_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
                 ->where('inventory_purchase_requisition_info.due_date','<=',$purchase_date)
                 ->whereIn('inventory_purchase_requisition_details.ref_use',[0,1])
                 ->whereIn('inventory_purchase_requisition_details.status',[1,2])
@@ -670,7 +690,7 @@ class PurchaseOrderController extends Controller
                 ->join('inventory_comparative_statement_info', 'inventory_comparative_statement_info.id','=', 'inventory_comparative_statement_details_info.cs_id')
                 ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_comparative_statement_details_info.item_id')
                 ->join('cadet_inventory_uom', 'cadet_inventory_uom.id','=', 'cadet_stock_products.unit')
-                ->select('inventory_comparative_statement_details_info.id as reference_details_id','inventory_comparative_statement_details_info.cs_id as reference_id','inventory_comparative_statement_details_info.item_id','inventory_comparative_statement_details_info.rate','inventory_comparative_statement_details_info.amount as total_amount','inventory_comparative_statement_details_info.discount','inventory_comparative_statement_details_info.vat_per','inventory_comparative_statement_details_info.vat_type','inventory_comparative_statement_details_info.vat_amount','inventory_comparative_statement_details_info.net_amount as net_total','inventory_comparative_statement_details_info.qty as req_app_qty',DB::raw("DATE_FORMAT(inventory_comparative_statement_info.date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(inventory_comparative_statement_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_comparative_statement_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
+                ->select('inventory_comparative_statement_details_info.id as reference_details_id','inventory_comparative_statement_details_info.cs_id as reference_id','inventory_comparative_statement_details_info.item_id','inventory_comparative_statement_details_info.rate','inventory_comparative_statement_details_info.amount as total_amount','inventory_comparative_statement_details_info.discount','inventory_comparative_statement_details_info.vat_per','inventory_comparative_statement_details_info.vat_type','inventory_comparative_statement_details_info.vat_amount','inventory_comparative_statement_details_info.net_amount as net_total','inventory_comparative_statement_details_info.qty as req_app_qty','inventory_comparative_statement_details_info.remarks',DB::raw("DATE_FORMAT(inventory_comparative_statement_info.date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(inventory_comparative_statement_info.due_date,'%d/%m/%Y') AS due_date"), 'inventory_comparative_statement_info.voucher_no as ref_voucher_name', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction','cadet_stock_products.round_of')
                 ->where('inventory_comparative_statement_info.due_date','<=',$purchase_date)
                 ->where('inventory_comparative_statement_info.vendor_id',$purchaseOrderInfo->vendor_id)
                 ->whereIn('inventory_comparative_statement_details_info.ref_use',[0,1])
@@ -763,7 +783,7 @@ class PurchaseOrderController extends Controller
                         if($approval_access && $approvalData->approval_level==$step){
                             $flag=true;
                             if($step==$last_step){
-                                $itemInfo = CadetInventoryProduct::module()->find($approvalData->item_id);
+                                $itemInfo = CadetInventoryProduct::find($approvalData->item_id);
                                 if(!empty($itemInfo)){
                                     if($approvalData->reference_type=='cs'){
                                         $comparativeStatementDetailsInfo = ComparativeStatementDetailsModel::module()->valid()->where('id', $approvalData->reference_details_id)->whereIn('ref_use',[0,1])->first();
@@ -815,6 +835,8 @@ class PurchaseOrderController extends Controller
                                             'app_qty'=>$approvalData->pur_qty,
                                             'approval_level'=>$step+1
                                         ]);
+                                        // update master status base on all app
+                                        self::masterVoucherUpdate($approvalData);
                                     }
                                 }else{
                                    $flag=false;
@@ -838,8 +860,7 @@ class PurchaseOrderController extends Controller
                                     'institute_id'=>self::getInstituteId(),
                                     'campus_id'=>self::getCampusId(),
                                 ]);
-                                // update master status base on all app
-                                self::masterVoucherUpdate($approvalData);
+                                
                                 DB::commit();
                                 $output = ['status'=>1, 'message'=>'Stock in item successfully approved'];
                             }
@@ -951,7 +972,7 @@ class PurchaseOrderController extends Controller
                 foreach ($delIds as $del_id){
                     $deleteData = PurchaseOrderDetailsModel::module()->valid()->find($del_id);
                     if($deleteData->status==1||$deleteData->status==2){
-                        $itemInfo = CadetInventoryProduct::module()->find($deleteData->item_id);
+                        $itemInfo = CadetInventoryProduct::find($deleteData->item_id);
                         $flag = false;
                         $msg[] = $itemInfo->product_name.' has purchase order qty approval';
                     }

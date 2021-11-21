@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Inventory\Entities\PriceCatelogueInfoModel;
 use Modules\Inventory\Entities\VendorModel;
+use Modules\Accounts\Entities\AccountsConfigurationModel;
+use Modules\Accounts\Entities\ChartOfAccountsConfigModel;
+use Modules\Accounts\Entities\ChartOfAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\InventoryHelper;
@@ -37,8 +40,8 @@ class VendorController extends Controller
         $search_key = $request->input('search_key');
         $order = $request->input('order');
         $sort = $request->input('sort');
-        $paginate_data_query = VendorModel::module()->valid()
-            ->when($search_key, function($query, $search_key){
+        $paginate_data_query = VendorModel::module()->
+            when($search_key, function($query, $search_key){
                 $query->where('name','LIKE','%'.$search_key.'%');
             })
             ->orderBy($sort,$order);     
@@ -76,7 +79,7 @@ class VendorController extends Controller
             ->orderBy('price_label', 'asc')
             ->groupBy(['catalogue_uniq_id', 'price_label'])
             ->get();
-        $vendorInfo  =  VendorModel::module()->valid()->find($id);
+        $vendorInfo  =  VendorModel::find($id);
         if(!empty($vendorInfo->price_cate_id)){
             $price_cate_id_model = PriceCatelogueInfoModel::select('catalogue_uniq_id', 'price_label')->module()->valid()->where('catalogue_uniq_id', $vendorInfo->price_cate_id)->first();
             $vendorInfo->price_cate_id_model = $price_cate_id_model;
@@ -110,11 +113,12 @@ class VendorController extends Controller
             'type' => 'required',
             'name' => 'required|max:255'
         ]);
+        $flag = true; $msg = '';
         DB::beginTransaction();
         try {
             $id = $request->id;
             $add_row = json_decode($request->add_row);
-            $data = $request->except(['vendor_image','image','add_row','price_cate_id_model','id','anniversary_show','birth_date','anniversary']);
+            $data = $request->except(['vendor_image','image','add_row','price_cate_id_model','id','anniversary_show','birth_date','anniversary','gl_code']);
             if(!empty($request->birth_date)){
                 $data['birth_date'] = DateTime::createFromFormat('d/m/Y', $request->birth_date)->format('Y-m-d');
             }else{
@@ -136,37 +140,94 @@ class VendorController extends Controller
             }
             if(!empty($id)){
                 $vendor_id =  $id;
-                $vendorInfo = VendorModel::module()->valid()->find($vendor_id); 
+                $vendorInfo = VendorModel::find($vendor_id); 
                 if(!empty(@$imageName)){
                     if(!empty($vendorInfo->image)){
                         $file_path = public_path().'/assets/inventory/vendor_image' .'/'.$vendorInfo->image;
                         if(file_exists($file_path)) unlink($file_path);
                     }
                 }
+                $data['gl_code'] = $request->gl_code;
                 $vendorInfo->update($data);
                 DB::table('inventory_vendor_terms_condition')->where('vendor_id', $vendor_id)->delete();
+                $output = ['status'=>1,'message'=>'Vendor successfully update'];
             }else{
-                $save = VendorModel::create($data);
-                $vendor_id = $save->id; 
-            }
-            // terms and condition 
-            $terms_condition_data = [];
-            foreach($add_row as $v){
-                if(!empty($v->term_condition)){
-                    $terms_condition_data[] = [
-                        'vendor_id'=>$vendor_id,
-                        'term_condition'=>$v->term_condition
-                    ];
+                $sundry_creditors_config = AccountsConfigurationModel::module()->where('particular', 'sundry_creditors')->first();
+                if(!empty($sundry_creditors_config)){
+                    if($sundry_creditors_config->account_type=='group'){
+                        $sundry_creditors_id = $sundry_creditors_config->particular_id;
+                        // chart of accounts auto insert
+                        $parentAccount = ChartOfAccount::findOrFail($sundry_creditors_id);
+                        $accountCodeCredentials = self::chartOfAccountCodeGenerate($parentAccount, 'ledger', null);
+                        $chartOfData = [
+                            'account_code'=>$accountCodeCredentials['accountCode'],
+                            'account_name'=>$request->name,
+                            'parent_id'=>$sundry_creditors_id,
+                            'account_type'=>'ledger',
+                            'increase_by'=>$parentAccount->increase_by,
+                            'layer'=>($parentAccount->layer + 1),
+                            'uid'=>$accountCodeCredentials['uid']
+                        ];
+                        ChartOfAccount::create($chartOfData);
+                        $coaConfig = ChartOfAccountsConfigModel::module()->first();
+                        if(empty($coaConfig) || $coaConfig->code_type=='Auto'){
+                            $data['gl_code'] = $accountCodeCredentials['accountCode'];
+                        }
+                        $save = VendorModel::create($data);
+                        $vendor_id = $save->id; 
+                    }else{
+                        $flag=false;
+                        $msg = "Sundry Creditors should be group type of code!";
+                    }
+                }else{
+                    $flag=false;
+                    $msg = "Configure Sundry Creditors code!";
                 }
             }
-            DB::table('inventory_vendor_terms_condition')->insert($terms_condition_data);
-            $output = ['status'=>1,'message'=>'Vendor successfully saved'];
-            DB::commit();
+            // terms and condition 
+            if($flag){
+                $terms_condition_data = [];
+                foreach($add_row as $v){
+                    if(!empty($v->term_condition)){
+                        $terms_condition_data[] = [
+                            'vendor_id'=>$vendor_id,
+                            'term_condition'=>$v->term_condition
+                        ];
+                    }
+                }
+                DB::table('inventory_vendor_terms_condition')->insert($terms_condition_data);
+                $output = ['status'=>1,'message'=>'Vendor successfully saved'];
+                DB::commit();
+            }else{
+                $output = ['status'=>0,'message'=>$msg];
+            }
         } catch (Throwable $e){
             DB::rollback();
             throw $e;
         } 
         return response()->json($output); 
+    }
+
+    public static function chartOfAccountCodeGenerate($parentAccount, $newAccountType, $id){
+        $accountCode = '';
+        $parentAccountCode = explode("--", $parentAccount->account_code);
+        if ($id) {
+            $account = ChartOfAccount::module()->where('parent_id', $parentAccount->id)->where('id', '!=', $id)->latest()->first();
+            $uid = ($account) ? $account->uid : 0;
+        } else {
+            $account = ChartOfAccount::module()->where('parent_id', $parentAccount->id)->latest()->first();
+            $uid = ($account) ? $account->uid : 0;
+        }
+        $uid++;
+
+        if ($newAccountType == 'group') {
+            $accountCode = $parentAccountCode[0] . "-" . $uid;
+        } elseif ($newAccountType == 'ledger') {
+            $accountCode = $parentAccountCode[0] . "--" . $uid;
+        }
+
+        return ['accountCode' => $accountCode, 'uid' => $uid];
+
     }
 
     /**
@@ -176,7 +237,7 @@ class VendorController extends Controller
      */
     public function show($id)
     {
-        $data['vendorInfo'] = VendorModel::select('*', DB::raw("DATE_FORMAT(birth_date,'%d/%m/%Y') AS birth_date_show, DATE_FORMAT(anniversary,'%d/%m/%Y') AS anniversary_date"))->module()->valid()->find($id);
+        $data['vendorInfo'] = VendorModel::select('*', DB::raw("DATE_FORMAT(birth_date,'%d/%m/%Y') AS birth_date_show, DATE_FORMAT(anniversary,'%d/%m/%Y') AS anniversary_date"))->find($id);
         if(!empty($data['vendorInfo']->price_cate_id)){
             $price_cate_info = PriceCatelogueInfoModel::select('catalogue_uniq_id', 'price_label')->module()->valid()->first();
             $data['vendorInfo']->price_cate_name = $price_cate_info->price_label;
@@ -220,9 +281,11 @@ class VendorController extends Controller
 
         DB::beginTransaction();
         try {
-            $checkPurchaseOrderInfo = DB::table('inventory_purchase_order_info')->where('vendor_id', $id)->first();
-            if(empty($checkPurchaseOrderInfo)){
-                $vendorInfo = VendorModel::module()->valid()->find($id);
+            $delete_checkInfo = self::vendorDeleteDependencyCheck($id);
+            $delete_check_status=$delete_checkInfo['status'];
+            $msg=$delete_checkInfo['msg'];
+            if($delete_check_status){
+                $vendorInfo = VendorModel::find($id);
                 if(!empty($vendorInfo->image)){
                     $file_path = public_path().'/assets/inventory/vendor_image' .'/'.$vendorInfo->image;
                     if(file_exists($file_path)) unlink($file_path);
@@ -233,7 +296,7 @@ class VendorController extends Controller
                 $output = ['status'=>1,'message'=>'Vendor successfully deleted'];
                 DB::commit();
             }else{
-                $output = ['status'=>0,'message'=>'Sorry! Vendor has purchase order'];
+                $output = ['status'=>0,'message'=>$msg];
             }
         } catch (Throwable $e) {
             DB::rollback();
