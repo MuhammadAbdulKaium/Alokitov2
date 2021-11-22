@@ -536,9 +536,7 @@ background:#0b460b !important;
                                     <li><a href="{{url('/inventory/stock-category')}}"> Stock Category</a></li>
                                     <li><a href="{{url('/inventory/unit-of-measurement')}}"> Unit Of Measurement</a></li>
                                     <li><a href="{{url('/inventory/stock-list')}}"> Stock Master</a></li>
-                                    @role(['super-admin'])
-                                       <li><a href="{{url('/inventory/stock-master-excel-import')}}"> Stock Master Excel Import</a></li>
-                                    @endrole
+                                    <li><a href="{{url('/inventory/stock-master-excel-import')}}"> Stock Master Excel Import</a></li>
                                     <li><a href="{{url('/inventory/stock-item-serial')}}"> Stock Item Serial</a></li>
                                  </ul>
                               </li>
@@ -611,12 +609,10 @@ background:#0b460b !important;
                      <ul class="dropdown-menus">
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
                            <ul class="dropdown-menus">
-                              @role(['super-admin'])
                               <li><a href="{{url('/accounts/accounts-configuration')}}"><i class="fa fa-sitemap"></i> Accounts Configuration</a></li>
                               <li><a href="{{url('/accounts/fiscal-year')}}"><i class="fa fa-sitemap"></i> Fiscal Year</a></li>
                               <li><a href="{{url('/accounts/voucher-config-list')}}"><i class="fa fa-sitemap"></i> Voucher Configuration</a></li>
                               <li><a href="{{url('/accounts/chart-of-accounts')}}"><i class="fa fa-sitemap"></i> Chart of Accounts</a></li>
-                              @endrole
                               <li><a href="{{url('/accounts/budget-allocation')}}"><i class="fa fa-sitemap"></i> Budget Allocation</a></li>
                            </ul>
                         </li>
