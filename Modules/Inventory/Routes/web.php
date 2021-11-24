@@ -127,6 +127,7 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     
     Route::post('comparative-statement-data', ['access'=>['inventory/comparative-statement-data/create'], 'uses'=>'ComparativeStatementController@store']);
     Route::get('comparative-statement-data/{id}', ['access'=>['inventory/comparative-statement.show'], 'uses'=>'ComparativeStatementController@show']);
+    Route::get('comparative-statement-history/{id}', ['access'=>['inventory/comparative-statement.show'], 'uses'=>'ComparativeStatementController@csHistory']);
     Route::delete('comparative-statement-data/{id}', ['access'=>['inventory/comparative-statement.delete'], 'uses'=>'ComparativeStatementController@destroy']);
 
 

@@ -26,6 +26,7 @@ class CreateInventoryComparativeStatementInfo extends Migration
             $table->tinyInteger('status')->default(0)->nullable()->comment('0=pending,1=apprroved,2=partial approve,3=reject,4=Issued,5=partial Issued');
             $table->tinyInteger('ref_use')->default(0)->nullable()->comment('0=No,1=Yes');
             $table->string('reference_type', 50)->nullable();
+            $table->tinyInteger('check_mandatory')->nullable();
             $table->integer('institute_id');
             $table->integer('campus_id');
             $table->softDeletes();

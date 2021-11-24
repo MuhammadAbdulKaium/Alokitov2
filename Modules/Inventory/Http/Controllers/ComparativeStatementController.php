@@ -190,7 +190,7 @@ class ComparativeStatementController extends Controller
             $data['campus_list'] = Campus::select('id', 'name')->where('institute_id', self::getInstituteId())->where('id',self::getCampusId())->get();
             $campus_id_model=Campus::select('id', 'name')->where('id', self::getCampusId())->first();
             $campus_name = $campus_id_model->name;
-            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'), 'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], 'itemAdded'=>'no','generateCS'=>'no','check_mandatory'=>0, 'vendor_id'=>0];
+            $data['formData'] = ['voucher_no'=>$voucherInfo['voucher_no'],'voucher_config_id'=>$voucherInfo['voucher_config_id'],'auto_voucher'=>$voucherInfo['auto_voucher'], 'date'=>date('d/m/Y'), 'due_date'=>date('d/m/Y'),'campus_id_model'=>$campus_id_model,'campus_id'=>self::getCampusId(),'campus_name'=>$campus_name,'instruction_of_model'=>$instruction_of_model,'instruction_of'=>Auth::user()->id,'instruction_name'=>$instruction_name,'reference_type'=>'', 'voucherDetailsData'=>[], $vendorData=[], $price_catalog_component_data=[], 'itemAdded'=>'no','generateCS'=>'no','check_mandatory'=>0, 'vendor_id'=>0];
         }else{
             $data = ['status'=>0, 'message'=>"Setup voucher configuration first"];
         }
@@ -308,6 +308,8 @@ class ComparativeStatementController extends Controller
                                     }
                                     $net_amount +=  $vat_amount;
                                 }
+                                $price_catalog_component_data['vat_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = $vat_amount;
+
                                 if(!empty($catalog_data->discount)){
                                     $net_amount -=  $catalog_data->discount;
                                 }
@@ -324,6 +326,7 @@ class ComparativeStatementController extends Controller
                         $has_vendor = true;
                         $terms_condition = (array_key_exists($v->id, $terms_conditions_grpBy))? $terms_conditions_grpBy[$v->id]:[];
                         $v->terms_condition = $terms_condition;
+                        $v->credit_limit = $v->credit_limit+0;
                         $vendorData[] = $v;
                     }
                 endforeach;
@@ -361,20 +364,23 @@ class ComparativeStatementController extends Controller
                                 }
                                 $net_amount +=  $vat_amount;
                             }
+                            $price_catalog_component_data['vat_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = $vat_amount;
                             if(!empty($catalog_data->discount)){
                                 $net_amount -=  $catalog_data->discount;
                             }
                             $price_catalog_component_data['net_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = $net_amount;
                         }else{
                             foreach($fields as $field){
-                                $price_catalog_component_data[$field.'_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = ($field=='vat_type')?'fixed':'';
+                                $price_catalog_component_data[$field.'_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = ($field=='vat_type')?'fixed':0;
                             }
-                            $price_catalog_component_data['amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = '';
-                            $price_catalog_component_data['net_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = '';
+                            $price_catalog_component_data['vat_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = 0;
+                            $price_catalog_component_data['amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = 0;
+                            $price_catalog_component_data['net_amount_'.$r['reference_details_id'].'_'.$r['item_id'].'_'.$v->id] = 0;
                         }
                     endforeach;
                     $terms_condition = (array_key_exists($v->id, $terms_conditions_grpBy))? $terms_conditions_grpBy[$v->id]:[];
                     $v->terms_condition = $terms_condition;
+                    $v->credit_limit = $v->credit_limit+0;
                     $vendorData[] = $v;
                 } 
             }
@@ -390,6 +396,7 @@ class ComparativeStatementController extends Controller
 
         
     }
+
 
 
     /**
@@ -414,6 +421,8 @@ class ComparativeStatementController extends Controller
         $due_date = DateTime::createFromFormat('d/m/Y', $request->due_date)->format('Y-m-d');
         $vendor_id = $request->vendor_id;
         $voucherDetailsData = $request->voucherDetailsData;
+        $vendorData = $request->vendorData;
+        $price_catalog_component_data = $request->price_catalog_component_data;
         if(!empty($vendor_id)){
             DB::beginTransaction();
             try {
@@ -423,7 +432,8 @@ class ComparativeStatementController extends Controller
                     "due_date" => $due_date,
                     "comments" => $request->comments,
                     "reference_type" => $request->reference_type,
-                    "vendor_id" => $vendor_id
+                    "vendor_id" => $vendor_id,
+                    "check_mandatory"=>$request->check_mandatory
                 ];
                 $auto_voucher = $request->auto_voucher;  // voucher type
                 $flag=true;
@@ -452,7 +462,7 @@ class ComparativeStatementController extends Controller
                     $save = ComparativeStatementInfoModel::create($data);
                     $cs_id = $save->id; 
                     $vendorInfo = VendorModel::find($vendor_id);
-
+                    $vendor_cs_history_data =[]; $vendor_terms_con_history_data =[];
                     foreach($voucherDetailsData as $ref):   // check item qty wise price catalogue and collect catalog id
                         $catalog_data = PriceCatelogueDetailsModel::module()->valid()
                             ->where('catalogue_uniq_id', $vendorInfo->price_cate_id)
@@ -527,8 +537,48 @@ class ComparativeStatementController extends Controller
                                 'remarks'=>$ref['remarks']
                             ];  
                         }
-                        ComparativeStatementDetailsModel::create($cs_details_data);
+                        $saveDtl = ComparativeStatementDetailsModel::create($cs_details_data);
+                        // vedor history data 
+                        foreach($vendorData as $vd):
+                            $vendor_cs_history_data[] = [
+                                'cs_id'=>$cs_id,
+                                'cs_details_id'=>$saveDtl->id,
+                                'vendor_id'=>$vd['id'],
+                                'vendor_name'=>$vd['name'],
+                                'gl_code'=>$vd['gl_code'],
+                                'credit_limit'=>$vd['credit_limit'],
+                                'credit_priod'=>$vd['credit_priod'],
+                                'item_id'=>$ref['item_id'],
+                                'qty'=>$ref['avail_qty'],
+                                'rate'=>$price_catalog_component_data['rate_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'amount'=>$price_catalog_component_data['amount_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'discount'=>$price_catalog_component_data['discount_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'vat_per'=>$price_catalog_component_data['vat_per_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'vat_type'=>$price_catalog_component_data['vat_type_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'vat_amount'=>$price_catalog_component_data['vat_amount_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'net_amount'=>$price_catalog_component_data['net_amount_'.$ref['reference_details_id'].'_'.$ref['item_id'].'_'.$vd['id']],
+                                'reference_type'=>$request->reference_type,
+                                'reference_id'=>$ref['reference_id'],
+                                'reference_details_id'=>$ref['reference_details_id'],
+                                'institute_id'=>self::getInstituteId(),
+                                'campus_id'=>self::getCampusId(),
+                            ];
+
+                        endforeach;
                     endforeach;
+                    // cs vendor history data save 
+                    DB::table('inventory_comparative_statement_vendor_history')->insert($vendor_cs_history_data);
+                    // vendor terms and condition
+                    foreach($vendorData as $vd):
+                        foreach ($vd['terms_condition'] as $vt) {
+                            $vendor_terms_con_history_data[] = [
+                                'cs_id'=>$cs_id,
+                                'vendor_id'=>$vd['id'],
+                                'term_condition'=>$vt['term_condition'],
+                            ];
+                        }
+                    endforeach;
+                    DB::table('inventory_comparative_statement_vendor_terms_condition_history')->insert($vendor_terms_con_history_data);
                     $output = ['status'=>1,'message'=>'Comparative Statement successfully saved'];
                     DB::commit();
                 }else{
@@ -690,6 +740,54 @@ class ComparativeStatementController extends Controller
         return response()->json($data);
     }
 
+    public function csHistory($id){
+        $item_list = self::getItemList($this);
+        $item_ids = $item_list->pluck('item_id')->all();
+        $voucherInfo  = ComparativeStatementInfoModel::module()->valid()
+            ->join('setting_campus', 'setting_campus.id','=', 'inventory_comparative_statement_info.campus_id')
+            ->leftJoin('users', 'inventory_comparative_statement_info.instruction_of','=', 'users.id')
+            ->select('inventory_comparative_statement_info.*',DB::raw("DATE_FORMAT(date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(due_date,'%d/%m/%Y') AS due_date_formate"), 'users.name', 'setting_campus.name as campus_name')
+            ->where('inventory_comparative_statement_info.id', $id)
+            ->first();
+        
+        $voucherDetailsData = ComparativeStatementDetailsModel::module()->itemAccess($item_ids)->valid()
+            ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_comparative_statement_details_info.item_id')
+            ->join('cadet_inventory_uom', 'cadet_inventory_uom.id', 'cadet_stock_products.unit')
+            ->select('inventory_comparative_statement_details_info.*','cadet_stock_products.product_name', 'cadet_inventory_uom.symbol_name as uom', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'),'cadet_stock_products.sku')
+            ->where('cs_id', $id)->get(); 
+        $voucherInfo->voucherDetailsData = $voucherDetailsData;
+        $vendor_history = DB::table('inventory_comparative_statement_vendor_history')->where('cs_id', $id)->get();
+        $vendor_history_group_by = collect($vendor_history)->groupBy('vendor_id')->all();
+        $terms_conditions_grpBy = collect(DB::table('inventory_comparative_statement_vendor_terms_condition_history')->where('cs_id', $id)->get())->groupBy('vendor_id')->all();
+        $vendorData = []; $price_catalog_component_data = [];
+        $fields = ['rate','amount', 'discount','vat_per','vat_type', 'net_amount'];
+        foreach ($vendor_history as $v) {
+            if(!array_key_exists($v->vendor_id, $vendorData)){
+                $vendor_row_data = [
+                    'name' => $v->vendor_name,
+                    'gl_code' => $v->gl_code,
+                    'credit_limit' => $v->credit_limit,
+                    'credit_priod' => $v->credit_priod,
+                ];
+                foreach($vendor_history_group_by[$v->vendor_id] as $vs){
+                    foreach($fields as $field){
+                        $price_catalog_component_data[$field.'_'.$vs->reference_details_id.'_'.$vs->item_id.'_'.$v->vendor_id] = $vs->{$field};
+                    }
+                }
+                $terms_condition = (array_key_exists($v->vendor_id, $terms_conditions_grpBy))? $terms_conditions_grpBy[$v->vendor_id]:[];
+                $vendor_row_data['terms_condition'] = $terms_condition;
+                $vendorData[$v->vendor_id] = (object)$vendor_row_data;
+            }
+        }
+        $data['fields'] = $fields;
+        $data['vendorData'] = $vendorData;
+        $data['price_catalog_component_data'] = $price_catalog_component_data;
+        $data['formData'] = $voucherInfo;
+
+        return view('inventory::purchase.comparativeStatement.comparative-statement-history', $data);
+        
+    }
+
     /**
      * Show the form for editing the specified resource.
      * @param int $id
@@ -733,6 +831,9 @@ class ComparativeStatementController extends Controller
                         if(empty($checkDetailsItem)){  
                             ComparativeStatementInfoModel::module()->valid()->find($cs_id)->delete(); 
                         }
+                        // cs vendor history delete
+                        DB::table('inventory_comparative_statement_vendor_history')->where('cs_details_id', $id)->delete();
+                        DB::table('inventory_comparative_statement_vendor_terms_condition_history')->where('cs_id', $cs_id)->delete();
                         $output = ['status'=>1, 'message'=>'Comparative statement item successfully deleted'];
                         DB::commit();
                     }
@@ -756,6 +857,8 @@ class ComparativeStatementController extends Controller
                     foreach ($delIds as $del_id){
                         ComparativeStatementDetailsModel::valid()->find($del_id)->delete();
                     }
+                    // cs vendor history data delete
+                    DB::table('inventory_comparative_statement_vendor_history')->whereIn('cs_details_id', $delIds)->delete();
                     $cs_unique_ids = collect($cs_ids)->unique()->values()->all();
                     foreach ($cs_unique_ids as $cs_id) {
                         $checkDetailsItem = ComparativeStatementDetailsModel::module()->valid()->where('cs_id', $cs_id)->first(); 
@@ -764,6 +867,7 @@ class ComparativeStatementController extends Controller
                             ComparativeStatementInfoModel::module()->valid()->find($cs_id)->delete(); 
                         }
                     }
+                    DB::table('inventory_comparative_statement_vendor_terms_condition_history')->whereIn('cs_id', $cs_unique_ids)->delete();
                     $output = ['status'=>1, 'message'=>'Comparative statement item successfully deleted'];
                     DB::commit();
                 }else{
@@ -776,5 +880,6 @@ class ComparativeStatementController extends Controller
         }  
         return response()->json($output);
     }
+    
 
 }

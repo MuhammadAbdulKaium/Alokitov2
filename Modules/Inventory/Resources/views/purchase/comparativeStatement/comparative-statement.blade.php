@@ -107,6 +107,7 @@
                                                     data-content="delete" title="delete"><i class="fa fa-trash-o"></i></a>
                                                 <a class="btn btn-primary btn-xs" @click="openModal('detailsForm', 'comparative-statement-data/'+list.cs_id)" 
                                                    ><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a>
+                                                <a class="btn btn-primary btn-xs" :href="baseUrl+'/comparative-statement-history/'+list.cs_id"><i class="fa fa-info-circle" aria-hidden="true"></i> Cs History</a>
                                             </td>
                                         </tr>
                                     </template>

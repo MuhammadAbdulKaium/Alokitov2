@@ -151,7 +151,7 @@
                                     <thead>
                                         <tr>
                                             <th colspan="5"></th>
-                                            <template v-for="(vendor, vi) in vendorData">
+                                            <template v-for="(vendor, vi) in formData.vendorData">
                                                 <th colspan="6" v-bind:key="vi">
                                                     <span style="float:left;">Vendor Name: @{{vendor.name}}</span>
                                                      <span style="float:right;">Gl Code: @{{vendor.gl_code}}</span>
@@ -165,7 +165,7 @@
                                             <th>UOM</th>
                                             <th>Remarks</th>
 
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <th>Rate</th>
                                                 <th>Amt.</th>
                                                 <th>Discount</th>
@@ -184,13 +184,13 @@
                                                 <td valign="middle">@{{data.uom}}</td>
                                                 <td valign="middle">@{{data.remarks}}</td>   
 
-                                                <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
-                                                    <td valign="middle">@{{price_catalog_component_data['rate_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
-                                                    <td valign="middle">@{{price_catalog_component_data['amount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
-                                                    <td valign="middle">@{{price_catalog_component_data['discount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
-                                                    <td valign="middle">@{{price_catalog_component_data['vat_per_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
-                                                    <td valign="middle">@{{price_catalog_component_data['vat_type_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
-                                                    <td valign="middle">@{{price_catalog_component_data['net_amount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['rate_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['amount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['discount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['vat_per_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['vat_type_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
+                                                    <td valign="middle">@{{formData.price_catalog_component_data['net_amount_'+data.reference_details_id+'_'+data.item_id+'_'+vendor.id]}}</td>
                                                 </template>
                                             </tr>
                                         </template>
@@ -204,12 +204,12 @@
                                     <tfoot>
                                         <tr>
                                             <td rowspan="6" colspan="5"></td>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6"></td>
                                             </template>
                                         </tr>
                                         <tr>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6">
                                                     <span class="text-left" style="float: left;">Credit Limit: @{{vendor.credit_limit}}</span> 
                                                     <span class="text-left" style="float: right;">Credit Period: @{{vendor.credit_priod}}</span> 
@@ -217,7 +217,7 @@
                                             </template>
                                         </tr>
                                         <tr>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6">
                                                     Terms & Coditions:
                                                     <ul>
@@ -227,17 +227,17 @@
                                             </template>
                                         </tr>
                                         <tr>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6"></td>
                                             </template>
                                         </tr>
                                         <tr>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6"></td>
                                             </template>
                                         </tr>
                                         <tr>
-                                            <template v-for="(vendor, vi) in vendorData" v-bind:key="vi">
+                                            <template v-for="(vendor, vi) in formData.vendorData" v-bind:key="vi">
                                                 <td colspan="6"> <input type="radio" :id="'vendor_id'+vendor.id" name="gender" :value="vendor.id" v-model="formData.vendor_id"> <label :for="'vendor_id'+vendor.id">Proceed with this vendor</label></td>
                                             </template>
                                         </tr>
@@ -314,6 +314,8 @@
             date:null,
             due_date:null,
             voucherDetailsData:[],
+            vendorData:[],
+            price_catalog_component_data:[],
             itemAdded:'no'
         },
         vendorData:[],
@@ -350,8 +352,8 @@
                             _this.formData.voucherDetailsData = res.data.voucherDetailsData;
                             _this.formData.itemAdded=res.data.vendor_found;
                             _this.formData.generateCS='yes';
-                            _this.vendorData = res.data.vendorData;
-                            _this.price_catalog_component_data = res.data.price_catalog_component_data;
+                            _this.formData.vendorData = res.data.vendorData;
+                            _this.formData.price_catalog_component_data = res.data.price_catalog_component_data;
                             _this.vendor_found = res.data.vendor_found;
                             _this.refDataList = [];
                             // uncheck all reference 

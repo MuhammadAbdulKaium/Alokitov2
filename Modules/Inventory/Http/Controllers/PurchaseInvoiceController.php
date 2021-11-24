@@ -712,7 +712,7 @@ class PurchaseInvoiceController extends Controller
         $total_discount = $approvalData->total_discount;
         $total_vat = $approvalData->total_vat;
         // chart of accounts code type config check start
-        $coaConfig = ChartOfAccountsConfigModel::first();
+        $coaConfig = ChartOfAccountsConfigModel::module()->first();
         if(!empty($coaConfig) && $coaConfig->code_type=='Manual'){
            $code_type = $coaConfig->code_type;
         }else{
@@ -723,9 +723,9 @@ class PurchaseInvoiceController extends Controller
         // check vendor ledger code
         $checkVendorGlCode = VendorModel::find($vendor_id);
         if(!empty($checkVendorGlCode->gl_code)){
-            $chartOfGlCode = ChartOfAccount::where($acc_code_col, $checkVendorGlCode->gl_code)->first();
+            $chartOfGlCode = ChartOfAccount::module()->where($acc_code_col, $checkVendorGlCode->gl_code)->first();
 
-            $sundry_creditors_config = AccountsConfigurationModel::where('particular', 'sundry_creditors')->first();
+            $sundry_creditors_config = AccountsConfigurationModel::module()->where('particular', 'sundry_creditors')->first();
             if(!empty($sundry_creditors_config)){
                 $sundry_creditors_id = $sundry_creditors_config->particular_id;
             }else{
@@ -752,11 +752,11 @@ class PurchaseInvoiceController extends Controller
             $msg[] = "Vendor GL code not setup";
         }
 
-        $accountsConfig = AccountsConfigurationModel::where('label_name', "po_invoice")->get()->keyBy('particular')->all();
+        $accountsConfig = AccountsConfigurationModel::module()->where('label_name', "po_invoice")->get()->keyBy('particular')->all();
         // check purchase accounts 
         if(isset($accountsConfig['po_account']) && !empty($accountsConfig['po_account'])){
             $po_account = $accountsConfig['po_account']; 
-            $chartOfCode = ChartOfAccount::where($acc_code_col, $po_account->particular_code)->first();
+            $chartOfCode = ChartOfAccount::module()->where($acc_code_col, $po_account->particular_code)->first();
             if(!empty($chartOfCode)){
                 if($chartOfCode->account_type=='ledger' && $po_account->account_type== 'ledger'){
                     $purchase_acc_id = $po_account->particular_id;
@@ -778,7 +778,7 @@ class PurchaseInvoiceController extends Controller
         if($total_discount>0){
             if(isset($accountsConfig['po_discount_account']) && !empty($accountsConfig['po_discount_account'])){
                 $po_discount_account = $accountsConfig['po_discount_account']; 
-                $chartOfCode = ChartOfAccount::where($acc_code_col, $po_discount_account->particular_code)->first();
+                $chartOfCode = ChartOfAccount::module()->where($acc_code_col, $po_discount_account->particular_code)->first();
                 if(!empty($chartOfCode)){
                     if($chartOfCode->account_type=='ledger' && $po_discount_account->account_type == 'ledger'){
                         $purchase_dis_acc_id = $po_discount_account->particular_id;
@@ -801,7 +801,7 @@ class PurchaseInvoiceController extends Controller
         if($total_vat>0){
             if(isset($accountsConfig['vat_accounts']) && !empty($accountsConfig['vat_accounts'])){
                 $vat_accounts = $accountsConfig['vat_accounts']; 
-                $chartOfCode = ChartOfAccount::where($acc_code_col, $vat_accounts->particular_code)->first();
+                $chartOfCode = ChartOfAccount::module()->where($acc_code_col, $vat_accounts->particular_code)->first();
                 if(!empty($chartOfCode)){
                     if($chartOfCode->account_type=='ledger' && $vat_accounts->account_type== 'ledger'){
                         $vat_acc_id = $vat_accounts->particular_id;
@@ -849,7 +849,9 @@ class PurchaseInvoiceController extends Controller
             'voucher_from'=>"Purchase Invoice",
             'voucher_type'=>3,
             'status'=>1,
-            'remarks'=>$approvalData->comments
+            'remarks'=>$approvalData->comments,
+            'institute_id'=>self::getInstituteId(),
+            'campus_id'=>self::getCampusId()
         ]);
         $acc_transaction_id = $save->id;
 
@@ -866,7 +868,9 @@ class PurchaseInvoiceController extends Controller
                 'transaction_id'=>$acc_transaction_id,
                 'tras_ledger_type'=>'debit',
                 'status'=>1,
-                'remarks'=>''
+                'remarks'=>'',
+                'institute_id'=>self::getInstituteId(),
+                'campus_id'=>self::getCampusId()
             ]);
         }
         // credit data entry
@@ -882,7 +886,9 @@ class PurchaseInvoiceController extends Controller
                 'transaction_id'=>$acc_transaction_id,
                 'tras_ledger_type'=>'credit',
                 'status'=>1,
-                'remarks'=>''
+                'remarks'=>'',
+                'institute_id'=>self::getInstituteId(),
+                'campus_id'=>self::getCampusId()
             ]);
         }
 
