@@ -20,7 +20,7 @@
 			return session()->get('campus');
 		}
 		public static function getAccCodeType(){
-			$coaConfig = ChartOfAccountsConfigModel::first();
+			$coaConfig = ChartOfAccountsConfigModel::module()->first();
 	        if(!empty($coaConfig) && $coaConfig->code_type=='Manual'){
 	           $code_type = $coaConfig->code_type;
 	        }else{
@@ -29,13 +29,18 @@
 	        return $code_type;
 		}
 		public static function cashBankLedgerId(){
-			$acc_config = AccountsConfigurationModel::where('particular', 'cash_hand')->orWhere('particular', 'cash_bank')->get();
+			$acc_config = AccountsConfigurationModel::module()
+			->where(function($query){
+				$query->where('particular', 'cash_hand')
+					  ->orWhere('particular', 'cash_bank');
+			})
+			->get();
 			$acc_config_keyBy = $acc_config->keyBy('particular')->all();
 			$cashBankIds = [];
 			if(isset($acc_config_keyBy['cash_bank'])){
 				$cash_bank_config = $acc_config_keyBy['cash_bank'];
 				if($cash_bank_config->account_type=='group'){
-					$cashBankAccounts  = ChartOfAccount::where('parent_id', $cash_bank_config->particular_id)->get();
+					$cashBankAccounts  = ChartOfAccount::module()->where('parent_id', $cash_bank_config->particular_id)->get();
 					if(count($cashBankAccounts)>0){
 						$cashBankIds = $cashBankAccounts->pluck('id')->all();
 					}
@@ -46,7 +51,7 @@
 			if(isset($acc_config_keyBy['cash_hand'])){
 				$cash_hand_config = $acc_config_keyBy['cash_hand'];
 				if($cash_hand_config->account_type=='group'){
-					$cashHandAccounts  = ChartOfAccount::where('parent_id', $cash_hand_config->particular_id)->get();
+					$cashHandAccounts  = ChartOfAccount::module()->where('parent_id', $cash_hand_config->particular_id)->get();
 					if(count($cashHandAccounts)>0){
 						$mergeArray = array_merge($cashBankIds,$cashHandAccounts->pluck('id')->all());
 						$cashBankIds = $mergeArray;
@@ -62,14 +67,19 @@
 		}
 
 		public static function bankLedgerIds(){
-			$bank_ledger_id = AccountsConfigurationModel::where('particular', 'cash_bank')->first()->particular_id;
-			$bankAccount = ChartOfAccount::where('parent_id', $bank_ledger_id)->get();
+			$bank_ledger_id = AccountsConfigurationModel::module()->where('particular', 'cash_bank')->first()->particular_id;
+			$bankAccount = ChartOfAccount::module()->where('parent_id', $bank_ledger_id)->get();
 			$bankIds = (count($bankAccount)>0)?$bankAccount->pluck('id')->all():[];
 			return $bankIds;
 		}
 
 		public static function cashBankGroupLedger(){
-			$acc_config = AccountsConfigurationModel::where('particular', 'cash_hand')->orWhere('particular', 'cash_bank')->get()->keyBy('particular')->all();
+			$acc_config = AccountsConfigurationModel::module()
+			->where(function($query){
+				$query->where('particular', 'cash_hand')
+					  ->orWhere('particular', 'cash_bank');
+			})
+			->get()->keyBy('particular')->all();
 			return $acc_config;
 		}
 
@@ -125,7 +135,7 @@
    			}else{
    				$accountCode = "concat('[',accounts_chart_of_accounts.account_code, '] ', accounts_chart_of_accounts.account_name) as accountCode";
    			}
-   			$ledgerQuery  = ChartOfAccount::select('accounts_chart_of_accounts.id','accounts_chart_of_accounts.increase_by',DB::raw($accountCode));
+   			$ledgerQuery  = ChartOfAccount::module()->select('accounts_chart_of_accounts.id','accounts_chart_of_accounts.increase_by',DB::raw($accountCode));
    			if(count($whereIn)>0){
    				$ledgerQuery->whereIn('id',$whereIn);
    			}
