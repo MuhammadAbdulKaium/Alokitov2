@@ -42,7 +42,6 @@
                     <h3 class="box-title"><i class="fa fa-search"></i> Stock Master </h3>
                     <div class="box-tools">
                         <a class="btn btn-success btn-sm" href="{{ url('inventory/add/stock-product') }}" data-target="#globalModal" data-toggle="modal"><i class="fa fa-plus-square"></i> New</a>
-                        <a class="btn btn-success btn-sm" href="#"><i class="fa fa-plus-square"></i> Import</a>
                     </div>
                 </div>
                 <div class="box-body">

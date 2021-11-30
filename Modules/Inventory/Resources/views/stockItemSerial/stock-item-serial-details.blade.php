@@ -38,6 +38,12 @@
                     <?php 
                         $barcode = (!empty($value->barcode))?$value->barcode:'empty';  
                         $qrcode = (!empty($value->qrcode))?$value->qrcode:'empty';  
+                        if(\Illuminate\Support\Str::contains($barcode,$charAr)){ 
+                            $barcode = 'invalid';
+                        } 
+                        if(\Illuminate\Support\Str::contains($qrcode,$charAr)){ 
+                            $qrcode = 'invalid';
+                        }  
                     ?>
                     <tr>
                         <td valign="middle">{{$key+1}}</td>

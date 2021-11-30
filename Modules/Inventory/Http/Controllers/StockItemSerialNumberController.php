@@ -175,8 +175,8 @@ class StockItemSerialNumberController extends Controller
                                     'serial_id'=>$stockSerial->id,
                                     'serial_code'=>$v['serial_code'],
                                     'serial_int_no'=>$v['serial_int_no'],
-                                    'barcode'=>$v['barcode'],
-                                    'qrcode'=>$v['qrcode'],
+                                    'barcode'=>$v['serial_code'],
+                                    'qrcode'=>$v['serial_code'],
                                     'institute_id'=>self::getInstituteId(),
                                     'campus_id'=>self::getCampusId(),
                                     'created_by'=>Auth::user()->id,
@@ -215,12 +215,13 @@ class StockItemSerialNumberController extends Controller
             ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_item_serial_info.item_id')
             ->select('inventory_item_serial_info.*', 'cadet_stock_products.product_name', 'cadet_stock_products.prefix', 'cadet_stock_products.suffix', 'cadet_stock_products.separator_symbol')
             ->find($id);
-        $serial_code_list = StockItemSerialDetailsModel::module()->select('serial_code','barcode','qrcode')
+        $serial_code_list = StockItemSerialDetailsModel::module()->select('serial_int_no','serial_code','barcode','qrcode')
             ->valid()->where('serial_id', $id)
-            ->groupBy('serial_code','barcode','qrcode')
+            ->groupBy('serial_int_no','serial_code','barcode','qrcode')
             ->orderBy('serial_int_no','asc')
             ->get();
         $data['serial_code_list'] = $serial_code_list; 
+        $data['charAr'] = ['#','&','@','?','(',')',':',';','<','>','[',']'];
         return view('inventory::stockItemSerial.stock-item-serial-details', $data);
         //return response()->json($data);
     }

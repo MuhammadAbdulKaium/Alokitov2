@@ -139,28 +139,20 @@
                             <table class="responsive table table-striped table-bordered" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
-                                        <th>Serial Code</th>
-                                        <th>Barcode</th>
-                                        <th>QR Code</th>
+                                        <th width="10%">No.</th>
+                                        <th>Serial Code</th>                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template v-if="Object.keys(formData.serial_code_list).length > 0">
                                         <tr v-for="(list, index) in formData.serial_code_list" v-bind:key="index">
                                             <td valign="middle">@{{index+1}}</td>
-                                            <td valign="middle">@{{list.serial_code}}</td>          
-                                            <td valign="middle">
-                                                <input type="text" name="barcode" v-model="list.barcode" class="form-control" maxlength="255" placeholder="Barcode">
-                                            </td>              
-                                            <td valign="middle">
-                                                <input type="text" name="qrcode" v-model="list.qrcode" class="form-control" maxlength="255" placeholder="qrcode">
-                                            </td>              
+                                            <td valign="middle">@{{list.serial_code}}</td>                                                                
                                         </tr>
                                     </template>
                                     <template v-else>
                                         <tr>
-                                            <td colspan="4">No code generate!</td>
+                                            <td colspan="2">No code generate!</td>
                                         </tr>
                                     </template>
                                 </tbody>

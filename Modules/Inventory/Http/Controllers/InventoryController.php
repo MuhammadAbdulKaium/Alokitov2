@@ -834,89 +834,98 @@ class InventoryController extends Controller
 
         $validated = $request->validate($rules);
 
+        // spcial char check
         $charAr = ['#','&','@','?','(',')',':',';','<','>','[',']'];
-        if(Str::contains($request->sku,$charAr)){
+        if(Str::contains($request->sku,$charAr)){ // sku check
             Session::flash('errorMessage', 'Special charecter are not allowed in sku name');
             return redirect()->back();
-        }else{
-            DB::beginTransaction();
-            try {
-                $stockItem = new CadetInventoryProduct();
-                $stockItem->product_name = $request->product_name;
-                $stockItem->product_description = $request->product_description;
-                $stockItem->unit = $request->unit;
-                $stockItem->stock_group = $request->stock_group;
-                $stockItem->use_serial = $request->use_serial;
-                $stockItem->has_fraction = $request->has_fraction;
-                if($request->has_fraction==1){
-                    $stockItem->round_of = $request->round_of;
-                    $stockItem->decimal_point_place = $request->decimal_point_place;
-                }else{
-                    if($request->use_serial==1){
-                        $stockItem->numeric_part = $request->numeric_part;
-                        $stockItem->prefix = $request->prefix;
-                        $stockItem->suffix = $request->suffix;
-                        $stockItem->separator_symbol = $request->separator_symbol;
-                    }
-                }
-
-                $stockItem->min_stock = $request->min_stock;
-                $stockItem->item_type = $request->item_type;
-                $stockItem->alias = $request->alias;
-                $stockItem->sku = $request->sku;
-                $stockItem->barcode = $request->sku;
-                $stockItem->qrcode = $request->sku;
-                $stockItem->code_type_id = $request->code_type_id;
-                $stockItem->category_id = $request->category_id;
-                $stockItem->warrenty_month = $request->warrenty_month;
-                $stockItem->reorder_qty = $request->reorder_qty;
-                $stockItem->additional_remarks = $request->additional_remarks;
-                $stockItem->store_tagging = $request->store_tagging;
-                $stockItem->campus_id = $this->academicHelper->getCampus();
-                $stockItem->institute_id = $this->academicHelper->getInstitute();
-                $stockItem->created_by = Auth::user()->id;
-
-                if ($request->image) {
-                    $photoFile = $request->file('image');
-                    $fileExtension = $photoFile->getClientOriginalExtension();
-                    $contentName = "inv" . date("Ymdhis") . mt_rand(100000, 999999) . "." . $fileExtension;
-                    $contentFileName = $contentName;
-                    $uploaded = $photoFile->move('assets/inventory/products/', $contentFileName);
-                    $stockItem->image = $contentFileName;
-                }
-                $stockSave = $stockItem->save();
-                // store wise item save
-                foreach ($request->store_tagging as $key => $value) {
-                    $storeData = [
-                        'item_id'=>$stockItem->id,
-                        'store_id'=>$value,
-                        'institute_id'=>$this->academicHelper->getInstitute(),
-                        'campus_id'=>$this->academicHelper->getCampus(),
-                        'created_by'=>Auth::user()->id,
-                        'created_at'=>date('Y-m-d H:i:s')
-                    ];
-                    DB::table('inventory_store_wise_item')->insert($storeData);
-                }
-                if ($stockSave) {
-                    $itemHistory = new CadetInventoryProductHistory();
-                    $itemHistory->product_id = $stockItem->id;
-                    $itemHistory->remarks = 'Product Insert';
-                    $itemHistory->created_by = Auth::user()->id;
-                    $historyDataSave = $itemHistory->save();
-                }
-                if ($historyDataSave) {
-                    DB::commit();
-                    Session::flash('message', 'New Stock item created successfully.');
-                    return redirect()->back();
-                } else {
-                    Session::flash('errorMessage', 'Error item Store.');
+        }
+        if($request->has_fraction==0){ // serial formate check
+            if($request->use_serial==1){
+                if(Str::contains($request->prefix,$charAr) || Str::contains($request->suffix,$charAr) || Str::contains($request->separator_symbol,$charAr)){
+                    Session::flash('errorMessage', 'Special charecter are not allowed in Serial prefix, suffix and separator');
                     return redirect()->back();
                 }
-            } catch (\Exception $e) {
-                DB::rollback();
-                Session::flash('errorMessage', 'Error creating Store.');
+            }
+        }
+        
+        DB::beginTransaction();
+        try {
+            $stockItem = new CadetInventoryProduct();
+            $stockItem->product_name = $request->product_name;
+            $stockItem->product_description = $request->product_description;
+            $stockItem->unit = $request->unit;
+            $stockItem->stock_group = $request->stock_group;
+            $stockItem->use_serial = $request->use_serial;
+            $stockItem->has_fraction = $request->has_fraction;
+            if($request->has_fraction==1){
+                $stockItem->round_of = $request->round_of;
+                $stockItem->decimal_point_place = $request->decimal_point_place;
+            }else{
+                if($request->use_serial==1){
+                    $stockItem->numeric_part = $request->numeric_part;
+                    $stockItem->prefix = $request->prefix;
+                    $stockItem->suffix = $request->suffix;
+                    $stockItem->separator_symbol = $request->separator_symbol;
+                }
+            }
+
+            $stockItem->min_stock = $request->min_stock;
+            $stockItem->item_type = $request->item_type;
+            $stockItem->alias = $request->alias;
+            $stockItem->sku = $request->sku;
+            $stockItem->barcode = $request->sku;
+            $stockItem->qrcode = $request->sku;
+            $stockItem->code_type_id = $request->code_type_id;
+            $stockItem->category_id = $request->category_id;
+            $stockItem->warrenty_month = $request->warrenty_month;
+            $stockItem->reorder_qty = $request->reorder_qty;
+            $stockItem->additional_remarks = $request->additional_remarks;
+            $stockItem->store_tagging = $request->store_tagging;
+            $stockItem->campus_id = $this->academicHelper->getCampus();
+            $stockItem->institute_id = $this->academicHelper->getInstitute();
+            $stockItem->created_by = Auth::user()->id;
+
+            if ($request->image) {
+                $photoFile = $request->file('image');
+                $fileExtension = $photoFile->getClientOriginalExtension();
+                $contentName = "inv" . date("Ymdhis") . mt_rand(100000, 999999) . "." . $fileExtension;
+                $contentFileName = $contentName;
+                $uploaded = $photoFile->move('assets/inventory/products/', $contentFileName);
+                $stockItem->image = $contentFileName;
+            }
+            $stockSave = $stockItem->save();
+            // store wise item save
+            foreach ($request->store_tagging as $key => $value) {
+                $storeData = [
+                    'item_id'=>$stockItem->id,
+                    'store_id'=>$value,
+                    'institute_id'=>$this->academicHelper->getInstitute(),
+                    'campus_id'=>$this->academicHelper->getCampus(),
+                    'created_by'=>Auth::user()->id,
+                    'created_at'=>date('Y-m-d H:i:s')
+                ];
+                DB::table('inventory_store_wise_item')->insert($storeData);
+            }
+            if ($stockSave) {
+                $itemHistory = new CadetInventoryProductHistory();
+                $itemHistory->product_id = $stockItem->id;
+                $itemHistory->remarks = 'Product Insert';
+                $itemHistory->created_by = Auth::user()->id;
+                $historyDataSave = $itemHistory->save();
+            }
+            if ($historyDataSave) {
+                DB::commit();
+                Session::flash('message', 'New Stock item created successfully.');
+                return redirect()->back();
+            } else {
+                Session::flash('errorMessage', 'Error item Store.');
                 return redirect()->back();
             }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Session::flash('errorMessage', 'Error creating Store.');
+            return redirect()->back();
         }
 
     }
@@ -975,145 +984,155 @@ class InventoryController extends Controller
             }
         }
         $validated = $request->validate($rules);
+
+        // spcial char check
         $charAr = ['#','&','@','?','(',')',':',';','<','>','[',']'];
-        if(Str::contains($request->sku,$charAr)){
+        if(Str::contains($request->sku,$charAr)){ // sku check
             Session::flash('errorMessage', 'Special charecter are not allowed in sku name');
             return redirect()->back();
-        }else{
-            DB::beginTransaction();
-            try {
-                $stockItem=CadetInventoryProduct::where('id','=',$id)->first();
-                // stock history
-                $update_history = self::stockItemHistory($request, $stockItem);
-                $update_status = $update_history[0]; 
-                $update_log = $update_history[1]; 
-                $update_check_status = true;
-                $store_tagging_db =  $stockItem->store_tagging;
-                $newStore = array_diff($request->store_tagging, $store_tagging_db);
-                $delStore = array_diff($store_tagging_db, $request->store_tagging);
-                if(count($delStore)>0){
-                    $update_status=true;
+        }
+        if($request->has_fraction==0){ // serial formate check
+            if($request->use_serial==1){
+                if(Str::contains($request->prefix,$charAr) || Str::contains($request->suffix,$charAr) || Str::contains($request->separator_symbol,$charAr)){
+                    Session::flash('errorMessage', 'Special charecter are not allowed in Serial prefix, suffix and separator');
+                    return redirect()->back();
                 }
-
-                if($update_status){
-                    $update_checkInfo = self::itemUpdateDependencyCheck($id,$delStore);
-                    $update_check_status=$update_checkInfo['status'];
-                    $msg=$update_checkInfo['msg'];
-
-                }
-                if($update_check_status){
-                    $stockItem->product_name = $request->product_name;
-                    $stockItem->product_description = $request->product_description;
-                    $stockItem->unit = $request->unit;
-                    $stockItem->stock_group = $request->stock_group;
-                    $stockItem->use_serial = $request->use_serial;
-                    $stockItem->has_fraction = $request->has_fraction;
-                    if($request->has_fraction==1){
-                        $stockItem->round_of = $request->round_of;
-                        $stockItem->decimal_point_place = $request->decimal_point_place;
-                    }else{
-                        $stockItem->round_of = null;
-                        $stockItem->decimal_point_place = null;
-                        if($request->use_serial==1){
-                            $stockItem->numeric_part = $request->numeric_part;
-                            $stockItem->prefix = $request->prefix;
-                            $stockItem->suffix = $request->suffix;
-                            $stockItem->separator_symbol = $request->separator_symbol;
-                        }else{
-                            $stockItem->numeric_part = null;
-                            $stockItem->prefix = null;
-                            $stockItem->suffix = null;
-                            $stockItem->separator_symbol = null; 
-                        }
-                    }
-
-                    $stockItem->min_stock = $request->min_stock;
-                    $stockItem->item_type = $request->item_type;
-                    $stockItem->alias = $request->alias;
-                    $stockItem->sku = $request->sku;
-                    $stockItem->barcode = $request->sku;
-                    $stockItem->qrcode = $request->sku;
-                    $stockItem->code_type_id = $request->code_type_id;
-                    $stockItem->category_id = $request->category_id;
-                    $stockItem->warrenty_month = $request->warrenty_month;
-                    $stockItem->reorder_qty = $request->reorder_qty;
-                    $stockItem->additional_remarks = $request->additional_remarks;
-                    
-                    $stockItem->store_tagging = $request->store_tagging;
-                    $stockItem->campus_id = $this->academicHelper->getCampus();
-                    $stockItem->institute_id = $this->academicHelper->getInstitute();
-                    $stockItem->created_by = Auth::user()->id;
-
-                    if ($request->image) {
-                        $photoFile = $request->file('image');
-                        $fileExtension = $photoFile->getClientOriginalExtension();
-                        $contentName = "inv" . date("Ymdhis") . mt_rand(100000, 999999) . "." . $fileExtension;
-                        $contentFileName = $contentName;
-                        $uploaded = $photoFile->move('assets/inventory/products/', $contentFileName);
-                        if(!empty($stockItem->image)){
-                            $file_path = public_path().'/assets/inventory/products/'.$stockItem->image;
-                            if(file_exists($file_path)) unlink($file_path);
-                        }
-                        $stockItem->image = $contentFileName;
-                    }
-                    $stockSave = $stockItem->save();
-                    // store wise item save
-                    if(count($newStore)>0){
-                        foreach ($newStore as $key => $value) {
-                            $storeData = [
-                                'item_id'=>$stockItem->id,
-                                'store_id'=>$value,
-                                'institute_id'=>$this->academicHelper->getInstitute(),
-                                'campus_id'=>$this->academicHelper->getCampus(),
-                                'created_by'=>Auth::user()->id,
-                                'created_at'=>date('Y-m-d H:i:s')
-                            ];
-                            DB::table('inventory_store_wise_item')->insert($storeData);
-                            $stockInfo  = InventoryStore::module()->find($value);
-                            $update_log[]='New store "'.$stockInfo->store_name.'" tagged';
-                        }
-                        
-                    }
-                    // delete store item
-                    if(count($delStore)>0){
-                        DB::table('inventory_store_wise_item')->where('institute_id', $this->academicHelper->getInstitute())->where('campus_id', $this->academicHelper->getCampus())->where('item_id', $id)->whereIn('store_id', $delStore)->update([
-                                'deleted_by'=>Auth::user()->id,
-                                'deleted_at'=>date('Y-m-d H:i:s'),
-                                'valid'=>0
-                            ]);
-                        foreach ($delStore as $del) {
-                            $stockInfo  = InventoryStore::find($del);
-                            $update_log[]='Remove store tagged "'.$stockInfo->store_name.'"';
-                        }
-                    }
-                    
-                    if ($stockSave) {
-                        if(count($update_log)>0){
-                            $update_history = '';
-                            $i=0;
-                            foreach ($update_log as $v) {
-                                if(++$i!=0 && count($update_log)!=$i) $update_history.=', ';
-                                $update_history.=$v;
-                            }
-                            $itemHistory = new CadetInventoryProductHistory();
-                            $itemHistory->product_id = $stockItem->id;
-                            $itemHistory->remarks = $update_history;
-                            $itemHistory->created_by = Auth::user()->id;
-                            $historyDataSave = $itemHistory->save();
-                        }
-                    }
-                    DB::commit();
-                    Session::flash('message', 'Stock Item  update successfully.');
-                }else{
-                    Session::flash('errorMessage', @$msg);
-                }
-                return redirect()->back();
-                
-            } catch (\Exception $e) {
-                DB::rollback();
-                Session::flash('errorMessage', 'Error updating Stock item.');
-                return redirect()->back();
             }
+        }
+       
+        DB::beginTransaction();
+        try {
+            $stockItem=CadetInventoryProduct::where('id','=',$id)->first();
+            // stock history
+            $update_history = self::stockItemHistory($request, $stockItem);
+            $update_status = $update_history[0]; 
+            $update_log = $update_history[1]; 
+            $update_check_status = true;
+            $store_tagging_db =  $stockItem->store_tagging;
+            $newStore = array_diff($request->store_tagging, $store_tagging_db);
+            $delStore = array_diff($store_tagging_db, $request->store_tagging);
+            if(count($delStore)>0){
+                $update_status=true;
+            }
+
+            if($update_status){
+                $update_checkInfo = self::itemUpdateDependencyCheck($id,$delStore);
+                $update_check_status=$update_checkInfo['status'];
+                $msg=$update_checkInfo['msg'];
+
+            }
+            if($update_check_status){
+                $stockItem->product_name = $request->product_name;
+                $stockItem->product_description = $request->product_description;
+                $stockItem->unit = $request->unit;
+                $stockItem->stock_group = $request->stock_group;
+                $stockItem->use_serial = $request->use_serial;
+                $stockItem->has_fraction = $request->has_fraction;
+                if($request->has_fraction==1){
+                    $stockItem->round_of = $request->round_of;
+                    $stockItem->decimal_point_place = $request->decimal_point_place;
+                }else{
+                    $stockItem->round_of = null;
+                    $stockItem->decimal_point_place = null;
+                    if($request->use_serial==1){
+                        $stockItem->numeric_part = $request->numeric_part;
+                        $stockItem->prefix = $request->prefix;
+                        $stockItem->suffix = $request->suffix;
+                        $stockItem->separator_symbol = $request->separator_symbol;
+                    }else{
+                        $stockItem->numeric_part = null;
+                        $stockItem->prefix = null;
+                        $stockItem->suffix = null;
+                        $stockItem->separator_symbol = null; 
+                    }
+                }
+
+                $stockItem->min_stock = $request->min_stock;
+                $stockItem->item_type = $request->item_type;
+                $stockItem->alias = $request->alias;
+                $stockItem->sku = $request->sku;
+                $stockItem->barcode = $request->sku;
+                $stockItem->qrcode = $request->sku;
+                $stockItem->code_type_id = $request->code_type_id;
+                $stockItem->category_id = $request->category_id;
+                $stockItem->warrenty_month = $request->warrenty_month;
+                $stockItem->reorder_qty = $request->reorder_qty;
+                $stockItem->additional_remarks = $request->additional_remarks;
+                
+                $stockItem->store_tagging = $request->store_tagging;
+                $stockItem->campus_id = $this->academicHelper->getCampus();
+                $stockItem->institute_id = $this->academicHelper->getInstitute();
+                $stockItem->created_by = Auth::user()->id;
+
+                if ($request->image) {
+                    $photoFile = $request->file('image');
+                    $fileExtension = $photoFile->getClientOriginalExtension();
+                    $contentName = "inv" . date("Ymdhis") . mt_rand(100000, 999999) . "." . $fileExtension;
+                    $contentFileName = $contentName;
+                    $uploaded = $photoFile->move('assets/inventory/products/', $contentFileName);
+                    if(!empty($stockItem->image)){
+                        $file_path = public_path().'/assets/inventory/products/'.$stockItem->image;
+                        if(file_exists($file_path)) unlink($file_path);
+                    }
+                    $stockItem->image = $contentFileName;
+                }
+                $stockSave = $stockItem->save();
+                // store wise item save
+                if(count($newStore)>0){
+                    foreach ($newStore as $key => $value) {
+                        $storeData = [
+                            'item_id'=>$stockItem->id,
+                            'store_id'=>$value,
+                            'institute_id'=>$this->academicHelper->getInstitute(),
+                            'campus_id'=>$this->academicHelper->getCampus(),
+                            'created_by'=>Auth::user()->id,
+                            'created_at'=>date('Y-m-d H:i:s')
+                        ];
+                        DB::table('inventory_store_wise_item')->insert($storeData);
+                        $stockInfo  = InventoryStore::module()->find($value);
+                        $update_log[]='New store "'.$stockInfo->store_name.'" tagged';
+                    }
+                    
+                }
+                // delete store item
+                if(count($delStore)>0){
+                    DB::table('inventory_store_wise_item')->where('institute_id', $this->academicHelper->getInstitute())->where('campus_id', $this->academicHelper->getCampus())->where('item_id', $id)->whereIn('store_id', $delStore)->update([
+                            'deleted_by'=>Auth::user()->id,
+                            'deleted_at'=>date('Y-m-d H:i:s'),
+                            'valid'=>0
+                        ]);
+                    foreach ($delStore as $del) {
+                        $stockInfo  = InventoryStore::find($del);
+                        $update_log[]='Remove store tagged "'.$stockInfo->store_name.'"';
+                    }
+                }
+                
+                if ($stockSave) {
+                    if(count($update_log)>0){
+                        $update_history = '';
+                        $i=0;
+                        foreach ($update_log as $v) {
+                            if(++$i!=0 && count($update_log)!=$i) $update_history.=', ';
+                            $update_history.=$v;
+                        }
+                        $itemHistory = new CadetInventoryProductHistory();
+                        $itemHistory->product_id = $stockItem->id;
+                        $itemHistory->remarks = $update_history;
+                        $itemHistory->created_by = Auth::user()->id;
+                        $historyDataSave = $itemHistory->save();
+                    }
+                }
+                DB::commit();
+                Session::flash('message', 'Stock Item  update successfully.');
+            }else{
+                Session::flash('errorMessage', @$msg);
+            }
+            return redirect()->back();
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            Session::flash('errorMessage', 'Error updating Stock item.');
+            return redirect()->back();
         }
 
     }
