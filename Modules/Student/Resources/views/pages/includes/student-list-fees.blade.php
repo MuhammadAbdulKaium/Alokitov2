@@ -33,6 +33,7 @@
 						</thead>
 
 						<tbody>
+{{--						{{$checkFeesAssign}}--}}
 						@foreach($searchData as $key=>$data)
 							<tr>
 								<td>{{$i++}}</td>
@@ -50,12 +51,6 @@
 									<input type="hidden" id="section_{{$data->section()->id}}" name="section[]" value="{{$data->section()->id}}">
 									<input type="hidden" id="academic_level_{{$data->academic_level}}" name="academic_level[]" value="{{$data->academic_level}}">
 									<input type="hidden" name="academic_year[]" value="{{$academicYearProfile->id}}">
-{{--									@foreach($checkFeesAssign as $key=>$fees)--}}
-{{--										@if($data->std_id == $fees->std_id)--}}
-{{--											<input type="number" value="{{$fees->fees}}" name="old_amount[]" class="form-control" readonly>--}}
-{{--										@endif--}}
-{{--									@endforeach--}}
-{{--									<input type="number" id="amount_{{$data->std_id}}" name="amount[]" value="{{$amount}}" class="form-control">--}}
 									@foreach($feesStructureList as $structure)
 										@if($structure->id == $feesStructure)
 											{{$structure->structure_name}}
@@ -63,16 +58,19 @@
 									@endforeach
 								</td>
 								@foreach($feesStructureDetailsList as $list)
-									<td><input type="number" value="{{$list->head_amount}}" name="head_amount_id[{{$list->head_id}}][]" class="form-control" required></td>
+									@isset($checkFeesAssign[$data->std_id])
+										@php
+											$fees_details=json_decode($checkFeesAssign[$data->std_id]->fees_details,1);
+												@endphp
+										@isset($fees_details[$list->head_id])
+											<td><input type="number" value= "{{$fees_details[$list->head_id]}}" name="head_amount_id[{{$list->head_id}}][]" class="form-control" required disabled></td>
+										@else
+											<td><input type="number" value= "{{$list->head_amount}}" name="head_amount_id[{{$list->head_id}}][]" class="form-control" required></td>
+										@endisset
+									@else
+										<td><input type="number" value= "{{$list->head_amount}}" name="head_amount_id[{{$list->head_id}}][]" class="form-control" required></td>
+									@endisset
 								@endforeach
-{{--								<td>--}}
-{{--									@foreach($checkFeesAssign as $key=>$fees)--}}
-{{--										@if($data->std_id == $fees->std_id)--}}
-{{--											<input type="number" value="{{$fees->late_fine}}" name="old_late_fine[]" class="form-control" readonly>--}}
-{{--										@endif--}}
-{{--									@endforeach--}}
-{{--									<input type="number" id="fine_{{$data->std_id}}" name="fine[]" value="{{$fine}}" class="form-control">--}}
-{{--								</td>--}}
 							</tr>
 						@endforeach
 						</tbody>

@@ -516,13 +516,13 @@ class StudentController extends Controller
         $academicYearProfile = AcademicsYear::where(['campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
             'status'=>'1'])->first();
-//        $checkFeesAssign = CadetFeesAssign::where(['campus_id' => $this->academicHelper->getCampus(),
-//            'instittute_id' => $this->academicHelper->getInstitute(),
-//            'academic_year'=>$academicYearProfile->id,
-//            'academic_level'=>$academicLevel,
-//            'batch'=>$batch,
-//            'section'=>$section
-//        ])->get();
+        $checkFeesAssign = CadetFeesAssign::where([
+            'academic_year'=>$academicYearProfile->id,
+            'academic_level'=>$academicLevel,
+            'batch'=>$batch,
+            'section'=>$section,
+            'structure_id'=>$feesStructure
+        ])->get()->keyBy('std_id');
         }
         $feesStructureList =FeesStructure::where(['campus_id' => $this->academicHelper->getCampus(),
         'institute_id' => $this->academicHelper->getInstitute()
@@ -530,7 +530,7 @@ class StudentController extends Controller
         $feesStructureDetailsList =FeesStructureDetails::join('fees_head','fees_structure_details.head_id','fees_head.id')->where('structure_id',$feesStructure)
             ->select('fees_structure_details.*','fees_head.fees_head')->get();
 
-        $stdListView = view('student::pages.includes.student-list-fees', compact('academicYearProfile','feesStructureDetailsList','searchData','feesStructure','feesStructureList'))->render();
+        $stdListView = view('student::pages.includes.student-list-fees', compact('checkFeesAssign','academicYearProfile','feesStructureDetailsList','searchData','feesStructure','feesStructureList'))->render();
         return ['status' => 'success', 'msg' => 'Student List found', 'html' => $stdListView];
     }
     public function searchCadetFeesGenerate(Request $request)
@@ -663,6 +663,7 @@ class StudentController extends Controller
                 $searchData = CadetFeesGenerate::join('student_manage_view','cadet_fees_generate.std_id','student_manage_view.std_id')
                     ->join('fees_structure','cadet_fees_generate.structure_id','fees_structure.id')
                     ->leftJoin('student_fees_collection','cadet_fees_generate.id','student_fees_collection.fees_generate_id')
+                    ->leftJoin('users','users.id','student_fees_collection.paid_by')
                     ->where([
                         'cadet_fees_generate.academic_year' => $academicYearProfile->id,
                         'cadet_fees_generate.academic_level' => $academicLevel,
@@ -671,7 +672,7 @@ class StudentController extends Controller
                         'cadet_fees_generate.month_name' => $month_name,
                         'cadet_fees_generate.structure_id' => $structure_id,
                         'cadet_fees_generate.status' => $status])
-                    ->select('cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
+                    ->select('users.name','cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
                         'student_fees_collection.transaction_id','student_fees_collection.payment_mode','student_fees_collection.payment_type','student_fees_collection.fine_amount',
                         'student_manage_view.std_id','student_manage_view.first_name','student_manage_view.last_name','student_manage_view.std_id','cadet_fees_generate.payment_last_date',
                         'cadet_fees_generate.structure_id','cadet_fees_generate.fine_type','cadet_fees_generate.late_fine',
@@ -681,6 +682,7 @@ class StudentController extends Controller
                 $searchData = CadetFeesGenerate::join('student_manage_view','cadet_fees_generate.std_id','student_manage_view.std_id')
                     ->join('fees_structure','cadet_fees_generate.structure_id','fees_structure.id')
                     ->leftJoin('student_fees_collection','cadet_fees_generate.id','student_fees_collection.fees_generate_id')
+                    ->leftJoin('users','users.id','student_fees_collection.paid_by')
                     ->where([
                         'cadet_fees_generate.academic_year' => $academicYearProfile->id,
                         'cadet_fees_generate.academic_level' => $academicLevel,
@@ -688,7 +690,7 @@ class StudentController extends Controller
                         'cadet_fees_generate.section' => $section,
                         'cadet_fees_generate.structure_id' => $structure_id,
                         'cadet_fees_generate.month_name' => $month_name])
-                    ->select('student_fees_collection.discount','cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
+                    ->select('users.name','student_fees_collection.discount','cadet_fees_generate.id','cadet_fees_generate.inv_id','cadet_fees_generate.status','student_fees_collection.total_payable','student_fees_collection.paid_amount','student_fees_collection.pay_date','student_fees_collection.paid_by','student_fees_collection.total_dues',
                         'student_fees_collection.transaction_id','student_fees_collection.payment_mode','student_fees_collection.payment_type','student_fees_collection.fine_amount',
                         'student_manage_view.std_id','student_manage_view.first_name','student_manage_view.last_name','student_manage_view.gr_no','student_manage_view.std_id','cadet_fees_generate.payment_last_date',
                         'cadet_fees_generate.structure_id','cadet_fees_generate.fine_type','cadet_fees_generate.late_fine',

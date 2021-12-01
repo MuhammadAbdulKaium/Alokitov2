@@ -293,16 +293,14 @@ background:#0b460b !important;
 
                      <ul class="dropdown-menus">
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
-
                            <ul class="dropdown-menus">
-                              <li><a href="/fees/dashboard/panel"><i class="fa fa-money"></i> Fees<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="/cadetfees/fees/head"><i class="fa fa-bank"></i> Fees Head</a></li>
-                                    <li><a href="/cadetfees/create/fees"><i class="fa fa-bank"></i> Fees Assign</a></li>
-                                    <li><a href="/cadetfees/generate/fees"><i class="fa fa-bank"></i> Fees Generate</a></li>
-                                    <li><a href="/cadetfees/fees/collection"><i class="fa fa-bank"></i> Fees Collection</a></li>
-
-                                    {{--                                    Menu--}}
+                              <li><a href="/cadetfees/fees/head"><i class="fa fa-bank"></i> Fees Head</a></li>
+                              <li><a href="/cadetfees/create/fees"><i class="fa fa-bank"></i> Fees Assign</a></li>
+                           </ul>
+{{--                           <ul class="dropdown-menus">--}}
+{{--                              <li><a href="/fees/dashboard/panel"><i class="fa fa-money"></i> Fees<span class="caret"></span></a>--}}
+{{--                                --}}
+{{--                                    --}}{{--                                    Menu--}}
 {{--                                    <li><a href="/fees/invoice"><i class="fa fa-sort-alpha-asc"></i> Fees Invoice</a></li>--}}
 {{--                                    <li><a href="/fees/paymenttransaction"><i class="fa fa-sort-alpha-asc"></i> Payment Transaction</a></li>--}}
 {{--                                    <li><a href="/fees/addfees"><i class="fa fa-exchange"></i> Add Fees</a></li>--}}
@@ -313,45 +311,49 @@ background:#0b460b !important;
 {{--                                    <li><a href="/fees/student/invoice/search"><i class="fa fa-exchange"></i> Process Invoice</a></li>--}}
 {{--                                    <li><a href="/fees/invoice/pdf/demo/10"><i class="fa fa-exchange"></i>Bangla Fees Report</a></li>--}}
 {{--                                    <li><a href="/fees/student/fine-reduction"><i class="fa fa-exchange"></i> Fine Reduction</a></li>--}}
-                                 </ul>
+{{--                                 </ul>--}}
                               </li>
-                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Accounting<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="{{url('/cadetfees/manual/fees')}}"><i class="fa fa-bank"></i> Manual Fees</a></li>
+{{--                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Accounting<span class="caret"></span></a>--}}
+{{--                                 <ul class="dropdown-menus">--}}
+{{--                                    <li><a href="{{url('/cadetfees/manual/fees')}}"><i class="fa fa-bank"></i> Manual Fees</a></li>--}}
 {{--                                    <li><a href="{{url('/finance/accounts/dashboard')}}"><i class="fa fa-bank"></i> Dashboard</a></li>--}}
 {{--                                    <li><a href="{{url('finance/accounts/index')}}"><i class="fa fa-bank"></i> Chart of Accounts</a></li>--}}
 {{--                                    <li><a href="{{url('finance/accounts/groups/add')}}"><i class="fa fa-bank"></i> Group</a></li>--}}
 {{--                                    <li><a href="{{url('finance/accounts/ledger/add')}}"><i class="fa fa-bank"></i>  Ledger</a></li>--}}
 {{--                                    <li><a href="{{url('finance/accounts/entries/index')}}"><i class="fa fa-bank"></i> Entires</a></li>--}}
-                                 </ul>
-                              </li>
-                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Accounting Reports<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="{{url('finance/reports/balancesheet')}}"><i class="fa fa-bank"></i> Balance Sheet</a></li>
-                                    <li><a href="{{url('finance/reports/profitloss')}}"><i class="fa fa-bank"></i> Profit Loss</a></li>
-                                    <li><a href="{{url('finance/reports/trialbalance')}}"><i class="fa fa-bank"></i>Trail Balance</a></li>
-                                    <li><a href="{{url('finance/accounts/reports/ledgerstatement')}}"><i class="fa fa-bank"></i> Ledger Statement</a></li>
-                                    <li><a href="{{url('finance/accounts/reports/ledgerentries')}}"><i class="fa fa-bank"></i> Ledger Entries</a></li>
-                                 </ul>
-                              </li>
+{{--                                 </ul>--}}
+{{--                              </li>--}}
+{{--                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Accounting Reports<span class="caret"></span></a>--}}
+{{--                                 <ul class="dropdown-menus">--}}
+{{--                                    <li><a href="{{url('finance/reports/balancesheet')}}"><i class="fa fa-bank"></i> Balance Sheet</a></li>--}}
+{{--                                    <li><a href="{{url('finance/reports/profitloss')}}"><i class="fa fa-bank"></i> Profit Loss</a></li>--}}
+{{--                                    <li><a href="{{url('finance/reports/trialbalance')}}"><i class="fa fa-bank"></i>Trail Balance</a></li>--}}
+{{--                                    <li><a href="{{url('finance/accounts/reports/ledgerstatement')}}"><i class="fa fa-bank"></i> Ledger Statement</a></li>--}}
+{{--                                    <li><a href="{{url('finance/accounts/reports/ledgerentries')}}"><i class="fa fa-bank"></i> Ledger Entries</a></li>--}}
+{{--                                 </ul>--}}
+{{--                              </li>--}}
 
-                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Fee (New)<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="{{url('fee/create/generalfee')}}"><i class="fa fa-bank"></i> Fee Create</a></li>
-                                    <li><a href="{{url('fee/feeassign/feeassign')}}"><i class="fa fa-bank"></i>Fee Assign</a></li>
-                                    <li><a href="{{url('fee/collection/single')}}"><i class="fa fa-bank"></i> Fee Collection</a></li>
-                                    <li><a href="{{url('fee/fine-collection/late-fine')}}"><i class="fa fa-bank"></i> Fine Collection</a></li>
-                                    <li><a href="{{url('fee/report/collection-amount/feedetails')}}"><i class="fa fa-bank"></i> Report Collection Amount</a></li>
-                                    <li><a href="{{url('fee/report/due-amount/student-wise')}}"><i class="fa fa-bank"></i> Report Due Amount</a></li>
-                                    <li><a href="{{url('fee/report/money-receipt/feereceipt')}}"><i class="fa fa-bank"></i> Report Money Receipt</a></li>
-                                    <li><a href="{{url('fee/setting/feehead')}}"><i class="fa fa-bank"></i> Fee Setting</a></li>
+{{--                              <li><a href="{{url('accounting/accdashboard')}}"><i class="fa fa-money"></i> Fee (New)<span class="caret"></span></a>--}}
+{{--                                 <ul class="dropdown-menus">--}}
+{{--                                    <li><a href="{{url('fee/create/generalfee')}}"><i class="fa fa-bank"></i> Fee Create</a></li>--}}
+{{--                                    <li><a href="{{url('fee/feeassign/feeassign')}}"><i class="fa fa-bank"></i>Fee Assign</a></li>--}}
+{{--                                    <li><a href="{{url('fee/collection/single')}}"><i class="fa fa-bank"></i> Fee Collection</a></li>--}}
+{{--                                    <li><a href="{{url('fee/fine-collection/late-fine')}}"><i class="fa fa-bank"></i> Fine Collection</a></li>--}}
+{{--                                    <li><a href="{{url('fee/report/collection-amount/feedetails')}}"><i class="fa fa-bank"></i> Report Collection Amount</a></li>--}}
+{{--                                    <li><a href="{{url('fee/report/due-amount/student-wise')}}"><i class="fa fa-bank"></i> Report Due Amount</a></li>--}}
+{{--                                    <li><a href="{{url('fee/report/money-receipt/feereceipt')}}"><i class="fa fa-bank"></i> Report Money Receipt</a></li>--}}
+{{--                                    <li><a href="{{url('fee/setting/feehead')}}"><i class="fa fa-bank"></i> Fee Setting</a></li>--}}
 
-                                 </ul>
-                              </li>
-                           </ul>
+{{--                                 </ul>--}}
+{{--                              </li>--}}
+{{--                           </ul>--}}
 
-                        </li>
-                        <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a></li>
+{{--                        </li>--}}
+                        <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="/cadetfees/generate/fees"><i class="fa fa-bank"></i> Fees Generate</a></li>
+                              <li><a href="/cadetfees/fees/collection"><i class="fa fa-bank"></i> Fees Collection</a></li>
+                           </ul></li>
                         <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
                      </ul>
 

@@ -19,6 +19,7 @@
                      <th><a  data-sort="sub_master_alias">Fine Amount</a></th>
                      <th><a  data-sort="sub_master_alias">Total Payable</a></th>
                      <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
+                     <th><a  data-sort="sub_master_alias">Discount</a></th>
                      <th><a  data-sort="sub_master_alias">Due Amount</a></th>
                      <th><a  data-sort="sub_master_alias">Date of Payment</a></th>
                      <th><a  data-sort="sub_master_alias">Payment Type</a></th>
@@ -41,6 +42,7 @@
                      <td>{{$feeCollection->fine_amount}}</td>
                      <td>{{$feeCollection->total_payable}}</td>
                      <td>{{$feeCollection->paid_amount}}</td>
+                     <td>{{$feeCollection->discount}}</td>
                      <td>{{$feeCollection->total_dues}}</td>
                      <td>{{$feeCollection->pay_date}}</td>
                      <td>{{$feeCollection->payment_type==1?'Manual':($feeCollection->payment_type==2?'Online':'N/A')}}</td>

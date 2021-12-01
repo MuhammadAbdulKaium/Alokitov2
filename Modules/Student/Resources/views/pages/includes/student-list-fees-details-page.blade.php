@@ -110,7 +110,7 @@
                                     <td>@isset($data->payment_type) {{($data->payment_type==1) ? 'Manual':( ($data->payment_type==2)?'Online' : 'N/A')}} @endisset</td>
                                     <td>{{$data->payment_mode}}</td>
                                     <td>{{$data->transaction_id}}</td>
-                                    <td>{{$data->paid_by}}</td>
+                                    <td>{{$data->name}}</td>
                                     <td>
                                         <button type="submit" class="btn btn-primary payData" @if($data->status==1)disabled @endif>Pay</button>
                                     </td>

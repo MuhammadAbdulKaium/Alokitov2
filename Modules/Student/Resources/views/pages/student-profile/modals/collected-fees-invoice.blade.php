@@ -1,4 +1,8 @@
- <div class="modal-body">
+<div class="modal-header">
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span
+                aria-hidden="true">×</span></button>
+</div>
+<div class="modal-body">
      <style>
          .clearfix {
              overflow: auto;
@@ -87,7 +91,7 @@
              text-transform: uppercase;
          }
      </style>
-     <a href="{{url('/student/fees/collection/invoice/pdf/'.$feeCollection->id)}}">Print</a>
+     <a href="{{url('/student/fees/collection/invoice/pdf/'.$feeCollection->id)}}" class="btn btn-primary">Print</a>
      <div class="container">
          <div class="row">
              <div class="row prescription-rows">
@@ -117,6 +121,7 @@
                      <th><a  data-sort="sub_master_alias">Fine Amount</a></th>
                      <th><a  data-sort="sub_master_alias">Total Payable</a></th>
                      <th><a  data-sort="sub_master_alias">Paid Amount</a></th>
+                     <th><a  data-sort="sub_master_alias">Discount</a></th>
                      <th><a  data-sort="sub_master_alias">Due Amount</a></th>
                      <th><a  data-sort="sub_master_alias">Date of Payment</a></th>
                      <th><a  data-sort="sub_master_alias">Payment Type</a></th>
@@ -138,6 +143,7 @@
                      <td>{{$feeCollection->fine_amount}}</td>
                      <td>{{$feeCollection->total_payable}}</td>
                      <td>{{$feeCollection->paid_amount}}</td>
+                     <td>{{$feeCollection->discount}}</td>
                      <td>{{$feeCollection->total_dues}}</td>
                      <td>{{$feeCollection->pay_date}}</td>
                      <td>{{$feeCollection->payment_type==1?'Manual':($feeCollection->payment_type==2?'Online':'N/A')}}</td>

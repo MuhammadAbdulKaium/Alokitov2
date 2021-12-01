@@ -118,6 +118,7 @@ class CadetFeesController extends Controller
         ])->get();
         $allInputs = array('year' => null, 'level' => null, 'batch' => null, 'section' => null, 'gr_no' => null, 'email' => null);
 
+
         return view('cadetfees::index',compact('academicLevels','allInputs','structureNames'))->with('allEnrollments', null);
 
     }

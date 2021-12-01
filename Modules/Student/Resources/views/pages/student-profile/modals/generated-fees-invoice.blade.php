@@ -1,4 +1,8 @@
- <div class="modal-body">
+<div class="modal-header">
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span
+                aria-hidden="true">×</span></button>
+</div>
+<div class="modal-body">
      <style>
          .clearfix {
              overflow: auto;
@@ -88,7 +92,7 @@
          }
      </style>
      <div class="container">
-         <a href="{{url('/student/fees/invoice/pdf/'.$generatedFees->id)}}">Print</a>
+         <a class="btn btn-primary" href="{{url('/student/fees/invoice/pdf/'.$generatedFees->id)}}">Print</a>
          <div class="row">
              <div class="row prescription-rows">
                  <div class="col-sm-12" style="text-align: center">

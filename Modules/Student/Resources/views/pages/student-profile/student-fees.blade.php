@@ -70,6 +70,7 @@
 						  <th>Fine Amount</th>
 						  <th>Total Payable</th>
 						  <th>Paid Amount</th>
+						  <th>Discount</th>
 						  <th>Paid Date</th>
 						  <th>Total Due</th>
 						  <th>Payment Type</th>
@@ -85,6 +86,7 @@
 							  <td>{{$collection->fine_amount}}</td>
 							  <td>{{$collection->total_payable}}</td>
 							  <td>{{$collection->paid_amount}}</td>
+							  <td>{{$collection->discount}}</td>
 							  <td>{{$collection->pay_date}}</td>
 							  <td>{{$collection->total_dues}}</td>
 							  <td>{{$collection->payment_type==1?'Manual':($collection->payment_type==2?'Online':'N/A')}}</td>
