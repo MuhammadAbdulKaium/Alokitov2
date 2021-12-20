@@ -94,8 +94,9 @@ class FeesStructureDetailsController extends Controller
                     }
                 }
             }
+            $feesStructureDetailsSum=FeesStructureDetails::where('structure_id',$request->structureID)->sum('head_amount');
             $feesStructureUpdate = $feesStructure->update([
-                'total_fees' => $sum
+                'total_fees' => $feesStructureDetailsSum
             ]);
 
         }
@@ -119,10 +120,11 @@ class FeesStructureDetailsController extends Controller
                 $structureDetailsHistory->created_by =Auth::user()->id;
                 $structureDetailsHistorySave=$structureDetailsHistory->save();
             }
+            $feesStructureUpdate = $feesStructure->update([
+                'total_fees' => $sum
+            ]);
         }
-        $feesStructureUpdate = $feesStructure->update([
-            'total_fees' => $sum
-        ]);
+
 
     }
 
