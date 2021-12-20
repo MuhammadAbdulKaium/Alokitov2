@@ -1,3 +1,4 @@
+
 @if($user->hasRole(['super-admin']) || $user->hasRole(['admin']))
 
     <link href="{{ URL::asset('css/jquery-ui.min.css') }}" rel="stylesheet" type="text/css"/>
@@ -6,10 +7,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">Add Previous Year Result</h4>
+                <h4 class="modal-title">Add Committee</h4>
             </div>
 
-            <form id="add-information-form" name="add-information-form"  class="form-horizontal" action="{{url('website/committee/store')}}" method="post" role="form" enctype="multipart/form-data">
+            <form id="add-information-form" name="add-information-form"  class="form-horizontal" action="{{url('website/committee/update', $committees->id)}}" method="post" role="form" enctype="multipart/form-data">
                 <input type="hidden" name="_token" value="{{csrf_token()}}">
                 <div class="modal-body">
                     <input id="campus_id" class="form-control" name="campus_id" type="hidden" value="{{session()->get('campus')}}">
@@ -29,11 +30,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="control-label" for="name">Name*</label>
-                                <input id="name" class="form-control" name="name" type="text" required>
+                                <input id="name" class="form-control" name="name" value="{{$committees->name}}" type="text" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="control-label" for="designation">Designation</label>
-                                <input id="designation" class="form-control" name="designation" maxlength="15" type="text">
+                                <input id="designation" class="form-control" name="designation" value="{{$committees->designation}}" maxlength="15" type="text">
                             </div>
 
                         </div>
@@ -42,11 +43,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="control-label" for="email">Email</label>
-                                <input id="email" class="form-control" name="email" type="email">
+                                <input id="email" class="form-control" name="email" value="{{$committees->email}}" type="email">
                             </div>
                             <div class="col-md-6">
                                 <label class="control-label" for="phone">Phone</label>
-                                <input id="phone" class="form-control" name="phone" type="number">
+                                <input id="phone" class="form-control" name="phone" value="{{$committees->phone}}" type="number">
                             </div>
                         </div>
                     </div>
@@ -54,7 +55,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <label class="control-label" for="speech">Speech</label>
-                                <textarea name="speech" id="speech" class="form-control"></textarea>
+                                <textarea name="speech" id="speech" class="form-control">{{$committees->speech}}</textarea>
                             </div>
                         </div>
                     </div>
@@ -86,6 +87,9 @@
 @else
     <h1>YOU DO NOT HAVE PERMISSION FOR THIS PAGE!</h1>
 @endif
+
+
+
 
 
 

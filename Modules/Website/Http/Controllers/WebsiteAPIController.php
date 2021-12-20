@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\AcademicHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Website\Entities\Success;
 use Modules\Website\Entities\WebsiteCommittee;
 use Modules\Website\Entities\WebsiteExtra;
 use Modules\Website\Entities\WebsiteFormDuration;
@@ -67,8 +68,47 @@ class WebsiteAPIController extends Controller
         else {
             return ['status' => 'failed', 'msg' => 'Invalid Campus or Institute ID'];
         }
-    }
+        }
+        public function successAPI(Request $request){
+            $campusId = $request->input('campus_id');
+            $instituteId = $request->input('institute_id');
 
+            // checking campus with institute
+            if ($this->academicHelper->findCampusWithInstId($campusId, $instituteId)) {
+
+                $successes = Success::where('campus_id', '=', $campusId)
+                    ->where('institute_id', '=', $instituteId)->get();
+
+                $successArray = null;
+
+                if (count($successes) > 0)
+                {
+                    foreach ($successes as $success)
+                    {
+
+
+                        $successArray[$success->id] =
+                            [
+                                'passing_year' => $success->passing_year,
+                                'total_examine' => $success->total_examine,
+                                'psc_passing_rate' => $success->psc_passing_rate,
+                                'jsc_passing_rate' => $success->jsc_passing_rate,
+                                'ssc_passing_rate' => $success->ssc_passing_rate,
+
+                                'hsc_passing_rate' => $success->hsc_passing_rate,
+
+                            ];
+                    }
+                    return ['status' => 'success', 'msg' => 'Website Committee ddd', 'data' => $successArray];
+                }
+                else {
+                    return ['status' => 'failed', 'msg' => 'No records found'];
+                }
+            }
+            else {
+                return ['status' => 'failed', 'msg' => 'Invalid Campus or Institute ID'];
+            }
+        }
 
     public function committeeAPI(Request $request)
     {
@@ -202,6 +242,7 @@ class WebsiteAPIController extends Controller
 
     }
 
+
     public function publicExamAPI(Request $request)
     {
         $campusId = $request->input('campus_id');
@@ -228,7 +269,7 @@ class WebsiteAPIController extends Controller
                     ];
                 }
 
-                return ['status' => 'success', 'msg' => 'Website Information', 'data' => $rulesArray];
+                return ['status' => 'success', 'msg' => 'Website success and achievement ', 'data' => $rulesArray];
             }
             else {
                 return ['status' => 'failed', 'msg' => 'No records found'];

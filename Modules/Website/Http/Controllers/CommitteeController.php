@@ -15,8 +15,19 @@ class CommitteeController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * @return Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|Response|\Illuminate\View\View
      */
+
+    public function  speech(){
+        $campus = session()->get('campus');
+        $institute = session()->get('institute');
+
+        $user = Auth::user();
+        $committees = WebsiteCommittee::where('campus_id', '=', $campus)
+            ->where('institute_id', '=', $institute)->get();
+
+        return view('website::committee.speech.index', compact('committees', 'user'));
+    }
     public function index()
     {
         $campus = session()->get('campus');
@@ -38,6 +49,11 @@ class CommitteeController extends Controller
         $user = Auth::user();
         return view('website::committee.create', compact('user'));
     }
+    public function speechCreate()
+    {
+        $user = Auth::user();
+        return view('website::committee.speech.create', compact('user'));
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -46,6 +62,23 @@ class CommitteeController extends Controller
      */
     public function store(Request $request)
     {
+            $campus = session()->get('campus');
+            $institute = session()->get('institute');
+        if($request->type!=null){
+            $data=WebsiteCommittee::where('campus_id', '=', $campus)
+                ->where('institute_id', '=', $institute)->where('type','=',$request->type)->get();
+         if($data)
+         {
+             if($request->type==1){
+                 return redirect()->back()->with('warning','Principle is already assigned !');
+             }else
+             {
+                 return redirect()->back()->with('warning','Chairman is already assigned !');
+             }
+
+         }
+        }
+
         $input = $request->all();
 
         if($file = $request->file('image')){
@@ -54,8 +87,9 @@ class CommitteeController extends Controller
             $file->move('images', $name);
             $input['image'] = $name;
         }
+
         WebsiteCommittee::create($input);
-        return redirect('website/committee');
+      return redirect()->back();
 
     }
 

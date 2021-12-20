@@ -13,8 +13,8 @@
                     <li><a href="/academics/default/index">Website</a></li>
                     <li class="active">Committee</li>
                 </ul>
-            </section>
-            <section class="content">
+
+                section class="content">
 
                 @if(count($committees) < 1)
 

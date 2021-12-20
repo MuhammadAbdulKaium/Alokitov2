@@ -9,7 +9,19 @@ Route::group(['middleware' => ['web', 'auth','setting-permission'], 'prefix' => 
     Route::get('/information/edit/{id}', 'InformationController@edit');
     Route::post('/information/update/{id}', 'InformationController@update');
 
+
+    //Routes for Achievement and success
+
+    Route::get('/success', 'SuccessController@index');
+    Route::get('/success/create', 'SuccessController@create');
+    Route::post('/success/store', 'SuccessController@store');
+    Route::get('/success/edit/{id}', 'SuccessController@edit');
+    Route::post('/success/update/{id}', 'SuccessController@update');
+    Route::post('/success/delete/{id}', 'SuccessController@destroy');
+
+
     //Routes for website information menu
+
     Route::get('/committee', 'CommitteeController@index');
     Route::get('/committee/create', 'CommitteeController@create');
     Route::post('/committee/store', 'CommitteeController@store');
@@ -17,6 +29,17 @@ Route::group(['middleware' => ['web', 'auth','setting-permission'], 'prefix' => 
     Route::get('/committee/edit/{id}', 'CommitteeController@edit');
     Route::post('/committee/update/{id}', 'CommitteeController@update');
     Route::get('/committee/delete/{id}', 'CommitteeController@destroy');
+
+
+
+    Route::get('/committee/speech', 'CommitteeController@speech');
+
+    Route::get('/committee-speech/create', 'CommitteeController@speechCreate');
+    Route::post('/committee-speech/store', 'CommitteeController@speechStore');
+    Route::get('/committee-speech/show/{id}', 'CommitteeController@speechShow');
+    Route::get('/committee-speech/edit/{id}', 'CommitteeController@speechEdit');
+    Route::post('/committee-speech/update/{id}', 'CommitteeController@speechUpdate');
+    Route::get('/committee-speech/delete/{id}', 'CommitteeController@speechDestroy');
 
     //Routes for website rules  menu
     Route::get('/rules', 'RulesController@index');
@@ -73,6 +96,7 @@ Route::group(['middleware' => 'cors', 'prefix' => 'website', 'namespace' => 'Mod
     Route::post('api_get_information/','WebsiteAPIController@informationAPI');
     //Committee API
     Route::post('api_get_committee/','WebsiteAPIController@committeeAPI');
+        Route::post('api_get_success/','WebsiteAPIController@successAPI');
     //Rules API
     Route::post('api_get_rules/','WebsiteAPIController@rulesAPI');
     //Extras API

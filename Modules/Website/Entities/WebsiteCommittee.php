@@ -16,6 +16,7 @@ class WebsiteCommittee extends Model
         'speech',
         'image',
         'email',
-        'phone'
+        'phone',
+        'type'
     ];
 }

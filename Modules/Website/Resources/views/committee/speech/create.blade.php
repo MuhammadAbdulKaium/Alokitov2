@@ -6,9 +6,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">Add Previous Year Result</h4>
+                <h4 class="modal-title">Add Committee</h4>
             </div>
-
             <form id="add-information-form" name="add-information-form"  class="form-horizontal" action="{{url('website/committee/store')}}" method="post" role="form" enctype="multipart/form-data">
                 <input type="hidden" name="_token" value="{{csrf_token()}}">
                 <div class="modal-body">
@@ -35,7 +34,14 @@
                                 <label class="control-label" for="designation">Designation</label>
                                 <input id="designation" class="form-control" name="designation" maxlength="15" type="text">
                             </div>
+                            <div class="col-md-6">
+                                <label class="control-label" for="designation">Type</label>
 
+                                <select name="type" id="" class="form-control">
+                                    <option value="1">Principle</option>
+                                    <option value="2">Chairman</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
