@@ -66,9 +66,10 @@ class CommitteeController extends Controller
             $institute = session()->get('institute');
         if($request->type!=null){
             $data=WebsiteCommittee::where('campus_id', '=', $campus)
-                ->where('institute_id', '=', $institute)->where('type','=',$request->type)->get();
+                ->where('institute_id', '=', $institute)->where('type','=',$request->type)->first();
          if($data)
          {
+
              if($request->type==1){
                  return redirect()->back()->with('warning','Principle is already assigned !');
              }else

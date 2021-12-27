@@ -70,7 +70,7 @@
                                                         <td>{{$i++}}</td>
                                                         <td><img height="80" src="/images/{{$committee->image}}" alt=""></td>
                                                         <td>{{$committee->name}}</td>
-                                                        <td>{{$committee->designation}}</td>
+                                                        <td>{{$committee->designation}}  <span class="badge badge-primary">@if($committee->type==1) Principle @elseif($committee->type==2) Chairman @endif</span></td>
                                                         <td>{{$committee->phone}}</td>
                                                         <td>{{$committee->email}}</td>
                                                         <td>{{substr($committee->speech, 0, 50)}}....</td>

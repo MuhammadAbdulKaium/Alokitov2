@@ -7,7 +7,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button aria-label="Close" data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">Add Committee</h4>
+                <h4 class="modal-title">Update  Committee Member Information</h4>
+                <span class="badge badge-primary">@if($committees->type==1) Principle @elseif($committees->type==2) Chairman @endif</span>
             </div>
 
             <form id="add-information-form" name="add-information-form"  class="form-horizontal" action="{{url('website/committee/update', $committees->id)}}" method="post" role="form" enctype="multipart/form-data">
