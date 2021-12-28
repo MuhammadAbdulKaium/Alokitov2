@@ -138,6 +138,7 @@ class WebsiteAPIController extends Controller
                         'email' => $committee->email,
                         'designation' => $committee->designation,
                         'speech' => $committee->speech,
+                        'type'=>$committee->type,
                         'image' => $photo
                     ];
                 }
