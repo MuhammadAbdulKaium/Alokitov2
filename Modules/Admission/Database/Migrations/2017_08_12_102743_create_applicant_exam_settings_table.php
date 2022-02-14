@@ -25,7 +25,9 @@ class CreateApplicantExamSettingsTable extends Migration
             $table->string('exam_end_time')->nullbale();
             $table->string('exam_venue')->nullbale();
             $table->boolean('exam_taken')->dafault(0);
+            $table->integer('max_applicants')->default(0);
             $table->integer('campus_id')->unsigned()->nullable();
+
             $table->foreign('campus_id')->references('id')->on('setting_campus')->onDelete('cascade');
             $table->integer('institute_id')->unsigned()->nullable();
             $table->foreign('institute_id')->references('id')->on('setting_institute')->onDelete('cascade');

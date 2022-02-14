@@ -93,6 +93,15 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="control-label" for="website_location_google_iframe">Structure</label>
+                                <textarea name="website_location_google_iframe" id="website_location_google_iframe" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <!--./body-->
                     <div class="modal-footer">

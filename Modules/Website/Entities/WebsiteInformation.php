@@ -18,6 +18,7 @@ class WebsiteInformation extends Model
         'school_contact',
         'school_history',
         'school_mission',
-        'school_structure'
+        'school_structure',
+        'website_location_google_iframe'
     ];
 }

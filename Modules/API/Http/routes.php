@@ -8,6 +8,14 @@ Route::group(['middleware' => 'cors', 'prefix' => 'api', 'namespace' => 'Modules
     Route::get('/get-state-list','AcademicAPIController@getStateList');
     Route::get('/get-city-list/{id}','AcademicAPIController@getCityList');
 
+    //new Route By Dev9
+
+
+
+   Route::post('/get-division-list','AcademicAPIController@getDivisionList');
+       Route::post('/save-admission-student','AdmissionAPIController@');
+
+//end
     Route::get('/get-academic-year/{institute}/{campusId}','AcademicAPIController@getAcademicYear');
     Route::get('/get-academic-year-list/{institute}/{campusId}','AcademicAPIController@getAcademicYearList');
     Route::post('/get-academic-level-list/','AcademicAPIController@getAcademicLevelList');

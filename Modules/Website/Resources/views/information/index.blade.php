@@ -98,6 +98,10 @@
                                         <th>Structure:</th>
                                         <td>{{$informations->school_structure}}</td>
                                     </tr>
+                                    <tr>
+                                        <th>Website location  Iframe Link</th>
+                                        <td>{{$informations->website_location_google_iframe}}</td>
+                                    </tr>
                                 </table>
 
                 @endif

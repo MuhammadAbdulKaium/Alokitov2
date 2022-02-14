@@ -92,6 +92,7 @@ Route::group(['middleware' => ['web', 'auth','setting-permission'], 'prefix' => 
 
 Route::group(['middleware' => 'cors', 'prefix' => 'website', 'namespace' => 'Modules\Website\Http\Controllers'], function()
 {
+    Route::get('api_get_country/','WebsiteAPIController@getSettingCountry');
     //Information API
     Route::post('api_get_information/','WebsiteAPIController@informationAPI');
     //Committee API

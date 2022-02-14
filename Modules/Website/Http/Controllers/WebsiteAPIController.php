@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\AcademicHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Modules\Setting\Entities\Country;
 use Modules\Website\Entities\Success;
 use Modules\Website\Entities\WebsiteCommittee;
 use Modules\Website\Entities\WebsiteExtra;
@@ -57,7 +58,8 @@ class WebsiteAPIController extends Controller
                     'school_history' => $information->school_history,
                     'school_mission' => $information->school_mission,
                     'school_structure' => $information->school_structure,
-                    'school_logo' => $photo
+                    'school_logo' => $photo,
+                    'school_location_iframe'=>$information->website_location_google_iframe
                 ];
                 return ['status' => 'success', 'msg' => 'Website Information', 'data' => $informationArray];
             }
@@ -323,7 +325,21 @@ class WebsiteAPIController extends Controller
             return ['status' => 'failed', 'msg' => 'Invalid Campus or Institute ID'];
         }
     }
-
+    //For Admission Blood Group and Country
+    public function getSettingCountry()
+    {
+        $countries = Country::all();
+        $countryArray=null;
+        foreach ($countries as $key=>$country)
+        {
+            $countryArray[$key]=[
+                'id'=>$country->id,
+                'name'=>$country->name,
+                'nationality'=>$country->nationality
+            ];
+        }
+        return ['status'=>'success','msg'=>'country ','data'=>$countryArray];
+    }
 
     public function formDurationAPI(Request $request)
     {

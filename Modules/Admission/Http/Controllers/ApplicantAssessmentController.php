@@ -28,6 +28,7 @@ Use App\UserInfo;
 use Carbon\Carbon;
 use Modules\Student\Http\Controllers\StudentGuardController;
 use Modules\Academics\Entities\AcademicsYear;
+use function React\Promise\all;
 
 
 class ApplicantAssessmentController extends Controller
@@ -608,6 +609,13 @@ class ApplicantAssessmentController extends Controller
             // return view with variable
             return view('admission::admission-assessment.modals.setting', compact('feesSettingProfile', 'applicantResultSheet'));
         }else{
+
+            $examSubjectMark=[];
+            foreach ($request->subjectName as $key=>$subject){
+                $examSubjectMark[$subject]=$request->subjectMark[$key];
+            }
+
+
             // fees setting id
             $examSettingId = $request->input('exam_setting_id');
             $examFees = $request->input('exam_fees');
@@ -620,6 +628,9 @@ class ApplicantAssessmentController extends Controller
             $examTaken = $request->input('exam_taken');
             $examMarks = $request->input('exam_marks');
             $examPassingMarks = $request->input('exam_passing_marks');
+
+
+
 
             // checking fees_setting_id
             if($examSettingId>0){
@@ -635,8 +646,18 @@ class ApplicantAssessmentController extends Controller
             $examSettingProfile->exam_start_time = $examStartTime;
             $examSettingProfile->exam_end_time = $examEndTime;
             $examSettingProfile->exam_venue = $examVenue;
+            $examSettingProfile->max_applicants=$request->max_applicants;
+            $examSettingProfile->last_date_of_submission= date('Y-m-d', strtotime($request->last_date_of_submission));
+
             $examSettingProfile->exam_taken = $examTaken;
             $examSettingProfile->exam_marks = $examMarks;
+            $examSettingProfile->exam_passing_marks = $examPassingMarks;
+            //working dev9
+
+            $examSettingProfile->exam_subjects_marks = json_encode($examSubjectMark);
+
+
+            //dev9 rules
             $examSettingProfile->exam_passing_marks = $examPassingMarks;
             $examSettingProfile->academic_year = $academicYear;
             $examSettingProfile->academic_level = $academicLevel;
@@ -791,6 +812,7 @@ class ApplicantAssessmentController extends Controller
 
 
     }
+
 
 
 

@@ -25,6 +25,7 @@
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/jquery.timepicker.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/sweetAlert.css') }}" rel="stylesheet"/>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @yield('styles')
 

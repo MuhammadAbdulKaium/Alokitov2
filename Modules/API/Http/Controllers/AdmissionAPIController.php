@@ -109,7 +109,164 @@ class AdmissionAPIController extends Controller
             return ['status' => 400, 'msg' => $validator->errors()];
         }
     }
+    //For testing By mazharul
+    public function customValidation($param){
 
+
+    }
+    // store applicant personal information
+    public function storeApplicantPersonalInfo($applicantId, $applicationNo, $request)
+    {
+        // student photo
+        $stdPhoto = $request->input('image', null);
+        // applicant new personal profile
+        $personalInoProfile = new $this->personalInfo();
+        // input details
+        $personalInoProfile->applicant_id        = $applicantId;
+        $personalInoProfile->std_name            = $request->input('std_name');
+        $personalInoProfile->invoice_id            = uniqid();
+        $personalInoProfile->amount               = 03;
+        $personalInoProfile->std_name_bn         = $request->input('std_name_bn');
+        // checking student photo
+        if($stdPhoto){
+            $personalInoProfile->std_photo = $stdPhoto;
+        }
+
+
+
+        $personalInoProfile->birth_date          = date('Y-m-d', strtotime($request->input('birth_date')));
+        $personalInoProfile->gender              = $request->input('gender');
+
+        $personalInoProfile->add_per_address      = $request->input('add_per_address');
+        $personalInoProfile->add_per_post        = $request->input('add_per_post');
+        $personalInoProfile->add_per_city        = $request->input('add_per_city');
+        $personalInoProfile->add_per_state       = $request->input('add_per_state');
+        $personalInoProfile->add_per_phone       = $request->input('add_per_phone');
+
+        $personalInoProfile->add_pre_address     = $request->input('add_pre_address');
+        $personalInoProfile->add_pre_post        = $request->input('add_pre_post');
+        $personalInoProfile->add_pre_city        = $request->input('add_pre_city');
+        $personalInoProfile->add_pre_state       = $request->input('add_pre_state');
+        $personalInoProfile->add_pre_phone       = $request->input('add_pre_phone');
+
+        // romeshshil code 5 new column
+
+        $personalInoProfile->special_care        = $request->input('special_care');
+        $personalInoProfile->tribal              = $request->input('tribal');
+        $personalInoProfile->nationality            = $request->input('nationality');
+        $personalInoProfile->religion          = $request->input('religion', null);
+        $personalInoProfile->area_of_land          = $request->input('area_of_land', null);
+
+        // save and checking
+        if($personalInoProfile->save()){
+            // checking student photo
+            if($stdPhoto){
+                // upload student photo
+                if($this->applicantPhotoUploader($applicantId, $applicationNo, $stdPhoto)==false){
+                    // response success
+                    return ['status'=>false, 'msg'=>'Unable to Store Applicant Photo'];
+                }
+            }
+            // response success
+            return ['status'=>true, 'id'=>$personalInoProfile->id,'invoice_id'=>$personalInoProfile->invoice_id];
+        }else{
+            // response failed
+            return ['status'=>false, 'msg'=>'Unable to Store Applicant personal information'];
+        }
+    }
+
+
+
+    public function saveStudentsData(Request  $request)
+    {
+      $this->customValidation($request);
+        $boo=$request->all();
+        $validator = Validator::make($request->all(), [
+            'firstName'=>'required',
+
+        'lastName'=>'required',
+        'banglaName'=>'required',
+        'dateOfBirth'=>'required',
+        'religion'=>'required',
+        'bloodGroup'=>'required',
+        'presentAddress'=>'required',
+        'permanentAddress'=>'required',
+        'birthCertificate'=>'required',
+        'country'=>'required',
+
+        ]);
+        $validator = Validator::make($request->father, [
+            'name'=>'required',
+            'contactAddress'=>'required',
+            'contactPhone'=>'required',
+        ]);
+        $validator = Validator::make($request->mother, [
+            'name'=>'required',
+            'contactAddress'=>'required',
+            'contactPhone'=>'required',
+        ]);
+        $validator = Validator::make($request->guardian, [
+            'name'=>'required',
+            'contactAddress'=>'required',
+            'contactPhone'=>'required',
+        ]);
+        
+        if($validator->passes()){
+            DB::beginTransaction();
+            try {
+                $campus = $request->input('campus_id');
+                $institute = $request->input('institute_id');
+                // campus id
+                $campusProfile = $this->campus->find($campus);
+                // application Year
+                $applicationYear = '20';
+                // username and email
+                $applicationId = $campus.$applicationYear.($campusProfile->app_counter+1);
+                $email = $applicationId;
+
+                // application new profile
+                $applicantProfile = new $this->applicant();
+                // input details
+                // $applicantProfile->email       = $request->input('email', $email);
+                $applicantProfile->email          = $email;
+                $applicantProfile->username       = $applicationId;
+                //$applicantProfile->username     = $request->input('username', $username);
+                $applicantProfile->password       = bcrypt($applicationId);
+                $applicantProfile->campus_id      = $campus;
+                $applicantProfile->institute_id   = $institute;
+                $applicantProfile->application_no = $applicationId;
+                // save applicant profile and checking
+                if($applicantProfile->save()){
+                    $personalInoProfile = (object) $this->storeApplicantPersonalInfo($applicantProfile->id, $applicationId, $request);
+
+                }
+
+            }catch (\Exception $e){
+
+
+            }
+
+
+
+            return  ['status'=>200,'msg'=>"Got the student data",'data'=>$request->all()];
+        }else {
+            return  ['status'=>200,'msg'=>"Error on data",'data'=>$request->all()];
+        }
+
+
+
+
+    }
+
+    public function saveGuardian(){
+
+
+
+
+        
+
+    }
+//End Testing
     // find academic section list
     public function storeOnlineStudent(Request $request)
     {
@@ -239,7 +396,7 @@ class AdmissionAPIController extends Controller
 
 
     // store applicant personal information
-    public function storeApplicantPersonalInfo($applicantId, $applicationNo, $request)
+    public function storeApplicantPersonalInfoNew($applicantId, $applicationNo, $request)
     {
         // student photo
         $stdPhoto = $request->input('image', null);
@@ -687,6 +844,8 @@ class AdmissionAPIController extends Controller
 
         // storing requesting input data
         if($validator->passes()) {
+
+
             // request txn details
             $stdId = $request->std_id;
             $txnAmount = $request->amount;

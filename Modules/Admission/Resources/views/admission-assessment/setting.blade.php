@@ -79,6 +79,7 @@
                         // statements
                         var applicant_grade_content_row=  $('#applicant_grade_content_row');
                         applicant_grade_content_row.html('');
+
                         applicant_grade_content_row.append(data);
                         waitingDialog.hide();
                     },

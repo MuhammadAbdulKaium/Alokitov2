@@ -32,6 +32,7 @@ use Modules\Communication\Entities\SmsLog;
 use Modules\Admin\Entities\SubscriptionManagementTransaction;
 use Modules\Admin\Entities\SubscriptionManagementProcessSession;
 use Illuminate\Support\Facades\Session;
+use Modules\Academics\Entities\Division;
 
 
 class AcademicAPIController extends Controller
@@ -63,8 +64,13 @@ class AcademicAPIController extends Controller
     private $smps;
 
     // constructor
-    public function __construct(Institute $institute, AcademicHelper $academicHelper, AcademicsAdmissionYear $admissionYear, AcademicsYear $academicsYear, Semester $semester, AcademicsLevel $academicsLevel, Batch $batch, Section $section, BatchController $batchController, AcademicsLevelController $levelController, SectionController $sectionController, SemesterController $semesterController, NoticeController $noticeController, AssessmentsController $assessmentsController, StudentProfileView $studentProfileView, ClassTopper $classTopper, ClassSubject $classSubject, ManageAcademicsController $manageAcademicsController, SubjectGroup $subjectGroup, BillingInfo $billingInfo, SmsCredit $smsCredit, SmsLog $smsLog, SubscriptionManagementTransaction $smts, SubscriptionManagementProcessSession $smps)
+    private $division;
+
+    public function __construct(Division $division,Institute $institute, AcademicHelper $academicHelper,
+                                AcademicsAdmissionYear
+    $admissionYear, AcademicsYear $academicsYear, Semester $semester, AcademicsLevel $academicsLevel, Batch $batch, Section $section, BatchController $batchController, AcademicsLevelController $levelController, SectionController $sectionController, SemesterController $semesterController, NoticeController $noticeController, AssessmentsController $assessmentsController, StudentProfileView $studentProfileView, ClassTopper $classTopper, ClassSubject $classSubject, ManageAcademicsController $manageAcademicsController, SubjectGroup $subjectGroup, BillingInfo $billingInfo, SmsCredit $smsCredit, SmsLog $smsLog, SubscriptionManagementTransaction $smts, SubscriptionManagementProcessSession $smps)
     {
+        $this->division=$division;
         $this->academicHelper  = $academicHelper;
         $this->admissionYear  = $admissionYear;
         $this->academicsYear  = $academicsYear;
@@ -198,9 +204,9 @@ class AcademicAPIController extends Controller
         // checking campus with institute
         if($this->academicHelper->findCampusWithInstId($campusId, $instituteId)){
             // year profile
-            $yearProfile = $this->academicsYear->where(['id'=>$yearId, 'institute_id'=> $instituteId, 'campus_id'=>$campusId])->first();
+          /*  $yearProfile = $this->academicsYear->where(['id'=>$yearId, 'institute_id'=> $instituteId, 'campus_id'=>$campusId])->first();*/
             // checking section
-            if($yearProfile){
+            /*if($yearProfile){*/
                 // find academic levels
                 $academicYearLevelList = (array)$this->levelController->findMyLevel($request);
                 // checking
@@ -210,10 +216,10 @@ class AcademicAPIController extends Controller
                     // return status with msg
                     return ['status'=>'failed', 'msg'=>'No records found'];
                 }
-            }else{
+            /*}else{
                 // return status with msg
                 return ['status'=>'failed', 'msg'=>'Academic Year not matched with campus and instituteD'];
-            }
+            }*/
         }else{
             // return status with msg
             return ['status'=>'failed', 'msg'=>'Invalid Campus or Institute ID'];
@@ -345,8 +351,7 @@ class AcademicAPIController extends Controller
                 $batchSemesterList = $this->academicHelper->getBatchSemesterList($yearId, $levelId, $batchId);
                 // checking
                 if(count($batchSemesterList)>0){
-                    return ['status'=>'success', 'msg'=>'Batch Semester list', 'data'=>$batchSemesterList];
-                }else{
+
                     // return status with msg
                     return ['status'=>'failed', 'msg'=>'No records found'];
                 }
@@ -358,6 +363,30 @@ class AcademicAPIController extends Controller
             // return status with msg
             return ['status'=>'failed', 'msg'=>'Invalid Campus or Institute ID'];
         }
+    }
+    //academic division
+    public function getDivisionList(Request $request)
+    {
+        $campusId = $request->input('campus');
+        $instituteId = $request->input('institute');
+        if($this->academicHelper->findCampusWithInstId($campusId, $instituteId)){
+            // notice list
+            $divisionList = $this->division->where([
+                // 'academic_year'=>$this->academicHelper->getAcademicYear(),
+                'campus'=> $campusId,
+                'institute'=>$instituteId
+            ])->get();
+            // checking
+            if(count($divisionList)>0){
+                return ['status'=>'success', 'msg'=>'Academic notice list', 'data'=>$divisionList];
+            }else{
+                // return status with msg
+                return ['status'=>'failed', 'msg'=>'No records found'];
+            }
+        }else{
+            return ['status'=>'failed', 'msg'=>'Invalid Campus or Institute ID'];
+        }
+
     }
 
     // academic notice list

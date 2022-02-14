@@ -112,6 +112,54 @@ background:#0b460b !important;
                         <span class="fa fa-desktop icon-margin"></span> Online Academic
                      </a>
                   </li>
+
+                  <li><a href="#"><span class="fa fa-users icon-margin"></span> Admission` <span
+                                class="caret"></span></a>
+
+                     <ul class="dropdown-menus">
+                        <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
+
+                           <ul class="dropdown-menus">
+                              <li>
+                                 <a href="/admission/assessment"> Assessment</a>
+                              </li>
+                              <li>
+                                 <a href="/website/committee"> Committee</a>
+                              </li>
+                              <li>
+                                 <a href="/website/success"> Achievement and Success</a>
+                              </li>
+                              <li>
+                                 <a href="/website/committee/speech"> Speech</a>
+                              </li>
+                              <li><a href="#">  Extras <span class="caret"></span></a>
+                                 <ul class="dropdown-menus">
+                                    <li><a href="{{url('/website/extra/facilities')}}"> Facilities </a></li>
+                                    <li><a href="{{url('/website/extra/publications')}}">Publications </a></li>
+                                    <li><a href="{{url('/website/extra/circular')}}"> Circular </a></li>
+                                    <li><a href="{{url('/website/extra/extra_curricular')}}"> Extra Curricular Activity </a></li>
+                                    <li><a href="{{url('/website/extra/books_syllabus')}}"> Books & syllabus </a></li>`
+                                 </ul>
+                              </li>
+                              <li>
+                                 <a href="/website/public_exam"> Public Exam</a>
+                              </li>
+                              <li>
+                                 <a href="/website/image"> Image</a>
+                              </li>
+                              <li>
+                                 <a href="/website/form"> Form</a>
+                              </li>
+
+
+
+                           </ul>
+
+                        </li>
+
+                     </ul>
+
+                  </li>
                   <li><a href="#"><span class="fa fa-users icon-margin"></span> Event <span class="caret"></span></a>
 
                   <ul class="dropdown-menus">

@@ -1,4 +1,9 @@
 
+@section('styles')
+	<style>
+
+	</style>
+@endsection
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="col-md-12">
@@ -11,7 +16,8 @@
 					<div class="col-sm-3">
 						<div class="form-group {{ $errors->has('exam_marks') ? ' has-error' : '' }}">
 							<label class="control-label" for="exam_marks">Exam Marks</label>
-							<input id="exam_marks" class="form-control settings" name="exam_marks" value="{{$feesSettingProfile?$feesSettingProfile->exam_marks:''}}" maxlength="100" placeholder="Enter Exam Marks" type="text" required>
+							<input id="exam_marks" class="form-control  settings" name="exam_marks"
+								   value="{{$feesSettingProfile?$feesSettingProfile->exam_marks:''}}" maxlength="100" placeholder="Enter Exam Marks" type="text" required>
 							<div class="help-block">
 								@if($errors->has('exam_marks'))
 									<strong>{{ $errors->first('exam_marks') }}</strong>
@@ -77,6 +83,21 @@
 						</div>
 					</div>
 					<div class="col-sm-3">
+						<div class="form-group {{ $errors->has('last_date_of_submission') ? ' has-error' : '' }}">
+							<label class="control-label" for="last_date_of_submission">Form submission Last Date</label>
+							<input id="exam_date" class="form-control datepicker settings" style="border-radius: 0px"
+								   name="last_date_of_submission" value="{{$feesSettingProfile?date('m/d/Y',strtotime
+								   ($feesSettingProfile->last_date_of_submission)):''}}" placeholder="Last Date Of
+								   Form Submission`	"
+								   readonly type="text" required>
+							<div class="help-block">
+								@if ($errors->has('last_date_of_submission'))
+									<strong>{{ $errors->first('last_date_of_submission') }}</strong>
+								@endif
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-3">
 						<div class="form-group {{ $errors->has('exam_start_time') ? ' has-error' : '' }}">
 							<label class="control-label" for="exam_start_time">Exam Start Time</label>
 							<input id="exam_start_time" class="form-control timepicker settings" name="exam_start_time" value="{{$feesSettingProfile?$feesSettingProfile->exam_start_time:''}}" placeholder="Enter Exam Start Time" type="text" readonly required>
@@ -100,7 +121,18 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-sm-9">
+					<div class="col-sm-3">
+						<label class="control-label" for="max_applicants">Maximum Applicants</label>
+						<input id="exam_start_time" class="form-control " name="max_applicants"
+							   value="{{$feesSettingProfile?$feesSettingProfile->max_applicants:''}}"
+							   placeholder="maximum applicants" type="text"  required>
+						<div class="help-block">
+							@if ($errors->has('max_applicants'))
+								<strong>{{ $errors->first('max_applicants') }}</strong>
+							@endif
+						</div>
+					</div>
+					<div class="col-sm-3">
 						<div class="form-group {{ $errors->has('exam_venue') ? ' has-error' : '' }}">
 							<label class="control-label" for="exam_venue">Exam Venue (Exam Center)</label>
 							<input id="exam_venue" class="form-control settings" name="exam_venue" value="{{$feesSettingProfile?$feesSettingProfile->exam_venue:''}}" maxlength="100" placeholder="Enter Exam Venus Name" type="text" required>
@@ -125,21 +157,198 @@
 						</div>
 					</div>
 				</div>
+
+
+				<div class="subjectWise bg-secondary">
+
+					<button type="button" class="btn-success" id="newAdd"  >Add Subject Mark <i class="fa
+					fa-plus-circle"></i></button>
+					<table class="table  table-bordered table-responsive">
+						<thead>
+						<tr>
+							<th>subject Name</th>
+							<th>subject mark</th>
+						</tr>
+
+
+						</thead>
+						<tbody class="subjectWise">
+						@php
+						$subjectCount=0;
+$totalSubjectMarks=0;
+
+						@endphp
+						@if($feesSettingProfile)
+						@foreach(json_decode($feesSettingProfile->exam_subjects_marks,1) as $key=>$examMark)
+							@php
+								$subjectCount++;
+
+							@endphp
+							<tr>
+								<td>
+									<input type="text" class="subjectInput form-control"
+										   id="subjectName{{$subjectCount}}"
+										   name="subjectName[]"
+										   value="{{$key}}">
+								</td>
+								<td>
+									<input type="number"
+										   id="subjectMark{{$subjectCount}}"
+										   class="subjectInput form-control" name="subjectMark[]"
+										   value="{{$examMark}}">
+									@php
+
+										$totalSubjectMarks=$examMark+$totalSubjectMarks;
+									@endphp
+								</td>
+
+
+
+							</tr>
+
+						@endforeach
+							@endif
+						</tbody>
+
+					</table>
+
+				</div>
 				<div class="box-footer text-right">
 					<button id="admission_setting_submit_btn" type="submit" class="btn btn-info settings">Submit</button>
+					<h5 id="errorFillMarks" class="text-danger"><i class="fa fa-exclamation-triangle"></i> Total Exam
+						marks distribution
+						is not filled Up
+					</h5>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
 
+
 <script>
+	function check(e){
+		console.log(e)
+	}
+
     $(document).ready(function () {
+
+
+
         // checking $applicantResultSheet
 	    @if($applicantResultSheet>0)
 	        $('.settings').attr("disabled", 'disabled');
 	    @endif
+		var subjectCount= {{$subjectCount}};
+		var examMarks=parseInt($("#exam_marks").val());
+		var filledMarks= {{$totalSubjectMarks}};
+		(filledMarks!==examMarks) ? ($("#errorFillMarks").show()) : ($("#errorFillMarks").hide())
+		$(document).on('keyup', ".subjectInput",function (){
+			filledMarks=0;
+			for(let i=1;i<=subjectCount;i++)
+			{
+				let subjectName=$("#subjectName"+i);
+				let subjectMark=$("#subjectMark"+i);
+				filledMarks+=parseInt(subjectMark.val())
+			}
+			console.log(filledMarks,examMarks);
+			(filledMarks!==examMarks) ? ($("#errorFillMarks").show()) : ($("#errorFillMarks").hide())
+		})
 
+		$("#exam_marks").on('keyup',function (){
+			examMarks=$("#exam_marks").val();
+			//show error if marks is not filled with examMarks
+			(filledMarks!==examMarks) ? ($("#errorFillMarks").show()) : ($("#errorFillMarks").hide())
+
+
+			console.log(examMarks)
+		})
+
+		$('#newAdd').on('click',function (e) {
+			console.log("boo")
+			filledMarks=0;
+			let errorFlag=false;
+			for(let i=1;i<=subjectCount;i++){
+				let subjectName=$("#subjectName"+i);
+				let subjectMark=$("#subjectMark"+i);
+				if(!subjectMark.val() || !subjectName.val())
+				{
+					Swal.fire({
+						position: 'top-end',
+						icon: 'error',
+						title: 'Complete the previous field',
+						showConfirmButton: false,
+						timer: 1500
+					})
+					errorFlag=true;
+					break;
+
+				}
+				else {
+					filledMarks+=parseInt(subjectMark.val())
+
+				}
+
+
+			}
+
+			console.log(filledMarks,examMarks);
+
+			(filledMarks!==examMarks) ? ($("#errorFillMarks").show()) : ($("#errorFillMarks").hide())
+			if(errorFlag){
+				return false;
+			}
+			else {
+
+
+			subjectCount++;
+			$('.subjectWise').append(
+					$(document.createElement('tr')).prop(
+							{
+								class:"subjectForm",
+								id:"subjectForm"+subjectCount
+							}
+					)
+			);
+			$('#subjectForm'+subjectCount).append(
+					$(document.createElement('td')).prop(
+							{
+								class:"subjectFormTd",
+								id:"subjectFormTd"+subjectCount+"1"
+							}
+					),
+			$(document.createElement('td')).prop(
+					{
+						class:"subjectFormTd",
+						id:"subjectFormTd"+subjectCount+"2"
+					}
+			)
+			);
+			$('#subjectFormTd'+subjectCount+"1").append(
+
+					$(document.createElement('input')).prop({
+						type: 'text',
+						placeholder:"Enter subject Name",
+						id: 'subjectName'+subjectCount,
+
+						className: 'form-control',
+						name:'subjectName[]'
+					})
+			);
+				$('#subjectFormTd'+subjectCount+"2").append(
+						'<input type="number" value="0" class="subjectInput form-control" name="subjectMark[]" ' +
+						'id="subjectMark'+subjectCount+'"/>'
+				);
+
+			}
+
+		})
+
+
+		$(".subjectInput").on('click',function(){
+			console.log("voo")
+
+		})
 
         $('form#admission_setting_form').on('submit', function (e) {
             e.preventDefault();
@@ -149,6 +358,7 @@
                 .append('<input type="hidden" name="academic_level" value="'+$('#academic_level_setting').val()+'"/>')
                 .append('<input type="hidden" name="batch" value="'+$('#batch_setting').val()+'"/>');
             // ajax request
+
             $.ajax({
                 type: 'POST',
                 cache: false,
@@ -157,11 +367,13 @@
                 datatype: 'html',
 
                 beforeSend: function() {
+
                     // show waiting dialog
                     waitingDialog.show('Submitting...');
                 },
 
                 success: function (data) {
+					console.log(data)
                     waitingDialog.hide();
                     // checking
                     if(data.status=='failed'){
@@ -175,6 +387,7 @@
 
                 error:function(data){
                     alert(JSON.stringify(data));
+					waitingDialog.hide();
                 }
             });
         });
