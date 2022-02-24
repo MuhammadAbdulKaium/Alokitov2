@@ -17,7 +17,8 @@
 						<div class="form-group {{ $errors->has('exam_marks') ? ' has-error' : '' }}">
 							<label class="control-label" for="exam_marks">Exam Marks</label>
 							<input id="exam_marks" class="form-control  settings" name="exam_marks"
-								   value="{{$feesSettingProfile?$feesSettingProfile->exam_marks:''}}" maxlength="100" placeholder="Enter Exam Marks" type="text" required>
+								   value="{{$feesSettingProfile?$feesSettingProfile->exam_marks:''}}" maxlength="100"
+								   placeholder="Enter Exam Marks" type="number" required>
 							<div class="help-block">
 								@if($errors->has('exam_marks'))
 									<strong>{{ $errors->first('exam_marks') }}</strong>
@@ -175,7 +176,7 @@
 						<tbody class="subjectWise">
 						@php
 						$subjectCount=0;
-$totalSubjectMarks=0;
+						$totalSubjectMarks=0;
 
 						@endphp
 						@if($feesSettingProfile)

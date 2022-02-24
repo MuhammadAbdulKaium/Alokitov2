@@ -3,7 +3,6 @@
 namespace Modules\API\Http\Controllers;
 
 use App\Http\Controllers\Helpers\AcademicHelper;
-use Carbon\Carbon;
 use Dompdf\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -11,11 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Modules\Academics\Entities\AcademicsYear;
 use Modules\Admission\Entities\ApplicantAddress;
 use Modules\Admission\Entities\ApplicantDocument;
 use Modules\Admission\Entities\ApplicantEnrollment;
-use Modules\Admission\Entities\ApplicantExamSetting;
 use Modules\Admission\Entities\ApplicantInformation;
 use Modules\Admission\Entities\ApplicantManageView;
 use Modules\Admission\Entities\ApplicantRelative;
@@ -62,39 +59,7 @@ class AdmissionAPIController extends Controller
         $this->smsSender = $smsSender;
         $this->hscApplicant = $hscApplicant;
     }
-    public function examSetting(Request $request){
-        $acadenicsYear=AcademicsYear::where([
-            'institute_id'=>$request->campus,
-            'campus_id'=>$request->institute,
-            'status'=>1
-        ])->first();
 
-
-        $examSetting=ApplicantExamSetting::where([
-            'institute_id'=>$request->campus,
-            'campus_id'=>$request->institute,
-            'batch'=>$request->batch
-        ])->first();
-        if($examSetting){
-            $arrExam=[];
-            $arrExam['Exam Fees']=$examSetting->exam_fees;
-
-            $arrExam['Time']= Carbon::parse($examSetting->exam_date)->format('d F y') ." ".$examSetting->exam_start_time
-            ." from ".$examSetting->exam_end_time;
-
-
-            $arrExam['Venue']=$examSetting->exam_venue;
-            $arrExam['Total Number of Applicant']=$examSetting->max_applicants;
-            $arrExam['Merit List']=$examSetting->merit_list_std_no;
-            $arrExam['Waiting List']=$examSetting->waiting_list_std_no;
-            $arrExam['Exam Marks']=$examSetting->exam_marks;
-            $arrExam['Pass Marks']=$examSetting->exam_passing_marks;
-            $arrExam['subjectMarks']=json_decode( $examSetting->exam_subjects_marks);
-        }else{
-            $arrExam=null;
-        }
-            return ['status'=>true, 'data'=>$arrExam];
-    }
 
     public function studentUserLogin(Request $request)
     {
@@ -215,7 +180,9 @@ class AdmissionAPIController extends Controller
 
     public function saveStudentsData(Request  $request)
     {
+        $academicsInformation=$request->academicsData['subjectWiseMark'];
 
+        return ['status'=> false, 'data'=>$academicsInformation,'msg'=>'Unable to Submit Applicant Profile'];
 
         $this->customValidation($request);
         $boo=$request->all();
@@ -280,29 +247,25 @@ class AdmissionAPIController extends Controller
                 if($applicantProfile->save()){
 
                    // return  ['status'=>200,'msg'=>"Saved the data",'data'=>$applicantProfile];
-                    $personalInoProfile = (object) $this->storeApplicantPersonalInformation($applicantProfile->id, $applicationId, $request);
+                    $personalInoProfile =
+                        (object) $this->storeApplicantPersonalInformation($applicantProfile->id, $applicationId, $request);
                         $father=$this->saveGuardian($request->father,"father",$applicationId);
                     $mother=$this->saveGuardian($request->mother,"mother",$applicationId);
                     $guardian=$this->saveGuardian($request->guardian,"guardian",$applicationId);
                     $relatives=[];
-                    $relatives['student']=$personalInoProfile;
                     $relatives['f']=$father;
                     $relatives['m']=$mother;
                     $relatives['g']=$guardian;
                     $relatives['r']=$request->all();
 
-                   // DB::commit();
-                    $campusProfile->app_counter = ($campusProfile->app_counter+1);
-                    $campusProfile->save();
-                    // If we reach here, then data is valid and working. Commit the queries!
-                    DB::commit();
+
                     return  ['status'=>200,'msg'=>"Father Save",'data'=>$relatives];
 
                 }
 
             }catch (\Exception $e){
 
-                return  ['status'=>500,'msg'=>"Something went Wrong k",'data'=>$e];
+                return  ['status'=>500,'msg'=>"Something went Wrong",'data'=>$e];
             }
 
 
@@ -316,7 +279,26 @@ class AdmissionAPIController extends Controller
 
 
     }
-
+/*name: null,//required
+bengaliName: null,
+nationality: null,//required
+profession: null,
+designation: null,
+department: null,
+organization: null,
+address: null,
+referenceContact: null,
+totalYearOfWorking: null,
+incomeYearly: null,
+nidNo: null,
+tinNo: null,
+passport: null,
+birthCertificateNo: null,
+drivingLicense: null,
+contactAddress: null,//required
+contactPhone: null,//required
+contactEmail: null,
+remarks: null*/
 
     public function saveGuardian($relative,$type,$applicant_id){
         $relativeData=new ApplicantRelative();
@@ -510,24 +492,9 @@ class AdmissionAPIController extends Controller
 
         $personalInoProfile->nationality            = $request->input('country');
         $personalInoProfile->religion          = $request->input('religion', null);
-    /*    lastCertification: null,
-            group_id: null,
-            : null,
-            rollNumber: null,
-            passingYear: null,
-            boardName: null,
-            instituteFullName: null,
-            gpa: null,*/
 
-        $personalInoProfile->last_certificate_name= $request->academicsData['lastCertification'];
-        $personalInoProfile->group_id= $request->academicsData['group_id'];
-        $personalInoProfile->registration_no= $request->academicsData['registrationNumber'];
-        $personalInoProfile->roll_no= $request->academicsData['rollNumber'];
-        $personalInoProfile->passing_year= $request->academicsData['passingYear'];
-        $personalInoProfile->board_name= $request->academicsData['boardName'];
-        $personalInoProfile->institute_full_name= $request->academicsData['instituteFullName'];
-        $personalInoProfile->gpa= $request->academicsData['gpa'];
-        $personalInoProfile->subject_wise_mark= json_encode($request->academicsData['subjectWiseMark']);
+
+        $personalInoProfile->last_acadeimic_certficate          = $request->input('religion', null);
 
 
 
@@ -547,8 +514,7 @@ class AdmissionAPIController extends Controller
                 }
             }
             // response success
-            return ['status'=>true, 'profile'=>$personalInoProfile,'id'=>$personalInoProfile->id,
-                'invoice_id'=>$personalInoProfile->invoice_id];
+            return ['status'=>true, 'id'=>$personalInoProfile->id,'invoice_id'=>$personalInoProfile->invoice_id];
         }else{
             // response failed
             return ['status'=>false, 'msg'=>'Unable to Store Applicant personal information'];

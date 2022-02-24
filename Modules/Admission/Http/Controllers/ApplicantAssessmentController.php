@@ -557,10 +557,14 @@ class ApplicantAssessmentController extends Controller
     {
 
         // sql qry
-        $qry = [
+       /* $qry = [
             'academic_year'  => $request->input('academic_year'),
             'academic_level' => $request->input('academic_level'),
             'batch'          => $request->input('batch'),
+            'campus_id'      => $this->academicHelper->getCampus(),
+            'institute_id'   => $this->academicHelper->getInstitute(),
+        ];*/
+        $qry = [
             'campus_id'      => $this->academicHelper->getCampus(),
             'institute_id'   => $this->academicHelper->getInstitute(),
         ];
@@ -571,9 +575,11 @@ class ApplicantAssessmentController extends Controller
             $examTaken = null;
         }
         // request details
-        $applicantProfiles = $this->applicantView->where($qry)->orderBy('application_no', 'ASC')->get();
+        $applicantProfiles = $this->applicantView->orderBy('application_no', 'ASC')->get();
         // return view with variable
-        return view('admission::admission-assessment.modals.grade-book', compact('applicantProfiles', 'examTaken'));
+        dd($applicantProfiles);
+        return view('admission::admission-assessment.modals.grade-book',
+            compact('applicantProfiles', 'examTaken'));
     }
 
     // exam setting
@@ -723,7 +729,7 @@ class ApplicantAssessmentController extends Controller
                 // create user profile for student
                 $userProfile = $this->studentInfoController->manageUserProfile(0, [
                     'name' =>$userFullName,
-                    'email' => $applicantProfile->application_no.'@gmamil.com',
+                    'email' => $applicantProfile->application_no.'@gmail.com',
                     'username' => $applicantProfile->username,
                     'password'=> bcrypt(123456)
                 ]);

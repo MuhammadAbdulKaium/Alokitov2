@@ -19,24 +19,24 @@ class CreateApplicantRelativesTable extends Migration
             $table->string('relation');
             $table->string('name');
 
-            $table->string('bengaliName')->nullable();
+            $table->string('bengali_name')->nullable();
             $table->integer('nationality')->nullable();
             $table->string('profession')->nullable();
             $table->string('designation')->nullable();
             $table->string('department')->nullable();
             $table->string('organization')->nullable();
             $table->string('address')->nullable();
-            $table->string('referenceContact')->nullable();
-            $table->string('totalYearOfWorking')->nullable();
-            $table->string('incomeYearly')->nullable();
-            $table->string('nidNo')->nullable();
-            $table->string('tinNo')->nullable();
+            $table->string('reference_contact')->nullable();
+            $table->string('total_year_of_working')->nullable();
+            $table->string('income_yearly')->nullable();
+            $table->string('nid_no')->nullable();
+            $table->string('tin_no')->nullable();
             $table->string('passport')->nullable();
-            $table->string('birthCertificateNo')->nullable();
-            $table->string('drivingLicense')->nullable();
-            $table->string('contactAddress')->nullable();
-            $table->string('contactPhone');
-            $table->string('contactEmail')->nullable();
+            $table->string('birth_certificateNo')->nullable();
+            $table->string('driving_license')->nullable();
+            $table->string('contact_address')->nullable();
+            $table->string('contact_phone');
+            $table->string('contact_email')->nullable();
             $table->text('remarks')->nullable();
 
 

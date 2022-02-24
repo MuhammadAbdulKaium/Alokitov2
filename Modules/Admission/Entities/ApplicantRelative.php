@@ -10,6 +10,7 @@ class ApplicantRelative extends Model
     use SoftDeletes;
     protected $fillable = [
         'applicant_id',
+        'isGuardian',
         'relation',
         'name',
         'bengaliName',
@@ -33,4 +34,8 @@ class ApplicantRelative extends Model
         'remarks'
 
     ];
+    public function applicantStudent(){
+        $this->belongsTo(ApplicantInformation::class);
+    }
+
 }
