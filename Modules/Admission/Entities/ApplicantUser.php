@@ -75,7 +75,19 @@ class ApplicantUser extends Model
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantFees', 'applicant_id', 'id')->first();
     }
-
+   public function relatives(){
+        return $this->hasMany('Modules\Admission\Entities\ApplicantRelative','applicant_id','id');
+   }
+    public function father()
+    {
+        return $this->hasOne('Modules\Admission\Entities\ApplicantRelative','applicant_id','id')->where('relation',
+            '=','father');
+    }
+    public function mother()
+    {
+        return $this->hasOne('Modules\Admission\Entities\ApplicantRelative','applicant_id','id')->where('relation',
+            '=','mother');
+    }
     public function result()
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantResult', 'applicant_id', 'id')->first();

@@ -18,7 +18,7 @@ class OnlineApplicationObserver
     }
 
     // online application enrollment created confirmation
-    public function created(ApplicantEnrollment $enrollment)
+  /*  public function created(ApplicantEnrollment $enrollment)
     {
         // find applicant personal information
         $application = $enrollment->application();
@@ -30,7 +30,7 @@ class OnlineApplicationObserver
         Log::info($applicantPersonalInfo->gud_phone);
         // send sms to online applicant guardian phone number with applicant login details
        $this->smsSender->onlineApplicationSmsJob($application, $applicantPersonalInfo);
-    }
+    }*/
 
 
 

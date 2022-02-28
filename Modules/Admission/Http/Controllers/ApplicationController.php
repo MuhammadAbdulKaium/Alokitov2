@@ -5,6 +5,7 @@ namespace Modules\Admission\Http\Controllers;
 use App\Http\Controllers\Helpers\AcademicHelper;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Modules\Admission\Entities\ApplicantAddress;
 use Modules\Admission\Entities\ApplicantDocument;
@@ -20,9 +21,9 @@ use Mpdf\Output\Destination;
 use Redirect;
 use Session;
 use Validator;
-use App;
+
 use Excel;
-use MPDF;
+
 use Illuminate\Support\Facades\View;
 
 class ApplicationController extends Controller
@@ -77,22 +78,22 @@ class ApplicationController extends Controller
 
         // use mPDF
 
-        $pdf = App::make('mpdf.wrapper');
+       /* $pdf = App::make('mpdf.wrapper');
         $pdf->loadView('admission::application.reports.report-application');
         $view = View::make('admission::application.reports.report-application');
         $html = $view->render();
-        $mpdf = new MPDF('utf-8',   'Legal', 14,'SolaimanLipi','10','5','5','0');
+        $mpdf = new  MPDF('utf-8',   'Legal', 14,'SolaimanLipi','10','5','5','0');
         $mpdf->autoScriptToLang = true;// Mandatory
         $mpdf->autoLangToFont = true;//Mandatory
         $mpdf->WriteHTML($html);
-        $mpdf->Output('application_no_'.$applicantProfile->application_no.'.pdf', 'D');
+        $mpdf->Output('application_no_'.$applicantProfile->application_no.'.pdf', 'D');*/
 
-//        // generate pdf
-//        $pdf = App::make('dompdf.wrapper');
-//        // load view
-//        $pdf->loadView('admission::application.reports.report-application')->setPaper('a4', 'portrait');
-//        return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
-//        return $pdf->stream();
+       // generate pdf
+       $pdf = App::make('dompdf.wrapper');
+       // load view
+       $pdf->loadView('admission::application.reports.report-application')->setPaper('a4', 'portrait');
+        return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
+      return $pdf->stream();
     }
 
 
@@ -270,8 +271,12 @@ class ApplicationController extends Controller
     // Show the specified resource.
     public function show($id)
     {
+
         // find applicant profile
-        $applicantProfile = $this->applicant->find($id);
+         $applicantProfile = $this->applicant->find($id);
+
+
+
         // page type
         $page = 'personal';
         // return assessment view page

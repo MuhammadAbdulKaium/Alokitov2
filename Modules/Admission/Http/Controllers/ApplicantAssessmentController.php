@@ -557,17 +557,17 @@ class ApplicantAssessmentController extends Controller
     {
 
         // sql qry
-       /* $qry = [
+        $qry = [
             'academic_year'  => $request->input('academic_year'),
             'academic_level' => $request->input('academic_level'),
             'batch'          => $request->input('batch'),
             'campus_id'      => $this->academicHelper->getCampus(),
             'institute_id'   => $this->academicHelper->getInstitute(),
-        ];*/
-        $qry = [
+        ];
+       /* $qry = [
             'campus_id'      => $this->academicHelper->getCampus(),
             'institute_id'   => $this->academicHelper->getInstitute(),
-        ];
+        ];*/
         // exam settings
         if($examSettingProfile = $this->examSetting->where($qry)->first()){
             $examTaken = $examSettingProfile->exam_taken;
@@ -575,9 +575,9 @@ class ApplicantAssessmentController extends Controller
             $examTaken = null;
         }
         // request details
-        $applicantProfiles = $this->applicantView->orderBy('application_no', 'ASC')->get();
+        $applicantProfiles = $this->applicantView->where($qry)->orderBy('application_no', 'ASC')->get();
         // return view with variable
-        dd($applicantProfiles);
+
         return view('admission::admission-assessment.modals.grade-book',
             compact('applicantProfiles', 'examTaken'));
     }

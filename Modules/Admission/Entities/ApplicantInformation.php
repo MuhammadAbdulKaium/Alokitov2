@@ -23,9 +23,9 @@ class ApplicantInformation extends Model
 
     //The attributes that are mass assignable.
     protected $fillable = ['*'];
-    public function relatives(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function father()
     {
-       return $this->hasMany(ApplicantRelative::class);
+       return $this->hasOne(ApplicantRelative::class,'');
     }
 
     // applicant application

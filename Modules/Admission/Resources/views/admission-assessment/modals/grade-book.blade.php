@@ -40,13 +40,17 @@
 					</thead>
 					<tbody>
 					@php $i=1; @endphp
+
 					@foreach($applicantProfiles as $applicant)
+
 						{{--checking applicant payment status--}}
-						@if($applicant->payment_status==0)  @continue @endif
+						@if($applicant->payment_status!=0)  @break @endif
+
 						{{--applicant ID--}}
 						@php $applicantId = $applicant->applicant_id; @endphp
 						{{--table row--}}
 						<tr id="row_{{$applicantId}}">
+
 							<td>
 								<input type="hidden" name="applicant_list[]" value="{{$applicantId}}" />
 								{{$i++}}
@@ -61,6 +65,7 @@
 							<td>
 								<a href="{{url('/admission/application/'.$applicant->applicant_id)}}">
 									{{$applicant->name}}
+
 								</a>
 							</td>
 							<td class="text-center">

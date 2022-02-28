@@ -73,7 +73,8 @@ class AdmissionAPIController extends Controller
         $examSetting=ApplicantExamSetting::where([
             'institute_id'=>$request->campus,
             'campus_id'=>$request->institute,
-            'batch'=>$request->batch
+            'batch'=>$request->batch,
+            'academic_year'=>$acadenicsYear->id
         ])->first();
         if($examSetting){
             $arrExam=[];
@@ -93,7 +94,7 @@ class AdmissionAPIController extends Controller
         }else{
             $arrExam=null;
         }
-            return ['status'=>true, 'data'=>$arrExam];
+            return ['status'=>true, 'data'=>$arrExam,'year'=>$acadenicsYear->id];
     }
 
     public function studentUserLogin(Request $request)
@@ -216,7 +217,7 @@ class AdmissionAPIController extends Controller
     public function saveStudentsData(Request  $request)
     {
 
-
+//return ['status'=>true,'data'=>$request->all()];
         $this->customValidation($request);
         $boo=$request->all();
         $validator = Validator::make($request->all(), [
@@ -281,9 +282,9 @@ class AdmissionAPIController extends Controller
 
                    // return  ['status'=>200,'msg'=>"Saved the data",'data'=>$applicantProfile];
                     $personalInoProfile = (object) $this->storeApplicantPersonalInformation($applicantProfile->id, $applicationId, $request);
-                        $father=$this->saveGuardian($request->father,"father",$applicationId);
-                    $mother=$this->saveGuardian($request->mother,"mother",$applicationId);
-                    $guardian=$this->saveGuardian($request->guardian,"guardian",$applicationId);
+                        $father=$this->saveGuardian($request->father,"father",$applicantProfile->id);
+                    $mother=$this->saveGuardian($request->mother,"mother",$applicantProfile->id);
+                    $guardian=$this->saveGuardian($request->guardian,"guardian",$applicantProfile->id);
                     $relatives=[];
                     $relatives['student']=$personalInoProfile;
                     $relatives['f']=$father;
@@ -291,7 +292,20 @@ class AdmissionAPIController extends Controller
                     $relatives['g']=$guardian;
                     $relatives['r']=$request->all();
 
-                   // DB::commit();
+
+
+                        $enrollmentProfile = new ApplicantEnrollment();
+                        // input details
+                        $enrollmentProfile->applicant_id   = $applicantProfile->id;
+                        $enrollmentProfile->academic_year  = $request->input('academic_year');
+                        $enrollmentProfile->academic_level = $request->input('academic_level');
+                        $enrollmentProfile->batch          = $request->input('batch');
+                        // checking choice list
+                      /*  if($choiceList = $request->input('choice_list', null)){
+                            $enrollmentProfile->choice_list  = json_encode($choiceList);
+                        }*/
+                        $enrollmentProfile->save();
+
                     $campusProfile->app_counter = ($campusProfile->app_counter+1);
                     $campusProfile->save();
                     // If we reach here, then data is valid and working. Commit the queries!

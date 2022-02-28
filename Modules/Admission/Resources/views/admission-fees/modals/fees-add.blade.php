@@ -79,7 +79,7 @@
 				<th style="width: 200px">Application Fees Amount</th>
 				@php $examDetails = $applicantProfile->examDetails(); @endphp
 				<td>
-					@if(!empty($examDetails) AND count($examDetails)>0)
+					@if(!empty($examDetails) )
 						{{$examDetails->exam_fees}}
 						<input type="hidden" name="fees_amount" value="{{$examDetails->exam_fees}}"/>
 					@else
@@ -87,6 +87,26 @@
 					@endif
 
 				</td>
+
+
+			</tr>
+			<tr>
+				@if($applicantProfile->payment_status==1)
+					<i class="label label-success">Paid</i>
+				@else
+					<th>
+						Paid
+					</th>
+					<td>
+						@if(!empty($examDetails) )
+
+							<input type="text" max="{{$examDetails->exam_fees}}" name="fees_amount" value="{{$examDetails->exam_fees}}"/>
+						@else
+							<i class="label label-danger">Fees Setting Not Found</i>
+						@endif
+
+					</td>
+				@endif
 
 			</tr>
 			</tfoot>

@@ -34,8 +34,9 @@ class ApplicantRelative extends Model
         'remarks'
 
     ];
-    public function applicantStudent(){
-        $this->belongsTo(ApplicantInformation::class);
+    public function applicantUser(){
+       return $this->belongsTo(ApplicantUser::class);
     }
+
 
 }

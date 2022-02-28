@@ -211,7 +211,7 @@ class AcademicAPIController extends Controller
                 $academicYearLevelList = (array)$this->levelController->findMyLevel($request);
                 // checking
                 if(count($academicYearLevelList)>0){
-                    return ['status'=>'success', 'msg'=>'Academic Level list', 'data'=>$academicYearLevelList];
+                    return ['status'=>'success', 'msg'=>'Academic Level list','data'=>$academicYearLevelList];
                 }else{
                     // return status with msg
                     return ['status'=>'failed', 'msg'=>'No records found'];

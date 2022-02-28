@@ -4,7 +4,9 @@ namespace Modules\Admission\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class          ApplicantManageView extends Model
+class
+
+ApplicantManageView extends Model
 {
     // Table name
     protected $table = 'applicant_manage_view';
