@@ -16,7 +16,7 @@
 @section('profile-content')
 				<h4> Fees Invoice </h4>
 		  @if($generatedFees->count()>0)
-		  <div class="table-responsive">
+		  <div class="table-responsive" style="overflow: scroll">
 			  <table  id="FeesInvoiceTables" class="table table-striped table-bordered" style="width: 100%">
 				  <thead>
 				  <tr>

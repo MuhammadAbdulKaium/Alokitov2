@@ -152,10 +152,10 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace
     Route::get('/batch-info', 'StudentEnrollController@batchInfo');
 
     /////  student profile address /////
-    Route::get('/profile/fees/{id}', 'StudentInfoController@getStudentFees')->middleware('std-profile-permission'); //home
-    Route::get('/fees/collection/invoice/{id}', 'StudentInfoController@getStudentFeesCollectionInvoice')->middleware('std-profile-permission'); //home
-    Route::get('/fees/collection/history/{id}/{genId}', 'StudentInfoController@getStudentFeesCollectionHistory')->middleware('std-profile-permission'); //home
-    Route::get('/fees/collection/invoice/pdf/{id}', 'StudentInfoController@getStudentFeesCollectionInvoicePdf')->middleware('std-profile-permission'); //home
+    Route::get('/profile/fees/{id}', 'StudentInfoController@getStudentFees'); //home
+    Route::get('/fees/collection/invoice/{id}', 'StudentInfoController@getStudentFeesCollectionInvoice'); //home
+    Route::get('/fees/collection/history/{id}/{genId}', 'StudentInfoController@getStudentFeesCollectionHistory'); //home
+    Route::get('/fees/collection/invoice/pdf/{id}', 'StudentInfoController@getStudentFeesCollectionInvoicePdf'); //home
 
     Route::get('/demoreport', 'StudentReportController@indexReport'); //home
 
