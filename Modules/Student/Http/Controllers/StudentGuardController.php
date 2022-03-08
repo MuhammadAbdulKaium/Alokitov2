@@ -5,10 +5,10 @@ namespace Modules\Student\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Modules\Admission\Entities\ApplicantRelative;
 use Modules\Student\Entities\StudentGuardian;
 use Modules\Student\Entities\StudentParent;
 use Modules\Student\Entities\StudentInformation;
-use Modules\Student\Entities\StudentEnrollment;
 use App\UserInfo;
 use App\Http\Controllers\Helpers\AcademicHelper;
 use Modules\Student\Entities\StudentProfileView;
@@ -57,11 +57,125 @@ class StudentGuardController extends Controller
         return view('student::pages.student-profile.modals.guardian-info-create')->with('std_id', $id);
     }
 
+    //////
+    /// Save Student Guardian Information function
+
+
+    public function saveGuardian($relative,$type,$user_id,$gender){
+        $relativeData=  new $this->studentGuardian();
+
+        $relativeData->first_name=$relative->name;
+        $relativeData->last_name=$relative->contact_email;
+        $relativeData->bn_fullname=$relative->bengali_name;
+        $relativeData->user_id =$user_id ;
+        $relativeData->type =$type ;
+        $relativeData->gender=$gender;
+        $relativeData->phone=$relative->contact_phone;
+        $relativeData->income=$relative->income_yearly;
+        $relativeData->qualification=$relative->qualification;
+        $relativeData->occupation=$relative->profession;
+        $relativeData->home_address=$relative->address;
+        $relativeData->office_address=$relative->contact_address;
+        $relativeData->remarks=$relative->remarks;
+        $relativeData->nid_number=$relative->nid_no;
+        $relativeData->birth_certificate=$relative->birth_certificateNo;
+        $relativeData->tin_number=$relative->tin_no;
+        $relativeData->passport_number=$relative->passport;
+        $relativeData->dln=$relative->driving_license;
+        $relativeData->dln=$relative->driving_license;
+        $relativeData->is_guardian=$relative->is_guardian;
+
+        $relativeData->save();
+        return $relativeData;
+
+
+
+
+
+
+    }
+
 
 /////////////////////// online application guardian creation starts here  ////////////////////////////
 
     public function storeOnlineStudentGuardian($stdId, $applicantProfile, $applicantPersonalInfo)
     {
+/*        0 - Mother 1 - Father 2 - Sister 3 - Brother 4 - Relative 5 - Other 6 - Spouse 7 - Son 8 - Daughter*/
+
+         $relatives=ApplicantRelative::where('applicant_id',$applicantProfile->id)->get();
+         foreach ($relatives as $relative)
+         {
+             if($relative->relation=="father"){
+                 $father=$relative;
+             }elseif ($relative->relation=="mother"){
+                 $mother=$relative;
+             }else{
+                 if($relative->relation==2 || $relative->relation==6  || $relative->relation==6 ||
+                     $relative->relation==8)
+                 {
+                     $gender=2;
+                 }elseif ($relative->relation==3 || $relative->relation==7  ){
+                     $gender=1;
+
+                 }else{
+                     $gender=3;
+
+                 }
+                 $relationType=$relative->relation;
+                 $otherRelative=$relative;
+                 $otherRelativeUser=new $this->user();
+                 $otherRelativeUser->name=$father->name;
+                 $otherRelativeUser->email=$stdId."relative.gmail.com";
+                 $otherRelativeUser->password=bcrypt(123456);
+                 $otherRelativeUser->save();
+                 $otherRelativeProfile=$this->saveGuardian($otherRelative,$relative->relation,$otherRelative->id,
+                     $gender);
+
+                 $otherRelativeUser->attachRole($this->role->where('name', 'parent')->first());
+                 $this->userInfo->create([
+                     'user_id'=>$otherRelativeUser->id, 'campus_id' => $applicantProfile->campus_id, 'institute_id' => $applicantProfile->institute_id
+                 ]);
+
+                 $this->studentParent->create(['gud_id' => $otherRelativeProfile->id, 'std_id' => $stdId, 'is_emergency' => 0]);
+
+
+             }
+         }
+        $fatherUserProfile=new $this->user();
+        $fatherUserProfile->name=$father->name;
+        $fatherUserProfile->email=$stdId."father.gmail.com";
+        $fatherUserProfile->password=bcrypt(123456);
+        $fatherUserProfile->save();
+      $fatherInfoProfile=$this->saveGuardian($father,1,$fatherUserProfile->id,1);
+
+
+
+        $motherUserProfile=new $this->user();
+        $motherUserProfile->name=$mother->name;
+        $motherUserProfile->email=$stdId."mother.gmail.com";
+        $motherUserProfile->password=bcrypt(123456);
+        $motherUserProfile->save();
+        $motherInfoProfile= $this->saveGuardian($mother,0,$motherUserProfile->id,2);
+
+
+
+        // assigning student role to this user
+        $motherUserProfile->attachRole($this->role->where('name', 'parent')->first());
+        $fatherUserProfile->attachRole($this->role->where('name', 'parent')->first());
+        // add user info
+        $this->userInfo->create([
+            'user_id'=>$motherUserProfile->id, 'campus_id' => $applicantProfile->campus_id, 'institute_id' => $applicantProfile->institute_id
+        ]);
+        $this->userInfo->create([
+            'user_id'=>$fatherUserProfile->id, 'campus_id' => $applicantProfile->campus_id, 'institute_id' => $applicantProfile->institute_id
+        ]);
+        // add this guardian as student parent
+        $this->studentParent->create(['gud_id' => $fatherInfoProfile->id, 'std_id' => $stdId, 'is_emergency' => 1]);
+        $this->studentParent->create(['gud_id' => $motherInfoProfile->id, 'std_id' => $stdId, 'is_emergency' => 0]);
+
+       return true;
+
+
         // response data
         $guardianCount = 0;
         // student guardian creation loop

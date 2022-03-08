@@ -19,6 +19,12 @@ ApplicantManageView extends Model
     {
         return $this->belongsTo('Modules\Admission\Entities\ApplicantUser', 'applicant_id', 'id')->first();
     }
+    public function  applicationAll(){
+        return $this->belongsTo('Modules\Admission\Entities\ApplicantUser', 'applicant_id', 'id');
+    }
+    public function singleResult(){
+        return $this->hasOne(ApplicantGrade::class,'applicant_id','applicant_id');
+    }
 
     // get applicant document
     public function document($documentType)
@@ -98,5 +104,6 @@ ApplicantManageView extends Model
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantGrade', 'applicant_id', 'applicant_id')->first();
     }
+
 
 }

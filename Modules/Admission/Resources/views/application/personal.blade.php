@@ -51,23 +51,24 @@
 				<th>Mother's Name (bn)</th>
 				<td>{{$mother->bengali_name}}</td>
 			</tr>
-			<tr>
-				<th>Father's Qualification</th>
-				<td>{{$personalInfo->father_education}}</td>
-				<th>Mother's Qualification</th>
-				<td>{{$personalInfo->mother_education}}</td>
-			</tr>
+
 			<tr>
 				<th>Father's Occupation</th>
-				<td>{{$personalInfo->father_occupation}}</td>
+				<td>{{$father->profession}}</td>
 				<th>Mother's Occupation</th>
-				<td>{{$personalInfo->mother_occupation}}</td>
+				<td>{{$mother->	profession}}</td>
+			</tr>
+			<tr>
+				<th>Father's Designation</th>
+				<td>{{$father->designation}}</td>
+				<th>Mother's Designation</th>
+				<td>{{$mother->designation}}</td>
 			</tr>
 			<tr>
 				<th>Father's Phone</th>
 				<td>{{$personalInfo->father_phone}}</td>
 				<th>Mother's Phone</th>
-				<td>{{$applicantProfile->father}}</td>
+				<td>{{$mother->contact_phone}}</td>
 			</tr>
 
 		</table>

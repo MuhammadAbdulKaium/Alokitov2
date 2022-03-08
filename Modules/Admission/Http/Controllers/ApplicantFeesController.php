@@ -90,6 +90,7 @@ class ApplicantFeesController extends Controller
             // input details
             $applicantFeesProfile->applicant_id = $applicantId;
             $applicantFeesProfile->fees_amount = $feesAmount;
+            $applicantFeesProfile->paid_amount = $request->paid_amount;
             $applicantFeesProfile->batch = $enrollment->batch;
             $applicantFeesProfile->academic_level = $enrollment->academic_level;
             $applicantFeesProfile->academic_year = $enrollment->academic_year;

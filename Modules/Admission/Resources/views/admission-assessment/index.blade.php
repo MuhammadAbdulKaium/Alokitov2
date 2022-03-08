@@ -38,10 +38,10 @@
 					<div>
 						<ul class="nav-tabs margin-bottom nav">
 							<li class="my-tab {{$page=='grade-book'?'active':''}}"><a  href="{{url('/admission/assessment/grade-book')}}">Grade Book</a></li>
-							<li class="my-tab {{$page=='grade-book'?'active':''}}"><a  href="{{url
-							('/admission/assessment/grade-book')}}">Payment </a></li>
-							<li class="my-tab {{$page=='grade-book'?'active':''}}"><a  href="{{url
-							('/admission/assessment/grade-book')}}">Marks Entry</a></li>
+							<li class="my-tab {{$page=='attendance'?'active':''}}"><a  href="{{url
+							('/admission/assessment/attendance')}}">Attendance </a></li>
+							<li class="my-tab {{$page=='marks_entry'?'active':''}}"><a  href="{{url
+							('/admission/assessment/marks-entry')}}">Marks Entry</a></li>
 							<li class="my-tab {{$page=='result'?'active':''}}"><a href="{{url('/admission/assessment/result')}}">Result</a></li>
 							<li class="my-tab {{$page=='setting'?'active':''}}"><a href="{{url('/admission/assessment/setting')}}">Setting</a></li>
 							<li class="my-tab {{$page=='reports'?'active':''}}"><a href="{{url('/admission/assessment/reports')}}">Reports</a></li>

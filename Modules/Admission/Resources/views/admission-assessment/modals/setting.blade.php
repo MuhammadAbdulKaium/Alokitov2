@@ -146,13 +146,29 @@
 					</div>
 					<div class="col-sm-3">
 						<div class="form-group {{ $errors->has('exam_taken') ? ' has-error' : '' }}">
-							<label class="control-label" for="">Result Published (Exam Taken)</label>
+							<label class="control-label" for="">Result Published </label>
 							<br/>
 							<input name="exam_taken" value="{{$applicantResultSheet>0?'1':'0'}}" type="hidden">
 							<label><input id="exam_taken" name="exam_taken" {{$applicantResultSheet>0?'disabled':''}} @if($feesSettingProfile){{$feesSettingProfile->exam_taken=='1'?'checked':''}}@endif type="checkbox" value="1"> Is Result Published</label>
 							<div class="help-block">
 								@if($errors->has('exam_taken'))
 									<strong>{{ $errors->first('exam_taken') }}</strong>
+								@endif
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-3">
+						<div class="form-group {{ $errors->has('exam_status') ? ' has-error' : '' }}">
+							<label class="control-label" for=""> Exam Taken</label>
+							<br/>
+							<input name="exam_status" value="{{$applicantResultSheet>0?'1':'0'}}" type="hidden">
+							<label><input id="exam_status" name="exam_status"
+										  {{$applicantResultSheet>0?'disabled':''}} @if($feesSettingProfile)
+										  {{$feesSettingProfile->exam_status=='1'?'checked':''}}@endif
+										  type="checkbox" value="1"> Is Exam Taken?</label>
+							<div class="help-block">
+								@if($errors->has('exam_status'))
+									<strong>{{ $errors->first('exam_status') }}</strong>
 								@endif
 							</div>
 						</div>

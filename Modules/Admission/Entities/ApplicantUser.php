@@ -92,4 +92,5 @@ class ApplicantUser extends Model
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantResult', 'applicant_id', 'id')->first();
     }
+
 }

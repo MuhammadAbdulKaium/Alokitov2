@@ -1,4 +1,5 @@
-@if($applicantProfiles->count()>0 AND $examTaken !==null)
+
+@if($applicantProfiles->count()>0 AND $examStatus !==null)
 	<link href="{{ URL::asset('css/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css"/>
 	<form id="applicant_grade_book_form">
 		<input type="hidden" name="_token" value="{{csrf_token()}}">
@@ -6,41 +7,48 @@
 			<div class="box-header with-border">
 				<div class="row">
 					<div class="col-sm-6">
-						@if($examTaken=='0')
-							<a class="btn btn-primary" href="{{url('/admission/assessment/grade-book/import')}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">
-								<i class="fa fa-plus-square" aria-hidden="true"></i> Import
-							</a>
-						@endif
-						<button id="grade_book_export_btn" class="btn btn-primary text-bold" data-key="export" type="button">
-							<i class="fa fa-plus-square" aria-hidden="true"></i> Export
-						</button>
-					</div>
-					<div class="col-sm-6 box-tool">
-						@if($examTaken=='0')
-							<button class="btn generate btn-primary pull-right text-bold" type="submit">Submit</button>
-						@endif
-					</div>
+
 				</div>
 			</div>
+                <style>
+                    th{
+                        vertical-align: middle;
+                        text-align: center;
+                    }
+                </style>
 			<div class="box-body" style="overflow-x:inherit">
 				<table id="example11" class="table table-striped table-bordered table-responsive">
 					<thead>
 					<tr>
-						<th>#</th>
-						<th>
+						<th rowspan="2">#</th><th rowspan="2">
 							<img class="profile-user-img img-responsive img-circle" src="{{URL::asset('assets/users/images/user-default.png')}}" alt="No Image" style="height:30px; width: 30px">
 						</th>
-						<th style="width: 120px" class="text-center"><a>Application No</a></th>
-						<th><a>Name</a></th>
-<!--						<th class="text-center"><a>Academic Details</a></th>-->
-						<th class="text-center"><a>Exam Date</a></th>
-						<th class="text-center"><a>Payment Info</a></th>
+						<th rowspan="2" style="width: 120px" class="text-center"><a>Application No</a></th>
+						<th rowspan="2"><a>Name</a></th>
 
-						<th class="text-center"><a>Application Status</a></th>
+                    @php
+                    $sub_count=0;
+                        foreach(json_decode($examSettingProfile->exam_subjects_marks,1) as $key=>$examMark){
+                                if($key==null){
+                                    $sub_count++;
+                                }
+                            }
 
-<!--						<th class="text-center"><a>Exam Grade (Marks)</a></th>-->
-						<th class="text-center">Action</th>
+
+
+
+
+                    @endphp
+
+						<th class="text-center" rowspan="1" colspan="{{$sub_count+1}}">Subject Marks </th>
 					</tr>
+                    <tr>
+                       @foreach(json_decode($examSettingProfile->exam_subjects_marks,1) as $key=>$examMark)
+                           <th rowspan="1"> {{$key}}( {{$examMark}} )</th>
+                        @endforeach
+                        <th>Total</th>
+
+                    </tr>
 					</thead>
 					<tbody>
 					@php $i=1; @endphp
@@ -72,60 +80,33 @@
 
 								</a>
 							</td>
-<!--							<td class="text-center">
-								{{$applicant->academicYear()->year_name}} / {{$applicant->academicLevel()->level_name}} ({{$applicant->batch()->batch_name}})
-							</td>-->
-							@php $examDetails = $applicant->examDetails(); @endphp
-							<td class="text-center">
-								{{date('d M, Y', strtotime($examDetails->exam_date))}}
-							</td>
 
-							<td>
-								@if($applicant->fees())
-									<span class=" badge badge-success">
-										Paid
-									</span>
-								Paid:{{$applicant->fees()->paid_amount}}
+                            @if($applicant->singleResult)
 
-								@else
-									Unpaid
-								@endif
-							</td>
-							<td class="text-center">
-								@if($applicant->application_status==1)
+                                @php
+                                    $subjectMark=json_decode($applicant->singleResult->subject_marks);
+                                @endphp
 
-									<span class="bg-success badge">Approved</span>
+                            @endif
 
-								@else
-								Not Approved
-								@endif
-							</td>
-							@php $examGrade = $applicant->grade(); @endphp
-<!--							<td class="text-center">
-								<div class="input-group text-center">
-									@if(!empty($gradeList))
-										<input id="applicant_grade_{{$applicantId}}" data-id="{{$applicantId}}" class="form-control mark-input text-center" maxlength="3" name="{{$applicantId}}[applicant_grade]" value="{{$gradeList[$applicantId]['grade_mark']}}" type="text">
-									@else
-										<input id="applicant_grade_{{$applicantId}}" data-id="{{$applicantId}}" class="form-control mark-input text-center" maxlength="3" name="{{$applicantId}}[applicant_grade]" value="{{$examGrade?$examGrade->applicant_grade:''}}" {{$examTaken=='1'?'disabled':''}} type="text">
-									@endif
+                            @foreach(json_decode($examSettingProfile->exam_subjects_marks,1) as $key=>$examMark)
+                                <td rowspan="1">
+                                    {{$applicant->single_result}}
+                                    <input type="number" max="{{$examMark}}"
+                                         @if($applicant->singleResult)  value="{{$subjectMark->$key}}" @endif
+                                                       name="marks[{{$applicantId}}][{{$key}}]"></td>
+                            @endforeach
 
-									<input type="hidden" id="exam_grade_{{$applicantId}}" name="{{$applicantId}}[exam_grade]" value="{{$examDetails?$examDetails->exam_marks:'0'}}">
-									<div class="input-group-addon"> / {{$examDetails?$examDetails->exam_marks:'0'}}</div>
-								</div>
-							</td>
-							<td class="text-center">
-								@if(!empty($gradeList))
-									<p id="btn_{{$applicant->applicant_id}}" class="btn btn-info grade text-bold">Save</p>
-									<input id="applicant_grade_id_{{$applicant->applicant_id}}" name="{{$applicantId}}[grade_id]" value="{{$gradeList[$applicantId]['grade_id']}}" type="hidden">
-								@else
-									@if($examTaken=='0')
-										<p id="btn_{{$applicant->applicant_id}}" class="btn btn-info grade text-bold">{{$examGrade?'Update':'Save'}}</p>
-										<input id="applicant_grade_id_{{$applicant->applicant_id}}" name="{{$applicantId}}[grade_id]" value="{{$examGrade?$examGrade->id:'0'}}" type="hidden">
-									@else
-										<p  class="btn btn-default text-bold">Result Published</p>
-									@endif
-								@endif
-							</td>-->
+                            <td>
+
+                                <input type="text"  @if($applicant->singleResult)
+                                         value="{{$applicant->singleResult->applicant_grade}}"
+                                       @endif
+                                       name="total[{{$applicantId}}]"
+                                ></td>
+
+
+
 						</tr>
 						@php $i = ($i++); @endphp
 					@endforeach
@@ -133,11 +114,12 @@
 				</table>
 			</div><!-- /.box-body -->
 			<div class="box-footer ">
-				@if($examTaken=='0')
+				@if($examStatus==true)
 					<button class="btn btn-primary pull-right submit-assessment text-bold" type="submit">Submit</button>
 				@endif
 			</div>
-		</div><!-- /.box-->
+		</div>
+        </div>
 	</form>
 @else
 	<div class="alert-auto-hide alert alert-warning alert-dismissable" style="opacity: 257.188;">
@@ -151,8 +133,22 @@
 <script src="{{ URL::asset('js/datatables/dataTables.bootstrap.min.js') }}"></script>
 <!-- datatable script -->
 <script>
+
     $(function () {
         $("#example1").DataTable();
+        $('#all_select').change(function (event) {
+
+            let val= $(this).prop('checked')
+            let txt= $(this).text();
+
+
+            if(val){
+                $(".Muumuu").prop('checked', true);
+            }else {
+                $(".Muumuu").prop('checked', false);
+            }
+
+        });
 
         $('form#applicant_grade_book_form').on('submit', function (e) {
             e.preventDefault();
@@ -166,7 +162,7 @@
             $.ajax({
                 type: 'POST',
                 cache: false,
-                url: '/admission/assessment/grade-book/store',
+                url: '/admission/marks/store',
                 data: $('form#applicant_grade_book_form').serialize(),
                 datatype: 'html',
 
@@ -178,6 +174,7 @@
                 success: function (data) {
                     // checking
                     if(data.status=='success'){
+                        console.log(data);
                         var gradeList = data.grade_id_list;
                         // looping
                         for(var key in gradeList){
@@ -194,6 +191,7 @@
 
                 error:function(data){
                     alert(JSON.stringify(data));
+                    waitingDialog.hide();
                 }
             });
         });
@@ -214,7 +212,7 @@
             ;
             // ajax request
             $.ajax({
-                url: '/admission/assessment/grade-book/update',
+                url: '/admission//marks/store',
                 type: 'post',
                 cache: false,
                 data: $(grade_update).serialize(),
@@ -226,6 +224,7 @@
                 },
 
                 success:function(data){
+                    console.log(data)
                     // hide dialog
                     waitingDialog.hide();
                     // checking

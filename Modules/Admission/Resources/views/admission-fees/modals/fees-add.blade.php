@@ -100,7 +100,8 @@
 					<td>
 						@if(!empty($examDetails) )
 
-							<input type="text" max="{{$examDetails->exam_fees}}" name="fees_amount" value="{{$examDetails->exam_fees}}"/>
+							<input type="text" max="{{$examDetails->paid_amount}}" name="paid_amount"
+								   value="{{$examDetails->exam_fees}}"/>
 						@else
 							<i class="label label-danger">Fees Setting Not Found</i>
 						@endif

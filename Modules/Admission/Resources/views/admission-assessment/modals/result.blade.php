@@ -7,7 +7,7 @@
 
 	<div class="box-body" style="overflow-x:inherit">
 		<p class="bg-blue-gradient text-center text-bold">Applicant Result Sheet</p>
-		@if($examTaken==1)
+		@if($examTaken==1 || $examTaken==0)
 		<ul id="applicant_result_list_btn_container" class="nav-tabs nav {{$applicantResultSheet->count()>0?'':'hide'}}">
 			<li class="active list"><a id="LIST" class="applicant-list">Applicants List</a></li>
 			<li class="list"><a id="PASSED" class="applicant-list">Passed</a></li>
@@ -22,6 +22,14 @@
 
 		<div class="row box-body">
 			<div id="applicant_result_list_container" class="col-md-12">
+				@if($examSettingProfile)
+					@if($examSettingProfile->exam_status)
+						<div class="text-center">
+							<p id="generate_applicant_result" class="btn btn-primary">Generate Result</p>
+						</div>
+					@endif
+
+				@endif
 				@if($examTaken==1)
 					@if($applicantResultSheet->count()>0)
 						@include('admission::admission-assessment.modals.result-list')
@@ -67,6 +75,7 @@
                 },
 
                 success: function (data) {
+                	console.log(data)
                     // statements
                     var applicant_result_list_container=  $('#applicant_result_list_container');
                     applicant_result_list_container.html(null);
@@ -107,6 +116,7 @@
                 },
 
                 success: function (data) {
+                	console.log(data)
                     // statements
                     $('#applicant_result_list_btn_container').removeClass('hide');
                     var applicant_result_list_container=  $('#applicant_result_list_container');

@@ -8,7 +8,7 @@ use Illuminate\Routing\Controller;
 
 class WebsiteAdmissionController extends Controller
 {
-   public function examSetting(Request $request){
+   public function attendance(Request $request){
        return ['status'=>'success','data'=>"boo"];
    }
 }

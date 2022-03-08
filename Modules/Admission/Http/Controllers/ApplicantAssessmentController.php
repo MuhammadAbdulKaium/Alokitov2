@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Admission\Entities\ApplicantGrade;
+use Modules\Admission\Entities\ApplicantInformation;
 use Modules\Admission\Entities\ApplicantMeritBatch;
 use Modules\Admission\Entities\ApplicantResult;
 use Modules\Admission\Entities\ApplicantExamSetting;
@@ -97,6 +98,12 @@ class ApplicantAssessmentController extends Controller
 
         // switch to page
         switch ($pageId) {
+            case 'attendance':
+                return view('admission::admission-assessment.attendance', compact('academicYears'))->with('page', 'attendance');
+                break;
+            case 'marks-entry':
+                return view('admission::admission-assessment.marks-entry', compact('academicYears'))->with('page', 'marks_entry');
+                break;
             case 'grade-book':
                 return view('admission::admission-assessment.grade-book', compact('academicYears'))->with('page', 'grade-book');
                 break;
@@ -115,6 +122,174 @@ class ApplicantAssessmentController extends Controller
                 return view('admission::admission-assessment.grade-book', compact('academicYears'))->with('page', 'grade-book');
         }
     }
+    public function attendanceIndex(Request $request){
+        $applicantProfiles = $this->applicantView->where([
+            'academic_year'  => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch'          => $request->input('batch'),
+        ])->with('applicationAll')->orderBy('application_no', 'ASC')->get();
+
+
+        $qry = [
+            'academic_year'  => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch'          => $request->input('batch'),
+            'campus_id'      => $this->academicHelper->getCampus(),
+            'institute_id'   => $this->academicHelper->getInstitute(),
+        ];
+        /* $qry = [
+             'campus_id'      => $this->academicHelper->getCampus(),
+             'institute_id'   => $this->academicHelper->getInstitute(),
+         ];*/
+        // exam settings
+       //return ['status'=>'success','data'=>$applicantProfiles];
+        if($examSettingProfile = $this->examSetting->where($qry)->first()){
+            $examStatus = $examSettingProfile->exam_status;
+        }else{
+            $examStatus = null;
+        }
+
+        return view('admission::admission-assessment.modals.attendance',
+            compact('applicantProfiles','examStatus'));
+
+
+    }
+    //Marks Entry Function
+    public function findMarks(Request $request){
+        $applicantProfiles = $this->applicantView->where([
+            'academic_year'  => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch'          => $request->input('batch'),
+            'application_status'=>1
+        ])->with('applicationAll')->with('singleResult')->orderBy('application_no', 'ASC')->get();
+
+
+        $qry = [
+            'academic_year'  => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch'          => $request->input('batch'),
+            'campus_id'      => $this->academicHelper->getCampus(),
+            'institute_id'   => $this->academicHelper->getInstitute(),
+        ];
+        /* $qry = [
+             'campus_id'      => $this->academicHelper->getCampus(),
+             'institute_id'   => $this->academicHelper->getInstitute(),
+         ];*/
+        // exam settings
+       //return ['status'=>'success','data'=>$applicantProfiles];
+        if($examSettingProfile = $this->examSetting->where($qry)->first()){
+            $examStatus = $examSettingProfile->exam_status;
+        }else{
+            $examStatus = null;
+        }
+
+        return view('admission::admission-assessment.modals.marks-entry',
+            compact('applicantProfiles','examStatus','examSettingProfile'));
+
+
+    }
+
+    public function marksStore(Request $request)
+    {
+       // dd($request->all());
+        $applicants=$request->applicant_list;
+        $ResultsTotal=$request->total;
+
+        $grades=ApplicantGrade::whereIn('applicant_id',$applicants)->get();
+      $gradesbyKey=$grades->keyBy('applicant_id');
+      $hasResult=$grades->pluck('applicant_id')->toArray();
+
+        //return ['status'=>'success','data'=>$hasResult];
+        foreach ($applicants as $applicant){
+           if(in_array($applicant,$hasResult)){
+               $singleApplicantGrade=$gradesbyKey[$applicant];
+               $singleApplicantGrade->applicant_grade=$ResultsTotal[$applicant];
+               $singleApplicantGrade->subject_marks=json_encode($request->marks[$applicant]);
+               $singleApplicantGrade->save();
+           }else{
+               $applicantGrade=new ApplicantGrade();
+
+               $applicantGrade->applicant_id    = $applicant; // applicant id
+               $applicantGrade->applicant_grade = $request->total[$applicant];
+               $applicantGrade->academic_year   = $request->input('academic_year');
+               $applicantGrade->academic_level  = $request->input('academic_level');
+               $applicantGrade->batch           = $request->input('academic_batch');
+               $applicantGrade->campus_id       = $this->academicHelper->getCampus();
+               $applicantGrade->institute_id    = $this->academicHelper->getInstitute();
+                    $applicantGrade->subject_marks=json_encode($request->marks[$applicant]);
+               $applicantGrade->save();
+               return ['status'=>'success','data'=>$applicantGrade];
+           }
+
+
+        }
+        return ['status'=>'success','data'=>$singleApplicantGrade];
+        return ['status'=>'success','data'=>$singleGrade];
+        // request details
+        $applicantList = $request->applicant_list;
+        // loop counter
+        $loopCounter = 0;
+        // returnData = array
+        $returnData = array();
+        // looping
+        for ($i = 0; $i < count($applicantList); $i++) {
+            // applicant id
+            $applicantId = $applicantList[$i];
+            // single Applicant Grade
+            $singleApplicantGrade = $request->$applicantId;
+            // grade id
+            $applicantGradeId = $singleApplicantGrade['grade_id'];
+            // checking
+            if ($applicantGradeId > 0) {
+                $applicantGrade = $this->applicantGrade->find($applicantGradeId);
+            } else {
+                $applicantGrade = new $this->applicantGrade();
+            }
+            // input or update grade details
+            $applicantGrade->applicant_id    = $applicantId; // applicant id
+            $applicantGrade->applicant_grade = $singleApplicantGrade['applicant_grade'];
+            $applicantGrade->academic_year   = $request->input('academic_year');
+            $applicantGrade->academic_level  = $request->input('academic_level');
+            $applicantGrade->batch           = $request->input('academic_batch');
+            $applicantGrade->campus_id       = $this->academicHelper->getCampus();
+            $applicantGrade->institute_id    = $this->academicHelper->getInstitute();
+            // save applicant grade
+            if ($applicantGrade->save()) {
+                $returnData[$applicantId] = $applicantGrade->id;
+                $loopCounter              = ($loopCounter+1);
+            }
+        }
+        // save applicant grade
+
+    }
+
+
+
+    ///End of Marks Entry
+    public function attendanceStore(Request $request){
+
+        $attendanceList=$request->present;
+        $attendanceListId=[];
+        if($attendanceList){
+            foreach($attendanceList as $key=>$attendence){
+                array_push($attendanceListId,$key);
+            }
+        }
+
+
+            foreach ($request->applicant_list as $applicantx){
+                $applicant=ApplicantUser::find($applicantx);
+                $applicant->attendance=false;
+                if(in_array($applicantx,$attendanceListId)){
+                    $applicant->attendance=true;
+                }
+                $applicant->save();
+
+            }
+
+
+        return ['status'=>'success','data'=>$attendanceListId];
+    }
 
     public function manageResult(Request $request)
     {
@@ -126,7 +301,8 @@ class ApplicantAssessmentController extends Controller
             'campus_id'      => $this->academicHelper->getCampus(),
             'institute_id'   => $this->academicHelper->getInstitute(),
         ];
-        // exam settings
+        // exam
+        $examSettingProfile=$this->examSetting->where($qry)->first();
         if($examSettingProfile = $this->examSetting->where($qry)->first()){
             $examTaken = $examSettingProfile->exam_taken;
         }else{
@@ -154,10 +330,18 @@ class ApplicantAssessmentController extends Controller
             $applicantLoopCounter = 0;
             // applicant grade looping
             foreach ($applicantGradeList as $gradeList){
+                //return ['status'=>true,'data'=>$applicantGradeList];
                 $applicantId = $gradeList->applicant_id;
                 $applicantGrade = $gradeList->applicant_grade;
+
+
+
                 // new exam result
-                $applicantResult = new $this->applicantResult();
+                $applicantResult=ApplicantResult::where('applicant_id',$applicantId)->first();
+                if(!$applicantResult){
+                    $applicantResult = new $this->applicantResult();
+                }
+
                 // checking applicant grade
                 if($applicantGrade>=$examPassingMark){
                     $passedList[] = $applicantId;
@@ -197,7 +381,19 @@ class ApplicantAssessmentController extends Controller
             }
 
             // merit batch profile
-            $meritBatchProfile = new $this->batch();
+            $meritBatchProfile=ApplicantMeritBatch::where(
+                [
+                    'academic_year'=>   $request->input('academic_year'),
+                    'academic_level'=>   $request->input('academic_level'),
+                    'batch'=>   $request->input('batch'),
+                    'campus_id'=>   $this->academicHelper->getCampus(),
+                    'institute_id'=>   $this->academicHelper->getInstitute()
+                ]
+            )->first();
+            if(!$meritBatchProfile){
+                $meritBatchProfile = new $this->batch();
+            }
+
             // input merit batch details
             $meritBatchProfile->merit_batch     = 1;
             $meritBatchProfile->academic_year   = $request->input('academic_year');
@@ -209,14 +405,18 @@ class ApplicantAssessmentController extends Controller
             $meritBatchProfile->save();
 
             // generate applicant result sheet
+
+
+
             $applicantResultSheet = $this->applicantResult->where($qry)->get();
             // return applicant result sheer
-            return view('admission::admission-assessment.modals.result-list', compact('applicantResultSheet', 'examTaken'));
+            return view('admission::admission-assessment.modals.result-list', compact('applicantResultSheet', 'examSettingProfile','examTaken'));
         }else{
             // generate applicant result sheet
             $applicantResultSheet = $this->applicantResult->where($qry)->get();
             // show applicant result sheet
-            return view('admission::admission-assessment.modals.result', compact('applicantResultSheet', 'examTaken'));
+            return view('admission::admission-assessment.modals.result', compact('applicantResultSheet', 'examTaken',
+                'examSettingProfile'));
         }
     }
 
@@ -632,6 +832,7 @@ class ApplicantAssessmentController extends Controller
             $examEndTime = $request->input('exam_end_time');
             $examVenue = $request->input('exam_venue');
             $examTaken = $request->input('exam_taken');
+            $examStatus = $request->input('exam_status');
             $examMarks = $request->input('exam_marks');
             $examPassingMarks = $request->input('exam_passing_marks');
 
@@ -656,6 +857,7 @@ class ApplicantAssessmentController extends Controller
             $examSettingProfile->last_date_of_submission= date('Y-m-d', strtotime($request->last_date_of_submission));
 
             $examSettingProfile->exam_taken = $examTaken;
+            $examSettingProfile->exam_status = $examStatus;
             $examSettingProfile->exam_marks = $examMarks;
             $examSettingProfile->exam_passing_marks = $examPassingMarks;
             //working dev9
@@ -725,7 +927,9 @@ class ApplicantAssessmentController extends Controller
                 $applicantPersonalInfo = $applicantProfile->personalInfo();
 
                 // create new std user account for the applicant
-                $userFullName = $applicantPersonalInfo->std_name;
+                $userFullName = $applicantPersonalInfo->first_name." ".$applicantPersonalInfo->last_name;
+
+
                 // create user profile for student
                 $userProfile = $this->studentInfoController->manageUserProfile(0, [
                     'name' =>$userFullName,
@@ -753,9 +957,10 @@ class ApplicantAssessmentController extends Controller
                     'user_id'     => $userProfile->id,
                     'type'        => 1,
                     'title'       => $applicantPersonalInfo->title,
-                    'first_name'  => $applicantPersonalInfo->std_name,
+                    'first_name'  => $applicantPersonalInfo->first_name,
                     'middle_name' => '',
-                    'last_name'   => '',
+                    'last_name'   => $applicantPersonalInfo->last_name,
+                    'batch_no'=>$request->batch,
                     'bn_fullname'   => $applicantPersonalInfo->std_name_bn,
                     'gender'      => $applicantPersonalInfo->gender=='0'?'Male':'Female',
                     'dob'         => date('Y-m-d', strtotime($applicantPersonalInfo->birth_date)),
@@ -768,9 +973,12 @@ class ApplicantAssessmentController extends Controller
                     'campus'      => $applicantProfile->campus_id,
                     'institute'   => $applicantProfile->institute_id,
                 ]);
+                //return $studentProfile;
+
 
                 // upload student photo
-                $studentPhoto = $this->studentInfoController->applicantPhotoUploader($studentProfile->id, $applicantPersonalInfo->std_photo);
+                $studentPhoto = $this->studentInfoController->applicantPhotoUploader($studentProfile->id,
+                    $applicantPersonalInfo->std_photo);
 
                 // create student enrollment
                 $this->studentInfoController->manageStdEnrollment(0, [
@@ -786,7 +994,7 @@ class ApplicantAssessmentController extends Controller
                 ]);
 
                 // create student address  details
-                $this->studentAddressController->storeOnlineStudentAddress($userProfile->id,  $applicantPersonalInfo);
+               // $this->studentAddressController->storeOnlineStudentAddress($userProfile->id,  $applicantPersonalInfo);
 
                 // create student guardian details
                 if($this->studentGuardController->storeOnlineStudentGuardian($studentProfile->id, $applicantProfile,  $applicantPersonalInfo)){

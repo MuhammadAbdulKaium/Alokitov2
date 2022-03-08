@@ -36,7 +36,19 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'admission', 'namespa
     //////////////  manage enquiry ///////////////////////
     Route::get('/applicant-sitplan/download', 'AdmissionController@applicantSitPlandownlaodView');
     Route::post('/applicant-sitplan/download', 'AdmissionController@applicantSitPlanDownlaod');
+///////manage attendance /////
 
+   // Route::get('/attendance/', 'ApplicantAssessmentController@attendanceIndex');
+
+    Route::post('/attendance/store', 'ApplicantAssessmentController@attendanceStore');
+
+    Route::get('/find/attendance', 'ApplicantAssessmentController@attendanceIndex');
+
+
+
+    Route::post('/marks/store', 'ApplicantAssessmentController@marksStore');
+
+    Route::get('/find/marks-entry', 'ApplicantAssessmentController@findMarks');
 
 
 

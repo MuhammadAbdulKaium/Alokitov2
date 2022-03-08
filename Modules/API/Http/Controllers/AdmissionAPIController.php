@@ -147,10 +147,7 @@ class AdmissionAPIController extends Controller
         }
     }
     //For testing By mazharul
-    public function customValidation($param){
 
-
-    }
     // store applicant personal information
     public function storeApplicantPersonalInfo($applicantId, $applicationNo, $request)
     {
@@ -218,8 +215,7 @@ class AdmissionAPIController extends Controller
     {
 
 //return ['status'=>true,'data'=>$request->all()];
-        $this->customValidation($request);
-        $boo=$request->all();
+
         $validator = Validator::make($request->all(), [
          'firstName'=>'required',
 
@@ -259,11 +255,11 @@ class AdmissionAPIController extends Controller
 
                 $campusProfile = $this->campus->find($campus);
 
-                $applicationYear = '21';
+                $applicationYear = '22';
                 // username and email
 
 
-                $applicationId = $campus.$applicationYear.($campusProfile->app_counter+2);
+                $applicationId = $campus.$applicationYear.($campusProfile->app_counter+1);
                 $email = $applicationId;
 
                 // application new profile
@@ -280,16 +276,36 @@ class AdmissionAPIController extends Controller
                 // save applicant profile and checking
                 if($applicantProfile->save()){
 
-                   // return  ['status'=>200,'msg'=>"Saved the data",'data'=>$applicantProfile];
                     $personalInoProfile = (object) $this->storeApplicantPersonalInformation($applicantProfile->id, $applicationId, $request);
-                        $father=$this->saveGuardian($request->father,"father",$applicantProfile->id);
-                    $mother=$this->saveGuardian($request->mother,"mother",$applicantProfile->id);
-                    $guardian=$this->saveGuardian($request->guardian,"guardian",$applicantProfile->id);
+                 // return  ['status'=>200,'msg'=>"Saved the data",'data'=>$personalInoProfile];
+
+                    $fatherGuardian=false;
+                    $motherGuardian=false;
+                    $otherGuardian=false;
+                   if($request->relation){
+                       if($request->relation==1){
+                           $fatherGuardian=true;
+                       }elseif ($request->relation==2){
+                           $motherGuardian=true;
+                       }else{
+                           $otherGuardian=true;
+                       }
+                   }
+
+
+                    $father=$this->saveGuardian($request->father,"father",$applicantProfile->id,$fatherGuardian);
+                    $mother=$this->saveGuardian($request->mother,"mother",$applicantProfile->id,$motherGuardian);
+                    if($otherGuardian)
+                    {
+                        $guardian=$this->saveGuardian($request->guardian,$request->relation,$applicantProfile->id,
+                            $otherGuardian);
+                    }
+
                     $relatives=[];
                     $relatives['student']=$personalInoProfile;
                     $relatives['f']=$father;
                     $relatives['m']=$mother;
-                    $relatives['g']=$guardian;
+                   // $relatives['g']=$guardian;
                     $relatives['r']=$request->all();
 
 
@@ -332,7 +348,8 @@ class AdmissionAPIController extends Controller
     }
 
 
-    public function saveGuardian($relative,$type,$applicant_id){
+    public function saveGuardian($relative,$type,$applicant_id,$isGuardian){
+
         $relativeData=new ApplicantRelative();
         $relativeData->name=$relative['name'];
         $relativeData->applicant_id=$applicant_id;
@@ -356,6 +373,7 @@ class AdmissionAPIController extends Controller
         $relativeData->contact_phone=$relative['contactPhone'];
         $relativeData->contact_email=$relative['contactEmail'];
         $relativeData->remarks=$relative['remarks'];
+        $relativeData->is_guardian=$isGuardian;
         $relativeData->save();
         return $relativeData;
 
@@ -365,7 +383,94 @@ class AdmissionAPIController extends Controller
         
 
     }
-//End Testing
+
+
+
+
+
+    // store applicant personal information by dev9
+    public function storeApplicantPersonalInformation($applicantId, $applicationNo, $request)
+    {
+        // student photo
+        $stdPhoto = $request->input('image', null);
+        // applicant new personal profile
+        $personalInoProfile = new $this->personalInfo();
+        // input details
+        $personalInoProfile->applicant_id        = $applicantId;
+        $personalInoProfile->first_name            = $request->input('firstName');
+        $personalInoProfile->last_name            = $request->input('lastName');
+
+        $personalInoProfile->invoice          = uniqid();
+        $personalInoProfile->amount               = 03;
+        $personalInoProfile->std_name_bn         = $request->input('banglaName');
+        // checking student photo
+        if($stdPhoto){
+            $personalInoProfile->std_photo = $stdPhoto;
+        }
+
+
+
+        $personalInoProfile->birth_date          = date('Y-m-d', strtotime($request->input('dateOfBirth')));
+        $personalInoProfile->gender              = $request->input('gender');
+        $personalInoProfile->blood_group        = $request->input('bloodGroup');
+        $personalInoProfile->present_address      = $request->input('permanentAddress');
+        $personalInoProfile->permanent_address	        = $request->input('presentAddress');
+        $personalInoProfile->religion	      = $request->input('religion');
+
+        $personalInoProfile->nationality            = $request->input('country');
+        $personalInoProfile->religion          = $request->input('religion', null);
+    /*    lastCertification: null,
+            group_id: null,
+            : null,
+            rollNumber: null,
+            passingYear: null,
+            boardName: null,
+            instituteFullName: null,
+            gpa: null,*/
+
+        $personalInoProfile->last_certificate_name= $request->academicsData['lastCertification'];
+        $personalInoProfile->group_id= $request->academicsData['group_id'];
+        $personalInoProfile->registration_no= $request->academicsData['registrationNumber'];
+        $personalInoProfile->roll_no= $request->academicsData['rollNumber'];
+        $personalInoProfile->passing_year= $request->academicsData['passingYear'];
+        $personalInoProfile->board_name= $request->academicsData['boardName'];
+        $personalInoProfile->institute_full_name= $request->academicsData['instituteFullName'];
+        $personalInoProfile->gpa= $request->academicsData['gpa'];
+        $personalInoProfile->subject_wise_mark= json_encode($request->academicsData['subjectWiseMark']);
+
+
+
+
+
+
+
+
+        // save and checking
+        if($personalInoProfile->save()){
+            // checking student photo
+            if($stdPhoto){
+                // upload student photo
+                if($this->applicantPhotoUploader($applicantId, $applicationNo, $stdPhoto)==false){
+                    // response success
+                    return ['status'=>false, 'msg'=>'Unable to Store Applicant Photo'];
+                }
+            }
+            // response success
+            return ['status'=>true, 'profile'=>$personalInoProfile,'id'=>$personalInoProfile->id,
+                'invoice_id'=>$personalInoProfile->invoice_id];
+        }else{
+            // response failed
+            return ['status'=>false, 'msg'=>'Unable to Store Applicant personal information'];
+        }
+    }
+
+//End Testing by DEV9
+
+
+
+
+
+
 
     // find academic section list
     public function storeOnlineStudent(Request $request)
@@ -444,7 +549,7 @@ class AdmissionAPIController extends Controller
                     // applicant new personal profile
                     $personalInoProfile = (object) $this->storeApplicantPersonalInfoNew($applicantProfile->id, $applicationId, $request);
                     // save applicant personalIno Profile and checking
-                   // return ['status'=> true, 'msg'=>$personalInoProfile];
+                    // return ['status'=> true, 'msg'=>$personalInoProfile];
                     if($personalInoProfile->status){
                         // enrollment new profile
                         $enrollmentProfile = new $this->enrollment();
@@ -495,80 +600,6 @@ class AdmissionAPIController extends Controller
             return [ 'status'=> false, 'errors'=>$validator->errors()];
         }
     }
-
-
-    // store applicant personal information by dev9
-    public function storeApplicantPersonalInformation($applicantId, $applicationNo, $request)
-    {
-        // student photo
-        $stdPhoto = $request->input('image', null);
-        // applicant new personal profile
-        $personalInoProfile = new $this->personalInfo();
-        // input details
-        $personalInoProfile->applicant_id        = $applicantId;
-        $personalInoProfile->first_name            = $request->input('firstName');
-        $personalInoProfile->last_name            = $request->input('lastName');
-
-        $personalInoProfile->invoice          = uniqid();
-        $personalInoProfile->amount               = 03;
-        $personalInoProfile->std_name_bn         = $request->input('banglaName');
-        // checking student photo
-        if($stdPhoto){
-            $personalInoProfile->std_photo = $stdPhoto;
-        }
-
-
-
-        $personalInoProfile->birth_date          = date('Y-m-d', strtotime($request->input('dateOfBirth')));
-        $personalInoProfile->gender              = $request->input('gender');
-
-        $personalInoProfile->nationality            = $request->input('country');
-        $personalInoProfile->religion          = $request->input('religion', null);
-    /*    lastCertification: null,
-            group_id: null,
-            : null,
-            rollNumber: null,
-            passingYear: null,
-            boardName: null,
-            instituteFullName: null,
-            gpa: null,*/
-
-        $personalInoProfile->last_certificate_name= $request->academicsData['lastCertification'];
-        $personalInoProfile->group_id= $request->academicsData['group_id'];
-        $personalInoProfile->registration_no= $request->academicsData['registrationNumber'];
-        $personalInoProfile->roll_no= $request->academicsData['rollNumber'];
-        $personalInoProfile->passing_year= $request->academicsData['passingYear'];
-        $personalInoProfile->board_name= $request->academicsData['boardName'];
-        $personalInoProfile->institute_full_name= $request->academicsData['instituteFullName'];
-        $personalInoProfile->gpa= $request->academicsData['gpa'];
-        $personalInoProfile->subject_wise_mark= json_encode($request->academicsData['subjectWiseMark']);
-
-
-
-
-
-
-
-
-        // save and checking
-        if($personalInoProfile->save()){
-            // checking student photo
-            if($stdPhoto){
-                // upload student photo
-                if($this->applicantPhotoUploader($applicantId, $applicationNo, $stdPhoto)==false){
-                    // response success
-                    return ['status'=>false, 'msg'=>'Unable to Store Applicant Photo'];
-                }
-            }
-            // response success
-            return ['status'=>true, 'profile'=>$personalInoProfile,'id'=>$personalInoProfile->id,
-                'invoice_id'=>$personalInoProfile->invoice_id];
-        }else{
-            // response failed
-            return ['status'=>false, 'msg'=>'Unable to Store Applicant personal information'];
-        }
-    }
-
     // student Photo uploader
     public function applicantPhotoUploader($applicantId, $applicationNo, $imageData)
     {
