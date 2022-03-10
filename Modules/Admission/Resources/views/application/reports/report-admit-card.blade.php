@@ -191,7 +191,18 @@
 			</table>
 		</div>
 		{{--applicant photo--}}
-		<div class="applicant-photo text-center">
+		<div class="applicant-photo text-center " style="position: relative">
+			@if($applicantProfile->payment_status==1)
+			<div class="ap" style="position: absolute;left: -200px;top: -20px">
+				<img  src="{{public_path().'/assets/stamp/approved.png'}}" alt="" style="width: 200px;height: 200px">
+			</div>
+			@else
+				<div class="ap" style="position: absolute;left: -200px;top: -20px">
+					<img  src="{{public_path().'/assets/stamp/NotApproved.png'}}" alt="" style="width: 200px;height:
+					200px">
+				</div>
+
+			@endif
 			@if($profilePhoto = $applicantProfile->document('PROFILE_PHOTO'))
 				<img src="{{URL::asset($profilePhoto->doc_path)}}"  style="width:125px;height:125px">
 			@else
@@ -236,19 +247,7 @@
 			{{--...............................<br>--}}
 			{{--<strong>Paid By</strong>--}}
 		</div>
-		<div class="text-center pull-right col-md-6">
 
-			{{--checking auth sign--}}
-			@if(isset($reportCardSetting->auth_sign) AND $reportCardSetting->auth_sign!=null AND !empty($reportCardSetting->auth_sign))
-				<img src="{{public_path().'/assets/users/images/'.$reportCardSetting->auth_sign}}" style="height: 40px; padding: 0px; margin-bottom: -6px;">
-			@endif
-			<br>...............................<br>
-			@if($applicantProfile->institute_id==29)
-			<strong>Head Teacher</strong>
-				@else
-				<strong>Exam Controller</strong>
-			@endif
-		</div>
 	</div>
 </div>
 </body>

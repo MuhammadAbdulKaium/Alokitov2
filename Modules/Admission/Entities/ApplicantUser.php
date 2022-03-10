@@ -4,10 +4,27 @@ namespace Modules\Admission\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable as Notifible;
 
-class ApplicantUser extends Model
+class ApplicantUser  extends Authenticatable implements JWTSubject
 {
-    use SoftDeletes;
+    use SoftDeletes,Notifible;
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     // Table name
     protected $table = 'applicant_user';
@@ -36,6 +53,15 @@ class ApplicantUser extends Model
     public function personalInfo()
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantInformation', 'applicant_id', 'id')->first();
+    }
+    public function singlePersonInfo(){
+        return $this->hasOne('Modules\Admission\Entities\ApplicantInformation', 'applicant_id', 'id');
+    }
+    //Applicant Manage View
+
+
+    public function applicantManageView(){
+        return $this->hasOne(ApplicantManageView::class,'applicant_id','id');
     }
 
     // get applicant address
@@ -75,9 +101,9 @@ class ApplicantUser extends Model
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantFees', 'applicant_id', 'id')->first();
     }
-   public function relatives(){
+    public function relatives(){
         return $this->hasMany('Modules\Admission\Entities\ApplicantRelative','applicant_id','id');
-   }
+    }
     public function father()
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantRelative','applicant_id','id')->where('relation',
@@ -92,5 +118,4 @@ class ApplicantUser extends Model
     {
         return $this->hasOne('Modules\Admission\Entities\ApplicantResult', 'applicant_id', 'id')->first();
     }
-
 }

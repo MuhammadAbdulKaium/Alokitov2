@@ -66,6 +66,7 @@ Route::group(['middleware' => 'cors', 'prefix' => 'api', 'namespace' => 'Modules
     /////////////////////////////////////  Online Admission (College) ////////////////////////////////////////////
     // HSC admission form
         Route::post('/GET-EXAM-SETTING', 'AdmissionAPIController@examSetting');
+        Route::post('/save-profile-photo', 'AdmissionAPIController@saveProfile');
         Route::post('/store-hsc-online-student', 'AdmissionAPIController@storeHscStudent');
     Route::get('/find-class-group-subjects/{batchId}/{yearId}', 'AcademicAPIController@findAcademicGroupSubject');
     // HSC application double entry checking

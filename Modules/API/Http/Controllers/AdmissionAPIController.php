@@ -82,6 +82,12 @@ class AdmissionAPIController extends Controller
 
             $arrExam['Time']= Carbon::parse($examSetting->exam_date)->format('d F y') ." ".$examSetting->exam_start_time
             ." from ".$examSetting->exam_end_time;
+                $applicant_count=ApplicantManageView::where([
+                    'institute_id'=>$request->campus,
+                    'campus_id'=>$request->institute,
+                    'batch'=>$request->batch,
+                    'academic_year'=>$acadenicsYear->id
+                ])->get()->count();
 
 
             $arrExam['Venue']=$examSetting->exam_venue;
@@ -91,6 +97,14 @@ class AdmissionAPIController extends Controller
             $arrExam['Exam Marks']=$examSetting->exam_marks;
             $arrExam['Pass Marks']=$examSetting->exam_passing_marks;
             $arrExam['subjectMarks']=json_decode( $examSetting->exam_subjects_marks);
+            if($examSetting->last_date_of_submission){
+                if(Carbon::parse($examSetting->last_date_of_submission)->isPast() || $applicant_count>$examSetting->max_applicants){
+                    $arrExam['exam_date_passed']=true;
+                }else{
+
+                    $arrExam['exam_date_passed']=false;
+                }
+            }
         }else{
             $arrExam=null;
         }
@@ -208,14 +222,53 @@ class AdmissionAPIController extends Controller
             return ['status'=>false, 'msg'=>'Unable to Store Applicant personal information'];
         }
     }
+    public function saveProfile(Request  $request){
+       // return ['status'=>true, 'data'=>$request->all()];
+       return $this->saveProfileImage($request->applicantId,2121,$request);
+    }
 
+    public function saveProfileImage($applicantId,$applicant_user,$request){
+        if($file = $request->hasFile('image')) {
+
+            $file = $request->file('image') ;
+            $fileName = $applicantId.$file->getClientOriginalName() ;
+
+            $destinationPath = 'assets/admission/images/';
+            $file->move($destinationPath,$fileName);
+
+            try{
+                $applicantDocument = new $this->document();
+
+                // storing user document
+                $applicantDocument->applicant_id = $applicantId;
+                $applicantDocument->doc_name     = $fileName;
+                $applicantDocument->doc_type     = "PROFILE_PHOTO";
+                $applicantDocument->doc_path     = $destinationPath;
+                $applicantDocument->doc_mime     = $file->getClientOriginalExtension();
+                $applicantDocument->doc_details     = "dfaskdfs      ";
+                $applicantDocument->save();
+                return ['status'=>true,'data'=>$applicantDocument];
+
+            }catch (\Exception $e){
+                return ['status'=>true,'data'=>$e];
+            }
+
+
+        }
+        return ['status'=>false,'data'=>"Problem"];
+    }
 
 
     public function saveStudentsData(Request  $request)
     {
 
+//return $this->saveProfileImage(1221035,222,$request);
+
+
 //return ['status'=>true,'data'=>$request->all()];
 
+
+       // return ['status'=>true,'data'=>$request->all()];
         $validator = Validator::make($request->all(), [
          'firstName'=>'required',
 
@@ -245,6 +298,7 @@ class AdmissionAPIController extends Controller
             'contactAddress'=>'required',
             'contactPhone'=>'required',
         ]);
+
         
         if($validator->passes()){
 
@@ -273,6 +327,7 @@ class AdmissionAPIController extends Controller
                 $applicantProfile->campus_id      = $campus;
                 $applicantProfile->institute_id   = $institute;
                 $applicantProfile->application_no = $applicationId;
+                // save applicant profile and checking
                 // save applicant profile and checking
                 if($applicantProfile->save()){
 
@@ -326,7 +381,7 @@ class AdmissionAPIController extends Controller
                     $campusProfile->save();
                     // If we reach here, then data is valid and working. Commit the queries!
                     DB::commit();
-                    return  ['status'=>200,'msg'=>"Father Save",'data'=>$relatives];
+                    return  ['status'=>200,'msg'=>"Father Save",'applicantId'=>$applicationId,'data'=>$relatives];
 
                 }
 
@@ -600,6 +655,7 @@ class AdmissionAPIController extends Controller
             return [ 'status'=> false, 'errors'=>$validator->errors()];
         }
     }
+
     // student Photo uploader
     public function applicantPhotoUploader($applicantId, $applicationNo, $imageData)
     {

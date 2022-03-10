@@ -12,7 +12,7 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
     protected $except = [
-        '/logout',
-        '/fee/student/onlinepayment/callback'
+        '/logout','*',
+        '/fee/student/onlinepayment/callback','/api/*','/website/*'
     ];
 }

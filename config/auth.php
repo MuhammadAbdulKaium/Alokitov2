@@ -1,5 +1,7 @@
 <?php
 
+use Modules\Admission\Entities\ApplicantUser;
+
 return [
 
     /*
@@ -42,8 +44,8 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
+            'driver' => 'jwt',
+            'provider' => 'applicant',
         ],
     ],
 
@@ -69,6 +71,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\User::class,
             'table' => 'users',
+        ],
+        'applicant' => [
+            'driver' => 'eloquent',
+            'model' => ApplicantUser::class,
+            'table' => 'applicant_user',
         ],
 
         // 'users' => [
@@ -97,6 +104,7 @@ return [
             'provider' => 'users',
             'table' => 'password_resets',
             'expire' => 60,
+            'hash' => false,
         ],
     ],
 

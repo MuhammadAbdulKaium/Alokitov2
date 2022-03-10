@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -66,6 +67,7 @@ class Kernel extends HttpKernel
         'setting-permission' => \App\Http\Middleware\SettingAccessPermission::class,
         'cadet-user-permission' => \App\Http\Middleware\CadetUserPermission::class,
         'cors' => \App\Http\Middleware\CORS::class,
+        'jwt.verify' =>JWTMiddleware::class,
 
     ];
 }

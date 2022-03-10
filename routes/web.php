@@ -10,6 +10,19 @@
 | contains the "web" middleware group. Now create something great!
 |
  */
+Route::prefix('api')->group(function () {
+
+
+    Route::post('register','AuthController@register');
+    Route::post('login','AuthController@login');
+
+    Route::group(['middleware'=>'jwt.verify'],function(){
+        Route::post('user13','AdmissionUserController@getUserInfo');
+        Route::post('user1','AuthController@getUser');
+        Route::post('download-admit','AuthController@downloadAdmit');
+        Route::resource('todos','TodoController');
+    });
+});
 
 Auth::routes();
 

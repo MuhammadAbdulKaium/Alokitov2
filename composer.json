@@ -26,6 +26,7 @@
         "phpoffice/phpexcel": "^1.8",
         "predis/predis": "1.1.6",
         "rap2hpoutre/laravel-log-viewer": "1.7.0",
+        "tymon/jwt-auth": "^1.0",
         "wildside/userstamps": "2.1.0"
     },
     "require-dev": {

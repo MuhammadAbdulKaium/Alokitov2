@@ -22,6 +22,7 @@
 						<div class="box-body box-profile">
 							{{--get applicant photo--}}
 							@php $profilePhoto = $applicantProfile->document('PROFILE_PHOTO'); @endphp
+							{{$profilePhoto}}
 							{{--set applicant photo--}}
 							<img class="profile-user-img img-responsive img-circle" src="{{URL::asset($profilePhoto?$profilePhoto->doc_path:'assets/users/images/user-default.png')}}" alt="No Image" style="height:100px;">
 							{{--appliant photo change button--}}
