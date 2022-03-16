@@ -147,6 +147,7 @@
 		</div>
 	</div>
 
+
 	{{--personal info part--}}
 	<div class="section">
 		@php $personalInfo = $applicantProfile->personalInfo();  @endphp
@@ -155,10 +156,25 @@
 		<div class="applicant-info">
 
 			<table id="applicant-profile" style="width:100%; text-align: left;">
-				<tr>
+				<tr style="position: relative">
 					<th width="120px">Student Name (English)</th>
 					<th width="1px">:</th>
-					<td colspan="4">{{$personalInfo->std_name}}</td>
+					@if($applicantProfile->singlePersonInfo)
+					<td colspan="4" >{{ $applicantProfile->singlePersonInfo->first_name}}
+					{{$applicantProfile->singlePersonInfo->last_name }}</td>
+						@endif
+					@if($applicantProfile->payment_status==1)
+						<div class="ap" style="position: absolute;left: 350px;top: -50px">
+							<img  src="{{public_path().'/assets/stamp/approved.png'}}" alt="" style="width: 200px;height: 200px">
+						</div>
+					@else
+						<div class="ap" style="position: absolute;left: 400px;top: -20px">
+							<img  src="{{public_path().'/assets/stamp/NotApproved.png'}}" alt="" style="width: 200px;height:
+					200px">
+						</div>
+
+					@endif
+
 				</tr>
 				<tr>
 					<th width="120px">Student Name (Bangla) </th>
@@ -168,7 +184,9 @@
 				<tr>
 					<th>Father's name</th>
 					<th>:</th>
-					<td>{{$personalInfo->father_name}}</td>
+					{{$personalInfo}}
+
+					<td>{{$father->name}}</td>
 					<th width="100px">Gender</th>
 					<th>:</th>
 					<td width="100px">{{$personalInfo->gender==0?"Male":'Female'}}</td>
@@ -176,7 +194,7 @@
 				<tr>
 					<th>Mother's Name</th>
 					<th>:</th>
-					<td>{{$personalInfo->mother_name}}</td>
+					<td>{{$mother->name}}</td>
 					<th>Birth Date</th>
 					<th width="1px">:</th>
 					<td>{{date('d M, Y', strtotime($personalInfo->birth_date))}}</td>
@@ -202,9 +220,12 @@
 			</table>
 		</div>
 		{{--applicant photo--}}
+
 		<div class="applicant-photo text-center">
 			@if($profilePhoto = $applicantProfile->document('PROFILE_PHOTO'))
-				<img src="{{URL::asset($profilePhoto->doc_path)}}"  style="width:125px;height:125px">
+				<img src="{{public_path().'/assets/admission/images/'.$profilePhoto->doc_name}}"  style="width:125px;
+				height:125px">
+
 			@else
 				<img src="{{public_path().'/assets/users/images/user-default.png'}}"  style="width:125px;height:125px">
 			@endif

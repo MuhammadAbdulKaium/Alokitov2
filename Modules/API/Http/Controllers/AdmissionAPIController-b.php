@@ -61,27 +61,7 @@ class AdmissionAPIController extends Controller
     }
 
 
-    public function studentUserLogin(Request $request)
-    {
-        // validating all requested input data
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|max:100', 'password' => 'required',
-        ]);
-        // storing requesting input data
-        if ($validator->passes()) {
-            // checking applicant username and password
-            if($applicantProfile = $this->checkApplicantUser($request->username, $request->password)){
-                // return
-                return ['status'=>true, 'data'=>$applicantProfile];
-            }else{
-                // return
-                return ['status'=>false, 'msg'=>'Invalid Username or Password'];
-            }
-        }else{
-            // return
-            return ['status'=>false, 'msg'=>'please check all inputs are selected ????'];
-        }
-    }
+
 
 
     // applicant password reset
@@ -674,7 +654,27 @@ remarks: null*/
     }
 
 
-
+    public function studentUserLogin(Request $request)
+    {
+        // validating all requested input data
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|max:100', 'password' => 'required',
+        ]);
+        // storing requesting input data
+        if ($validator->passes()) {
+            // checking applicant username and password
+            if($applicantProfile = $this->checkApplicantUser($request->username, $request->password)){
+                // return
+                return ['status'=>true, 'data'=>$applicantProfile];
+            }else{
+                // return
+                return ['status'=>false, 'msg'=>'Invalid Username or Password'];
+            }
+        }else{
+            // return
+            return ['status'=>false, 'msg'=>'please check all inputs are selected ????'];
+        }
+    }
     ////////////////////////////////////// HSC  Admission //////////////////////////////////////
 
     //  store HSC online admission form

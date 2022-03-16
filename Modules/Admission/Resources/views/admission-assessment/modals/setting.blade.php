@@ -149,7 +149,8 @@
 							<label class="control-label" for="">Result Published </label>
 							<br/>
 							<input name="exam_taken" value="{{$applicantResultSheet>0?'1':'0'}}" type="hidden">
-							<label><input id="exam_taken" name="exam_taken" {{$applicantResultSheet>0?'disabled':''}} @if($feesSettingProfile){{$feesSettingProfile->exam_taken=='1'?'checked':''}}@endif type="checkbox" value="1"> Is Result Published</label>
+							<label><input id="exam_taken" name="exam_taken"
+										  @if($feesSettingProfile){{$feesSettingProfile->exam_taken=='1'?'checked':''}}@endif type="checkbox" value="1"> Is Result Published</label>
 							<div class="help-block">
 								@if($errors->has('exam_taken'))
 									<strong>{{ $errors->first('exam_taken') }}</strong>
@@ -253,7 +254,7 @@
 
 
         // checking $applicantResultSheet
-	    @if($applicantResultSheet>0)
+	    @if($feesSettingProfile->exam_taken===1)
 	        $('.settings').attr("disabled", 'disabled');
 	    @endif
 		var subjectCount= {{$subjectCount}};

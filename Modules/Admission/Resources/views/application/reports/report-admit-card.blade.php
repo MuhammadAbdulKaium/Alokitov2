@@ -169,7 +169,12 @@
 				</tr>
 				<tr>
 					<th style="width: 150px">Full Name</th>
-					<td>{{$applicantProfile->name}}</td>
+
+					<td>
+						{{$applicantUser->singlePersonInfo->first_name}}
+						{{$applicantUser->singlePersonInfo->last_name}}
+
+					</td>
 				</tr>
 				<tr>
 					<th style="width: 150px">Class</th>
@@ -203,9 +208,11 @@
 				</div>
 
 			@endif
-			@if($profilePhoto = $applicantProfile->document('PROFILE_PHOTO'))
-				<img src="{{URL::asset($profilePhoto->doc_path)}}"  style="width:125px;height:125px">
-			@else
+				@if($profilePhoto = $applicantProfile->document('PROFILE_PHOTO'))
+					<img src="{{public_path().'/assets/admission/images/'.$profilePhoto->doc_name}}"  style="width:125px;
+				height:125px">
+
+				@else
 				<img src="{{public_path().'/assets/users/images/user-default.png'}}"  style="width:125px;height:125px">
 			@endif
 		</div>

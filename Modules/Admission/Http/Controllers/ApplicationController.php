@@ -69,12 +69,17 @@ class ApplicationController extends Controller
     {
         // application new profile
         $applicantProfile = $this->applicant->find($applicantId);
-//        return $applicantProfile->personalInfo();
+        $applicantProfile=ApplicantUser::where('id',$applicantId)->with('singlePersonInfo','applicantManageView','father','mother')->first();
+//return $applicantProfile;
+        $father=$applicantProfile->father;
+        $mother=$applicantProfile->mother;
+        //return $father;
+        //        return $applicantProfile->personalInfo();
         $instituteId= $applicantProfile->institute_id;
         //institute profile
         $instituteInfo =Institute::find($instituteId);
         // share all variables with the view
-        view()->share(compact('instituteInfo', 'applicantProfile'));
+        view()->share(compact('instituteInfo', 'father','mother','applicantProfile'));
 
         // use mPDF
 
@@ -92,7 +97,7 @@ class ApplicationController extends Controller
        $pdf = App::make('dompdf.wrapper');
        // load view
        $pdf->loadView('admission::application.reports.report-application')->setPaper('a4', 'portrait');
-        return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
+        //return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
       return $pdf->stream();
     }
 
@@ -101,11 +106,12 @@ class ApplicationController extends Controller
     {
         // application new profile
         $applicantProfile = $this->applicantView->where(['applicant_id'=>$applicantId])->first();
+        $applicantUser=ApplicantUser::find($applicantId);
         $reportCardSetting = $this->reportCardSetting->where(['institute'=>$applicantProfile->institute_id, 'campus'=>$applicantProfile->campus_id])->first();
         //institute profile
         $instituteInfo = $applicantProfile->institute();
         // share all variables with the view
-        view()->share(compact('instituteInfo', 'applicantProfile', 'reportCardSetting'));
+        view()->share(compact('instituteInfo','applicantUser', 'applicantProfile', 'reportCardSetting'));
         // generate pdf
         $pdf = App::make('dompdf.wrapper');
         // load view

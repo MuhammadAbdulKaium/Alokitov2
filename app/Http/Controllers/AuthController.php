@@ -10,6 +10,7 @@ use Modules\Academics\Entities\ReportCardSetting;
 use Modules\Admission\Entities\ApplicantManageView;
 use Modules\Admission\Entities\ApplicantUser;
 use Modules\Admission\Entities\ApplicantUser as User;
+use Modules\Setting\Entities\Institute;
 
 class AuthController extends Controller
 {
@@ -19,6 +20,7 @@ class AuthController extends Controller
 
 
     public function login(Request $request){
+
 
         if($request->email && $request->campus && $request->institute){
             $checkMail=ApplicantUser::where([
@@ -30,6 +32,9 @@ class AuthController extends Controller
             if(!$checkMail){
                 return response()->json(['error' => 'Invalid Campus'], 401);
             }
+        }else
+        {
+            return response()->json(['error' => 'Invalid Campus'], 401);
         }
     $validator = Validator::make($request->all(), [
     'email' => 'required',
@@ -81,27 +86,68 @@ class AuthController extends Controller
     'user' => auth('api')->user()
     ]);
     }
+    public function logout()
+    {
+        auth('api')->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+    public function downloadApplication(Request $request){
+        $user=ApplicantUser::where('application_no',$request->id)->first();
+        $applicantId=$user->id;
+
+        $applicantProfile=ApplicantUser::where('id',$applicantId)->with('singlePersonInfo','applicantManageView','father','mother')->first();
+//return $applicantProfile;
+        $father=$applicantProfile->father;
+        $mother=$applicantProfile->mother;
+        //return $father;
+        //        return $applicantProfile->personalInfo();
+        $instituteId= $applicantProfile->institute_id;
+        //institute profile
+        $instituteInfo =Institute::find($instituteId);
+        // share all variables with the view
+        view()->share(compact('instituteInfo', 'father','mother','applicantProfile'));
+
+        // use mPDF
+
+        /* $pdf = App::make('mpdf.wrapper');
+         $pdf->loadView('admission::application.reports.report-application');
+         $view = View::make('admission::application.reports.report-application');
+         $html = $view->render();
+         $mpdf = new  MPDF('utf-8',   'Legal', 14,'SolaimanLipi','10','5','5','0');
+         $mpdf->autoScriptToLang = true;// Mandatory
+         $mpdf->autoLangToFont = true;//Mandatory
+         $mpdf->WriteHTML($html);
+         $mpdf->Output('application_no_'.$applicantProfile->application_no.'.pdf', 'D');*/
+
+        // generate pdf
+        $pdf = App::make('dompdf.wrapper');
+        // load view
+        $pdf->loadView('admission::application.reports.report-application')->setPaper('a4', 'portrait');
+        //return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
+        return $pdf->stream();
+    }
 
 
     public function downloadAdmit(Request $request){
-        $user=\auth('api')->user();
+       $user=ApplicantUser::where('application_no',$request->id)->first();
         if($user){
-            $uID=$user->id;
-            $userInfo=ApplicantUser::where('id',$uID)->with('applicantManageView')->first();
-            $applicantProfile = ApplicantManageView::where(['applicant_id'=>$uID])->first();
-            $reportCardSetting = ReportCardSetting::where(['institute'=>$applicantProfile->institute_id,
-                'campus'=>$applicantProfile->campus_id])->first();
+            $applicantId=$user->id;
+
+            // application new profile
+            $applicantProfile = ApplicantManageView::where(['applicant_id'=>$applicantId])->first();
+            $applicantUser=ApplicantUser::find($applicantId);
+           /* $reportCardSetting = ReportCardSetting::where(['institute'=>$applicantProfile->institute_id,
+                'campus'=>$applicantProfile->campus_id])->first();*/
             //institute profile
             $instituteInfo = $applicantProfile->institute();
             // share all variables with the view
-            view()->share(compact('instituteInfo', 'applicantProfile', 'reportCardSetting'));
+            view()->share(compact('instituteInfo','applicantUser', 'applicantProfile'));
             // generate pdf
             $pdf = App::make('dompdf.wrapper');
             // load view
             $pdf->loadView('admission::application.reports.report-admit-card')->setPaper('a4', 'portrait');
             return $pdf->download('admit_card_no_'.$applicantProfile->application_no.'.pdf');
-
-           // return ['status'=>true,'admit'=>]
 
         }
     }

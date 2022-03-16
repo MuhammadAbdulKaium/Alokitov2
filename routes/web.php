@@ -15,14 +15,21 @@ Route::prefix('api')->group(function () {
 
     Route::post('register','AuthController@register');
     Route::post('login','AuthController@login');
+    Route::post('refresh','AuthController@refresh');
+
+    Route::post('download-admit','AuthController@downloadAdmit');
+    Route::post('download-application','AuthController@downloadApplication');
 
     Route::group(['middleware'=>'jwt.verify'],function(){
+        Route::post('logout','AuthController@logout');
+
         Route::post('user13','AdmissionUserController@getUserInfo');
         Route::post('user1','AuthController@getUser');
-        Route::post('download-admit','AuthController@downloadAdmit');
+
         Route::resource('todos','TodoController');
     });
 });
+Route::post('api/download-admit-first','\Modules\API\Http\Controllers\AdmissionAPIController@downloadAdmitCard');
 
 Auth::routes();
 

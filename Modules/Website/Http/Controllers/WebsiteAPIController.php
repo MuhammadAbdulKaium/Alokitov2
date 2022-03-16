@@ -283,7 +283,48 @@ class WebsiteAPIController extends Controller
         }
     }
 
+public function galleryImage(Request $request){
+    $campusId = $request->input('campus_id');
+    $instituteId = $request->input('institute_id');
 
+    // checking campus with institute
+    if ($this->academicHelper->findCampusWithInstId($campusId, $instituteId)) {
+
+        $albums = WebsiteImage::where('campus_id', '=', $campusId)
+            ->where('institute_id', '=', $instituteId)->get();
+
+        $albumsArray = null;
+
+        if (count($albums) > 0)
+        {
+            foreach ($albums as $album)
+            {
+                $images = explode('|', $album->images);
+                $file = array();
+
+                foreach ($images as $image)
+                {
+                    $file[] =  $image;
+                }
+
+                $albumsArray[$album->id] = [
+                    'type' => $album->type,
+                    'name' => $album->name,
+                    'images' => $file
+                ];
+            }
+            return ['status' => 'success', 'msg' => 'Website Information', 'data' => $albumsArray];
+        }
+        else {
+            return ['status' => 'failed', 'msg' => 'No records found'];
+        }
+    }
+    else {
+        return ['status' => 'failed', 'msg' => 'Invalid Campus or Institute ID'];
+    }
+
+
+}
     public function imageAPI(Request $request)
     {
         $campusId = $request->input('campus_id');

@@ -22,8 +22,9 @@
 						<div class="box-body box-profile">
 							{{--get applicant photo--}}
 							@php $profilePhoto = $applicantProfile->document('PROFILE_PHOTO'); @endphp
-							{{$profilePhoto}}
+
 							{{--set applicant photo--}}
+
 							<img class="profile-user-img img-responsive img-circle" src="{{URL::asset($profilePhoto?$profilePhoto->doc_path:'assets/users/images/user-default.png')}}" alt="No Image" style="height:100px;">
 							{{--appliant photo change button--}}
 							<a class="btn center-block" href="/admission/applicant/{{$applicantProfile->id}}/photo/edit" title="Change Profile Picture" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-sm"><i class = "fa fa-pencil-square" aria-hidden="true"></i> Change Picture</a>
@@ -73,7 +74,7 @@
 								<li class="list-group-item text-center">
 									<a class="label label-success download" data-key="application" target="_blank" data-id="{{$applicantProfile->id}}">Download Application</a>
 								</li>
-								@if($applicantProfile->payment_status==1)
+								@if($applicantProfile->payment_status==0)
 									<li class="list-group-item text-center">
 										<a class="label label-success download" data-key="admit-card" target="_blank" data-id="{{$applicantProfile->id}}">Download Admit Card</a>
 									</li>

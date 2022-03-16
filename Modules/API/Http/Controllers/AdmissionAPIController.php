@@ -7,11 +7,13 @@ use Carbon\Carbon;
 use Dompdf\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Academics\Entities\AcademicsYear;
+use Modules\Academics\Entities\ReportCardSetting;
 use Modules\Admission\Entities\ApplicantAddress;
 use Modules\Admission\Entities\ApplicantDocument;
 use Modules\Admission\Entities\ApplicantEnrollment;
@@ -247,6 +249,10 @@ class AdmissionAPIController extends Controller
                 $applicantDocument->doc_mime     = $file->getClientOriginalExtension();
                 $applicantDocument->doc_details     = "dfaskdfs      ";
                 $applicantDocument->save();
+
+
+
+
                 return ['status'=>true,'data'=>$applicantDocument];
 
             }catch (\Exception $e){
@@ -381,7 +387,8 @@ class AdmissionAPIController extends Controller
                     $campusProfile->save();
                     // If we reach here, then data is valid and working. Commit the queries!
                     DB::commit();
-                    return  ['status'=>200,'msg'=>"Father Save",'applicantId'=>$applicationId,'data'=>$relatives];
+                    return  ['status'=>200,'msg'=>"Father Save",'userName'=>$applicationId,'applicantId'=>$applicantProfile->id,
+                        'data'=>$relatives];
 
                 }
 
@@ -400,6 +407,67 @@ class AdmissionAPIController extends Controller
 
 
 
+    }
+    public function downloadAdmitCard(Request $request)
+    {
+        //return ['status'=>true,'data'=>$request->all()];
+
+        try {
+
+
+        $applicantId=$request->applicantId;
+        // application new profile
+        $applicantProfile = ApplicantManageView::where(['applicant_id'=>$applicantId])->first();
+        $applicantUser=ApplicantUser::find($applicantId);
+        $reportCardSetting = ReportCardSetting::where(['institute'=>$applicantProfile->institute_id,
+            'campus'=>$applicantProfile->campus_id])->first();
+        //institute profile
+        $instituteInfo = $applicantProfile->institute();
+        // share all variables with the view
+        view()->share(compact('instituteInfo','applicantUser', 'applicantProfile', 'reportCardSetting'));
+        // generate pdf
+        $pdf = App::make('dompdf.wrapper');
+        // load view
+        $pdf->loadView('admission::application.reports.report-admit-card')->setPaper('a4', 'portrait');
+        return $pdf->download('admit_card_no_'.$applicantProfile->application_no.'.pdf');
+        //return $pdf->stream();
+        }
+        catch (\Exception $e){
+            return $e;
+        }
+    }
+
+    public function downloadApplication($applicantId)
+    {
+        $applicantProfile=ApplicantUser::where('id',$applicantId)->with('singlePersonInfo','applicantManageView','father','mother')->first();
+
+        $father=$applicantProfile->father;
+        $mother=$applicantProfile->mother;
+
+        $instituteId= $applicantProfile->institute_id;
+        //institute profile
+        $instituteInfo =Institute::find($instituteId);
+        // share all variables with the view
+        view()->share(compact('instituteInfo', 'father','mother','applicantProfile'));
+
+        // use mPDF
+
+        /* $pdf = App::make('mpdf.wrapper');
+         $pdf->loadView('admission::application.reports.report-application');
+         $view = View::make('admission::application.reports.report-application');
+         $html = $view->render();
+         $mpdf = new  MPDF('utf-8',   'Legal', 14,'SolaimanLipi','10','5','5','0');
+         $mpdf->autoScriptToLang = true;// Mandatory
+         $mpdf->autoLangToFont = true;//Mandatory
+         $mpdf->WriteHTML($html);
+         $mpdf->Output('application_no_'.$applicantProfile->application_no.'.pdf', 'D');*/
+
+        // generate pdf
+        $pdf = App::make('dompdf.wrapper');
+        // load view
+        $pdf->loadView('admission::application.reports.report-application')->setPaper('a4', 'portrait');
+        return $pdf->download('application_no_'.$applicantProfile->application_no.'.pdf');
+        return $pdf->stream();
     }
 
 

@@ -406,6 +406,13 @@ class ApplicantAssessmentController extends Controller
 
             // generate applicant result sheet
 
+            //check If the Exam Result is published and the mark has Been Final generate
+            if($examSetting->final_result_published==0 && $examSetting->exam_taken==1 ){
+                $examSetting->final_result_published=1;
+                $examSetting->save();
+
+            }
+
 
 
             $applicantResultSheet = $this->applicantResult->where($qry)->get();
@@ -861,8 +868,20 @@ class ApplicantAssessmentController extends Controller
             $examSettingProfile->exam_marks = $examMarks;
             $examSettingProfile->exam_passing_marks = $examPassingMarks;
             //working dev9
+            $newExamSubjectArray=[];
 
-            $examSettingProfile->exam_subjects_marks = json_encode($examSubjectMark);
+            if($examSubjectMark){
+
+                foreach ($examSubjectMark as $key=>$examSub){
+                    if($key && $examSub){
+                        $newExamSubjectArray[$key]=$examSub;
+                    }
+
+                }
+            }
+
+
+            $examSettingProfile->exam_subjects_marks = json_encode($newExamSubjectArray);
 
 
             //dev9 rules
@@ -1026,30 +1045,6 @@ class ApplicantAssessmentController extends Controller
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

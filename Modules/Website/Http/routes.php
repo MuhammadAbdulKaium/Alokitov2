@@ -106,6 +106,7 @@ Route::group(['middleware' => 'cors', 'prefix' => 'website', 'namespace' => 'Mod
     Route::post('api_get_public_exam_result/','WebsiteAPIController@publicExamAPI');
     //Image API
     Route::post('api_get_image/','WebsiteAPIController@imageAPI');
+    Route::post('api_get_image-gallery/','WebsiteAPIController@galleryImage');
     //Image API
     Route::post('api_get_online_form_duration/','WebsiteAPIController@formDurationAPI');
 });

@@ -274,12 +274,14 @@
 					{{--<input id="add_pre_state" class="form-control" name="add_pre_state" value="{{$personalInfo->add_pre_state}}" type="text">--}}
 					<select id="add_pre_state" class="form-control" name="add_pre_state">
 						<option value="" selected disabled>--- Select Present State ---</option>
+						@if($allState)
 						@if($allState->count()>0)
 							{{--state list looping--}}
 							@foreach($allState as $state)
 								<option value="{{$state->id}}" {{$state->id==$personalInfo->add_pre_state?'selected':''}} >{{$state->name}}</option>
 							@endforeach
 						@endif
+							@endif
 					</select>
 					<div class="help-block">
 						@if ($errors->has('add_pre_state'))
@@ -296,7 +298,7 @@
 					@php $allPreCity = $personalInfo->preState()?$personalInfo->preState()->allCity():null; @endphp
 					<select id="add_pre_city" class="form-control" name="add_pre_city">
 						<option value="" selected disabled>--- Select Present City ---</option>
-						@if($allPreCity->count()>0)
+						@if($allPreCity && $allPreCity->count()>0)
 							{{--state list looping--}}
 							@foreach($allPreCity as $city)
 								<option value="{{$city->id}}" {{$city->id==$personalInfo->add_pre_city?'selected':''}} >{{$city->name}}</option>
@@ -358,7 +360,7 @@
 					{{--<input id="add_per_state" class="form-control" name="add_per_state" value="{{$personalInfo->add_per_state}}" type="text">--}}
 					<select id="add_per_state" class="form-control" name="add_per_state">
 						<option value="" selected disabled>--- Select Permanent State ---</option>
-						@if($allState->count()>0)
+						@if($allState && $allState->count()>0)
 							{{--state list looping--}}
 							@foreach($allState as $state)
 								<option value="{{$state->id}}" {{$state->id==$personalInfo->add_per_state?'selected':''}} >{{$state->name}}</option>
@@ -381,7 +383,7 @@
 					@php $allPerCity = $personalInfo->perState()?$personalInfo->perState()->allCity():null; @endphp
 					<select id="add_per_city" class="form-control" name="add_per_city">
 						<option value="" selected disabled>--- Select Permanent City ---</option>
-						@if($allPerCity->count()>0)
+						@if($allPerCity && $allPerCity->count()>0)
 							{{--state list looping--}}
 							@foreach($allPerCity as $city)
 								<option value="{{$city->id}}" {{$city->id==$personalInfo->add_per_city?'selected':''}} >{{$city->name}}</option>

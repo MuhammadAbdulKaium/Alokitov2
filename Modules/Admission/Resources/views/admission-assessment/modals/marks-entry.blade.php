@@ -1,14 +1,18 @@
 
 @if($applicantProfiles->count()>0 AND $examStatus !==null)
 	<link href="{{ URL::asset('css/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css"/>
+
 	<form id="applicant_grade_book_form">
+
 		<input type="hidden" name="_token" value="{{csrf_token()}}">
 		<div class="box box-solid">
 			<div class="box-header with-border">
 				<div class="row">
-					<div class="col-sm-6">
-
+                    @if(!$examStatus)
+                <div class="col-sm-12 p-2  text-danger" style="text-align: center">
+                        <h3><i class="fa fa-exclamation-triangle"></i> Exam is not Yet taken</h3>
 				</div>
+                    @endif
 			</div>
                 <style>
                     th{
@@ -99,11 +103,14 @@
 
                             <td>
 
-                                <input type="text"  @if($applicant->singleResult)
+                                <input type="number"  @if($applicant->singleResult)
                                          value="{{$applicant->singleResult->applicant_grade}}"
                                        @endif
+                                               max="{{$examSettingProfile->exam_marks}}"
                                        name="total[{{$applicantId}}]"
-                                ></td>
+                                >
+
+                            </td>
 
 
 
@@ -113,6 +120,7 @@
 					</tbody>
 				</table>
 			</div><!-- /.box-body -->
+
 			<div class="box-footer ">
 				@if($examStatus==true)
 					<button class="btn btn-primary pull-right submit-assessment text-bold" type="submit">Submit</button>
