@@ -112,13 +112,13 @@
 		});
 
 		// paginating
-		$('.pagination a').on('click', function (e) {
-			e.preventDefault();
-			var url = $(this).attr('href').replace('store', 'find');
-			loadRolePermissionList(url);
-			// window.history.pushState("", "", url);
-			// $(this).removeAttr('href');
-		});
+		// $('.pagination a').on('click', function (e) {
+		// 	e.preventDefault();
+		// 	var url = $(this).attr('href').replace('store', 'find');
+		// 	loadRolePermissionList(url);
+		// 	// window.history.pushState("", "", url);
+		// 	// $(this).removeAttr('href');
+		// });
 		// loadRole-PermissionList
 		function loadRolePermissionList(url) {
 			$.ajax({
@@ -142,6 +142,8 @@
 					}
 				},
 				error:function(data){
+					// hide waiting dialog
+					waitingDialog.hide();
 					alert(JSON.stringify(data));
 				}
 			});
