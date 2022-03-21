@@ -254,7 +254,7 @@
 
 
         // checking $applicantResultSheet
-	    @if($feesSettingProfile->exam_taken===1)
+	    @if($feesSettingProfile && $feesSettingProfile->exam_taken===1)
 	        $('.settings').attr("disabled", 'disabled');
 	    @endif
 		var subjectCount= {{$subjectCount}};

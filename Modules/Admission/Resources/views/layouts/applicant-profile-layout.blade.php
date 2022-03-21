@@ -74,11 +74,11 @@
 								<li class="list-group-item text-center">
 									<a class="label label-success download" data-key="application" target="_blank" data-id="{{$applicantProfile->id}}">Download Application</a>
 								</li>
-								@if($applicantProfile->payment_status==0)
+
 									<li class="list-group-item text-center">
 										<a class="label label-success download" data-key="admit-card" target="_blank" data-id="{{$applicantProfile->id}}">Download Admit Card</a>
 									</li>
-								@endif
+
 
 								@if($applicantResult = $applicantProfile->result())
 									@if($applicantResult->applicant_merit_type=='APPROVED')

@@ -87,7 +87,7 @@
 					<td>
 						@php $applicantInfo = $applicant->personalInfo(); @endphp
 						<a href="{{url('/admission/application/'.$applicantResult->applicant_id)}}">
-							{{$applicantInfo->std_name}}
+							{{$applicantInfo->first_name}} {{$applicantInfo->last_name}}
 						</a>
 					</td>
 					<td class="text-center">

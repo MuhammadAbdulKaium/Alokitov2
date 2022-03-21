@@ -74,6 +74,8 @@
                     },
 
                     success: function (data) {
+
+
                         // show waiting dialog
                         waitingDialog.hide();
                         // statements
@@ -87,6 +89,7 @@
                     error:function(data){
                         // show waiting dialog
                         waitingDialog.hide();
+                        console.log(data)
                         // sweet alert
 	                    swal('Error', 'No response from server', 'error');
                     }

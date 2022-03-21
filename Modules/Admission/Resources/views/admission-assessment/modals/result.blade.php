@@ -52,14 +52,15 @@
             @include('admission::admission-assessment.modals.result-list')
         @else
             <div class="text-center">
-                <p id="generate_applicant_result" class="btn btn-primary">Generate Result</p>
+                <p id="generate_applicant_result" class="btn btn-primary">Generate Final Result</p>
             </div>
         @endif
     @else
         <div class="text-center">
-            <p class="btn btn-default text-bold">
-                Exam has not been taken or Result has not been published.
-            </p>
+
+            <div class="text-center">
+                <p id="generate_applicant_result" class="btn btn-primary">Generate Temporary Result</p>
+            </div>
         </div>
     @endif
 </div>
