@@ -120,9 +120,9 @@ background:#0b460b !important;
                         <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
 
                            <ul class="dropdown-menus">
-                                 <li><a href="/admission"><i class="fa fa-user-plus"></i> Admission</a></li>
+<!--                                 <li><a href="/admission"><i class="fa fa-user-plus"></i> Admission</a></li>
                                  <li><a href="/admission/application"><i class="fa fa-external-link"></i> Online Application</a></li>
-                                 <li><a href="/admission/enquiry"><i class="fa fa-users"></i> Manage Enquiry</a></li>
+                                 <li><a href="/admission/enquiry"><i class="fa fa-users"></i> Manage Enquiry</a></li>-->
                                  <li><a href="/admission/fees"><i class="fa fa-users"></i> Manage Fees</a></li>
                                  <li><a href="/admission/assessment"><i class="fa fa-users"></i> Manage Assessment</a></li>
                                  {{--<li><a href="#"><i class="fa fa-file-text-o"></i> Admission Letter</a></li>--}}
@@ -254,9 +254,7 @@ background:#0b460b !important;
                               <li>
                                  <a href="/website/committee"> Committee</a>
                               </li>
-                              <li>
-                                 <a href="/website/success"> Achievement and Success</a>
-                              </li>
+
                               <li>
                                  <a href="/website/committee/speech"> Speech</a>
                               </li>

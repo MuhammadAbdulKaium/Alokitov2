@@ -37,7 +37,7 @@
                 <div class="box box-solid">
                     <div>
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa fa-search"></i>View Website Committee</h3>
+                            <h3 class="box-title"><i class="fa fa-search"></i>View Website Committee </h3>
                             <div class="box-tools">
                                 <a class="btn btn-success btn-sm" href="{{url('website/committee-speech/create')}}" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg">Add</a>
                             </div>
@@ -86,7 +86,7 @@
                                                 <td>{{$i++}}</td>
                                                 <td><img height="80" src="/images/{{$committee->image}}" alt=""></td>
                                                 <td>{{$committee->name}}</td>
-                                                <td>{{$committee->designation}}</td>
+                                                <td>{{$committee->designation}} <span class="badge badge-primary">@if($committee->type==1) Principle @elseif($committee->type==2) Chairman @endif</span></td>
                                                 <td>{{$committee->phone}}</td>
                                                 <td>{{$committee->email}}</td>
                                                 <td>{{substr($committee->speech, 0, 50)}}....</td>

@@ -243,9 +243,10 @@
 										<td>
 											@php $applicantInfo = $applicant->personalInfo(); @endphp
 											<a href="{{url('/admission/application/'.$applicantResult->applicant_id)}}">
-												{{$applicantInfo->std_name}}
+												{{$applicantInfo->first_name}} {{$applicantInfo->last_name}}
 											</a>
 										</td>
+
 										<td>{{$applicant->email}}</td>
 										<td> {{$applicantResult->academicYear()->year_name}}</td>
 										<td>{{$applicantResult->academicLevel()->level_name}}</td>

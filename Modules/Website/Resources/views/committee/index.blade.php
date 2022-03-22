@@ -14,7 +14,7 @@
                     <li class="active">Committee</li>
                 </ul>
 
-                section class="content">
+                <section class="content">
 
                 @if(count($committees) < 1)
 
