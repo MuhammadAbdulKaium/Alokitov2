@@ -112,30 +112,6 @@ background:#0b460b !important;
                         <span class="fa fa-desktop icon-margin"></span> Online Academic
                      </a>
                   </li>
-
-                  <li><a href="#"><span class="fa fa-users icon-margin"></span> Admission<span
-                                class="caret"></span></a>
-
-                     <ul class="dropdown-menus">
-                        <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
-
-                           <ul class="dropdown-menus">
-                                 <li><a href="/admission"><i class="fa fa-user-plus"></i> Admission</a></li>
-                                 <li><a href="/admission/application"><i class="fa fa-external-link"></i> Online Application</a></li>
-                                 <li><a href="/admission/enquiry"><i class="fa fa-users"></i> Manage Enquiry</a></li>
-                                 <li><a href="/admission/fees"><i class="fa fa-users"></i> Manage Fees</a></li>
-                                 <li><a href="/admission/assessment"><i class="fa fa-users"></i> Manage Assessment</a></li>
-                                 {{--<li><a href="#"><i class="fa fa-file-text-o"></i> Admission Letter</a></li>--}}
-
-
-
-                           </ul>
-
-                        </li>
-
-                     </ul>
-
-                  </li>
                   <li><a href="#"><span class="fa fa-users icon-margin"></span> Event <span class="caret"></span></a>
 
                   <ul class="dropdown-menus">
@@ -235,6 +211,7 @@ background:#0b460b !important;
                            <ul class="dropdown-menus">
                               <li><a href="{{url('/employee/evaluation/view')}}"><i class="fa fa-gears"></i> Evaluation </a></li>
                               <li><a href="{{url('/employee/evaluation/search/view')}}"><i class="fa fa-gears"></i> Search Evaluation </a></li>
+                              <li><a href="{{url('/employee/bulk-edit')}}"><i class="fa fa-gears"></i> HR Profile Edit </a></li>
                               <li><a href="{{url('/employee/evaluation/history/view')}}"><i class="fa fa-gears"></i> Evaluation History </a></li>
                            </ul>
                         </li>
@@ -274,6 +251,9 @@ background:#0b460b !important;
                               </li>
                               <li>
                                  <a href="/website/image"> Image</a>
+                              </li>
+                              <li>
+                                 <a href="/website/form"> Form</a>
                               </li>
 
 
@@ -343,6 +323,7 @@ background:#0b460b !important;
                            <ul class="dropdown-menus">
                               <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Student Enrollment</a></li>
                               <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Student</a></li>
+                              <li><a href="/student/cadet/bulk/edit"><i class="fa fa-reorder"></i> Student Profile Edit</a></li>
                               <li><a href="/student/cadet-performance-bulk"><i class="fa fa-reorder"></i> Factor Entries</a></li>
                               <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Student</a></li>
                               <li><a href="/student/import"><i class="fa fa-upload"></i> Import Student</a></li>

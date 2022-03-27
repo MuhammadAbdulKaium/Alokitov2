@@ -1,7 +1,12 @@
 <?php
 
 Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 'employee', 'namespace' => 'Modules\Employee\Http\Controllers'], function () {
-
+     // Employee Information Bulk Edit 
+     Route::get('/bulk-edit','EmployeeBulkEditController@index');
+     Route::get('/bulk-edit/search','EmployeeBulkEditController@employeeSearch');
+     Route::post('/bulk/edit/save','EmployeeBulkEditController@employeEdit');
+     Route::get('/class/fees','EmployeeBulkEditController@classFess');
+ 
     // employee index
     Route::get('/', 'EmployeeController@index');
 

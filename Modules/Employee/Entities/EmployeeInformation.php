@@ -53,14 +53,25 @@ class  EmployeeInformation extends Model
         'campus_id',
         'institute_id',
         'sort_order',
+        'religion',
+        'alt_mobile',
+        'birth_place',
     ];
 
+    public function getEmployeAddress(){
+        return $this->hasMany('App\Address','user_id','user_id');
+    }
     //returs the user information from the user db table
     public function user()
     {
         // getting user info
         return $this->belongsTo('App\User', 'user_id', 'id')->first();
     }
+    public function singleUser()
+    {
+        return $this->belongsTo('App\User', 'user_id', 'id');
+    }
+
 
     // employee nationality
     public function nationality()
