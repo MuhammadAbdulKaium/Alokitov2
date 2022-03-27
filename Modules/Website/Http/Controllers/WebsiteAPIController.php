@@ -131,6 +131,8 @@ class WebsiteAPIController extends Controller
                 {
                     if ($committee['image']) {
                         $photo = $committee->image;
+                    }else{
+                        $photo=null;
                     }
 
                     $committeeArray[$committee->id] =

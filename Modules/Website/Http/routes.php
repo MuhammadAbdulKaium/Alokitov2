@@ -1,6 +1,6 @@
 <?php
-
-Route::group(['middleware' => ['web', 'auth','setting-permission'], 'prefix' => 'website', 'namespace' => 'Modules\Website\Http\Controllers'], function()
+//,'setting-permission'
+Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'website', 'namespace' => 'Modules\Website\Http\Controllers'], function()
 {
     //Routes for website information menu
     Route::get('/information', 'InformationController@index');
