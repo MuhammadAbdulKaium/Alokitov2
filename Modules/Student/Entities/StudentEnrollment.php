@@ -44,7 +44,18 @@ class StudentEnrollment extends Model
         // getting student attatchment from student attachment db table
         return $this->belongsTo('Modules\Student\Entities\StudentInformation', 'std_id', 'id')->first();
     }
-
+    public function singleBatch()
+    {
+        // getting student attatchment from student attachment db table
+        return $this->belongsTo('Modules\Academics\Entities\Batch', 'batch', 'id');
+    }
+     // returs enrollment studnet academic section
+     public function singleSection()
+     {
+         // getting student attatchment from student attachment db table
+         return $this->belongsTo('Modules\Academics\Entities\Section', 'section', 'id');
+     }
+     
     // returs enrollment history
     public function history($type)
     {

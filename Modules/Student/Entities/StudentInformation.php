@@ -52,7 +52,24 @@ class StudentInformation extends Model
         'language',
         'batch_no',
     ];
-
+    public function hobbyDreamIdolAim(){
+        return $this->hasMany('Modules\Student\Entities\CadetAssesment', 'student_id', 'id');
+    }
+    public function singleEnrollment()
+    {
+        // getting student attatchment from student attachment db table
+        return $this->hasOne('Modules\Student\Entities\StudentEnrollment', 'std_id', 'id');
+    }
+    public function singleUser()
+    {
+        // getting user info
+        return $this->belongsTo('App\User', 'user_id', 'id');
+    }
+     //return the student nationality 
+     public function nationalitys()
+     {
+         return $this->hasOne('Modules\Setting\Entities\Country', 'id', 'nationality');
+     }
     public function nationality()
     {
         return $this->belongsTo('Modules\Setting\Entities\Country', 'nationality', 'id')->first();

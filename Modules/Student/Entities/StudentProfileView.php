@@ -38,6 +38,19 @@ class StudentProfileView extends Model
         'status',
     ];
 
+    public function getStudentAddress(){
+        return $this->hasMany('App\Address','user_id','user_id');
+    }
+    public function singleUser()
+    {
+        return $this->belongsTo('App\User', 'user_id', 'id');
+    }
+    public function singleStudent()
+    {
+        // getting student attachment from student attachment db table
+        return $this->belongsTo('Modules\Student\Entities\StudentInformation', 'std_id', 'id');
+    }
+   
     //returns the user information from the user db table
     public function user()
     {
@@ -65,6 +78,9 @@ class StudentProfileView extends Model
         // getting student attachment from student attachment db table
         return $academicsYear = $this->belongsTo('Modules\Academics\Entities\AcademicsYear', 'academic_year', 'id')->first();
     }
+    public function academicYear(){
+        return $this->belongsTo('Modules\Academics\Entities\AcademicsYear', 'academic_year', 'id');
+    }
 
     // return enrollment studnet academic level
     public function level()
@@ -73,12 +89,17 @@ class StudentProfileView extends Model
         return $level = $this->belongsTo('Modules\Academics\Entities\AcademicsLevel', 'academic_level', 'id')->first();
     }
 
+    public function academicLevel(){
+        return $this->belongsTo('Modules\Academics\Entities\AcademicsLevel', 'academic_level', 'id');
+    }
+
     // returs enrollment studnet academic batch
     public function batch()
     {
         // getting student attatchment from student attachment db table
         return $batch = $this->belongsTo('Modules\Academics\Entities\Batch', 'batch', 'id')->first();
     }
+    
 
     public function singleBatch()
     {
@@ -97,7 +118,7 @@ class StudentProfileView extends Model
         // getting student attatchment from student attachment db table
         return $this->belongsTo('Modules\Academics\Entities\Section', 'section', 'id');
     }
-
+   
     public function campus()
     {
         return $this->hasMany('Modules\Setting\Entities\Campus', 'institute', 'id')->orderBy('name', 'ASC')->get();

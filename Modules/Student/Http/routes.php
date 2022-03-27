@@ -4,6 +4,13 @@
 
 Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'student', 'namespace' => 'Modules\Student\Http\Controllers'], function () {
 
+    
+    // bulkEdit Route Start
+    Route::get('/cadet/bulk/edit',"CadetBulkEditController@index");
+    Route::get('/cadet/search-section',"CadetBulkEditController@searchSection");
+    Route::get('/cadet/bulk/search',"CadetBulkEditController@searchGenarateForm");
+    Route::post('/cadet/bulk/edit/save','CadetBulkEditController@bulkEditSaveData');
+    
     Route::get('/', 'StudentInfoController@index');
 
     Route::get('/manage', 'StudentController@manageStudent')->name('manage-student');
