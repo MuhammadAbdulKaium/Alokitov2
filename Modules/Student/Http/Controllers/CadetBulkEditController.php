@@ -191,23 +191,22 @@ class CadetBulkEditController extends Controller
     }
     public function bulkEditSaveData(Request $request)
     {
-        // return $request->all();
-        // die();
+        
         DB::beginTransaction();
         try {
             if (isset($request->upload)) {
                 foreach ($request->upload as $key => $value) {
-
-
+    
+    
                     $studentEnroment = StudentEnrollment::where('std_id', $key)->first();
-                    $admissionYear = isset($request->admissionYear) ? $request->admissionYear[$key] : $studentEnroment->admission_year;
-                    $academicYear = isset($request->academicYear) ? $request->academicYear[$key] : $studentEnroment->academic_year;
-                    $academicLevel = isset($request->academicLevel) ? $request->academicLevel[$key] : $studentEnroment->academic_level;
-                    $batch = isset($request->batch) ? $request->batch[$key] : $studentEnroment->batch;
-                    $section = isset($request->section) ? $request->section[$key] : $studentEnroment->section;
-
-
-                    // if($admissionYear)
+                    $admissionYear = isset($request->admissionYear) ? (int) $request->admissionYear[$key] : $studentEnroment->admission_year;
+                    $academicYear = isset($request->academicYear) ? (int) $request->academicYear[$key] : $studentEnroment->academic_year;
+                    $academicLevel = isset($request->academicLevel) ? (int) $request->academicLevel[$key] : $studentEnroment->academic_level;
+                    $batch =  isset($request->batch) ? (int) $request->batch[$key] : $studentEnroment->batch;
+                    $section = isset($request->section) ? (int) $request->section[$key] : $studentEnroment->section;
+    
+                    // return $batch ;
+                    // return gettype($batch) ;
                     if ($studentEnroment) {
                         $studentEnroment->update([
                             'admission_year' => $admissionYear,
@@ -217,7 +216,8 @@ class CadetBulkEditController extends Controller
                             'section' => $section,
                         ]);
                     }
-
+                    // return $studentEnroment;
+    
                     //student  information for StudentInformation Table chack by campus id , institute id, id
                     $studentInformation = StudentInformation::where([['campus', $this->academicHelper->getCampus()], ['institute', $this->academicHelper->getInstitute()], ['id', $key]])->first();
                     //student information for User Table chack by id
@@ -232,17 +232,14 @@ class CadetBulkEditController extends Controller
                     $mother = StudentGuardian::where('type', 0)->whereIn('id', array_values($parent->toArray()))->first();
                     //student Father's informationor for StudentGuardian Table chack by user_id, type
                     $father = StudentGuardian::where('type', 1)->whereIn('id', array_values($parent->toArray()))->first();
-
+    
                     // Student meridPosition & tution_fees for StudentEnrolement Table chack by std_id
                     $meridPosition = StudentEnrollment::where('std_id', $key)->first();
-                    $studentEnrollHistory = StdEnrollHistory::findOrFail($key);
-
-
-
+    
                     // Student presentAddress for Address Table chack by 
                     $presentAddress = Address::where(['user_id' => $user->id, 'type' => 'STUDENT_PRESENT_ADDRESS'])->first();
                     $permanentAddress = Address::where(['user_id' => $user->id, 'type' => 'STUDENT_PERMANENT_ADDRESS'])->first();
-
+    
                     // get Student Information Data
                     $username =  isset($request->user_name) ? $request->user_name[$key] : $user->username;
                     $first_name =  isset($request->first_name) ? $request->first_name[$key] : $studentInformation->first_name;
@@ -257,7 +254,7 @@ class CadetBulkEditController extends Controller
                     $nationality =  isset($request->nationality) ? $request->nationality[$key] : $studentInformation->nationality;
                     $language =  isset($request->language) ? $request->language[$key] : $studentInformation->language;
                     $identification_mark =  isset($request->identification_mark) ? $request->identification_mark[$key] : $studentInformation->identification_mark;
-
+    
                     // get Student Father's Data
                     $fathername = isset($request->fathername) ? $request->fathername[$key] : $father->first_name;
                     $fatheremail =  isset($request->fatheremail) ? $request->fatheremail[$key] : $father->email;
@@ -273,10 +270,10 @@ class CadetBulkEditController extends Controller
                     $permanentaddress =  isset($request->permanentaddress) ? $request->permanentaddress[$key] : $permanentAddress->address;
                     // get Student StudentEnrollment Data
                     $gr_no =  isset($request->gr_no) ? $request->gr_no[$key] : $meridPosition->gr_no;
-                    $tution_fees =  isset($request->tution_fees) ? $request->tution_fees[$key] : $meridPosition->tution_fees;
-
-
+    
+    
                     if ($studentInformation) {
+                        // return "ache";
                         if ($request->user_name || $request->first_name || $request->last_name || $request->middle_name || $request->bn_fullname || $request->gender || $request->dob || $request->birth_place || $request->birth_place || $request->religion || $request->blood_group || $request->nationality || $request->language || $request->identification_mark) {
                             if ($checkUser &&  $request->user_name[$key] != $user->username) {
                                 return response()->json([
@@ -345,18 +342,29 @@ class CadetBulkEditController extends Controller
                     }
                     // // meridPosition update
                     if ($meridPosition) {
-                        if ($request->gr_no || $request->tution_fees) {
+                        if ($request->gr_no) {
                             $meridPosition->update([
                                 'gr_no' => $gr_no,
-                                'tution_fees' => $tution_fees ? $tution_fees : 0
                             ]);
-                            $studentEnrollHistory->update([
-                                'gr_no' => $gr_no,
-                                'tution_fees' => $tution_fees ? $tution_fees : 0
-                            ]);
+                          
                         }
-                    }
+                        StdEnrollHistory::create([
+                            'enroll_id'=>$meridPosition->id,
+                            'gr_no'=>$gr_no,
+                            'section'=>$section,
+                            'batch'=>$batch,
+                            'academic_level'=>$academicLevel,
+                            'academic_year'=>$academicYear,
+                            'enrolled_at'=> Carbon::now(),
+                            'batch_status'=>$meridPosition->batch_status,
+                            'remark'=>$meridPosition->remark,
+                            'admission_year'=> $admissionYear,
+                            'enroll_status'=>$meridPosition->enroll_status,
+                        ]);
 
+                    
+                    }
+    
                     // delet && create Student Assesment Data
                     // CadetAssesment 
                     $hobby = CadetAssesment::where(['student_id' => $key, 'type' => 3])->first();
@@ -365,26 +373,26 @@ class CadetBulkEditController extends Controller
                     $idol = CadetAssesment::where(['student_id' => $key, 'type' => 6])->first();
                     // get Student assesment Data
                     if ($hobby) {
-
+    
                         $input_hobby =  isset($request->hobby) ? $request->hobby[$key] : $hobby->remarks;
                     }
                     if ($aim) {
-
+    
                         $input_aim =  isset($request->aim) ? $request->aim[$key] : $aim->remarks;
                     }
                     if ($dream) {
-
+    
                         $input_dream =  isset($request->dream) ? $request->dream[$key] : $dream->remarks;
                     }
                     if ($idol) {
-
+    
                         $input_idol =  isset($request->idol) ? $request->idol[$key] : $idol->remarks;
                     }
                     $academics_year_id = isset($request->academicYear) ? $request->academicYear[$key] : 0;
                     $academics_level_id = isset($request->academicLevel) ? $request->academicLevel[$key] : 0;
                     $section_id = isset($request->section) ? $request->section[$key] : 0;
                     $batch_id = isset($request->batch) ? $request->batch[$key] : 0;
-
+    
                     $assHobby = isset($request->hobby) ? $request->hobby[$key] : " ";
                     $assAim =  isset($request->aim) ? $request->aim[$key] : " ";
                     $assDream = isset($request->dream) ? $request->dream[$key] : " ";
@@ -407,7 +415,7 @@ class CadetBulkEditController extends Controller
                                 'date' => Carbon::now(),
                                 'type' => 3,
                                 'remarks' => $assHobby
-
+    
                             ]);
                         }
                     }
@@ -429,7 +437,7 @@ class CadetBulkEditController extends Controller
                                 'date' => Carbon::now(),
                                 'type' => 4,
                                 'remarks' => $assAim
-
+    
                             ]);
                         }
                     }
@@ -451,7 +459,7 @@ class CadetBulkEditController extends Controller
                                 'date' => Carbon::now(),
                                 'type' => 5,
                                 'remarks' => $assDream
-
+    
                             ]);
                         }
                     }
@@ -473,7 +481,7 @@ class CadetBulkEditController extends Controller
                                 'date' => Carbon::now(),
                                 'type' => 6,
                                 'remarks' => $assIdol
-
+    
                             ]);
                         }
                     }
