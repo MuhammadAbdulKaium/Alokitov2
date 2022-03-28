@@ -685,8 +685,7 @@ class SmsController extends Controller
             $smsApi = json_decode(str_replace("\\", "", $smsApi), true);
             $sender_id=$smsApiProfile->sender_id;
             //$smsApi = "https://api.mobireach.com.bd/SendTextMultiMessage?Username=raqib&Password=Abcd@1234&From=ALOKITO&To=";
-            $this->smsClass->sendMultiSms($batch_count, $smsApi['api_path'], $smsMessage,$sender_id,$instituteId);
-
+           $this->smsClass->sendMultiSms($batch_count, $smsApi['api_path'], $smsMessage,$sender_id,$instituteId);
 //            Session::flash('success', 'Successfully Send SMS');
             return "success";
 

@@ -117,11 +117,10 @@ class SendSms implements ShouldQueue
                 Log::info("Full Sms Send API" . $apiPath);
 
                 //            // call guzzle http auto request
-            $client = new Client(); //GuzzleHttp\Client
-            $result = $client->get($apiPath);
-            Log::info("==== Route".$result->getBody());
-            Log::info("==== Status Code".$result->getStatusCode());
-
+                $client = new Client(); //GuzzleHttp\Client
+                $result = $client->get($apiPath);
+//            Log::info("==== Route".$result->getBody());
+//            Log::info("==== Status Code".$result->getStatusCode());
             }
 
 //
@@ -140,57 +139,6 @@ class SendSms implements ShouldQueue
             //get smsLog list by sms_batch_it
             $singleSmsLog = SmsLog::where('sms_batch_id', $batch_count)->where('institution_id',$this->institution_id)->first();
 
-           $apiPath = $this->smsApi . "&contacts=" . $singleSmsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($singleSmsLog->singleMessage()->message);
-                Log::info("Full Sms Send API" . $apiPath);
-            // call guzzle http auto request
-            $client = new Client(); //GuzzleHttp\Client
-            $result = $client->get($apiPath);
-            Log::info("==== Route".$result->getBody());
-            Log::info("==== Status Code".$result->getStatusCode());
-
-            Log::info("This is My SMs Path");
-
-        }
-
-
-        elseif($this->smsMessage=="onlineApplicaitonSmsSend") {
-
-            Log::info("------------------ Online Application Send SMS Start----------------");
-
-            $batch_count = $this->sms_batch_id;
-            Log::info("Fees Sms Batch Id".$batch_count);
-            Log::info("Institue ID Log".$this->institution_id);
-
-            //get smsLog list by sms_batch_it
-            $singleSmsLog = SmsLog::where('sms_batch_id', $batch_count)->where('institution_id',$this->institution_id)->first();
-
-           $apiPath = $this->smsApi . "&contacts=" . $singleSmsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($singleSmsLog->singleMessage()->message);
-                Log::info("Full Sms Send API" . $apiPath);
-            // call guzzle http auto request
-            $client = new Client(); //GuzzleHttp\Client
-            $result = $client->get($apiPath);
-//            Log::info("==== Route".$result->getBody());
-//            Log::info("==== Status Code".$result->getStatusCode());
-
-            Log::info("This is My SMs Path");
-
-            Log::info("------------------ Online Application Send SMS End----------------");
-
-        }
-
-        //------------ Send HSC Online Applicaiton SMS ------------------//
-
-        elseif($this->smsMessage=="hscApplicaitonSmsSend") {
-
-            Log::info("------------------ Hsc application Send SMS Start----------------");
-
-            $batch_count = $this->sms_batch_id;
-            Log::info("Batch Id".$batch_count);
-            Log::info("Institue ID Log".$this->institution_id);
-
-            //get smsLog list by sms_batch_it
-            $singleSmsLog = SmsLog::where('sms_batch_id', $batch_count)->where('institution_id',$this->institution_id)->first();
-
             $apiPath = $this->smsApi . "&contacts=" . $singleSmsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($singleSmsLog->singleMessage()->message);
             Log::info("Full Sms Send API" . $apiPath);
             // call guzzle http auto request
@@ -198,10 +146,59 @@ class SendSms implements ShouldQueue
             $result = $client->get($apiPath);
 //            Log::info("==== Route".$result->getBody());
 //            Log::info("==== Status Code".$result->getStatusCode());
+//
+//            Log::info("This is My SMs Path");
 
-            Log::info("This is My SMs Path");
+        }
 
-            Log::info("------------------ Hsc Application Send SMS End----------------");
+
+        elseif($this->smsMessage=="onlineApplicaitonSmsSend") {
+
+//            Log::info("------------------ Online Application Send SMS Start----------------");
+
+            $batch_count = $this->sms_batch_id;
+//            Log::info("Fees Sms Batch Id".$batch_count);
+//            Log::info("Institue ID Log".$this->institution_id);
+
+            //get smsLog list by sms_batch_it
+            $singleSmsLog = SmsLog::where('sms_batch_id', $batch_count)->where('institution_id',$this->institution_id)->first();
+
+            $apiPath = $this->smsApi . "&contacts=" . $singleSmsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($singleSmsLog->singleMessage()->message);
+//                Log::info("Full Sms Send API" . $apiPath);
+            // call guzzle http auto request
+            $client = new Client(); //GuzzleHttp\Client
+            $result = $client->get($apiPath);
+//            Log::info("==== Route".$result->getBody());
+//            Log::info("==== Status Code".$result->getStatusCode());
+
+//            Log::info("This is My SMs Path");
+//            Log::info("------------------ Online Application Send SMS End----------------");
+
+        }
+
+        //------------ Send HSC Online Applicaiton SMS ------------------//
+
+        elseif($this->smsMessage=="hscApplicaitonSmsSend") {
+
+//            Log::info("------------------ Hsc application Send SMS Start----------------");
+
+            $batch_count = $this->sms_batch_id;
+//            Log::info("Batch Id".$batch_count);
+//            Log::info("Institue ID Log".$this->institution_id);
+
+            //get smsLog list by sms_batch_it
+            $singleSmsLog = SmsLog::where('sms_batch_id', $batch_count)->where('institution_id',$this->institution_id)->first();
+
+            $apiPath = $this->smsApi . "&contacts=" . $singleSmsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($singleSmsLog->singleMessage()->message);
+//            Log::info("Full Sms Send API" . $apiPath);
+            // call guzzle http auto request
+            $client = new Client(); //GuzzleHttp\Client
+            $result = $client->get($apiPath);
+//            Log::info("==== Route".$result->getBody());
+//            Log::info("==== Status Code".$result->getStatusCode());
+
+//            Log::info("This is My SMs Path");
+//            Log::info("------------------ Hsc Application Send SMS End----------------");
 
         }
 
@@ -217,7 +214,7 @@ class SendSms implements ShouldQueue
         // multipleFeesSms
 
         elseif($this->smsMessage=="multipleFeesSms") {
-            Log::info("==== Fees Multi Sms Batch==".$this->sms_batch_id);
+//            Log::info("==== Fees Multi Sms Batch==".$this->sms_batch_id);
             // get batch id
             $batch_count = $this->sms_batch_id;
 
@@ -229,13 +226,13 @@ class SendSms implements ShouldQueue
 
                 if(!empty($smsLog->user_no)){
                     $apiPath = $this->smsApi . "&contacts=" . $smsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($smsLog->singleMessage()->message);
-                    Log::info("Full Sms Send API" . $apiPath);
+//                    Log::info("Full Sms Send API" . $apiPath);
 
                     // call guzzle http auto request
                     $client = new Client(); //GuzzleHttp\Client
                     $result = $client->get($apiPath);
-                    Log::info("==== Route".$result->getBody());
-                    Log::info("==== Status Code".$result->getStatusCode());
+//                    Log::info("==== Route".$result->getBody());
+//                    Log::info("==== Status Code".$result->getStatusCode());
 
                 }
             }
@@ -243,11 +240,11 @@ class SendSms implements ShouldQueue
 
 
         elseif($this->smsMessage=="result") {
-            Log::info("result Sms Section Here");
+//            Log::info("result Sms Section Here");
 
             $batch_count = $this->sms_batch_id;
 
-            Log::info("Result Sms Log=========");
+//            Log::info("Result Sms Log=========");
 
             $smsLogList=SmsLog::where('sms_batch_id',$batch_count)->where('institution_id',$this->institution_id)->get();
 
@@ -255,7 +252,7 @@ class SendSms implements ShouldQueue
 
                 if(!empty($smsLog->user_no)){
                     $apiPath = $this->smsApi . "&contacts=" . $smsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($smsLog->singleMessage()->message);
-                    Log::info("Full Sms Send API" . $apiPath);
+//                    Log::info("Full Sms Send API" . $apiPath);
 
                     // call guzzle http auto request
 //                    $client = new Client(); //GuzzleHttp\Client
@@ -290,15 +287,15 @@ class SendSms implements ShouldQueue
 //             }
             $this->sendSmsApiCall($getNumberList,'single',$this->smsApi);
             // check batch id log
-            Log::info("Sms Message Nai".$this->sms_batch_id);
+//            Log::info("Sms Message Nai".$this->sms_batch_id);
         }
 
 
 
 
         elseif($this->smsMessage=="absentattendance") {
-            Log::info("absentattendance Sms Section Here");
-            Log::info("==== Absent Attendance Batch_id==".$this->sms_batch_id);
+//            Log::info("absentattendance Sms Section Here");
+//            Log::info("==== Absent Attendance Batch_id==".$this->sms_batch_id);
             // get batch id
             $batch_count = $this->sms_batch_id;
 
@@ -306,7 +303,7 @@ class SendSms implements ShouldQueue
 
             $institute_id=session()->get('institute');
             $smsLogList=SmsLog::where('sms_batch_id',$batch_count)->where('institution_id',$this->institution_id)->get();
-            Log::info("Test Logo Absent Logo");
+//            Log::info("Test Logo Absent Logo");
             foreach ($smsLogList as $smsLog){
 
                 if(!empty($smsLog->user_no)){
@@ -316,8 +313,8 @@ class SendSms implements ShouldQueue
                     // call guzzle http auto request
                     $client = new Client(); //GuzzleHttp\Client
                     $result = $client->get($apiPath);
-                    Log::info("==== Route".$result->getBody());
-                    Log::info("==== Status Code".$result->getStatusCode());
+//                    Log::info("==== Route".$result->getBody());
+//                    Log::info("==== Status Code".$result->getStatusCode());
 
                 }
             }
@@ -326,8 +323,8 @@ class SendSms implements ShouldQueue
 
 
         elseif($this->smsMessage=="present") {
-            Log::info("present Sms Section Here");
-            Log::info("==== present Attendance Batch_id==".$this->sms_batch_id);
+//            Log::info("present Sms Section Here");
+//            Log::info("==== present Attendance Batch_id==".$this->sms_batch_id);
             // get batch id
             $batch_count = $this->sms_batch_id;
 
@@ -339,7 +336,7 @@ class SendSms implements ShouldQueue
 
                 if(!empty($smsLog->user_no)){
                     $apiPath = $this->smsApi . "&contacts=" . $smsLog->user_no."&senderid=" .$this->smsSender_id. "&msg=" . urlencode($smsLog->singleMessage()->message);
-                    Log::info("Full Sms Send API" . $apiPath);
+//                    Log::info("Full Sms Send API" . $apiPath);
 
 //                    // call guzzle http auto request
                     $client = new Client(); //GuzzleHttp\Client
@@ -372,8 +369,8 @@ class SendSms implements ShouldQueue
                     // call guzzle http auto request
                     $client = new Client(); //GuzzleHttp\Client
                     $result = $client->get($apiPath);
-                    Log::info("==== Route".$result->getBody());
-                    Log::info("==== Status Code".$result->getStatusCode());
+//                    Log::info("==== Route".$result->getBody());
+//                    Log::info("==== Status Code".$result->getStatusCode());
 
                 }
             }
@@ -400,8 +397,8 @@ class SendSms implements ShouldQueue
                     // call guzzle http auto request
                     $client = new Client(); //GuzzleHttp\Client
                     $result = $client->get($apiPath);
-                    Log::info("==== Route".$result->getBody());
-                    Log::info("==== Status Code".$result->getStatusCode());
+//                    Log::info("==== Route".$result->getBody());
+//                    Log::info("==== Status Code".$result->getStatusCode());
 
                 }
             }
@@ -524,26 +521,55 @@ class SendSms implements ShouldQueue
     }
 
 
-    public function sendSmsApiCall($getNumberList,$smsType,$smsApi,$senderId){
-        $smsDataSet=array();
-        foreach ($getNumberList as $getNumber){
-            $smsDataSet['messageList'][]= array(
-                'message'=>$getNumber->singleMessage()->message,
-                'mobileNo'=>$getNumber->user_no
-            );
-        }
-
-        $smsDataSet['type']=$smsType;
-        $smsDataSet['smsApi']=$smsApi."&senderid=" .$this->smsSender_id;
-
-
-        Log::info("==== Json Data".json_encode($smsDataSet));
-
+//    public function sendSmsApiCall($getNumberList,$smsType,$smsApi,$senderId){
+//        $smsDataSet=array();
+//        foreach ($getNumberList as $getNumber){
+//            $smsDataSet['messageList'][]= array(
+//                'message'=>$getNumber->singleMessage()->message,
+//                'mobileNo'=>$getNumber->user_no
+//            );
+//        }
 //
-        // call guzzle http auto request
-        $client = new Client(); //GuzzleHttp\Client
-        //$result = $client->get($apiPath);
-         $result = $client->request('POST', 'http://localhost:8080/sendsms', ['json' => $smsDataSet]);
+//        $smsDataSet['type']=$smsType;
+//        $smsDataSet['smsApi']=$smsApi."&senderid=" .$this->smsSender_id;
+//
+//
+//        Log::info("==== Json Data".json_encode($smsDataSet));
+//
+////
+//        // call guzzle http auto request
+//        $client = new Client(); //GuzzleHttp\Client
+////        $result = $client->get($apiPath);
+////        $result = $client->request('POST', 'https://ems.alokitosoftware.com/sendsms', ['json' => $smsDataSet]);
+//         $result = $client->request('POST', 'http://localhost:8080/sendsms', ['json' => $smsDataSet]);
+//
+//    }
+
+
+    public function sendSmsApiCall($getNumberList,$smsType,$smsApi,$senderId){
+        foreach ($getNumberList as $getNumber){
+
+            $url = env('SMS_SERVER_URL');
+            $data = [
+                "api_key" => env('SMS_API_KEY'),
+                "type" => "text",
+                "contacts" => $getNumber->user_no,
+                "senderid" => $this->smsSender_id,
+                "msg" => $getNumber->singleMessage()->message,
+            ];
+
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            curl_close($ch);
+//
+//            Log::info("========== ".$response);
+        }
 
     }
 
