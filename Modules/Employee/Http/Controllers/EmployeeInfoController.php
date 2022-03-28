@@ -462,6 +462,8 @@ class EmployeeInfoController extends Controller
 
         $stuffs= $teachers=EmployeeInformation::where('institute_id',$instituteId)->where('campus_id',$campus_id)->where('category','0')->get();
         $i=1;
+        $data = [];
+        
         foreach ($stuffs as $stuff){
             $data[] = array(
                 'id'=>$stuff->id,
