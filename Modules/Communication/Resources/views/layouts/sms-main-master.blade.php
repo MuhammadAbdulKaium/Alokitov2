@@ -65,6 +65,41 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="exampleModalLongTitle">Important Notification</h4>
+        </div>
+        <div class="modal-body">
+            <p>
+                <div><b>As per attached (BTRC) guideline for SMS broadcast please flow the below instruction from now onward.</b></div>
+                <br><br>
+                <div>1. নিয়ম অনুযায়ী, টারগেটিং/এপিআই/নাম্বারলিস্ট এর সকল ধরণের প্রোমোশনাল/ গ্রিটিংস এসএমএস অবশ্যই বাংলায় ( ইউনিকোড) হতে হবে। 
+                    শুধুমাত্র মেশিন জেনারেটেড এসএমএস / নোটিফিকেশন ( উদাহরণঃ এটিএম কার্ড OTP ) ,ছাড়া সব ধরণের এসএমএস অবশ্যই বাংলা ( ইউনিকোড)
+                     ব্যবহার করতে আহবান এবং সতর্ক করা হচ্ছে। অন্যথায় একাউন্ট স্থগিত হবে এবং ইউজার/গ্রাহক/ক্লায়েন্ট এর দায়ভার বহন করবেন। ধন্যবাদ।</div>
+                <br>
+                <div>Dear User/Client, Greetings! As per regulations, all kinds of promotional/greetings SMS have to be in Bangla (Unicode) for
+                     both Campaign and API. Except Only machine-generated SMS/notification (example: ATM card OTP etc.), all other SMS content 
+                     must be in Bangla and all are requested to strictly follow this regulation. Otherwise, the SMS account will be blocked and 
+                     the User/Client will bear the responsibility or any damage caused due to violation of this regulation. Thanks.</div>
+                <br>
+                <div>2. Content must have to vet from BTRC before broadcast and Share the vetting content to MNO's.</div>
+                <br>
+                <div>Please take immediate action and comply with BTRC guideline.</div>
+                <br><br>
+                <div class="text-warning"><a href="https://bangladeshsms.com/assets/BTRC_Letter_Regarding_SMS.pdf" target="_blank">
+                    From_BTRC_Regarding_Circulation_of_SMS_in_Bengali_language.pdf</a></div>
+                <br>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Agree</button>
+        </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -77,6 +112,9 @@
                 $(this).remove();
             });
         });
+
+        console.log("HEllo");
+        $('#exampleModalLong').modal('show');
 
             @yield('page-script')
     });
