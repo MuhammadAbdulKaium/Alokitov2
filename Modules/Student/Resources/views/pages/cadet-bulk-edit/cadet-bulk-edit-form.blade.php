@@ -366,7 +366,7 @@
                                                         class="form-control input">
 
                                                 </td>
-                                                @if (Auth::user()->role()->name == 'super-admin')
+                                                @if ($authRole == 'super-admin' || $authRole == 'admin')
                                                     <td>
                                                         <select name="admissionYear[{{ $studentInfo->std_id }}]"
                                                             id="" class="form-control input">
@@ -945,7 +945,7 @@
                                                                 class="form-control input">
                                                         </td>
                                                     @endif
-                                                    @if (Auth::user()->role()->name == 'super-admin')
+                                                    @if ($authRole == 'super-admin' || $authRole == 'admin')
                                                         @if ($form == 'admissionYear')
                                                             <td>
 

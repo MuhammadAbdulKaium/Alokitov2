@@ -58,7 +58,7 @@ class CadetBulkEditController extends Controller
     public function searchGenarateForm(Request $request)
     {
         // return $request->all();
-
+        $authRole = Auth::user()->role()->name;
         $selectForms = $request->selectForm;
         $countries = Country::all();
         $academicAdmissionYear = AcademicsAdmissionYear::where([
@@ -453,7 +453,7 @@ class CadetBulkEditController extends Controller
         }
       
         // return $studentInfos;
-        return view("student::pages.cadet-bulk-edit.cadet-bulk-edit-form", compact('batches', 'academicAdmissionYear', 'academicYears', 'sections', 'levels', 'studentInfos', 'selectForms', 'countries'));
+        return view("student::pages.cadet-bulk-edit.cadet-bulk-edit-form", compact('authRole', 'batches', 'academicAdmissionYear', 'academicYears', 'sections', 'levels', 'studentInfos', 'selectForms', 'countries'));
     }
     public function bulkEditSaveData(Request $request)
     {
