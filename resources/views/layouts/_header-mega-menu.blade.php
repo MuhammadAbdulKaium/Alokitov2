@@ -167,7 +167,7 @@ background:#0b460b !important;
                                     <li><a href="{{url('/employee/manage/teacher')}}"><i class="fa fa-users"></i> Manage Teacher</a></li>
                                  </ul>
                               </li>
-                              <li><a href="#"><i class="fa fa-user"></i> Employee Management<span class="caret"></span></a>
+                              <li><a href="#"><i class="fa fa-user"></i> Employee Register<span class="caret"></span></a>
                                  <ul class="dropdown-menus">
                                     <li><a href="/employee/departments"><i class="fa fa-sitemap"></i> Department</a></li>
                                     <li><a href="/employee/designations"><i class="fa fa-signal"></i> Designation</a></li>
@@ -255,7 +255,9 @@ background:#0b460b !important;
                               <li>
                                  <a href="/website/committee"> Committee</a>
                               </li>
-
+                              <li>
+                                 <a href="/website/success"> Achievement and Success</a>
+                              </li>
                               <li>
                                  <a href="/website/committee/speech"> Speech</a>
                               </li>
@@ -344,7 +346,7 @@ background:#0b460b !important;
                         <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a>
                            <ul class="dropdown-menus">
                               <li><a href="/student/profile/create"><i class="fa fa-user-plus"></i> Student Enrollment</a></li>
-                              <li><a href="/student/manage"><i class="fa fa-reorder"></i> Manage Student</a></li>
+                              <li><a href="/student/manage"><i class="fa fa-reorder"></i>Student Register</a></li>
                               <li><a href="/student/cadet/bulk/edit"><i class="fa fa-reorder"></i> Student Profile Edit</a></li>
                               <li><a href="/student/cadet-performance-bulk"><i class="fa fa-reorder"></i> Factor Entries</a></li>
                               <li><a href="/student/manage/status"><i class="fa fa-reorder"></i> Deactive Student</a></li>

@@ -148,111 +148,42 @@
             });
 
             function searchEmployee() {
-                var selectForm = $('.select-form').val();
+               
+                $_token = "{{ csrf_token() }}";
+                $.ajax({
+                    headers: {
+                        'X-CSRF-Token': $('meta[name=_token]').attr('content')
+                    },
+                    url: "{{ url('/employee/bulk-edit/search') }}",
+                    type: 'GET',
+                    cache: false,
+                    data: $('form#std_manage_search_form').serialize(),
+                    datatype: 'application/json',
 
+                    beforeSend: function() {
+                        // show waiting dialog
+                        waitingDialog.show('Loading...');
+                    },
 
-                var selectCategory = $('.select-category').val();
-                if ($("#showNull").is(":checked")) {
-                    var newSelectForm = [];
-                    selectForm?.map(element => {
-                        if (element == "department") {
+                    success: function(data) {
+                        console.log(data);
+                        waitingDialog.hide();
+                        var std_list_container_row = $('#std_list_container_row');
+                        std_list_container_row.html('');
+                        std_list_container_row.append(data);
 
-                            newSelectForm.push(element);
-                        }
-                        if (element == "designation") {
-                            newSelectForm.push(element);
-                        }
-                    });
-                    if (!newSelectForm.length > 0) {
-                        Swal.fire('Error!', 'Select department or designation Multiple Field!', 'error');
-                    } else {
-                        $_token = "{{ csrf_token() }}";
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-Token': $('meta[name=_token]').attr('content')
-                            },
-                            url: "{{ url('/employee/bulk-edit/search') }}",
-                            type: 'GET',
-                            cache: false,
-                            data: $('form#std_manage_search_form').serialize(),
-                            datatype: 'application/json',
+                    },
 
-                            beforeSend: function() {
-                                // show waiting dialog
-                                // waitingDialog.show('Loading...');
-                            },
+                    error: function(data) {
+                        // hide waiting dialog
+                        waitingDialog.hide();
 
-                            success: function(data) {
-                                console.log(data);
-                                waitingDialog.hide();
-                                var std_list_container_row = $('#std_list_container_row');
-                                std_list_container_row.html('');
-                                std_list_container_row.append(data);
-
-                            },
-
-                            error: function(data) {
-                                // hide waiting dialog
-                                waitingDialog.hide();
-
-                                alert(JSON.stringify(data));
-                            }
-                        });
+                        alert(JSON.stringify(data));
                     }
-                } else {
-
-                    $_token = "{{ csrf_token() }}";
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-Token': $('meta[name=_token]').attr('content')
-                        },
-                        url: "{{ url('/employee/bulk-edit/search') }}",
-                        type: 'GET',
-                        cache: false,
-                        data: $('form#std_manage_search_form').serialize(),
-                        datatype: 'application/json',
-
-                        beforeSend: function() {
-                            // show waiting dialog
-                            waitingDialog.show('Loading...');
-                        },
-
-                        success: function(data) {
-                            console.log(data);
-                            waitingDialog.hide();
-                            var std_list_container_row = $('#std_list_container_row');
-                            std_list_container_row.html('');
-                            std_list_container_row.append(data);
-
-                        },
-
-                        error: function(data) {
-                            // hide waiting dialog
-                            waitingDialog.hide();
-
-                            alert(JSON.stringify(data));
-                        }
-                    });
-                }
-
-
+                });
             }
-            $('.select-category').change(function() {
-                if ($("#showNull").is(":checked")) {
-                    $("#showNull").attr('checked', false);
-                }
-            });
-            $("#showNull").click(function() {
-                if ($("#showNull").is(":checked")) {
-                    $('.select-class').attr("disabled", true);
-                    $('#selectSection').attr("disabled", true);
-                    $('.select-category').attr("disabled", true);
-                } else {
-                    $('.select-class').attr("disabled", false);
-                    $('#selectSection').attr("disabled", false);
-                    $('.select-category').attr("disabled", false);
-                }
-            })
+           
+           
             $('.search-btn').click(function() {
                 $('.select-type').val('search');
                 searchEmployee();

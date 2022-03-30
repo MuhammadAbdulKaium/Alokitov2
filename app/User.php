@@ -49,6 +49,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Models\Role')->first();
     }
+    public function singleroleUser(){
+        return $this->hasOne(RoleUser::class);
+    }
 
     // user permissions
     public function permissions() {

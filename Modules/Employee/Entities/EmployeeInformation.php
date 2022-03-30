@@ -156,11 +156,17 @@ class  EmployeeInformation extends Model
             return false;
         }
     }
+    public function singleDepartment(){
+        return $this->belongsTo('Modules\Employee\Entities\EmployeeDepartment', 'department', 'id');
+    }
 
     // return designatio list
     public function designations()
     {
         return $this->hasMany('Modules\Employee\Entities\EmployeeDesignation', 'dept_id', 'department')->get();
+    }
+    public function singleDesignation(){
+        return $this->belongsTo('Modules\Employee\Entities\EmployeeDesignation', 'designation', 'id');
     }
 
     // employee gender

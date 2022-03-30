@@ -101,7 +101,9 @@
                                                         <option value="">__Select Role__</option>
                                                         @foreach ($allRole as $role)
                                                             <option value="{{ $role->id }}"
-                                                                @if ($employee->user()->roles()->count() > 0) {{ $employee->user()->roles()->first()->id == $role->id? 'selected': '' }} @endif>
+                                                                @if ($employee->singleUser->singleroleUser) @if ($employee->singleUser->singleroleUser->singleRole)
+                                                                {{$employee->singleUser->singleroleUser->singleRole->id == $role->id ? 'selected' : '' }} @endif
+                                                                @endif>
                                                                 {{ $role->display_name }}</option>
                                                         @endforeach
                                                     </select>
@@ -183,10 +185,10 @@
                                                     <select name="department[{{ $employee->id }}]"
                                                         class="form-control search-select2 input">>
 
-                                                        <option value="0">__Select Department__</option>
+                                                        <option value="">__Select Department__</option>
                                                         @foreach ($allDepartment as $department)
                                                             <option
-                                                                @if ($employee->department()) {{ $employee->department()->id == $department->id ? 'selected' : '' }} @endif
+                                                                @if ($employee->singleDepartment) {{$employee->singleDepartment->id == $department->id ? 'selected' : '' }} @endif
                                                                 value="{{ $department->id }}">
                                                                 {{ $department->name }}
                                                             </option>
@@ -197,10 +199,10 @@
                                                     <select name="designation[{{ $employee->id }}]"
                                                         class="form-control search-select2 input">>
 
-                                                        <option value="0">__Select Designation __</option>
+                                                        <option value="">__Select Designation __</option>
                                                         @foreach ($allDesignation as $designation)
                                                             <option
-                                                                @if ($employee->designation()) {{ $employee->designation()->id == $designation->id ? 'selected' : '' }} @endif
+                                                                @if ($employee->singleDesignation) {{ $employee->singleDesignation->id == $designation->id ? 'selected' : '' }} @endif
                                                                 value="{{ $designation->id }}">
                                                                 {{ $designation->name }}</option>
                                                         @endforeach
@@ -209,11 +211,11 @@
                                                 <td class="">
                                                     <select name="category[{{ $employee->id }}]"
                                                         class="form-control input">>
-                                                        <option value="2">--Select Category--</option>
-                                                        <option {{ $employee->category == 1 ? 'selected' : '' }}
+                                                        <option value="">--Select Category--</option>
+                                                        <option {{ $employee->category === 1 ? 'selected' : '' }}
                                                             value="1">
                                                             Teaching</option>
-                                                        <option {{ $employee->category == 0 ? 'selected' : '' }}
+                                                        <option {{ $employee->category === 0 ? 'selected' : '' }}
                                                             value="0">
                                                             Non Teaching</option>
                                                     </select>
@@ -262,7 +264,7 @@
                                                     <select name="religion[{{ $employee->id }}]" id=""
                                                         class="form-control input">
 
-                                                        <option value="0">--Select Religion--</option>
+                                                        <option value="">--Select Religion--</option>
                                                         @foreach ($religions as $key => $value)
                                                             <option
                                                                 {{ $employee->religion == $key + 1 ? 'selected' : '' }}
@@ -302,13 +304,14 @@
                                                 </td>
 
                                                 <td class="">
+                                                   
                                                     <select id="experience_year" class="form-control input"
                                                         name="experience_year[{{ $employee->id }}]">
 
                                                         <option value="">--- Select E.Y ---</option>
                                                         @for ($i = 0; $i <= 40; $i++)
                                                             <option
-                                                                {{ $employee->experience_year == $i ? 'selected' : '' }}
+                                                                {{ $employee->experience_year === $i ? 'selected' : '' }}
                                                                 value="{{ $i }}">{{ $i }}
                                                             </option>
                                                         @endfor
@@ -323,7 +326,7 @@
                                                         <option value="">--- Select E.M ---</option>
                                                         @for ($i = 0; $i <= 11; $i++)
                                                             <option
-                                                                {{ $employee->experience_month == $i ? 'selected' : '' }}
+                                                                {{ $employee->experience_month === $i ? 'selected' : '' }}
                                                                 value="{{ $i }}">{{ $i }}
                                                             </option>
                                                         @endfor
@@ -505,9 +508,12 @@
                                                         <td>
                                                             <select name="role[{{ $employee->id }}]" id=""
                                                                 class="form-control input">
+                                                                <option value="">__Select Role__</option>
                                                                 @foreach ($allRole as $role)
                                                                     <option value="{{ $role->id }}"
-                                                                        @if ($employee->user()->roles()->count() > 0) {{ $employee->user()->roles()->first()->id == $role->id? 'selected': '' }} @endif>
+                                                                        @if ($employee->singleUser->singleroleUser) @if ($employee->singleUser->singleroleUser->singleRole)
+                                                                        {{$employee->singleUser->singleroleUser->singleRole->id == $role->id ? 'selected' : '' }} @endif
+                                                                        @endif>
                                                                         {{ $role->display_name }}</option>
                                                                 @endforeach
                                                             </select>
@@ -606,11 +612,11 @@
                                                         <td class="">
                                                             <select name="department[{{ $employee->id }}]"
                                                                 class="form-control search-select2 input">>
-
+        
                                                                 <option value="0">__Select Department__</option>
                                                                 @foreach ($allDepartment as $department)
                                                                     <option
-                                                                        @if ($employee->department()) {{ $employee->department()->id == $department->id ? 'selected' : '' }} @endif
+                                                                        @if ($employee->singleDepartment) {{$employee->singleDepartment->id == $department->id ? 'selected' : '' }} @endif
                                                                         value="{{ $department->id }}">
                                                                         {{ $department->name }}
                                                                     </option>
@@ -622,11 +628,11 @@
                                                         <td class="">
                                                             <select name="designation[{{ $employee->id }}]"
                                                                 class="form-control search-select2 input">>
-
+        
                                                                 <option value="0">__Select Designation __</option>
                                                                 @foreach ($allDesignation as $designation)
                                                                     <option
-                                                                        @if ($employee->designation()) {{ $employee->designation()->id == $designation->id ? 'selected' : '' }} @endif
+                                                                        @if ($employee->singleDesignation) {{ $employee->singleDesignation->id == $designation->id ? 'selected' : '' }} @endif
                                                                         value="{{ $designation->id }}">
                                                                         {{ $designation->name }}</option>
                                                                 @endforeach
@@ -637,12 +643,12 @@
                                                         <td class="">
                                                             <select name="category[{{ $employee->id }}]"
                                                                 class="form-control input">>
-                                                                <option value="2">--Select Category--</option>
+                                                                <option value=" ">--Select Category--</option>
                                                                 <option
-                                                                    {{ $employee->category == 1 ? 'selected' : '' }}
+                                                                    {{ $employee->category === 1 ? 'selected' : '' }}
                                                                     value="1">Teaching</option>
                                                                 <option
-                                                                    {{ $employee->category == 0 ? 'selected' : '' }}
+                                                                    {{ $employee->category === 0 ? 'selected' : '' }}
                                                                     value="0">Non Teaching</option>
                                                             </select>
                                                         </td>
@@ -702,7 +708,7 @@
                                                             <select name="religion[{{ $employee->id }}]" id=""
                                                                 class="form-control input">
 
-                                                                <option value="0">--Select Religion--</option>
+                                                                <option value="">--Select Religion--</option>
                                                                 @foreach ($religions as $key => $value)
                                                                     <option
                                                                         {{ $employee->religion == $key + 1 ? 'selected' : '' }}
@@ -748,13 +754,14 @@
                                                     @endif
                                                     @if ($form == 'experience_year')
                                                         <td class="">
+                                                           
                                                             <select id="experience_year" class="form-control input"
                                                                 name="experience_year[{{ $employee->id }}]">
 
                                                                 <option value="">--- Select E.Y ---</option>
                                                                 @for ($i = 0; $i <= 40; $i++)
                                                                     <option
-                                                                        {{ $employee->experience_year == $i ? 'selected' : '' }}
+                                                                        {{ $employee->experience_year === $i ? 'selected' : ' ' }}
                                                                         value="{{ $i }}">
                                                                         {{ $i }}</option>
                                                                 @endfor
@@ -768,9 +775,9 @@
 
 
                                                                 <option value="">--- Select E.M ---</option>
-                                                                @for ($i = 0; $i <= 40; $i++)
+                                                                @for ($i = 0; $i <= 11; $i++)
                                                                     <option
-                                                                        {{ $employee->experience_month == $i ? 'selected' : '' }}
+                                                                        {{ $employee->experience_month === $i ? 'selected' : '' }}
                                                                         value="{{ $i }}">
                                                                         {{ $i }}</option>
                                                                 @endfor

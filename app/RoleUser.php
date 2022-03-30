@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Model;
 
 class RoleUser extends Model
@@ -16,5 +17,8 @@ class RoleUser extends Model
     {
         // getting user info
         return $this->belongsTo('App\User', 'user_id', 'id')->first();
+    }
+    public function singleRole(){
+        return $this->hasOne(Role::class,'id','role_id');
     }
 }
