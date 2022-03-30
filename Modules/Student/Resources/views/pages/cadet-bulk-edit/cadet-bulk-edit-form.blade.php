@@ -20,63 +20,62 @@
             <div id="w1" class="grid-view">
                 <h5><i class="fa fa-search"></i> Total Search Result({{ $studentInfos ? count($studentInfos) : 0 }})
                 </h5>
-               
-                    <form id="std_cadet_bulk_edit" method="POST" action="{{ url('/student/cadet/bulk/edit/save') }}">
-                        <div class="text-right">
-                            <button type="submit" class="btn btn-info   mb-4"><i
-                                    class="fa fa-upload"></i>Submit</button>
-                        </div>
-                        <div class="table-responsive">
-                            @csrf
-                            <table id="myTable" class="table table-striped table-bordered display">
-                                @if (!$selectForms)
 
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Si</th>
-                                            <th class="text-start">
-                                                <input type="checkbox" name="" id="allCheckbox"> <label
-                                                    for="allCheckbox">All Mark</label>
-                                            </th>
-                                            <th>Student Number</th>
-                                            <th class="text-center">First Name</th>
-                                            <th class="text-center">Last Name</th>
-                                            <th class="text-center">Nick Name</th>
-                                            <th class="text-center">Bengali Name</th>
-                                            <th class="text-center">Gender</th>
-                                            <th class="text-center">Date of Birth</th>
-                                            <th class="text-center">Birth Place</th>
-                                            <th class="text-center"> Religion </th>
-                                            <th class="text-center">Blood Group</th>
-                                            <th class="text-center">Merit Position</th>
-                                            <th class="text-center">Present Address</th>
-                                            <th class="text-center">Permanent Address</th>
-                                            <th class="text-center">Nationality</th>
-                                            <th class="text-center">Language</th>
-                                            <th class="text-center">Identification Marks</th>
-                                            <th class="text-center">Hobby</th>
-                                            <th class="text-center">Aim</th>
-                                            <th class="text-center">Dream</th>
-                                            <th class="text-center">Idol</th>
-                                            {{-- <th class="text-center">Tution Fees</th> --}}
-                                            <th class="text-center">Father's Name</th>
-                                            <th class="text-center">Father's Occupation </th>
-                                            <th class="text-center">Father's Contact</th>
-                                            <th class="text-center">Father's Email</th>
-                                            <th class="text-center">Mother's Name</th>
-                                            <th class="text-center">Mother's Occupation </th>
-                                            <th class="text-center">Mother's Contact</th>
-                                            <th class="text-center">Mother's Email</th>
-                                            <th class="text-center">Admission Year</th>
-                                            <th class="text-center">Academic Year</th>
-                                            <th class="text-center">Academic Level</th>
-                                            <th class="text-center">Batch</th>
-                                            <th class="text-center">Section</th>
-                                        </tr>
+                <form id="std_cadet_bulk_edit" method="POST" action="{{ url('/student/cadet/bulk/edit/save') }}">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-info   mb-4"><i class="fa fa-upload"></i>Submit</button>
+                    </div>
+                    <div class="table-responsive">
+                        @csrf
+                        <table id="myTable" class="table table-striped table-bordered display">
+                            @if (!$selectForms)
 
-                                    </thead>
-                                    @if (count($studentInfos) > 0)
-                                        
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Si</th>
+                                        <th class="text-start">
+                                            <input type="checkbox" name="" id="allCheckbox"> <label
+                                                for="allCheckbox">All Mark</label>
+                                        </th>
+                                        <th>Student Number</th>
+                                        <th class="text-center">First Name</th>
+                                        <th class="text-center">Last Name</th>
+                                        <th class="text-center">Middle Name</th>
+                                        <th class="text-center">Bengali Name</th>
+                                        <th class="text-center">Gender</th>
+                                        <th class="text-center">Date of Birth</th>
+                                        <th class="text-center">Birth Place</th>
+                                        <th class="text-center"> Religion </th>
+                                        <th class="text-center">Blood Group</th>
+                                        <th class="text-center">Merit Position</th>
+                                        <th class="text-center">Present Address</th>
+                                        <th class="text-center">Permanent Address</th>
+                                        <th class="text-center">Nationality</th>
+                                        <th class="text-center">Language</th>
+                                        <th class="text-center">Identification Marks</th>
+                                        <th class="text-center">Hobby</th>
+                                        <th class="text-center">Aim</th>
+                                        <th class="text-center">Dream</th>
+                                        <th class="text-center">Idol</th>
+                                        {{-- <th class="text-center">Tution Fees</th> --}}
+                                        <th class="text-center">Father's Name</th>
+                                        <th class="text-center">Father's Occupation </th>
+                                        <th class="text-center">Father's Contact</th>
+                                        <th class="text-center">Father's Email</th>
+                                        <th class="text-center">Mother's Name</th>
+                                        <th class="text-center">Mother's Occupation </th>
+                                        <th class="text-center">Mother's Contact</th>
+                                        <th class="text-center">Mother's Email</th>
+                                        <th class="text-center">Admission Year</th>
+                                        <th class="text-center">Academic Year</th>
+                                        <th class="text-center">Academic Level</th>
+                                        <th class="text-center">Batch</th>
+                                        <th class="text-center">Section</th>
+                                    </tr>
+
+                                </thead>
+                                @if (count($studentInfos) > 0)
+
                                     <tbody>
                                         @foreach ($studentInfos as $key => $studentInfo)
                                             <tr>
@@ -298,23 +297,25 @@
                                                     $motherContact = '';
                                                     $motherEmail = '';
                                                 @endphp
-                                                @if ($studentInfo->singleStudent->myGuardians())
-                                                    @foreach ($studentInfo->singleStudent->myGuardians() as $parent)
-                                                        @if ($parent->guardian()->type == 1)
-                                                            @php
-                                                                $fatherName = $parent->guardian()->first_name;
-                                                                $fatcherOCCPation = $parent->guardian()->occupation;
-                                                                $fatherContact = $parent->guardian()->mobile;
-                                                                $fatherEmail = $parent->guardian()->email;
-                                                            @endphp
-                                                        @endif
-                                                        @if ($parent->guardian()->type == 0)
-                                                            @php
-                                                                $motherName = $parent->guardian()->first_name;
-                                                                $motherOccpation = $parent->guardian()->occupation;
-                                                                $motherContact = $parent->guardian()->mobile;
-                                                                $motherEmail = $parent->guardian()->email;
-                                                            @endphp
+                                                @if ($studentInfo->singleStudent->singleParent)
+                                                    @foreach ($studentInfo->singleStudent->singleParent as $parent)
+                                                        @if($parent->singleGuardian)
+                                                            @if ($parent->singleGuardian->type == 1)
+                                                                @php
+                                                                    $fatherName = $parent->singleGuardian->first_name;
+                                                                    $fatcherOCCPation = $parent->singleGuardian->occupation;
+                                                                    $fatherContact = $parent->singleGuardian->mobile;
+                                                                    $fatherEmail = $parent->singleGuardian->email;
+                                                                @endphp
+                                                            @endif
+                                                            @if ($parent->singleGuardian->type == 0)
+                                                                @php
+                                                                    $motherName = $parent->singleGuardian->first_name;
+                                                                    $motherOccpation = $parent->singleGuardian->occupation;
+                                                                    $motherContact = $parent->singleGuardian->mobile;
+                                                                    $motherEmail = $parent->singleGuardian->email;
+                                                                @endphp
+                                                            @endif
                                                         @endif
                                                     @endforeach
                                                 @endif
@@ -471,130 +472,130 @@
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    @else
+                                @else
                                     <tbody class="row_position">
                                         <tr>
                                             <td colspan="500" class="text-center">Data Not Found</td>
                                         </tr>
                                     </tbody>
-                                    @endif
-                                @else
-                                    <thead>
-                                        <tr>
-                                            <th class="">Si</th>
-                                            <th class="text-start">
-                                                <input type="checkbox" name="" id="allCheckbox">
-                                                <label for="allCheckbox">All Mark</label>
-                                            </th>
-                                            @foreach ($selectForms as $form)
-                                                @if ($form == 'CadetNumber')
-                                                    <th>Student Number</th>
-                                                @endif
-                                                @if ($form == 'admissionYear')
-                                                    <th>Admission Year</th>
-                                                @endif
-                                                @if ($form == 'academicYear')
-                                                    <th>Academic Year</th>
-                                                @endif
-                                                @if ($form == 'academicLevel')
-                                                    <th>Academic Level</th>
-                                                @endif
-                                                @if ($form == 'batch')
-                                                    <th>Batch</th>
-                                                @endif
-                                                @if ($form == 'section')
-                                                    <th>Section</th>
-                                                @endif
-                                                @if ($form == 'FirstName')
-                                                    <th>First Name</th>
-                                                @endif
-                                                @if ($form == 'LastName')
-                                                    <th>Last Name</th>
-                                                @endif
-                                                @if ($form == 'NickName')
-                                                    <th>Nick Name</th>
-                                                @endif
-                                                @if ($form == 'BengaliName')
-                                                    <th>Bengali Name</th>
-                                                @endif
-                                                @if ($form == 'Gender')
-                                                    <th>Gender</th>
-                                                @endif
-                                                @if ($form == 'DateofBirth')
-                                                    <th>Date of Birth</th>
-                                                @endif
-                                                @if ($form == 'BirthPlace')
-                                                    <th>Birth Place</th>
-                                                @endif
-                                                @if ($form == 'Religion')
-                                                    <th> Religion </th>
-                                                @endif
-                                                @if ($form == 'BloodGroup')
-                                                    <th>Blood Group</th>
-                                                @endif
-                                                @if ($form == 'MeritPosition')
-                                                    <th>Merit Position</th>
-                                                @endif
-                                                @if ($form == 'PresentAddress')
-                                                    <th>Present Address</th>
-                                                @endif
-                                                @if ($form == 'PermanentAddress')
-                                                    <th>Permanent Address</th>
-                                                @endif
-                                                @if ($form == 'Nationality')
-                                                    <th>Nationality</th>
-                                                @endif
-                                                @if ($form == 'Language')
-                                                    <th>Language</th>
-                                                @endif
-                                                @if ($form == 'IdentificationMarks')
-                                                    <th>Identification Marks</th>
-                                                @endif
-                                                @if ($form == 'Hobby')
-                                                    <th>Hobby</th>
-                                                @endif
-                                                @if ($form == 'Aim')
-                                                    <th>Aim</th>
-                                                @endif
-                                                @if ($form == 'Dream')
-                                                    <th>Dream</th>
-                                                @endif
-                                                @if ($form == 'Idol')
-                                                    <th>Idol</th>
-                                                @endif
-                                                {{-- @if ($form == 'TutionFees')
+                                @endif
+                            @else
+                                <thead>
+                                    <tr>
+                                        <th class="">Si</th>
+                                        <th class="text-start">
+                                            <input type="checkbox" name="" id="allCheckbox">
+                                            <label for="allCheckbox">All Mark</label>
+                                        </th>
+                                        @foreach ($selectForms as $form)
+                                            @if ($form == 'CadetNumber')
+                                                <th>Student Number</th>
+                                            @endif
+                                            @if ($form == 'admissionYear')
+                                                <th>Admission Year</th>
+                                            @endif
+                                            @if ($form == 'academicYear')
+                                                <th>Academic Year</th>
+                                            @endif
+                                            @if ($form == 'academicLevel')
+                                                <th>Academic Level</th>
+                                            @endif
+                                            @if ($form == 'batch')
+                                                <th>Batch</th>
+                                            @endif
+                                            @if ($form == 'section')
+                                                <th>Section</th>
+                                            @endif
+                                            @if ($form == 'FirstName')
+                                                <th>First Name</th>
+                                            @endif
+                                            @if ($form == 'LastName')
+                                                <th>Last Name</th>
+                                            @endif
+                                            @if ($form == 'NickName')
+                                                <th>Middle Name</th>
+                                            @endif
+                                            @if ($form == 'BengaliName')
+                                                <th>Bengali Name</th>
+                                            @endif
+                                            @if ($form == 'Gender')
+                                                <th>Gender</th>
+                                            @endif
+                                            @if ($form == 'DateofBirth')
+                                                <th>Date of Birth</th>
+                                            @endif
+                                            @if ($form == 'BirthPlace')
+                                                <th>Birth Place</th>
+                                            @endif
+                                            @if ($form == 'Religion')
+                                                <th> Religion </th>
+                                            @endif
+                                            @if ($form == 'BloodGroup')
+                                                <th>Blood Group</th>
+                                            @endif
+                                            @if ($form == 'MeritPosition')
+                                                <th>Merit Position</th>
+                                            @endif
+                                            @if ($form == 'PresentAddress')
+                                                <th>Present Address</th>
+                                            @endif
+                                            @if ($form == 'PermanentAddress')
+                                                <th>Permanent Address</th>
+                                            @endif
+                                            @if ($form == 'Nationality')
+                                                <th>Nationality</th>
+                                            @endif
+                                            @if ($form == 'Language')
+                                                <th>Language</th>
+                                            @endif
+                                            @if ($form == 'IdentificationMarks')
+                                                <th>Identification Marks</th>
+                                            @endif
+                                            @if ($form == 'Hobby')
+                                                <th>Hobby</th>
+                                            @endif
+                                            @if ($form == 'Aim')
+                                                <th>Aim</th>
+                                            @endif
+                                            @if ($form == 'Dream')
+                                                <th>Dream</th>
+                                            @endif
+                                            @if ($form == 'Idol')
+                                                <th>Idol</th>
+                                            @endif
+                                            {{-- @if ($form == 'TutionFees')
                                                     <th>Tution Fees</th>
                                                 @endif --}}
-                                                @if ($form == 'FatherName')
-                                                    <th>Father's Name</th>
-                                                @endif
-                                                @if ($form == 'FatherOccupation')
-                                                    <th>Father's Occupation </th>
-                                                @endif
-                                                @if ($form == 'FatherContact')
-                                                    <th>Father's Contact</th>
-                                                @endif
-                                                @if ($form == 'FatherEmail')
-                                                    <th>Father's Email</th>
-                                                @endif
-                                                @if ($form == 'MotherName')
-                                                    <th>Mother's Name</th>
-                                                @endif
-                                                @if ($form == 'MotherOccupation')
-                                                    <th>Mother's Occupation </th>
-                                                @endif
-                                                @if ($form == 'MotherContact')
-                                                    <th>Mother's Contact</th>
-                                                @endif
-                                                @if ($form == 'MotherEmail')
-                                                    <th>Mother's Email</th>
-                                                @endif
-                                            @endforeach
-                                        </tr>
+                                            @if ($form == 'FatherName')
+                                                <th>Father's Name</th>
+                                            @endif
+                                            @if ($form == 'FatherOccupation')
+                                                <th>Father's Occupation </th>
+                                            @endif
+                                            @if ($form == 'FatherContact')
+                                                <th>Father's Contact</th>
+                                            @endif
+                                            @if ($form == 'FatherEmail')
+                                                <th>Father's Email</th>
+                                            @endif
+                                            @if ($form == 'MotherName')
+                                                <th>Mother's Name</th>
+                                            @endif
+                                            @if ($form == 'MotherOccupation')
+                                                <th>Mother's Occupation </th>
+                                            @endif
+                                            @if ($form == 'MotherContact')
+                                                <th>Mother's Contact</th>
+                                            @endif
+                                            @if ($form == 'MotherEmail')
+                                                <th>Mother's Email</th>
+                                            @endif
+                                        @endforeach
+                                    </tr>
 
-                                    </thead>
-                                    @if (count($studentInfos) > 0)
-                                        
+                                </thead>
+                                @if (count($studentInfos) > 0)
+
                                     <tbody>
                                         @foreach ($studentInfos as $key => $studentInfo)
                                             <tr>
@@ -713,7 +714,7 @@
 
                                                             <input type="number" value="{{ $studentInfo->gr_no }}"
                                                                 name="gr_no[{{ $studentInfo->std_id }}]"
-                                                                class="input">
+                                                                class="input form-control">
                                                         </td>
                                                     @endif
                                                     @php
@@ -861,26 +862,28 @@
                                                         $motherContact = '';
                                                         $motherEmail = '';
                                                     @endphp
-                                                    @if ($studentInfo->singleStudent->myGuardians())
-                                                        @foreach ($studentInfo->singleStudent->myGuardians() as $parent)
-                                                            @if ($parent->guardian()->type == 1)
-                                                                @php
-                                                                    $fatherName = $parent->guardian()->first_name;
-                                                                    $fatcherOCCPation = $parent->guardian()->occupation;
-                                                                    $fatherContact = $parent->guardian()->mobile;
-                                                                    $fatherEmail = $parent->guardian()->email;
-                                                                @endphp
-                                                            @endif
-                                                            @if ($parent->guardian()->type == 0)
-                                                                @php
-                                                                    $motherName = $parent->guardian()->first_name;
-                                                                    $motherOccpation = $parent->guardian()->occupation;
-                                                                    $motherContact = $parent->guardian()->mobile;
-                                                                    $motherEmail = $parent->guardian()->email;
-                                                                @endphp
-                                                            @endif
-                                                        @endforeach
-                                                    @endif
+                                                     @if ($studentInfo->singleStudent->singleParent)
+                                                     @foreach ($studentInfo->singleStudent->singleParent as $parent)
+                                                         @if($parent->singleGuardian)
+                                                             @if ($parent->singleGuardian->type == 1)
+                                                                 @php
+                                                                     $fatherName = $parent->singleGuardian->first_name;
+                                                                     $fatcherOCCPation = $parent->singleGuardian->occupation;
+                                                                     $fatherContact = $parent->singleGuardian->mobile;
+                                                                     $fatherEmail = $parent->singleGuardian->email;
+                                                                 @endphp
+                                                             @endif
+                                                             @if ($parent->singleGuardian->type == 0)
+                                                                 @php
+                                                                     $motherName = $parent->singleGuardian->first_name;
+                                                                     $motherOccpation = $parent->singleGuardian->occupation;
+                                                                     $motherContact = $parent->singleGuardian->mobile;
+                                                                     $motherEmail = $parent->singleGuardian->email;
+                                                                 @endphp
+                                                             @endif
+                                                         @endif
+                                                     @endforeach
+                                                 @endif
                                                     @if ($form == 'FatherName')
                                                         <td class="">
                                                             <input name="fathername[{{ $studentInfo->std_id }}]"
@@ -1072,25 +1075,25 @@
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    @else
+                                @else
                                     <tbody class="row_position">
                                         <tr>
                                             <td colspan="500" class="text-center">Data Not Found</td>
                                         </tr>
                                     </tbody>
-                                    @endif
                                 @endif
+                            @endif
 
-                            </table>
-                            <!--./modal-body-->
+                        </table>
+                        <!--./modal-body-->
 
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-info pull-right"><i class="fa fa-upload"></i>
-                                Submit</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-info pull-right"><i class="fa fa-upload"></i>
+                            Submit</button>
 
-                        </div>
-                    </form>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

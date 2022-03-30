@@ -53,7 +53,7 @@
                         @csrf
 
                         <div class="row" style="margin-bottom: 50px">
-                          
+
                             <div class="col-sm-2">
                                 <label for="">Class*</label>
                                 <select name="classId" id="" class="form-control select-class" required>
@@ -80,7 +80,7 @@
                                     <option value="CadetNumber">Student Number</option>
                                     <option value="FirstName">First Name</option>
                                     <option value="LastName">Last Name</option>
-                                    <option value="NickName">Nick Name</option>
+                                    <option value="NickName">Middle Name</option>
                                     <option value="BengaliName">Bengali Name</option>
                                     <option value="Gender">Gender</option>
                                     <option value="DateofBirth">Date of Birth</option>
@@ -97,7 +97,6 @@
                                     <option value="Aim">Aim</option>
                                     <option value="Dream">Dream</option>
                                     <option value="Idol">Idol</option>
-                                    <option value="TutionFees">Tution Fees</option>
                                     <option value="FatherName">Father's Name</option>
                                     <option value="FatherOccupation">Father's Occupation</option>
                                     <option value="FatherContact">Father's Contact</option>
@@ -123,7 +122,7 @@
 
                             </div>
                             <div class="col-sm-1" style="margin-top: 25px;">
-                                <input class="btn btn-xs btn-info" type="reset" value="Reset">
+                                <input type="reset" class="btn-primary" value="Reset" style="width: 50px">
 
                             </div>
                         </div>
@@ -158,9 +157,7 @@
 
 
             $('.select-class').change(function() {
-                if ($("#showNull").is(":checked")) {
-                    $("#showNull").attr('checked', false);
-                }
+
                 // Ajax Request Start
                 $_token = "{{ csrf_token() }}";
 
@@ -196,76 +193,56 @@
             });
 
 
-
+            var selectForm = [];
             function searchStudents() {
                 // var yearId = $('.select-year').val();
                 var classId = $('.select-class').val();
                 var sectionId = $('.select-section').val();
-                var selectForm = $('.select-form').val();
+                selectForm = $('.select-form').val();
 
                 // console.log(selectForm);
                 if ($("#showNull").is(":checked")) {
-                    var newSelectForm = [];
-                    selectForm?.map(element => {
-                        if (element == "admissionYear") {
 
-                            newSelectForm.push(element);
-                        }
-                        if (element == "academicYear") {
-                            newSelectForm.push(element);
-                        }
-                        if (element == "academicLevel") {
+                    $_token = "{{ csrf_token() }}";
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-Token': $('meta[name=_token]').attr('content')
+                        },
+                        url: "{{ url('/student/cadet/bulk/search') }}",
+                        type: 'GET',
+                        cache: false,
+                        data: $('form#std_manage_search_form').serialize(),
+                        datatype: 'application/json',
 
-                            newSelectForm.push(element);
-                        }
-                        if (element == "batch") {
-                            newSelectForm.push(element);
-                        }
-                        if (element == "section") {
-                            newSelectForm.push(element);
+                        beforeSend: function() {
+                            // show waiting dialog
+                            waitingDialog.show('Loading...');
+                        },
+
+                        success: function(data) {
+                            console.log(data);
+                            // hide waiting dialog
+                            waitingDialog.hide();
+                            var std_list_container_row = $('#std_list_container_row');
+                            std_list_container_row.html('');
+                            std_list_container_row.append(data);
+
+
+                        },
+
+                        error: function(data) {
+                            // hide waiting dialog
+                            waitingDialog.hide();
+
+                            alert(JSON.stringify(data));
                         }
                     });
-                    console.log(newSelectForm);
-                    if (!newSelectForm.length > 0) {
-                        Swal.fire('Error!', 'Select A.Y or Ad.Y or A.l or Batch or Section Multiple Field!', 'error');
-                    } else {
-                        $_token = "{{ csrf_token() }}";
-                        $.ajax({
-                            headers: {
-                                'X-CSRF-Token': $('meta[name=_token]').attr('content')
-                            },
-                            url: "{{ url('/student/cadet/bulk/search') }}",
-                            type: 'GET',
-                            cache: false,
-                            data: $('form#std_manage_search_form').serialize(),
-                            datatype: 'application/json',
+                    // if (!newSelectForm.length > 0) {
+                    //     Swal.fire('Error!', 'Select A.Y or Ad.Y or A.l or Batch or Section Multiple Field!', 'error');
+                    // } else {
+                    // }
 
-                            beforeSend: function() {
-                                // show waiting dialog
-                                waitingDialog.show('Loading...');
-                            },
-
-                            success: function(data) {
-                                console.log(data);
-                                // hide waiting dialog
-                                waitingDialog.hide();
-                                var std_list_container_row = $('#std_list_container_row');
-                                std_list_container_row.html('');
-                                std_list_container_row.append(data);
-
-
-                            },
-
-                            error: function(data) {
-                                // hide waiting dialog
-                                waitingDialog.hide();
-
-                                alert(JSON.stringify(data));
-                            }
-                        });
-                    }
-
-                } else if (classId || sectionId) {
+                } else {
                     $_token = "{{ csrf_token() }}";
                     $.ajax({
                         headers: {
@@ -299,27 +276,17 @@
                             alert(JSON.stringify(data));
                         }
                     });
-                } else {
-                    Swal.fire('Error!', 'Select All the fields first!', 'error');
                 }
 
 
             }
-            $("#showNull").click(function() {
-                if ($("#showNull").is(":checked")) {
-                    $('.select-class').attr("disabled", true);
-                    $('.select-section').attr("disabled", true);
-                } else {
-                    $('.select-class').attr("disabled", false);
-                    $('.select-section').attr("disabled", false);
-                }
-            })
+
 
             $('.search-btn').click(function() {
                 $('.select-type').val('search');
                 searchStudents();
             });
-
+            // bulk Edit Save
             $(document).on('submit', 'form#std_cadet_bulk_edit', function(e) {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -333,55 +300,36 @@
                     }
                 });
                 e.preventDefault();
-                var first_name = false;
-                var user_name = false;
-                var hobby = false;
-                var aim = false;
-                var idol = false;
-                var dream = false;
-               
-                $('input[name^=hobby]').each(function() {
-                    if (!$(this).val()) {
-                        hobby = true;
+                var first_name = true;
+                var language = true;
+
+                $('input[name^=upload]').each(function() {
+                    if ($(this).is(':checked')) {
+                        var tr = $(this).parent().parent();
+                        var languageVal = tr.find('input[name^=language]').val();
+                        if (!languageVal && selectForm.indexOf("Language") !== -1) {
+                            language = false;
+                        }
+                        var nameVal = tr.find('input[name^=first_name]').val();
+                        if (!nameVal && selectForm.indexOf("FirstName") !== -1) {
+                            first_name = false;
+                        }
                     }
-                });
-                $('input[name^=aim]').each(function() {
-                    if (!$(this).val()) {
-                        aim = true;
-                    }
-                });
-                $('input[name^=idol]').each(function() {
-                    if (!$(this).val()) {
-                        idol = true;
-                    }
-                });
-                $('input[name^=dream]').each(function() {
-                    if (!$(this).val()) {
-                        dream = true;
-                    }
-                });
-                $('input[name^=first_name]').each(function() {
-                    if (!$(this).val()) {
-                        first_name = true;
-                    }
-                });
-                $('input[name^=user_name]').each(function() {
-                    if (!$(this).val()) {
-                        user_name = true;
-                    }
-                });
+                })
+              
+                console.log(language);
                 // ajax request
-                if (user_name) {
-                    Toast.fire({
-                        icon: "error",
-                        title: "Cadet Number Field is required"
-                    });
-                } else if (first_name) {
+                if (!first_name) {
                     Toast.fire({
                         icon: "error",
                         title: "First Name Field is required"
                     });
-                }  else {
+                } else if (!language) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Language Field is required"
+                    });
+                } else {
                     $.ajax({
                         url: "/student/cadet/bulk/edit/save",
                         type: 'POST',
@@ -399,17 +347,17 @@
                             // console.log(data);
                             waitingDialog.hide();
                             console.log(data);
-                            searchStudents();
                             if (data.errors) {
                                 Toast.fire({
                                     icon: 'error',
                                     title: data.errors
                                 });
                             } else {
+                                searchStudents();
 
                                 Toast.fire({
                                     icon: 'success',
-                                    title: 'Cadet Bulk Edit successfully!'
+                                    title: 'Student Bulk Edit successfully!'
                                 });
                             }
 

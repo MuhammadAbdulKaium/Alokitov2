@@ -35,6 +35,9 @@ class StudentParent extends Model
     {
         return $this->belongsTo('Modules\Student\Entities\StudentGuardian', 'gud_id', 'id')->first();
     }
+    public function singleGuardian(){
+        return $this->belongsTo('Modules\Student\Entities\StudentGuardian', 'gud_id', 'id');
+    }
 
     public function myStudent()
     {

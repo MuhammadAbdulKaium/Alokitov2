@@ -35,7 +35,6 @@ class CadetBulkEditController extends Controller
     }
     public function index()
     {
-
         $studentInfos = StudentInformation::with('hobbyDreamIdolAim', 'singleEnrollment', 'singleEnrollment.singleBatch', 'singleEnrollment.singleSection', 'nationalitys')->where([['campus', $this->academicHelper->getCampus()], ['institute', $this->academicHelper->getInstitute()]])->get();
         $countries = Country::all();
         $academicYears = $this->academicHelper->getAllAcademicYears();
@@ -82,6 +81,7 @@ class CadetBulkEditController extends Controller
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
         ])->get();
+
         $classId = $request->classId;
         $sectionId = $request->sectionId;
         $searchBatchSection = [];
@@ -92,108 +92,375 @@ class CadetBulkEditController extends Controller
             $searchBatchSection['section'] = $sectionId;
         }
 
+        $searchAllStudent = [];
+        $parent = StudentParent::pluck('std_id');
+        $studentassesment = StudentProfileView::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute()
+        ])->pluck('std_id')->toArray();
+        if($request->showNull){
+            if(isset($request->selectForm)){
+    
+                foreach ($request->selectForm as $form) {
+        
+                    if ($form == "section") {
+                        $sectionNull = StudentProfileView::where([
+                            'section' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $sectionEmpty = StudentProfileView::where([
+                            'section' => 0,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $sectionNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $sectionEmpty);
+                    }
+                    if ($form == "batch") {
+        
+                        $batchNull = StudentProfileView::where([
+                            'batch' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $batchEmpty = StudentProfileView::where([
+                            'batch' => 0,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $batchNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $batchEmpty);
+                    }
+        
+                    if ($form == "academicLevel") {
+                        $levelNull = StudentProfileView::where([
+                            'academic_level' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $levelEmptye =  StudentProfileView::where([
+                            'academic_level' => 0,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $levelNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $levelEmptye);
+                    }
+                    if ($form == "academicYear") {
+                        $academicYearNull = StudentProfileView::where([
+                            'academic_year' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $academicYearEmpty =  StudentProfileView::where([
+                            'academic_year' => 0,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $academicYearNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $academicYearEmpty);
+                    }
+                    if ($form == "admissionYear") {
+                        $admissionYearEmpty = StudentEnrollment::where([
+                            'admission_year' => 0,
+                        ])->pluck('std_id')->toArray();
+                        $admissionYearNull = StudentEnrollment::where([
+                            'admission_year' => null,
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $admissionYearEmpty);
+                        $searchAllStudent = array_merge($searchAllStudent, $admissionYearNull);
+                    }
+                    if ($form == "MotherEmail") {
+                        $MotherEmail = StudentGuardian::where([
+                            'type' => 0,
+                            'email' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$MotherEmail)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "MotherContact") {
+                        $MotherContact = StudentGuardian::where([
+                            'type' => 0,
+                            'mobile' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$MotherContact)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "MotherOccupation") {
+                        $MotherOccupation = StudentGuardian::where([
+                            'type' => 0,
+                            'occupation' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$MotherOccupation)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "MotherName") {
+                        $MotherName = StudentGuardian::where([
+                            'type' => 0,
+                            'first_name' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$MotherName)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "FatherEmail") {
+                        $FatherEmail = StudentGuardian::where([
+                            'type' => 1,
+                            'email' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$FatherEmail)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "FatherContact") {
+                        $FatherContact = StudentGuardian::where([
+                            'type' => 1,
+                            'mobile' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$FatherContact)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "FatherOccupation") {
+                        $FatherOccupation = StudentGuardian::where([
+                            'type' => 1,
+                            'occupation' => null
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$FatherOccupation)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+                    if ($form == "FatherName") {
+                          $FatherNameEmpty = StudentGuardian::where([
+                            'type' => 1,
+                            'first_name' => null,
+                        ])->pluck('id')->toArray();
+                        $parent = StudentParent::whereIn('gud_id',$FatherNameEmpty)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $parent);
+                    }
+        
+                    if ($form == "Idol") {
+                        $Idol = CadetAssesment::where(['type' => 6])->pluck('student_id')->toArray();
+                        $idolStdId = array_diff($studentassesment,$Idol);
+                        $searchAllStudent = array_merge($searchAllStudent, $idolStdId);
+                    }
+                    if ($form == "Dream") {
+                        $Dream = CadetAssesment::where(['type' => 5])->pluck('student_id')->toArray();
+                        $dreamStdId = array_diff($studentassesment,$Dream);
+                        $searchAllStudent = array_merge($searchAllStudent, $dreamStdId);
+                    }
+                    if ($form == "Aim") {
+                        $Aim = CadetAssesment::where(['type' => 4])->pluck('student_id')->toArray();
+                        $AimStdId = array_diff($studentassesment,$Aim);
+                        $searchAllStudent = array_merge($searchAllStudent, $AimStdId);
+                    }
+                    if ($form == "Hobby") {
+                        $Hobby = CadetAssesment::where(['type' => 3])->pluck('student_id')->toArray();
+                        $HobbyStdId = array_diff($studentassesment,$Hobby);
+                        
+                        $searchAllStudent = array_merge($searchAllStudent, $HobbyStdId);
+                    }
+        
+                    if ($form == "IdentificationMarks") {
+                        $identification = StudentInformation::where([
+                            'identification_mark' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $identification);
+                    }
+                    if ($form == "Language") {
+                        $Language = StudentInformation::where([
+                            'language' => ' ',
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $Language);
+                    }
+                    if ($form == "Nationality") {
+                        $Nationality = StudentInformation::where([
+                            'nationality' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $Nationality);
+                    }
+                    if ($form == "PermanentAddress") {
+                     
+                        $AddressNull = Address::where(['address' => null, 'type' => 'STUDENT_PERMANENT_ADDRESS'])->pluck('user_id')->toArray();
+                        $AddressEmpty = Address::where(['address' =>" ", 'type' => 'STUDENT_PERMANENT_ADDRESS'])->pluck('user_id')->toArray();
+                        $PermanentAddressNull = StudentProfileView::where([
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->whereIn('user_id',$AddressNull)->pluck('std_id')->toArray();
 
-        if ($request->classId || $request->sectionId) {
+                        $PermanentAddressEmpty = StudentProfileView::where([
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->whereIn('user_id',$AddressEmpty)->pluck('std_id')->toArray();
 
-            $studentInfos = StudentProfileView::with('singleBatch', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
-                ->where($searchBatchSection)
-                ->where(['campus' => $this->academicHelper->getCampus(), 'institute' => $this->academicHelper->getInstitute()])->get();
+                        $searchAllStudent = array_merge($searchAllStudent, $PermanentAddressEmpty);
+                        $searchAllStudent = array_merge($searchAllStudent, $PermanentAddressNull);
+                    }
+                    if ($form == "PresentAddress") {
+                      
+
+                        $EmptyeAddress = Address::where(['address' =>" ", 'type' => 'STUDENT_PRESENT_ADDRESS'])->pluck('user_id')->toArray();
+                        $nullAddress = Address::where(['address' => null, 'type' => 'STUDENT_PRESENT_ADDRESS'])->pluck('user_id')->toArray();
+                        $PresentAddressNull = StudentProfileView::where([
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->whereIn('user_id',$nullAddress)->pluck('std_id')->toArray();
+                        $PresentAddressEmptye = StudentProfileView::where([
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->whereIn('user_id',$EmptyeAddress)->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $PresentAddressNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $PresentAddressEmptye);
+                    }
+                    if ($form == "MeritPosition") {
+                        $meridPosition = StudentProfileView::where([
+                            'gr_no' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $meridPosition);
+                    }
+                    if ($form == "BloodGroup") {
+                        $BloodGroup =  StudentInformation::where([
+                            'blood_group' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $BloodGroup);
+                    }
+                    if ($form == "Religion") {
+                        // religion
+                        $religionNull = StudentProfileView::where([
+                            'religion' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $religionEmpty = StudentProfileView::where([
+                            'religion' => 0,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('std_id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $religionNull);
+                        $searchAllStudent = array_merge($searchAllStudent, $religionEmpty);
+                    }
+                    if ($form == "BirthPlace") {
+                        // birth_place
+                        $birth_place =  StudentInformation::where([
+                            'birth_place' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $birth_place);
+                    }
+                    if ($form == "DateofBirth") {
+                        // dob
+                        $dob =  StudentInformation::where([
+                            'dob' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $dob);
+                    }
+                    if ($form == "Gender") {
+                        // gender
+                        $gender =  StudentInformation::where([
+                            'gender' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $gender);
+                    }
+                    if ($form == "BengaliName") {
+                        // bn_fullname
+                        $bn_fullname =  StudentInformation::where([
+                            'bn_fullname' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $bn_fullname);
+                    }
+                    if ($form == "NickName") {
+                        // middle_name
+                        $middle_name =  StudentInformation::where([
+                            'middle_name' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $middle_name);
+                    }
+                    if ($form == "LastName") {
+                        $last_name =  StudentInformation::where([
+                            'last_name' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $last_name);
+                    }
+                    if ($form == "FirstName") {
+                        $first_name =  StudentInformation::where([
+                            'first_name' => null,
+                            'campus' => $this->academicHelper->getCampus(),
+                            'institute' => $this->academicHelper->getInstitute()
+                        ])->pluck('id')->toArray();
+                        $searchAllStudent = array_merge($searchAllStudent, $first_name);
+                    }
+                }
+            }
+            $searchAllUniqueStudent = array_unique($searchAllStudent);
         }
-        if ($request->showNull) {
-
-            $searchNullValue = [];
-            $searchEmptyValue = [];
-            $selectForm = array();
-            foreach ($request->selectForm as $form) {
-                if ($form == 'admissionYear') {
-                    array_push($selectForm, 'admissionYear');
-                } else if ($form == 'academicYear') {
-                    array_push($selectForm, 'academicYear');
-                } else if ($form == 'academicLevel') {
-                    array_push($selectForm, 'academicLevel');
-                } else if ($form == 'batch') {
-                    array_push($selectForm, 'batch');
-                } else if ($form == 'section') {
-                    array_push($selectForm, 'section');
-                }
-            }
-            foreach ($selectForm as $form) {
-                if ($form == 'academicYear') {
-                    $searchNullValue['academic_year'] = null;
-                    $searchEmptyValue['academic_year'] = 0;
-                }
-                if ($form == 'academicLevel') {
-                    $searchNullValue['academic_level'] = null;
-                    $searchEmptyValue['academic_level'] = 0;
-                }
-                if ($form == 'batch') {
-                    $searchNullValue['batch'] = null;
-                    $searchEmptyValue['batch'] = 0;
-                }
-
-                if ($form == 'section') {
-                    $searchNullValue['section'] = null;
-                    $searchEmptyValue['section'] = 0;
-                }
-                if ($form == 'admissionYear') {
-                    // $serchEnrolment[admission_year]
-                    $studentEnrollments = StudentEnrollment::where([
-                        'admission_year' => 0,
-                    ])->orWhere('admission_year', null)->pluck('std_id');
-                }
-            }
-            //  return $searchNullValue;
-
-            $studentNullValue = StudentProfileView::where($searchNullValue)->where([
-                'campus' => $this->academicHelper->getCampus(),
-                'institute' => $this->academicHelper->getInstitute()
-            ])->pluck('std_id')->toArray();
-            $studentEmptyValue = StudentProfileView::where($searchEmptyValue)->where([
-                'campus' => $this->academicHelper->getCampus(),
-                'institute' => $this->academicHelper->getInstitute()
-            ])->pluck('std_id')->toArray();
-            if (sizeof($studentNullValue) > 0 && sizeof($studentEmptyValue) > 0) {
-                $studentEmptyNullValue = array_merge($studentNullValue, $studentEmptyValue);
-            } else if (sizeof($studentNullValue) > 0) {
-                $studentEmptyNullValue = $studentNullValue;
-            } else if (sizeof($studentEmptyValue) > 0) {
-                $studentEmptyNullValue = $studentEmptyValue;
-            } else {
-                $studentEmptyNullValue = [];
-            }
-
-            if (isset($studentEnrollments) && isset($studentEmptyNullValue)) {
-                $studentInfos = StudentProfileView::with('singleBatch', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
+        if ($request->showNull  && $request->classId && $request->sectionId) {
+            // $studentInfos 
+            if (isset($searchAllUniqueStudent)) {
+                $studentInfos = StudentProfileView::with('singleBatch', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent','singleStudent.singleParent.singleGuardian', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
                     ->where([
+                        'batch' => $request->classId,
+                        'section' => $request->sectionId,
                         'campus' => $this->academicHelper->getCampus(),
                         'institute' => $this->academicHelper->getInstitute()
-                    ])->whereIn('std_id', array_values($studentEnrollments->toArray()))
-                    ->whereIn('std_id', array_values($studentEmptyNullValue))->get();
-            } else if (isset($studentEmptyNullValue)) {
-                $studentInfos = StudentProfileView::with('singleBatch', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
-                    ->where([
-                        'campus' => $this->academicHelper->getCampus(),
-                        'institute' => $this->academicHelper->getInstitute()
-                    ])->whereIn('std_id', array_values($studentEmptyNullValue))->get();
-            } else if (isset($studentEnrollments)) {
-                $studentInfos = StudentProfileView::with('singleBatch', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
-                    ->whereIn('std_id', array_values($studentEnrollments))
-                    ->where([
-                        'campus' => $this->academicHelper->getCampus(),
-                        'institute' => $this->academicHelper->getInstitute()
-                    ])->get();
+                    ])->whereIn('std_id', array_values($searchAllUniqueStudent))->get();
             } else {
                 $studentInfos = [];
             }
+        } else if ($request->showNull  && $request->classId) {
+            if (isset($searchAllUniqueStudent)) {
+                $studentInfos = StudentProfileView::with('singleBatch','singleStudent.singleParent.singleGuardian', 'singleSection', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
+                    ->where([
+                        'batch' => $request->classId,
+                        'campus' => $this->academicHelper->getCampus(),
+                        'institute' => $this->academicHelper->getInstitute()
+                    ])->whereIn('std_id', array_values($searchAllUniqueStudent))->get();
+            } else {
+                $studentInfos = [];
+            }
+        } else if ($request->showNull) {
+            // return $searchAllUniqueStudent;
+            if (isset($searchAllUniqueStudent)) {
+                $studentInfos = StudentProfileView::with('singleBatch', 'singleSection','singleStudent.singleParent.singleGuardian', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
+                    ->where([
+                        'campus' => $this->academicHelper->getCampus(),
+                        'institute' => $this->academicHelper->getInstitute()
+                    ])->whereIn('std_id', array_values($searchAllUniqueStudent))->get();
+            } else {
+                $studentInfos = [];
+            }
+        } else {
+            $studentInfos = StudentProfileView::with('singleBatch', 'singleSection','singleStudent.singleParent.singleGuardian', 'academicYear', 'academicLevel', 'getStudentAddress', 'singleUser', 'singleStudent.singleEnrollment', 'singleStudent.singleEnrollment.admissionYear', 'singleStudent.singleUser', 'singleStudent', 'singleStudent.nationalitys', 'singleStudent.hobbyDreamIdolAim')
+                ->where($searchBatchSection)
+                ->where(['campus' => $this->academicHelper->getCampus(), 'institute' => $this->academicHelper->getInstitute()])->get();
         }
+      
         // return $studentInfos;
         return view("student::pages.cadet-bulk-edit.cadet-bulk-edit-form", compact('batches', 'academicAdmissionYear', 'academicYears', 'sections', 'levels', 'studentInfos', 'selectForms', 'countries'));
     }
     public function bulkEditSaveData(Request $request)
     {
-        
+
         DB::beginTransaction();
         try {
+            
             if (isset($request->upload)) {
                 foreach ($request->upload as $key => $value) {
     
@@ -266,8 +533,23 @@ class CadetBulkEditController extends Controller
                     $mothercontact =  isset($request->mothercontact) ? $request->mothercontact[$key] : $mother->mobile;
                     $motheroccupation =  isset($request->motheroccupation) ? $request->motheroccupation[$key] : $mother->occupation;
                     // get Student address Data
-                    $presentaddress =  isset($request->presentaddress) ? $request->presentaddress[$key] : $presentAddress->address;
-                    $permanentaddress =  isset($request->permanentaddress) ? $request->permanentaddress[$key] : $permanentAddress->address;
+                    $presentaddress = null;
+                    if (isset($request->presentaddress)) {
+                        $presentaddress = $request->presentaddress[$key];
+                    } else if ($presentAddress) {
+                        $presentaddress = $presentAddress->address;
+                    } else {
+                        $presentaddress = null;
+                    }
+                    $permanentaddress = null;
+                    if (isset($request->permanentaddress)) {
+                        $permanentaddress = $request->permanentaddress[$key];
+                    } else if ($permanentAddress) {
+                        $permanentaddress = $permanentAddress->address;
+                    } else {
+                        $permanentaddress = null;
+                    }
+                   
                     // get Student StudentEnrollment Data
                     $gr_no =  isset($request->gr_no) ? $request->gr_no[$key] : $meridPosition->gr_no;
     
@@ -303,6 +585,7 @@ class CadetBulkEditController extends Controller
                         }
                     }
                     //  Father's Information Update
+                 
                     if ($father) {
                         if ($request->fathername || $request->fatheremail || $request->fathercontact || $request->fatheroccupation) {
                             $father->update([
@@ -325,44 +608,59 @@ class CadetBulkEditController extends Controller
                         }
                     }
                     // //PresentAddress Update
-                    if ($presentAddress) {
-                        if ($request->presentaddress) {
-                            $presentAddress->update([
-                                'address' => $presentaddress
+                    if (!empty($presentAddress)) {
+                        // return "update"
+                        $presentAddress->update([
+                            'address' => $presentaddress
+                        ]);
+                    } else {
+                        // return "Create";
+                        if (!empty($request->presentaddress[$key])) {
+                            Address::create([
+                                'user_id'=>$user->id,
+                                'type'=>'STUDENT_PRESENT_ADDRESS',
+                                'address'=>isset($request->presentaddress)?$request->presentaddress[$key] : null
                             ]);
                         }
                     }
-                    // //  permanentAddress Update
-                    if ($permanentAddress) {
-                        if ($request->permanentaddress) {
-                            $permanentAddress->update([
-                                'address' => $permanentaddress
+    
+                    //  permanentAddress Update
+                   if (!empty($permanentAddress)) {
+                        // return "update"
+                        $permanentAddress->update([
+                            'address' => $permanentaddress
+                        ]);
+                    } else {
+                        if (!empty($request->permanentaddress[$key])) {
+                            Address::create([
+                                'user_id'=>$user->id,
+                                'type'=>'STUDENT_PERMANENT_ADDRESS',
+                                'address'=>isset($request->permanentaddress)?$request->permanentaddress[$key] : null
                             ]);
                         }
                     }
+                  
+                    
                     // // meridPosition update
                     if ($meridPosition) {
                         if ($request->gr_no) {
                             $meridPosition->update([
                                 'gr_no' => $gr_no,
                             ]);
-                          
                         }
                         StdEnrollHistory::create([
-                            'enroll_id'=>$meridPosition->id,
-                            'gr_no'=>$gr_no,
-                            'section'=>$section,
-                            'batch'=>$batch,
-                            'academic_level'=>$academicLevel,
-                            'academic_year'=>$academicYear,
-                            'enrolled_at'=> Carbon::now(),
-                            'batch_status'=>$meridPosition->batch_status,
-                            'remark'=>$meridPosition->remark,
-                            'admission_year'=> $admissionYear,
-                            'enroll_status'=>$meridPosition->enroll_status,
+                            'enroll_id' => $meridPosition->id,
+                            'gr_no' => $gr_no,
+                            'section' => $section,
+                            'batch' => $batch,
+                            'academic_level' => $academicLevel,
+                            'academic_year' => $academicYear,
+                            'enrolled_at' => Carbon::now(),
+                            'batch_status' => $meridPosition->batch_status,
+                            'remark' => $meridPosition->remark,
+                            'admission_year' => $admissionYear,
+                            'enroll_status' => $meridPosition->enroll_status,
                         ]);
-
-                    
                     }
     
                     // delet && create Student Assesment Data
@@ -491,7 +789,6 @@ class CadetBulkEditController extends Controller
                     'errors' => "Please Min 1 row Select !"
                 ]);
             }
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
