@@ -92,7 +92,11 @@ class AttendanceController extends Controller
 
             case 'manage':
                 // attendanceType
-                $allAcademicsLevel    = $this->academicsLevel->where('academics_year_id', $this->getAcademicYearId())->get();
+                // $allAcademicsLevel    = $this->academicsLevel->where('academics_year_id', $this->getAcademicYearId())->get();
+                $allAcademicsLevel    = $this->academicsLevel->where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                ])->get();
                 $allAttendanceSession = $this->attendanceSession->orderBy('session_name', 'ASC')->get();
                 $attendanceSettingProfile = $this->getAttendanceSettings();
 
@@ -120,7 +124,7 @@ class AttendanceController extends Controller
             case 'upload':
                 $attendanceHistory = $this->attendanceUploadHistory->where([
                     'campus'=>$this->getInstituteCampusId(),'institute'=>$this->getInstituteId()
-                ])->orderBy('created_at', 'DSC')->get();
+                ])->orderBy('created_at', 'desc')->get();
                 return View('academics::manage-attendance.upload', compact('attendanceHistory'))->with('page', 'upload');
                 break;
 

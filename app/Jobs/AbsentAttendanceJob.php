@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Helpers\BengaliDateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -29,7 +30,7 @@ use App\Jobs\SendSms;
 
 class AbsentAttendanceJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, BengaliDateTime;
 
     protected $studentIdList;
     protected $absentStudentList;
@@ -58,6 +59,8 @@ class AbsentAttendanceJob implements ShouldQueue
 
             // get today student attendance List
             $attdendanceList = StudentAttendance::where('attendance_date', date('Y-m-d'))->whereIn('student_id', $this->studentIdList)->get();
+            Log::info("Attendance List - ".$attdendanceList);
+
 
             $studentMsgAtt = array();
             $parentMsgAtt = array();
@@ -66,18 +69,21 @@ class AbsentAttendanceJob implements ShouldQueue
                 $message = "";
                 //get name, batch, section, attendance-details
                 $fullName = $attendance->student()->title . " " . $attendance->student()->first_name . " " . $attendance->student()->middle_name . " " . $attendance->student()->last_name;
+                $bnFullName = $attendance->student()->bn_fullname;
                 $section_name = $attendance->details()->section()->section_name;
                 $batch_name = $attendance->details()->batch()->batch_name;
                 $date = date("d-m-Y");
+                $bnDate = self::bn_date($date);
 
                 if ($attendance->attendacnce_type == 0) {
                     $absentStudentArray[] = $attendance->student_id;
 
                     // multiple staring replace
-                    $searchString = array("{attendance}", "{name}", "{section}", "{batch}", "{date}");
-                    $replaceString = array("Absent", $fullName, $section_name, $batch_name, $date);
+                    $searchString = array("{attendance}", "{bn_name}", "{section}", "{batch}", "{date}");
+                    $replaceString = array("অনুপস্থিত", $bnFullName, $section_name, $batch_name, $bnDate);
 
                     $message = str_replace($searchString, $replaceString, $smsAttendace->message);
+                    Log::info("Message Text - ".$message);
 
                     //save message sms_message table
                     $message_id = $this->setSmsMessage($message);
@@ -166,6 +172,10 @@ class AbsentAttendanceJob implements ShouldQueue
 
 // process data array function send sms etc
     public  function processData($arrayData){
+        // Log::info([
+        //     'status' => 'Process Data',
+        //     'value' => $arrayData
+        // ]);
 
         if(array_key_exists("s",$arrayData)) {
 
@@ -206,6 +216,10 @@ class AbsentAttendanceJob implements ShouldQueue
 
         $smsbatch = SmsBatch::where('institution_id', $institute_id)->first();
         $batch_count = $smsbatch->batch_count;
+        // Log::info([
+        //     'status' => '!SMS Log!',
+        //     'value' => $arrayList
+        // ]);
 
            foreach ($arrayList as $data) {
                if (!empty($data->$phone)) {

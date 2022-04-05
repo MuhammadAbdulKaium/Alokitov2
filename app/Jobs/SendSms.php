@@ -294,7 +294,7 @@ class SendSms implements ShouldQueue
 
 
         elseif($this->smsMessage=="absentattendance") {
-//            Log::info("absentattendance Sms Section Here");
+        //    Log::info("absentattendance Sms Section Here");
 //            Log::info("==== Absent Attendance Batch_id==".$this->sms_batch_id);
             // get batch id
             $batch_count = $this->sms_batch_id;
@@ -302,8 +302,12 @@ class SendSms implements ShouldQueue
             //get smsLog list by sms_batch_it
 
             $institute_id=session()->get('institute');
-            $smsLogList=SmsLog::where('sms_batch_id',$batch_count)->where('institution_id',$this->institution_id)->get();
-//            Log::info("Test Logo Absent Logo");
+            $smsLogList=SmsLog::where('sms_batch_id',$batch_count)->where('institution_id',$institute_id)->get();
+            // Log::info("Sms Batch Count".$batch_count);
+            // Log::info([
+            //     'status' => '!SMS Asif!',
+            //     'value' => $this->institution_id
+            // ]);
             foreach ($smsLogList as $smsLog){
 
                 if(!empty($smsLog->user_no)){
@@ -547,6 +551,11 @@ class SendSms implements ShouldQueue
 
 
     public function sendSmsApiCall($getNumberList,$smsType,$smsApi,$senderId){
+        // Log::info([
+        //     'status' => '!Final Log!',
+        //     'value' => $getNumberList
+        // ]);
+        
         foreach ($getNumberList as $getNumber){
 
             $url = env('SMS_SERVER_URL');

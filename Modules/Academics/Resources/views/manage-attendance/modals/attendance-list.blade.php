@@ -216,6 +216,7 @@
                 },
 
                 success:function(data){
+                    console.log(data);
                     // hide waiting dialog
                     waitingDialog.hide();
                     // checking

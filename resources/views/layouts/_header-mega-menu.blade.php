@@ -811,7 +811,7 @@ background:#0b460b !important;
 {{--                                 <li><a href="/setting/language/index"><i class="fa fa-language"></i> Languages</a></li>--}}
                                  <li><a href="{{url('setting')}}"><i class="fa fa-bank"></i> Institute</a></li>
 {{--                                 <li><a href="/setting/institute/property"><i class="fa fa-bank"></i> Institute Property</a></li>--}}
-{{--                                 <li><a href="/setting/attendance"><i class="fa fa-bank"></i> Attendance Setting</a></li>--}}
+                                 <li><a href="/setting/attendance"><i class="fa fa-bank"></i> Attendance Setting</a></li>
                                  <li><a href="/setting/fees/setting/list"><i class="fa fa-bank"></i>Fine Setting</a></li>
 {{--                                 <li><a href="/setting/login/screen"><i class="fa fa-bank"></i> Setting Login Screen </a></li>--}}
                               </ul>
