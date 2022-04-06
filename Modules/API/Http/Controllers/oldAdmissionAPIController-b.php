@@ -28,7 +28,7 @@ use Modules\Admission\Entities\HscApplicant;
 
 use GuzzleHttp\Client;
 
-class AdmissionAPIController extends Controller
+class oldAdmissionAPIController extends Controller
 {
     private $academicHelper;
     private $applicant;
