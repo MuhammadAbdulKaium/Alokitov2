@@ -38,9 +38,9 @@
                             @endrole
 
                             {{--daily attendance--}}
-                            <li @if($page == "daily-attendance") class="active" @endif>
+                            {{-- <li @if($page == "daily-attendance") class="active" @endif>
                                 <a href="{{url('/academics/manage/attendance/daily-attendance')}}">Daily Attendance</a>
-                            </li>
+                            </li> --}}
 
                             {{--checking user role--}}
                             @role(['super-admin','admin'])

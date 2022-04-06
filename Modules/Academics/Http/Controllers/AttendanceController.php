@@ -105,6 +105,7 @@ class AttendanceController extends Controller
                 break;
 
             case 'daily-attendance':
+                return abort(404);
                 // academic level
                 $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
                 // return veiw with variables
