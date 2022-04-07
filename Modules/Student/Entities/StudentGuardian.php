@@ -63,6 +63,9 @@ class StudentGuardian extends Model
     {
         return $this->hasMany('Modules\Student\Entities\StudentParent', 'gud_id', 'id')->get();
     }
+    public function student(){
+        return $this->hasMany('Modules\Student\Entities\StudentParent', 'gud_id', 'id');
+    }
 
 
 

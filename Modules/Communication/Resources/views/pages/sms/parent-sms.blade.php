@@ -426,6 +426,7 @@ $('#comment').val($text)
               if(data.length==0) {
                 swal("Alert", "Parents Not Found", "error");
             } else {
+                console.log(data);
                 $.each(data, function( index, value ) {
                     // add value
                     $("#demo-input-locals").tokenInput("add",value);

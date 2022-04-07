@@ -43,6 +43,13 @@ class StudentParent extends Model
     {
         return $this->belongsTO('Modules\Student\Entities\StudentInformation', 'std_id', 'id')->first();
     }
+    public function myStudentSingle()
+    {
+        return $this->belongsTO('Modules\Student\Entities\StudentInformation', 'std_id', 'id');
+    }
+    public function myStudentView(){
+        return $this->belongsTo(StudentProfileView::class,'std_id','std_id');
+    }
 
     //returns the user information from the user db table
     public function user()

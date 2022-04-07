@@ -5,6 +5,8 @@ namespace Modules\Student\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller;
+use Modules\Academics\Entities\Batch;
+use Modules\Academics\Entities\Section;
 use Modules\Admission\Entities\ApplicantRelative;
 use Modules\Student\Entities\StudentGuardian;
 use Modules\Student\Entities\StudentParent;
@@ -778,16 +780,35 @@ class StudentGuardController extends Controller
                     $parentArray[] = $parent->gud_id;
                 }
 
-                $parentList = StudentGuardian::whereIn('id', $parentArray)->get();
+                $parentList = StudentGuardian::with('student.myStudentSingle')->with('student.myStudentView')->whereIn('id', $parentArray)->get();
 
                 if ($parentList->count() > 0) {
+
                     foreach ($parentList as $parent) {
+
+                        if($parent->student && $parent->student[0]){
+                            $stdName=$parent->student[0]->myStudentSingle->first_name ." "
+                                .$parent->student[0]->myStudentSingle->middle_name." ".
+                                $parent->student[0]->myStudentSingle->last_name;
+
+                        }
+                        if($parent->student && $parent->student[0]){
+                            $batch=$parent->student[0]->myStudentView->batch;
+                            $section=$parent->student[0]->myStudentView->section;
+                            $batch_name=Batch::getBatchNameById($batch);
+                            $section_name=Section::getSectionNameById($section);
+
+                        }
                         $data[] = array(
                             'id' => $parent->id,
                             'user_id' => $parent->id,
-                            'name' => $parent->first_name . '' . $parent->last_name . ' ( ' . $parent->mobile . ' )',
+                            'name' => $stdName."---".$batch_name."---".$section_name."---".$parent->first_name . '' .
+                                $parent->last_name .
+                                ' ( ' .
+                                $parent->mobile . ' )',
                             'phone' => $parent->mobile,
-                            'parents_count' => $i++
+                            'parents_count' => $i++,
+
                         );
                     }
                     return json_encode($data);
@@ -806,7 +827,11 @@ class StudentGuardController extends Controller
     public function getParentByBatchSection($batch,$section){
 
 //        $academics_years=session()->get('academic_year');
+        $batch_name=Batch::getBatchNameById($batch);
+        $section_name=Section::getSectionNameById($section);
+        //return json_encode($batch_name);
         $std_enrollments=StudentProfileView::where(['batch'=>$batch,'section'=>$section])->get();
+
         $studentIdList = array();
         $i=1;
         if($std_enrollments){
@@ -816,6 +841,7 @@ class StudentGuardController extends Controller
             }
 
             $parents=$this->studentParent->whereIn('std_id',$studentIdList)->where('is_emergency',1)->get();
+            //return json_encode($parents);
 
             if(!empty($parents)) {
                 $parentArray=[];
@@ -823,16 +849,27 @@ class StudentGuardController extends Controller
                     $parentArray[] = $parent->gud_id;
                 }
 
-                $parentList = StudentGuardian::whereIn('id', $parentArray)->get();
+                $parentList = StudentGuardian::with('student.myStudentSingle')->whereIn('id', $parentArray)->get();
 
                 if ($parentList->count() > 0) {
                     foreach ($parentList as $parent) {
+                        if($parent->student[0]){
+                            $stdName=$parent->student[0]->myStudentSingle->first_name ." "
+                                .$parent->student[0]->myStudentSingle->middle_name." ".
+                                $parent->student[0]->myStudentSingle->last_name;
+
+                        }
                         $data[] = array(
                             'id' => $parent->id,
                             'user_id' => $parent->id,
-                            'name' => $parent->first_name . '' . $parent->last_name . ' ( ' . $parent->mobile . ' )',
+                            'name' => $stdName."---".$batch_name."---".$section_name."---".$parent->first_name . '' .
+                                $parent->last_name .
+                                ' ( ' .
+                                $parent->mobile . ' )',
                             'phone' => $parent->mobile,
-                            'parents_count' => $i++
+                            'parents_count' => $i++,
+
+
                         );
                     }
                     return json_encode($data);
