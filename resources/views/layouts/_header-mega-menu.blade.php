@@ -66,7 +66,9 @@ background:#0b460b !important;
                                  </ul>
                               </li>
                               <li><a href="{{url('academics/manage')}}"><i class="fa fa-book "></i>Manage Academics</a></li>
-                              <li><a href="{{url('academics/manage/assessments/grade-setup')}}"><i class="fa fa-book "></i>Manage Assessments</a></li>
+                              @role(['super-admin'])
+                                 <li><a href="{{url('academics/manage/assessments/grade-setup')}}"><i class="fa fa-book "></i>Manage Assessments</a></li>
+                              @endrole
                               {{--                           </ul>--}}
                               {{--                        </li>--}}
                               <li><a href="{{url('/academics/timetable/manage')}}"><i class="fa fa-calendar"></i> Timetable</a></li>
