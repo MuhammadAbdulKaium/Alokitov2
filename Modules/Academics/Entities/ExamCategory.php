@@ -10,6 +10,7 @@ class ExamCategory extends Model
 
     protected $fillable = [
         'exam_category_name',
+        'alias',
         'campus',
         'institute',
     ];

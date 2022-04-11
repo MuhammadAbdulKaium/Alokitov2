@@ -20,7 +20,6 @@ class CreateCadetSubjectMarksTable extends Migration
             $table->integer('semester_id');
             $table->integer('exam_id');
             $table->integer('batch_id');
-            $table->integer('section_id');
             $table->integer('full_marks');
             $table->integer('pass_marks');
             $table->integer('full_mark_conversion');

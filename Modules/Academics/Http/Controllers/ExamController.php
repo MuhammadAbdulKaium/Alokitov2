@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Modules\Academics\Entities\Batch;
 use Modules\Academics\Entities\ExamCategory;
@@ -46,7 +45,16 @@ use Modules\Academics\Entities\Subject;
 use Modules\Academics\Entities\SubjectMark;
 use Modules\Communication\Entities\SmsBatch;
 use Modules\Communication\Entities\SmsLog;
-
+use PDF;
+use App;
+use App\Helpers\UserAccessHelper;
+use ClassTeacherAssign;
+use Modules\Academics\Entities\AcademicsApprovalLog;
+use Modules\Academics\Entities\AdditionalSubject;
+use Modules\Academics\Entities\ExamList;
+use Modules\Academics\Entities\SubjectTeacher;
+use Modules\LevelOfApproval\Entities\ApprovalNotification;
+use Modules\Setting\Entities\Institute;
 
 class ExamController extends Controller
 {
@@ -67,6 +75,7 @@ class ExamController extends Controller
     private $smsSender;
     private $gradeDetails;
     private $assessmentReportController;
+    use UserAccessHelper;
 
     // constructor
     public function __construct(Section $section, Batch $batch, Semester $semester, AcademicsYear $academicsYear, AcademicsLevel $academicsLevel,  Grade $grade, AcademicHelper $academicHelper, ExamStatus $examStatus, ExamSummary $examSummary, StudentProfileView $studentProfileView, AssessmentsController $assessmentsController, StudentAttendanceReportController $studentAttendanceReportController, GradeCategory $gradeCategory, SmsSender $smsSender, AssessmentReportController $assessmentReportController, GradeDetails $gradeDetails)
@@ -112,43 +121,57 @@ class ExamController extends Controller
         // return view with variables
         return view('academics::manage-assessments.modals.exam-status', compact('examStatus', 'academicYear', 'semesterProfile'));
     }
-        public function editExamCategoryExam($id)
-        {
-            $examCategory=ExamCategory::where('id','=',$id)->first();
-            return view('academics::exam.modal.edit-exam-category', compact('examCategory'));
+    public function editExamCategoryExam($id)
+    {
+        $examCategory = ExamCategory::where('id', '=', $id)->first();
+        return view('academics::exam.modal.edit-exam-category', compact('examCategory'));
+    }
+    public function updateExamCategoryExam(Request $request, $id)
+    {
+        $examCategory = ExamCategory::where('id', '=', $id)->first();
 
-        }
-        public function updateExamCategoryExam(Request $request,$id)
-        {
-            $examCategory=ExamCategory::where('id','=',$id)->first();
-            $categoryUpdate=$examCategory->update([
-                'exam_category_name'=>$request->exam_category_name
-            ]);
-            if($categoryUpdate){
-                Session::flash('message', 'Exam Category Update successfully!');
+        $sameNameCategory = ExamCategory::where('exam_category_name', $request->exam_category_name)->first();
+        $sameAliasCategory = ExamCategory::where('alias', $request->alias)->first();
+
+        if ($sameNameCategory || $sameAliasCategory) {
+            if ($sameNameCategory->id != $examCategory->id) {
+                Session::flash('errorMessage', 'Sorry! There is already an exam category exist with this name.');
                 return redirect()->back();
             }
-
-        }
-        public function deleteExamCategory($id){
-            $examCategory=ExamCategory::where('id','=',$id)->first();
-            $examName = ExamName::where('exam_category_id','=',$id)->first();
-            if($examName){
-                Session::flash('errorMessage', 'Exam Category Can not be deleted, dependencies on Exam Name!');
+            if ($sameAliasCategory->id != $examCategory->id) {
+                Session::flash('errorMessage', 'Sorry! There is already an exam category exist with this alias.');
                 return redirect()->back();
             }
-            else{
-                $deleteSuccess=$examCategory->delete();
-                if($deleteSuccess){
-                    Session::flash('message', 'Exam Category deleted successfully!');
-                    return redirect()->back();
-                }
-                else{
-                    Session::flash('errorMessage', 'Exam Category Not deleted!');
-                    return redirect()->back();
-                }
+        }
+
+        $categoryUpdate = $examCategory->update([
+            'exam_category_name' => $request->exam_category_name,
+            'alias' => $request->alias
+        ]);
+
+        if ($categoryUpdate) {
+            Session::flash('message', 'Exam Category Update successfully!');
+            return redirect()->back();
+        }
+    }
+    public function deleteExamCategory($id)
+    {
+        $examCategory = ExamCategory::where('id', '=', $id)->first();
+        $examName = ExamName::where('exam_category_id', '=', $id)->first();
+        if ($examName) {
+            Session::flash('errorMessage', 'Exam Category Can not be deleted, dependencies on Exam Name!');
+            return redirect()->back();
+        } else {
+            $deleteSuccess = $examCategory->delete();
+            if ($deleteSuccess) {
+                Session::flash('message', 'Exam Category deleted successfully!');
+                return redirect()->back();
+            } else {
+                Session::flash('errorMessage', 'Exam Category Not deleted!');
+                return redirect()->back();
             }
         }
+    }
     public function updateExamStatus(Request $request)
     {
 
@@ -731,37 +754,48 @@ class ExamController extends Controller
 
     public function examMarksEntry(Request $request)
     {
+        $pageAccessData = self::linkAccess($request);
+
         $academicYears = $this->academicHelper->getAllAcademicYears();
-        return view('academics::exam.exam-marks-entry', compact('academicYears'));
+        $semesters = Semester::all();
+        $examNames = ExamName::all();
+
+        return view('academics::exam.exam-marks-entry', compact('pageAccessData', 'academicYears', 'semesters', 'examNames'));
     }
 
     public function examStudentSearch(Request $request)
     {
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
         $yearId = $request->yearId;
         $semesterId = $request->termId;
         $examId = $request->examId;
         $getClass = $request->batchId;
         $getSection = $request->sectionId;
         $getSubject = $request->subjectId;
+        $type = $request->type;
 
-        $getStudent = StudentProfileView::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-            'batch' => $getClass,
-            'section' => $getSection,
-        ])->get();
+        $batch = Batch::findOrFail($getClass);
 
-        $examParameter = SubjectMark::where([
+        $grades = (sizeof($batch->grade) > 0) ? $batch->grade[0]->allDetails() : null;
+
+        // Student getting start
+        $examList = ExamList::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
             'academic_year_id' => $yearId,
-            'semester_id' => $semesterId,
+            'term_id' => $semesterId,
             'exam_id' => $examId,
             'batch_id' => $getClass,
             'section_id' => $getSection,
-            'subject_id' => $getSubject,
         ])->first();
-
+        $classSubject = ClassSubject::where([
+            ['class_id', $request->batchId],
+            ['section_id', $request->sectionId],
+            ['subject_id', $request->subjectId],
+            ['subject_type', '!=', 1],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()],
+        ])->first();
         $examMarks = ExamMark::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
@@ -771,7 +805,52 @@ class ExamController extends Controller
             'subject_id' => $getSubject,
             'batch_id' => $getClass,
             'section_id' => $getSection
-        ])->get();
+        ]);
+        $stdIdsFromExamMarks = $examMarks->pluck('student_id')->toArray();
+        $examMarks = $examMarks->get()->keyBy('student_id');
+        $currentStdIds = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->where([
+            'academic_year' => $yearId,
+            'batch' => $getClass,
+            'section' => $getSection,
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->pluck('std_id')->toArray();
+
+        $stdIds = [];
+        // Take student ids from both student profile view & exam marks.
+        $allStdIds = array_merge($currentStdIds, $stdIdsFromExamMarks);
+        $stdIds = array_unique($allStdIds);
+        if ($classSubject) {
+            // If this subject is either elective or optional for this batch, section
+            $stdIdsFromAdditionalSub = $this->academicHelper->stdIdsHasTheSub($request->batchId, $request->sectionId, $request->subjectId);
+            $tempStdIds = [];
+            foreach($stdIds as $stdId){
+                if (isset($stdIdsFromAdditionalSub[$stdId])) {
+                    array_push($tempStdIds, $stdId);
+                }
+            }
+            $stdIds = $tempStdIds;
+        }
+        if ($examList) {
+            if ($examList->publish_status != 0){
+                // Take student ids from only exam marks.
+                $stdIds = $stdIdsFromExamMarks;
+            } 
+        }
+
+        $getStudent = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('std_id', $stdIds)->get();
+        // Student getting end
+
+        $examParameter = SubjectMark::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_id' => $examId,
+            'batch_id' => $getClass,
+            'subject_id' => $getSubject,
+        ])->first();
 
         $examAttendances = ExamAttendance::where([
             'campus_id' => $this->academicHelper->getCampus(),
@@ -785,31 +864,104 @@ class ExamController extends Controller
         ])->get();
 
         $parameterMarks = json_decode($examParameter->marks, true)['fullMarks'];
+        $parameterPassMarks = json_decode($examParameter->marks, true)['passMarks'];
         $parameterKeys = array_keys($parameterMarks);
         $parameters = ExamMarkParameter::whereIn('id', $parameterKeys)->get();
+        $canSave = $request->can_save;
+        if ($examList) {
+            if ($examList->publish_status != 0) {
+                $canSave = false;
+            }
+        }
 
-        $stdListView = view('academics::exam.exam-marks-entry-list', compact('getStudent', 'examParameter', 'examMarks', 'examAttendances', 'parameterMarks', 'parameters', 'yearId', 'semesterId', 'examId', 'getClass', 'getSection', 'getSubject'))->render();
-        return ['status' => 'success', 'msg' => 'Student List found', 'html' => $stdListView];
+        if ($type == 'print') {
+            $academicsYear = AcademicsYear::findOrFail($yearId);
+            $semester = Semester::findOrFail($semesterId);
+            $exam = ExamName::findOrFail($examId);
+            $section = Section::findOrFail($getSection);
+            $subject = Subject::findOrFail($getSubject);
+
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->loadView('academics::exam.snippets.exam-marks-entry-pdf', compact('examList', 'grades', 'institute', 'getStudent', 'examParameter', 'examMarks', 'examAttendances', 'parameterMarks', 'parameterPassMarks', 'parameters', 'academicsYear', 'semester', 'exam', 'batch', 'section', 'subject'))->setPaper('a4', 'landscape');
+            return $pdf->stream();
+        } else {
+            $stdListView = view('academics::exam.exam-marks-entry-list', compact('examList', 'grades', 'type', 'getStudent', 'examParameter', 'examMarks', 'examAttendances', 'parameterMarks', 'parameterPassMarks', 'parameters', 'yearId', 'semesterId', 'examId', 'getClass', 'getSection', 'getSubject', 'canSave'))->render();
+            return ['status' => 'success', 'msg' => 'Student List found', 'html' => $stdListView];
+        }
     }
 
     public function examSaveStudentMarks(Request $request)
     {
         $subjectMark = SubjectMark::findOrFail($request->subjectMarksId);
 
+        $previousExamList = ExamList::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'academic_year_id' => $request->academicYearId,
+            'term_id' => $request->semesterId,
+            'exam_id' => $request->examId,
+            'batch_id' => $request->batchId,
+            'section_id' => $request->sectionId,
+        ])->first();
+
+        if (!$request->stuChecks) {
+            return [
+                'status' => 0,
+                'msg' => "Please select at least one row",
+            ];
+        }
+        
         DB::beginTransaction();
         try {
-            foreach ($request->marks as $key => $mark) {
-                $totalMark = 0;
-                $on100 = 0;
-                $totalConversionMark = 0;
+            if (!$previousExamList) {
+                $previousExamList = ExamList::create([
+                    'academic_year_id' => $request->academicYearId,
+                    'term_id' => $request->semesterId,
+                    'exam_id' => $request->examId,
+                    'batch_id' => $request->batchId,
+                    'section_id' => $request->sectionId,
+                    'publish_status' => 0,
+                    'step' => 1,
+                    'created_by' => Auth::id(),
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                ]);
+            } else {
+                if ($previousExamList->publish_status == 1) {
+                    return [
+                        'status' => 0,
+                        'msg' => 'Exam sent for approval, can not change mark!'
+                    ];
+                } elseif ($previousExamList->publish_status == 2) {
+                    return [
+                        'status' => 0,
+                        'msg' => 'Exam already published, can not change mark!'
+                    ];
+                }
+            }
+
+            foreach ($request->stuChecks as $stuId) {
+                $mark = $request->marks[$stuId];
+                $totalMark = null;
+                $on100 = null;
+                $totalConversionMark = null;
+                $criteriaHasMark = false;
 
                 foreach ($mark as $criteriaMark) {
-                    $totalMark += $criteriaMark;
+                    if ($criteriaMark != null) {
+                        $criteriaHasMark = true;
+                        $totalMark += $criteriaMark;
+                    }
                 }
 
-                if ($totalMark > 0) {
-                    $on100 = ($totalMark / $subjectMark->full_marks) * 100;
-                    $totalConversionMark = ($on100 * $subjectMark->full_mark_conversion) / 100;
+                if ($totalMark!==null) {
+                    if ($totalMark>0) {
+                        $on100 = ($totalMark / $subjectMark->full_marks) * 100;
+                        $totalConversionMark = ($on100 * $subjectMark->full_mark_conversion) / 100;
+                    }else{
+                        $on100 = 0;
+                        $totalConversionMark = 0;
+                    }
                 }
 
                 $previousExamMark = ExamMark::where([
@@ -821,9 +973,16 @@ class ExamController extends Controller
                     'subject_id' => $request->subjectId,
                     'batch_id' => $request->batchId,
                     'section_id' => $request->sectionId,
-                    'student_id' => $key,
+                    'student_id' => $stuId,
                     'subject_marks_id' => $subjectMark->id,
                 ])->first();
+
+                // if (!$criteriaHasMark) {
+                //     if ($previousExamMark) {
+                //         $previousExamMark->delete();
+                //     }
+                //     continue;
+                // }
 
                 if ($previousExamMark) {
                     $previousExamMark->update([
@@ -839,10 +998,11 @@ class ExamController extends Controller
                         'academic_year_id' => $request->academicYearId,
                         'semester_id' => $request->semesterId,
                         'exam_id' => $request->examId,
+                        'exam_list_id' => $previousExamList->id,
                         'subject_id' => $request->subjectId,
                         'batch_id' => $request->batchId,
                         'section_id' => $request->sectionId,
-                        'student_id' => $key,
+                        'student_id' => $stuId,
                         'subject_marks_id' => $subjectMark->id,
                         'total_mark' => $totalMark,
                         'total_conversion_mark' => $totalConversionMark,
@@ -857,140 +1017,233 @@ class ExamController extends Controller
             }
 
             DB::commit();
-            Session::flash('message', 'Exam marks saved successfully!');
-            return redirect()->back();
+            return [
+                'status' => 1,
+                'msg' => 'Exam marks saved successfully!'
+            ];
         } catch (\Exception $e) {
             DB::rollback();
-            Session::flash('errorMessage', 'Error Saving Exam Marks.');
-            return redirect()->back();
+            return [
+                'status' => 0,
+                'msg' => $e,
+            ];
         }
     }
 
-    public function examCategoryExam()
+    public function examDeleteStudentMarks(Request $request)
     {
-        $category = ExamCategory::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        $subjectMark = SubjectMark::findOrFail($request->subjectMarksId);
 
-        $semester = Semester::where([
+        $previousExamList = ExamList::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
-        ])->get();
+            'academic_year_id' => $request->academicYearId,
+            'term_id' => $request->semesterId,
+            'exam_id' => $request->examId,
+            'batch_id' => $request->batchId,
+            'section_id' => $request->sectionId,
+        ])->first();
 
-        $examName = ExamName::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        if (!$request->stuChecks) {
+            return [
+                'status' => 0,
+                'msg' => "Please select at least one row",
+            ];
+        }
+        
+        DB::beginTransaction();
+        try {
+            if ($previousExamList) {
+                if ($previousExamList->publish_status == 1) {
+                    return [
+                        'status' => 0,
+                        'msg' => 'Exam sent for approval, can not remove marks!'
+                    ];
+                } elseif ($previousExamList->publish_status == 2) {
+                    return [
+                        'status' => 0,
+                        'msg' => 'Exam already published, can not remove marks!'
+                    ];
+                }
+            }
 
-        $batches = Batch::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
-        return view('academics::exam.exam-category-exam', compact('semester', 'category', 'examName','batches'));
+            foreach ($request->stuChecks as $stuId) {
+                $previousExamMark = ExamMark::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'academic_year_id' => $request->academicYearId,
+                    'semester_id' => $request->semesterId,
+                    'exam_id' => $request->examId,
+                    'subject_id' => $request->subjectId,
+                    'batch_id' => $request->batchId,
+                    'section_id' => $request->sectionId,
+                    'student_id' => $stuId,
+                    'subject_marks_id' => $subjectMark->id,
+                ])->first();
+
+                if ($previousExamMark) {
+                    $previousExamMark->delete();
+                }
+            }
+
+            DB::commit();
+            return [
+                'status' => 1,
+                'msg' => 'Selected student\'s exam marks removed successfully!'
+            ];
+        } catch (\Exception $e) {
+            DB::rollback();
+            return [
+                'status' => 0,
+                'msg' => $e,
+            ];
+        }
+    }
+
+    public function examCategoryExam(Request $request)
+    {
+        $pageAccessData = self::linkAccess($request);
+
+        $category = ExamCategory::all();
+        $examName = ExamName::all();
+        $batches = Batch::all();
+
+        return view('academics::exam.exam-category-exam', compact('pageAccessData', 'category', 'examName', 'batches'));
     }
 
     public function getAllSemesters()
     {
-        return Semester::where([
-            'campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute(),
-        ])->get();
+        return Semester::get();
     }
 
     public function getAllExamNames()
     {
-        return ExamName::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        return ExamName::all();
     }
 
     public function getAllBatch()
     {
-        return Batch::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        return Batch::all();
+    }
+
+    public function getSubjectsFromBatch($batchId)
+    {
+        $user = Auth::user();
+        $isAdmin = false;
+        $classTeacherAssign = null;
+        $employeeId = ($user->employee()) ? $user->employee()->id : null;
+
+        if ($user->role()->id == 1 || $user->role()->id == 6) {
+            $isAdmin = true;
+        } else {
+            if ($employeeId) {
+                $classTeacherAssign = DB::table('class_teacher_assign')->where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'batch_id' => $batchId,
+                    'teacher_id' => $employeeId,
+                    'status' => 1
+                ])->first();
+            }
+        }
+
+        if ($isAdmin || $classTeacherAssign) {
+            $classSubjectIds = ClassSubject::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'class_id' => $batchId,
+            ])->pluck('subject_id');
+            return Subject::whereIn('id', $classSubjectIds)->get();
+        } else {
+            if ($employeeId) {
+                $allClassSubjectIds = SubjectTeacher::where('employee_id', $employeeId)->pluck('class_subject_id');
+                $classSubjectIds = ClassSubject::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'class_id' => $batchId,
+                ])->whereIn('id', $allClassSubjectIds)->pluck('subject_id');
+                $subjects = Subject::whereIn('id', $classSubjectIds)->get();
+            } else {
+                $subjects = [];
+            }
+            return $subjects;
+        }
     }
 
     public function getSubjectsFromSection($sectionId)
     {
-        $subjectIds = ClassSubject::where('section_id', $sectionId)->pluck('subject_id');
+        $subjectIds = ClassSubject::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'section_id' => $sectionId
+        ])->pluck('subject_id');
         return Subject::whereIn('id', $subjectIds)->get();
     }
 
     public function getExamMarkParameters()
     {
-        return ExamMarkParameter::where([
-            'campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute()
-        ])->get();
+        return ExamMarkParameter::all();
     }
 
     public function getBatchesFromExamName($examId)
     {
         $examNameIds = ExamName::findOrFail($examId)->classes;
 
-        return Batch::whereIn('id', $examNameIds)->get();
+        if ($examNameIds) {
+            return Batch::whereIn('id', $examNameIds)->get();
+        }
+        return [];
     }
 
     public function getExamNamesFromTerm($termId)
     {
-        return Semester::findOrFail($termId)->examNames;
+        return ExamName::all();
     }
 
-    public function examMarks()
+    public function examMarks(Request $request)
     {
-        $academicYears = $this->academicHelper->getAllAcademicYears();
+        $pageAccessData = self::linkAccess($request);
 
-        return view('academics::exam.exam-marks', compact('academicYears'));
+        $examNames = ExamName::all();
+
+        return view('academics::exam.exam-marks', compact('pageAccessData', 'examNames'));
     }
 
     public function examSetMarks(Request $request)
     {
+        $pageAccessData = self::linkAccess($request);
+
         $validator = Validator::make($request->all(), [
-            'yearId'      => 'required',
-            'termId'      => 'required',
             'examId'      => 'required',
             'batchId'      => 'required',
-            'sectionId'      => 'required',
         ]);
 
         if ($validator->passes()) {
-            $academicYears = $this->academicHelper->getAllAcademicYears();
             $examMarkParameters = $this->getExamMarkParameters();
-            $selectedAcademicYear = AcademicsYear::findOrFail($request->yearId);
-            $semesters = $selectedAcademicYear->semesters();
 
-            $examNames = $this->getExamNamesFromTerm($request->termId);
-            $selectedSemester = Semester::FindOrFail($request->termId);
+            $examNames = ExamName::all();
             $batches = $this->getBatchesFromExamName($request->examId);
             $selectedBatch = Batch::findOrFail($request->batchId);
             $allSection = $selectedBatch->section();
-            $selectedSection = Section::findOrFail($request->sectionId);
             $exam = ExamName::findOrFail($request->examId);
-            $allSubject = $this->getSubjectsFromSection($request->sectionId);
+            $allSubject = $this->getSubjectsFromBatch($request->batchId);
 
             if ($request->subjectId) {
                 $selectedSubject = Subject::findOrFail($request->subjectId);
                 $subjects = Subject::where('id', $request->subjectId)->get();
             } else {
                 $selectedSubject = null;
-                $subjects = $this->getSubjectsFromSection($request->sectionId);
+                $subjects = $this->getSubjectsFromBatch($request->batchId);
             }
 
             $subjectMarks = SubjectMark::where([
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),
-                'academic_year_id' => $request->yearId,
-                'semester_id' => $request->termId,
                 'exam_id' => $request->examId,
                 'batch_id' => $request->batchId,
-                'section_id' => $request->sectionId,
             ])->get();
 
-            return view('academics::exam.exam-marks', compact('academicYears', 'selectedAcademicYear', 'semesters', 'selectedSemester', 'examNames', 'batches', 'examMarkParameters', 'exam', 'subjects', 'subjectMarks', 'selectedBatch', 'allSection', 'selectedSection', 'allSubject', 'selectedSubject'));
+            return view('academics::exam.exam-marks', compact('pageAccessData', 'examNames', 'batches', 'examMarkParameters', 'exam', 'subjects', 'subjectMarks', 'selectedBatch', 'allSection', 'allSubject', 'selectedSubject'));
         } else {
             Session::flash('errorMessage', 'Please input valid data before search!');
             return redirect()->back();
@@ -1035,33 +1288,24 @@ class ExamController extends Controller
 
     public function examAssignView($id)
     {
-        $examAssign = ExamName::where('id','=',$id)->first();
-        $sections = Section::with('singleBatch')->where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
-        $category = ExamCategory::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
-        $batches = Batch::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        $examAssign = ExamName::where('id', '=', $id)->first();
+        $sections = Section::with('singleBatch')->get();
+        $category = ExamCategory::all();
+        $batches = Batch::all();
         $eXamId = $id;
         //        $exam=ExamName::find($id);
-        return view('academics::exam.modal.exam-assign-class', compact('batches', 'sections', 'eXamId','examAssign'));
+        return view('academics::exam.modal.exam-assign-class', compact('batches', 'sections', 'eXamId', 'examAssign'));
     }
 
     public function examClassAssign(Request $request, $id)
     {
-//        $classJson = json_encode($request->sections);
+        //        $classJson = json_encode($request->sections);
         $examName = ExamName::find($id);
 
         if ($examName) {
             DB::beginTransaction();
             try {
-//                $examName->classes = $classJson;
+                //                $examName->classes = $classJson;
                 $examName->classes = $request->sections;
                 $sectionEntry = $examName->save();
 
@@ -1078,40 +1322,38 @@ class ExamController extends Controller
     }
     public function editExamName($id)
     {
-        $category = ExamCategory::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
-        $semester = Semester::where([
-            'campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute(),
-        ])->get();
-        $examName=ExamName::where('id','=',$id)->first();
-        return view('academics::exam.modal.edit-exam-name', compact('category','semester','examName'));
-
+        $category = ExamCategory::all();
+        $semester = Semester::get();
+        $examName = ExamName::where('id', '=', $id)->first();
+        return view('academics::exam.modal.edit-exam-name', compact('category', 'semester', 'examName'));
     }
     public function updateExamName(Request $request, $id)
     {
-//        return $request;
         $validatedData = $request->validate([
-            'exam_name' => 'required|unique:cadet_exam_name|max:255',
+            'exam_name' => 'required|max:255',
             'exam_category_id' => 'required',
-            'term_id' => 'required',
         ]);
-        $examNameDetails=ExamName::where('id','=',$id)->first();
-        if($request->effective_on=='on')
-        {
-            $effective=1;
-        }
-        else{
-            $effective=0;
 
+        $examNameDetails = ExamName::where('id', '=', $id)->first();
+
+        $sameNameExam = ExamName::where('exam_name', $request->exam_name)->first();
+
+        if ($sameNameExam) {
+            if ($sameNameExam->id != $examNameDetails->id) {
+                Session::flash('errorMessage', 'Sorry! There is already an exam name exist with this name.');
+                return redirect()->back();
+            }
+        }
+
+        if ($request->effective_on == 'on') {
+            $effective = 1;
+        } else {
+            $effective = 0;
         }
         DB::beginTransaction();
         try {
             $examName = $examNameDetails->exam_name = $request->exam_name;
             $examNameDetails->exam_category_id  = $request->exam_category_id;
-            $examNameDetails->term_id = $request->term_id;
             $examNameDetails->effective_on = $effective;
             $examNameDetails->updated_by = Auth::id();
             $examNameDetails->save();
@@ -1127,16 +1369,20 @@ class ExamController extends Controller
             return redirect()->back();
         }
     }
-    public function deleteExamName($id){
-        $examNameDetails=ExamName::where('id','=',$id)->first();
-        $deleteExam=$examNameDetails->delete();
-        if($deleteExam)
-        {
-            Session::flash('message', 'Exam Delete successfully.');
+    public function deleteExamName($id)
+    {
+        $examNameDetails = ExamName::findOrFail($id);
+        $subjectMark = SubjectMark::where('exam_id', $id)->first();
+        if ($subjectMark) {
+            Session::flash('errorMessage', 'Subject mapping found with this exam! Can not delete.');
             return redirect()->back();
         }
-        else{
-            Session::flash('errorMessage', 'Error Delete Exam.');
+        $deleteExam = $examNameDetails->delete();
+        if ($deleteExam) {
+            Session::flash('message', 'Exam Delete successfully.');
+            return redirect()->back();
+        } else {
+            Session::flash('errorMessage', 'Error Deleting Exam.');
             return redirect()->back();
         }
     }
@@ -1144,22 +1390,61 @@ class ExamController extends Controller
     // Exam Ajax Methods Starts
     public function examSearchSubjects(Request $request)
     {
-        return $this->getSubjectsFromSection($request->section);
+        return $this->getSubjectsFromBatch($request->batch);
     }
 
     public function searchSubjectsFromMarks(Request $request)
     {
+        $user = Auth::user();
+        $isAdmin = false;
+        $classTeacherAssign = null;
+        $employeeId = ($user->employee()) ? $user->employee()->id : null;
+
+        if ($user->role()->id == 1 || $user->role()->id == 6) {
+            $isAdmin = true;
+        } else {
+            if ($employeeId) {
+                $classTeacherAssign = DB::table('class_teacher_assign')->where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'batch_id' => $request->batchId,
+                    'section_id' => $request->sectionId,
+                    'teacher_id' => $employeeId,
+                    'status' => 1
+                ])->first();
+            }
+        }
+
         $subjectIds = SubjectMark::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
-            'academic_year_id' => $request->yearId,
-            'semester_id' => $request->termId,
             'exam_id' => $request->examId,
-            'batch_id' => $request->batchId,
-            'section_id' => $request->sectionId,
+            'batch_id' => $request->batchId
         ])->pluck('subject_id');
 
-        return Subject::whereIn('id', $subjectIds)->get();
+        if ($isAdmin || $classTeacherAssign) {
+            $classSubjectIds = ClassSubject::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'class_id' => $request->batchId,
+                'section_id' => $request->sectionId,
+            ])->pluck('subject_id');
+            return Subject::whereIn('id', $subjectIds)->whereIn('id', $classSubjectIds)->get();
+        } else {
+            if ($employeeId) {
+                $allClassSubjectIds = SubjectTeacher::where('employee_id', $employeeId)->pluck('class_subject_id');
+                $classSubjectIds = ClassSubject::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'class_id' => $request->batchId,
+                    'section_id' => $request->sectionId,
+                ])->whereIn('id', $allClassSubjectIds)->pluck('subject_id');
+                $subjects = Subject::whereIn('id', $subjectIds)->whereIn('id', $classSubjectIds)->get();
+            } else {
+                $subjects = [];
+            }
+            return $subjects;
+        }
     }
 
     public function examSetMarksPost(Request $request)
@@ -1167,8 +1452,6 @@ class ExamController extends Controller
         $examMarks = ExamMark::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
-            'academic_year_id' => $request->yearId,
-            'semester_id' => $request->termId,
             'exam_id' => $request->examId,
             'subject_id' => $request->subjectId,
             'batch_id' => $request->batchId,
@@ -1182,43 +1465,32 @@ class ExamController extends Controller
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
             'subject_id' => $request->subjectId,
-            'academic_year_id' => $request->yearId,
-            'semester_id' => $request->termId,
             'exam_id' => $request->examId,
             'batch_id' => $request->batchId,
-            'section_id' => $request->sectionId,
         ])->first();
 
         DB::beginTransaction();
         try {
             if ($previousSubjectMark) {
                 $previousSubjectMark->update([
-                    'section_id' => $request->sectionId,
                     'full_marks' => $request->fullMark,
                     'pass_marks' => $request->passMark,
                     'full_mark_conversion' => $request->fullMarkConversion,
                     'pass_mark_conversion' => $request->passMarkConversion,
                     'marks' => $request->marks,
-                    'effective_for' => $request->effectiveFor,
-                    'status' => $request->type,
                     'updated_at' => Carbon::now(),
                     'updated_by' => Auth::id()
                 ]);
             } else {
                 $insertSubjectMark = SubjectMark::insert([
                     'subject_id' => $request->subjectId,
-                    'academic_year_id' => $request->yearId,
-                    'semester_id' => $request->termId,
                     'exam_id' => $request->examId,
                     'batch_id' => $request->batchId,
-                    'section_id' => $request->sectionId,
                     'full_marks' => $request->fullMark,
                     'pass_marks' => $request->passMark,
                     'full_mark_conversion' => $request->fullMarkConversion,
                     'pass_mark_conversion' => $request->passMarkConversion,
                     'marks' => $request->marks,
-                    'effective_for' => $request->effectiveFor,
-                    'status' => $request->type,
                     'created_at' => Carbon::now(),
                     'created_by' => Auth::id(),
                     'campus_id' => $this->academicHelper->getCampus(),
@@ -1233,19 +1505,86 @@ class ExamController extends Controller
             return "Error Saving datas!";
         }
     }
+
+    public function examSetAllMarksPost(Request $request)
+    {
+        $errors = [];
+        $subjects = Subject::all()->keyBy('id');
+
+        foreach ($request->data as $subjectId => $data) {
+            $examMarks = ExamMark::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'exam_id' => $data['examId'],
+                'subject_id' => $data['subjectId'],
+                'batch_id' => $data['batchId'],
+            ])->first();
+
+            if ($examMarks) {
+                $errors[$subjectId] = "Saved Marks found on " . $subjects[$subjectId]->subject_name . ", can not change this subject marks!";
+                continue;
+            }
+
+            $previousSubjectMark = SubjectMark::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'subject_id' => $data['subjectId'],
+                'exam_id' => $data['examId'],
+                'batch_id' => $data['batchId'],
+            ])->first();
+
+            DB::beginTransaction();
+            try {
+                if ($previousSubjectMark) {
+                    $previousSubjectMark->update([
+                        'full_marks' => $data['fullMark'],
+                        'pass_marks' => $data['passMark'],
+                        'full_mark_conversion' => $data['fullMarkConversion'],
+                        'pass_mark_conversion' => $data['passMarkConversion'],
+                        'marks' => json_encode($data['marks']),
+                        'updated_at' => Carbon::now(),
+                        'updated_by' => Auth::id()
+                    ]);
+                } else {
+                    SubjectMark::insert([
+                        'subject_id' => $data['subjectId'],
+                        'exam_id' => $data['examId'],
+                        'batch_id' => $data['batchId'],
+                        'full_marks' => $data['fullMark'],
+                        'pass_marks' => $data['passMark'],
+                        'full_mark_conversion' => $data['fullMarkConversion'],
+                        'pass_mark_conversion' => $data['passMarkConversion'],
+                        'marks' => json_encode($data['marks']),
+                        'created_at' => Carbon::now(),
+                        'created_by' => Auth::id(),
+                        'campus_id' => $this->academicHelper->getCampus(),
+                        'institute_id' => $this->academicHelper->getInstitute(),
+                    ]);
+                }
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                $errors[$subjectId] = "Error In " . $subjects[$subjectId]->subject_name . "!";
+                continue;
+            }
+        }
+
+        return $errors;
+    }
     // Exam Ajax Methods Ends
 
     public function getExamCategories()
     {
-        return ExamCategory::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-        ])->get();
+        return ExamCategory::all();
     }
 
     public function getClassesFromSubject($subjectId)
     {
-        $classIds = ClassSubject::where('subject_id', $subjectId)->pluck('class_id');
+        $classIds = ClassSubject::where([
+            'subject_id' => $subjectId,
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->pluck('class_id');
         return Batch::whereIn('id', $classIds)->get();
     }
 
@@ -1279,12 +1618,16 @@ class ExamController extends Controller
         return Subject::whereIn('id', $subjectIds)->get();
     }
 
-    public function examSchedules()
+    public function examSchedules(Request $request)
     {
+        $pageAccessData = self::linkAccess($request);
+
         $academicYears = $this->academicHelper->getAllAcademicYears();
         $examCategories = $this->getExamCategories();
+        $terms = Semester::all();
+        $exams = ExamName::all();
 
-        return view('academics::exam.exam-schedules', compact('academicYears', 'examCategories'));
+        return view('academics::exam.exam-schedules', compact('pageAccessData', 'academicYears', 'examCategories', 'terms', 'exams'));
     }
 
     // Exam Ajax methods start
@@ -1310,8 +1653,6 @@ class ExamController extends Controller
             $subjectMarks = SubjectMark::with('subject')->where([
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),
-                'academic_year_id' => $request->yearId,
-                'semester_id' => $request->termId,
                 'exam_id' => $request->examId,
             ])->whereIn('batch_id', $request->classIds)->get()->groupBy('subject_id');
         } else {
@@ -1320,8 +1661,6 @@ class ExamController extends Controller
             $subjectMarks = SubjectMark::with('subject')->where([
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),
-                'academic_year_id' => $request->yearId,
-                'semester_id' => $request->termId,
                 'exam_id' => $request->examId,
             ])->get()->groupBy('subject_id');
         }
@@ -1336,9 +1675,22 @@ class ExamController extends Controller
 
         $markParameters = $this->getExamMarkParameters();
 
-        $datas = ['subjectMarks' => $subjectMarks->all(), 'classes' => $classes, 'markParameters' => $markParameters, 'previousSchedules' => $previousSchedules];
+        $type = $request->type;
 
-        return $datas;
+        $canSave = $request->canSave;
+
+        if ($type == 'print') {
+            $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+            $academicsYear = AcademicsYear::findOrFail($request->yearId);
+            $semester = Semester::findOrFail($request->termId);
+            $exam = ExamName::findOrFail($request->examId);
+
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->loadView('academics::exam.snippets.exam-schedule-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type'))->setPaper('a4', 'landscape');
+            return $pdf->stream();
+        } else {
+            return view('academics::exam.snippets.exam-schedule-table', compact('canSave', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type'))->render();
+        }
     }
 
     public function examSaveSchedule(Request $request)
@@ -1359,8 +1711,8 @@ class ExamController extends Controller
                 if ($previousSchedule) {
                     $previousSchedule->update([
                         'schedules' => json_encode($request->schedules[$batchId]),
-                        'from_date' => Carbon::parse($request->fromDate),
-                        'to_date' => Carbon::parse($request->toDate),
+                        'from_date' => Carbon::parse($request->schedules[$batchId]['fromDate']),
+                        'to_date' => Carbon::parse($request->schedules[$batchId]['toDate']),
                         'updated_at' => Carbon::now(),
                         'updated_by' => Auth::id(),
                     ]);
@@ -1372,8 +1724,8 @@ class ExamController extends Controller
                         'subject_id' => $request->subjectId,
                         'batch_id' => $batchId,
                         'schedules' => json_encode($request->schedules[$batchId]),
-                        'from_date' => Carbon::parse($request->fromDate),
-                        'to_date' => Carbon::parse($request->toDate),
+                        'from_date' => Carbon::parse($request->schedules[$batchId]['fromDate']),
+                        'to_date' => Carbon::parse($request->schedules[$batchId]['toDate']),
                         'created_at' => Carbon::now(),
                         'created_by' => Auth::id(),
                         'campus_id' => $this->academicHelper->getCampus(),
@@ -1390,6 +1742,59 @@ class ExamController extends Controller
         }
     }
 
+    public function saveAllExamSchedules(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            foreach ($request->subjectIds as $subjectId) {
+                foreach ($request->batchIds as $batchId) {
+                    if (isset($request->schedules[$subjectId][$batchId])) {
+                        $previousSchedule = ExamSchedule::where([
+                            'campus_id' => $this->academicHelper->getCampus(),
+                            'institute_id' => $this->academicHelper->getInstitute(),
+                            'academic_year_id' => $request->yearId,
+                            'semester_id' => $request->semesterId,
+                            'exam_id' => $request->examId,
+                            'subject_id' => $subjectId,
+                            'batch_id' => $batchId,
+                        ])->first();
+
+                        if ($previousSchedule) {
+                            $previousSchedule->update([
+                                'schedules' => json_encode($request->schedules[$subjectId][$batchId]),
+                                'from_date' => Carbon::parse($request->schedules[$subjectId][$batchId]['fromDate']),
+                                'to_date' => Carbon::parse($request->schedules[$subjectId][$batchId]['toDate']),
+                                'updated_at' => Carbon::now(),
+                                'updated_by' => Auth::id(),
+                            ]);
+                        } else {
+                            ExamSchedule::insert([
+                                'academic_year_id' => $request->yearId,
+                                'semester_id' => $request->semesterId,
+                                'exam_id' => $request->examId,
+                                'subject_id' => $subjectId,
+                                'batch_id' => $batchId,
+                                'schedules' => json_encode($request->schedules[$subjectId][$batchId]),
+                                'from_date' => Carbon::parse($request->schedules[$subjectId][$batchId]['fromDate']),
+                                'to_date' => Carbon::parse($request->schedules[$subjectId][$batchId]['toDate']),
+                                'created_at' => Carbon::now(),
+                                'created_by' => Auth::id(),
+                                'campus_id' => $this->academicHelper->getCampus(),
+                                'institute_id' => $this->academicHelper->getInstitute(),
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+            return 'All Exam Schedules Saved Successfully!';
+        } catch (\Exception $e) {
+            DB::rollback();
+            return 'Error saving Exam Schedules!';
+        }
+    }
+
     // Exam Ajax methods end
 
     public function examSeatPlan()
@@ -1401,15 +1806,16 @@ class ExamController extends Controller
     public function storeExamCategory(Request $request)
     {
         $validatedData = $request->validate([
-            'exam_category_name' => 'required|unique:cadet_exam_category|max:255',
+            'exam_category_name' => 'required|max:255|unique:cadet_exam_category,exam_category_name',
+            'alias' => 'required|max:255|unique:cadet_exam_category,alias',
         ]);
+
         DB::beginTransaction();
         try {
             $examCategory = ExamCategory::insert([
                 'exam_category_name' => $request->exam_category_name,
+                'alias' => $request->alias,
                 'created_by' => Auth::id(),
-                'campus' => $this->academicHelper->getCampus(),
-                'institute' => $this->academicHelper->getInstitute(),
             ]);
 
             if ($examCategory) {
@@ -1426,20 +1832,23 @@ class ExamController extends Controller
     public function storeExamName(Request $request)
     {
         $validatedData = $request->validate([
-            'exam_name' => 'required|unique:cadet_exam_name|max:255',
+            'exam_name' => 'required|max:255',
             'exam_category_id' => 'required',
-            'term_id' => 'required',
         ]);
+        $sameNameExam = ExamName::where('exam_name', $request->exam_name)->get();
+
+        if (sizeOf($sameNameExam) > 0) {
+            Session::flash('errorMessage', 'Sorry! There is already an exam exist with this name.');
+            return redirect()->back();
+        }
+
         DB::beginTransaction();
         try {
             $examName = ExamName::insert([
                 'exam_name' => $request->exam_name,
                 'exam_category_id' => $request->exam_category_id,
-                'term_id' => $request->term_id,
                 'effective_on' => $request->effective_on == 'on' ? 1 : 0,
-                'created_by' => Auth::id(),
-                'campus' => $this->academicHelper->getCampus(),
-                'institute' => $this->academicHelper->getInstitute(),
+                'created_by' => Auth::id()
             ]);
 
             if ($examName) {
@@ -1458,11 +1867,15 @@ class ExamController extends Controller
 
 
     // Exam Attendance Methods start
-    public function examAttendance()
+    public function examAttendance(Request $request)
     {
-        $academicYears = $this->academicHelper->getAllAcademicYears();
+        $pageAccessData = self::linkAccess($request);
 
-        return view('academics::exam.exam-attendance', compact('academicYears'));
+        $academicYears = $this->academicHelper->getAllAcademicYears();
+        $terms = Semester::all();
+        $exams = ExamName::all();
+
+        return view('academics::exam.exam-attendance', compact('pageAccessData', 'academicYears', 'terms', 'exams'));
     }
 
     // Exam Attendance Ajax Methods start
@@ -1480,7 +1893,7 @@ class ExamController extends Controller
         return Subject::whereIn('id', $subjectIds)->get();
     }
 
-    public function searchMarkParametersFromExamSchedule(Request $request)
+    protected function getMarkParametersFromExamSchedule($request)
     {
         $examScheduleRow = ExamSchedule::where([
             'campus_id' => $this->academicHelper->getCampus(),
@@ -1497,8 +1910,16 @@ class ExamController extends Controller
         return ExamMarkParameter::whereIn('id', array_keys($examSchedule))->get();
     }
 
+    public function searchMarkParametersFromExamSchedule(Request $request)
+    {
+        return $this->getMarkParametersFromExamSchedule($request);
+    }
+
     public function searchStudentsForAttendance(Request $request)
     {
+        $subject = Subject::findOrFail($request->subjectId);
+        $criterias = $this->getMarkParametersFromExamSchedule($request);
+
         $previousAttendance = ExamAttendance::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
@@ -1506,18 +1927,32 @@ class ExamController extends Controller
             'semester_id' => $request->semesterId,
             'exam_id' => $request->examId,
             'subject_id' => $request->subjectId,
-            'criteria_id' => $request->criteriaId,
             'batch_id' => $request->batchId,
             'section_id' => $request->sectionId
+        ])->get()->keyBy('criteria_id');
+
+        $classSubject = ClassSubject::where([
+            ['class_id', $request->batchId],
+            ['section_id', $request->sectionId],
+            ['subject_id', $request->subjectId],
+            ['subject_type', '!=', 1],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()],
         ])->first();
 
-        $students = StudentProfileView::where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
-            'academic_year' => $request->academicYearId,
-            'batch' => $request->batchId,
-            'section' => $request->sectionId
-        ])->get();
+
+        if ($classSubject) {
+            $stdIds = $this->academicHelper->stdIdsHasTheSub($request->batchId, $request->sectionId, $request->subjectId);
+            $students = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->whereIn('std_id', $stdIds)->get();
+        } else {
+            $students = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->where([
+                'campus' => $this->academicHelper->getCampus(),
+                'institute' => $this->academicHelper->getInstitute(),
+                'academic_year' => $request->academicYearId,
+                'batch' => $request->batchId,
+                'section' => $request->sectionId
+            ])->get();
+        }
 
         $examSchedule = ExamSchedule::where([
             'campus_id' => $this->academicHelper->getCampus(),
@@ -1529,13 +1964,25 @@ class ExamController extends Controller
             'batch_id' => $request->batchId
         ])->value('schedules');
 
-        $schedule = json_decode($examSchedule, true);
+        $scheduleData = json_decode($examSchedule, true);
+        // $schedule = $scheduleData[$request->criteriaId];
+        $schedule = $scheduleData;
 
-        return [$previousAttendance, $students, $schedule[$request->criteriaId]];
+        $type = $request->type;
+
+        $canSave = $request->canSave;
+
+        $htmlData = view('academics::exam.snippets.exam-attendance-sheet', compact('canSave', 'previousAttendance', 'criterias', 'students', 'schedule', 'type'))->render();
+
+        return [$htmlData, $schedule];
     }
 
-    public function saveStudentsAttendance(Request $request)
+    public function printAttendanceSheet(Request $request)
     {
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+        $subject = Subject::findOrFail($request->subjectId);
+        $criterias = $this->getMarkParametersFromExamSchedule($request);
+
         $previousAttendance = ExamAttendance::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
@@ -1543,34 +1990,101 @@ class ExamController extends Controller
             'semester_id' => $request->semesterId,
             'exam_id' => $request->examId,
             'subject_id' => $request->subjectId,
-            'criteria_id' => $request->criteriaId,
             'batch_id' => $request->batchId,
             'section_id' => $request->sectionId
+        ])->get()->keyBy('criteria_id');
+
+        $classSubject = ClassSubject::where([
+            ['class_id', $request->batchId],
+            ['section_id', $request->sectionId],
+            ['subject_id', $request->subjectId],
+            ['subject_type', '!=', 1],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()],
         ])->first();
+
+
+        if ($classSubject) {
+            $stdIds = $this->academicHelper->stdIdsHasTheSub($request->batchId, $request->sectionId, $request->subjectId);
+            $students = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->whereIn('std_id', $stdIds)->get();
+        } else {
+            $students = StudentProfileView::with('singleUser', 'singleBatch', 'singleSection')->where([
+                'campus' => $this->academicHelper->getCampus(),
+                'institute' => $this->academicHelper->getInstitute(),
+                'academic_year' => $request->academicYearId,
+                'batch' => $request->batchId,
+                'section' => $request->sectionId
+            ])->get();
+        }
+
+        $examSchedule = ExamSchedule::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'academic_year_id' => $request->academicYearId,
+            'semester_id' => $request->semesterId,
+            'exam_id' => $request->examId,
+            'subject_id' => $request->subjectId,
+            'batch_id' => $request->batchId
+        ])->value('schedules');
+
+        $scheduleData = json_decode($examSchedule, true);
+        // $schedule = $scheduleData[$request->criteriaId];
+        $schedule = $scheduleData;
+
+        $academicsYear = AcademicsYear::findOrFail($request->academicYearId);
+        $semester = Semester::findOrFail($request->semesterId);
+        $exam = ExamName::findOrFail($request->examId);
+        $batch = Batch::findOrFail($request->batchId);
+        $section = Section::findOrFail($request->sectionId);
+        $subject = Subject::findOrFail($request->subjectId);
+
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('academics::exam.snippets.exam-attendance-pdf', compact('institute', 'previousAttendance', 'criterias', 'students', 'schedule', 'academicsYear', 'semester', 'exam', 'batch', 'section', 'subject'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
+
+    public function saveStudentsAttendance(Request $request)
+    {
+        $criteriaIds = array_keys($request->attendance);
 
         DB::beginTransaction();
         try {
-            if ($previousAttendance) {
-                $previousAttendance->update([
-                    'attendance' => json_encode($request->attendance),
-                    'updated_at' => Carbon::now(),
-                    'updated_by' => Auth::id()
-                ]);
-            } else {
-                ExamAttendance::insert([
+            foreach ($criteriaIds as $criteriaId) {
+                $previousAttendance = ExamAttendance::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
                     'academic_year_id' => $request->academicYearId,
                     'semester_id' => $request->semesterId,
                     'exam_id' => $request->examId,
                     'subject_id' => $request->subjectId,
-                    'criteria_id' => $request->criteriaId,
+                    'criteria_id' => $criteriaId,
                     'batch_id' => $request->batchId,
-                    'section_id' => $request->sectionId,
-                    'attendance' => json_encode($request->attendance),
-                    'created_at' => Carbon::now(),
-                    'created_by' => Auth::id(),
-                    'campus_id' => $this->academicHelper->getCampus(),
-                    'institute_id' => $this->academicHelper->getInstitute(),
-                ]);
+                    'section_id' => $request->sectionId
+                ])->first();
+
+                if ($previousAttendance) {
+                    $previousAttendance->update([
+                        'attendance' => json_encode($request->attendance[$criteriaId]),
+                        'updated_at' => Carbon::now(),
+                        'updated_by' => Auth::id()
+                    ]);
+                } else {
+                    ExamAttendance::insert([
+                        'academic_year_id' => $request->academicYearId,
+                        'semester_id' => $request->semesterId,
+                        'exam_id' => $request->examId,
+                        'subject_id' => $request->subjectId,
+                        'criteria_id' => $criteriaId,
+                        'batch_id' => $request->batchId,
+                        'section_id' => $request->sectionId,
+                        'attendance' => json_encode($request->attendance[$criteriaId]),
+                        'created_at' => Carbon::now(),
+                        'created_by' => Auth::id(),
+                        'campus_id' => $this->academicHelper->getCampus(),
+                        'institute_id' => $this->academicHelper->getInstitute(),
+                    ]);
+                }
             }
 
             DB::commit();
@@ -1579,5 +2093,125 @@ class ExamController extends Controller
             DB::rollback();
             return "Error saving Attendance!";
         }
+    }
+
+    public function examList()
+    {
+        $authUser = Auth::user();
+        $examLists = ExamList::with('exam', 'year', 'term', 'batch', 'section')->where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->latest()->get();
+
+        $permittedSectionIds = [];
+        $allSectionPermitted = false;
+        if ($authUser->role()->name == 'super-admin') {
+            $allSectionPermitted = true;
+        } elseif ($authUser->role()->name == 'admin') {
+            $allSectionPermitted = true;
+        } elseif ($authUser->employee()) {
+            $permittedSectionIds = DB::table('class_teacher_assign')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'teacher_id' => $authUser->employee()->id,
+                'status' => 1
+            ])->pluck('section_id')->toArray();
+        }
+
+        $approvalLogs = AcademicsApprovalLog::with('user')->where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            // 'menu_id' => $examList->id,
+            'menu_type' => 'exam_result',
+        ])->get()->groupBy('menu_id');
+
+        $examListHasApproval = [];
+        foreach ($examLists as $examList) {
+            $approval_info = $this->academicHelper->getApprovalInfo('exam_result', $examList);
+            $approval_access = $approval_info['approval_access'];
+            $lastStep = $approval_info['last_step'];
+            
+            $examListHasApproval[$examList->id]['has_approval'] = $approval_access;
+
+            $approved_by = [];
+            if ($examList->publish_status == 2) {
+                $approvalHistoryInfo = ApprovalNotification::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'unique_name' => 'exam_result',
+                    'menu_id' => $examList->id,
+                ])->first();
+                $allUsers = $this->academicHelper->getAllUsers();
+                if ($approvalHistoryInfo) {
+                    if ($approvalHistoryInfo->approval_info) {
+                        $approvalDatas = json_decode($approvalHistoryInfo->approval_info);
+                        foreach ($approvalDatas as $key => $approvalData) {
+                            $persons = [];
+                            $userApproved = [];
+                            foreach ($approvalData->users_approved as $userinfo) {
+                                $userApproved[$userinfo->user_id] = true;
+                                if (isset($allUsers[$userinfo->user_id])) {
+                                    $user = $allUsers[$userinfo->user_id];
+                                    $persons[] = $user->name . ' on ' . Carbon::parse($userinfo->approved_at)->diffForHumans();
+                                }
+                            }
+                            $personTxt = implode(", ", $persons);
+                            $approved_by[] = "Step " . $key . ': Approved by- ' . $personTxt;
+                        }
+                    }
+                }
+            } else {
+                for($i=1;$i<=$lastStep;$i++){
+                    $personTxt = '';
+                    $persons = [];
+                    if (isset($approvalLogs[$examList->id])) {
+                        $approval_logs = $approvalLogs[$examList->id]->where('approval_layer', $i);
+                        foreach ($approval_logs as $log) {
+                            $persons[] = $log->user->name . ' on ' . Carbon::parse($log->created_at)->diffForHumans();
+                        }
+                        $personTxt = implode(", ", $persons);
+                    }
+                    $approved_by[] = "Step " . $i . ': approved by- ' . $personTxt;
+                }
+            }
+            
+            $examListHasApproval[$examList->id]['approval_text'] = implode(",<br>", $approved_by);
+        }
+
+        return view('academics::exam.exam-list', compact('examLists', 'approvalLogs', 'allSectionPermitted', 'permittedSectionIds', 'examListHasApproval'));
+    }
+
+    public function examSendForApproval($id)
+    {
+        $examList = ExamList::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            $examList->update([
+                'publish_status' => 1
+            ]);
+    
+            // Notification insertion for level of approval start
+            ApprovalNotification::create([
+                'module_name' => 'Academics',
+                'menu_name' => 'Tabulation Sheet(Exam)',
+                'unique_name' => 'exam_result',
+                'menu_link' => 'academics/exam/tabulation-sheet/exam/'.$examList->id,
+                'menu_id' => $id,
+                'approval_level' => 1,
+                'action_status' => 0,
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ]);
+            // Notification insertion for level of approval end
+
+            DB::commit();
+            Session::flash('message', 'Exam sent for approval successfully.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Session::flash('errorMessage', $th);
+        }
+
+        return redirect()->back();
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCadetExamMarksTable extends Migration
+class CreateCadetExamListsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,25 +13,18 @@ class CreateCadetExamMarksTable extends Migration
      */
     public function up()
     {
-        Schema::create('cadet_exam_marks', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('cadet_exam_lists', function (Blueprint $table) {
+            $table->id();
             $table->integer('academic_year_id');
-            $table->integer('semester_id');
+            $table->integer('term_id');
             $table->integer('exam_id');
-            $table->integer('subject_id');
             $table->integer('batch_id');
             $table->integer('section_id');
-            $table->integer('student_id');
-            $table->integer('subject_marks_id');
-            $table->integer('total_mark')->nullable();
-            $table->integer('total_conversion_mark')->nullable();
-            $table->integer('on_100')->nullable();
-            $table->longText('breakdown_mark');
+            $table->integer('publish_status')->comment("0=none, 1=pending, 2=published, 3=rejected");
+            $table->integer('step');
             $table->timestamps();
-            $table->softDeletes();
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
-            $table->integer('deleted_by')->nullable();
             $table->integer('campus_id');
             $table->integer('institute_id');
         });
@@ -44,6 +37,6 @@ class CreateCadetExamMarksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cadet_exam_marks');
+        Schema::dropIfExists('cadet_exam_lists');
     }
 }

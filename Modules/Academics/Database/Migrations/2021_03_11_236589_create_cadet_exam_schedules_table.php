@@ -22,8 +22,7 @@ class CreateCadetExamSchedulesTable extends Migration
             $table->integer('batch_id');
             $table->longText('schedules');
             $table->timestamp('from_date');
-            $table->timestamp('to_date');
-            $table->string('name');
+            $table->timestamp('to_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->integer('created_by');

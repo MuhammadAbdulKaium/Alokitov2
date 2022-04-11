@@ -18,17 +18,23 @@
     <section class="content">
         <div id="p0">
             @if(Session::has('message'))
-                <p class="alert alert-success alert-auto-hide" style="text-align: center"> <a href="#" class="close"
-                                                                                              style="text-decoration:none" data-dismiss="alert"
-                                                                                              aria-label="close">&times;</a>{{ Session::get('message') }}</p>
+                <p class="alert alert-success alert-auto-hide" style="text-align: center"> 
+                <a href="#" class="close" style="text-decoration:none" data-dismiss="alert"
+                aria-label="close">&times;</a>{{ Session::get('message') }}</p>
             @elseif(Session::has('alert'))
-                <p class="alert alert-warning alert-auto-hide" style="text-align: center">  <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" aria-label="close">&times;</a>{{ Session::get('alert') }}</p>
+                <p class="alert alert-warning alert-auto-hide" style="text-align: center">  
+                <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" 
+                aria-label="close">&times;</a>{{ Session::get('alert') }}</p>
             @elseif(Session::has('errorMessage'))
-                <p class="alert alert-danger alert-auto-hide" style="text-align: center">  <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" aria-label="close">&times;</a>{{ Session::get('errorMessage') }}</p>
+                <p class="alert alert-danger alert-auto-hide" style="text-align: center">  
+                <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" 
+                aria-label="close">&times;</a>{{ Session::get('errorMessage') }}</p>
             @endif
         </div>
         <div class="row">
-            <div class="col-sm-3">
+            @if (in_array(3000 ,$pageAccessData))
+            <div class="col-sm-4">
+                @if (in_array("academics/exam-category/store" ,$pageAccessData))
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-plus-square"></i> Add Exam Category </h3>
@@ -38,17 +44,28 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-sm-8">
-                                    <label for="">Exam Category Name</label>
-                                    <input type="text" class="form-control" name="exam_category_name">
+                                <div class="col-sm-5">
+                                    <label for="">Category Name</label>
+                                    <input type="text" class="form-control" name="exam_category_name" required>
+                                    @error('exam_category_name')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-sm-4">
+                                    <label for="">Alias</label>
+                                    <input type="text" class="form-control" name="alias" required>
+                                    @error('alias')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-sm-3">
                                     <button class="btn btn-success" style="margin-top: 23px">Save</button>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
+                @endif
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-search"></i> Exam Category List </h3>
@@ -57,20 +74,29 @@
                         <table class="table table-bordered" id="categoryTable">
                             <thead>
                                 <tr>
-                                    <th scope="col">Exam Category Name</th>
+                                    <th>#</th>
+                                    <th scope="col">Category Name</th>
+                                    <th scope="col">Alias</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($category as $cat)
                                 <tr>
+                                    <td>{{ $loop->index+1 }}</td>
                                     <td>{{$cat->exam_category_name}}</td>
+                                    <td>{{$cat->alias}}</td>
                                     <td>
-                                        <a href="/academics/edit/exam-category/exam/{{$cat->id}}" data-target="#globalModal" class="btn btn-primary btn-xs" data-toggle="modal" data-modal-size="modal-lg" tabindex="-1">Edit</a>
-{{--                                        <a href="" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>--}}
+                                        @if (in_array("academics/exam-category.edit" ,$pageAccessData))
+                                        <a href="/academics/edit/exam-category/exam/{{$cat->id}}" data-target="#globalModal" 
+                                            class="btn btn-primary btn-xs" data-toggle="modal" data-modal-size="modal-sm" 
+                                            tabindex="-1"><i class="fa fa-edit"></i></a>
+                                        @endif
+                                        @if (in_array("academics/exam-category.delete" ,$pageAccessData))
                                         <a href="/academics/delete/exam/category/{{$cat->id}}" class="btn btn-danger btn-xs"
                                             onclick="return confirm('Are you sure to Delete?')" data-placement="top"
                                             data-content="delete"><i class="fa fa-trash-o"></i></a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -78,8 +104,11 @@
                         </table>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-9">
+            </div>    
+            @endif
+            @if (in_array(3200 ,$pageAccessData))
+            <div class="col-sm-8">
+                @if (in_array("academics/exam-name/store" ,$pageAccessData))
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-plus-square"></i> Add Exam </h3>
@@ -89,25 +118,16 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <label for="">Exam Name</label>
                                     <input type="text" class="form-control" name="exam_name">
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <label for="">Exam Category</label>
                                     <select class="form-control" name="exam_category_id">
                                         <option value="">Select Category</option>
                                         @foreach($category as $cat)
                                             <option value="{{$cat->id}}">{{$cat->exam_category_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label for="">Term</label>
-                                    <select class="form-control" name="term_id">
-                                        <option value="">Select Term</option>
-                                        @foreach($semester as $sem)
-                                            <option value="{{$sem->id}}">{{$sem->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -121,6 +141,7 @@
                         </form>
                     </div>
                 </div>
+                @endif
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-search"></i> Exam List </h3>
@@ -129,46 +150,52 @@
                         <table class="table table-bordered" id="categoryTable">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th scope="col">Exam Name</th>
                                     <th scope="col">Exam Category</th>
-                                    <th scope="col">Term</th>
                                     <th scope="col">Effective?</th>
                                     <th scope="col">Assigned To</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" width="12%">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($examName as $name)
                                 <tr>
+                                    <td>{{ $loop->index+1 }}</td>
                                     <td>{{$name->exam_name}}</td>
                                     <td>{{$name->ExamCategory->exam_category_name}}</td>
-                                    <td>{{$name->Term->name}}</td>
                                     <td>{{$name->effective_on=='1'?'Yes':'No'}}</td>
                                     <td>
                                         @if (is_array($name->classes) || is_object($name->classes))
                                             @foreach($name->classes as $cl)
                                                 @foreach($batches as $batch)
                                                     @if($batch->id == $cl)
-                                                        <p class="btn btn-primary">
+                                                        <span class="badge badge-info">
                                                             {{$batch->batch_name}}
-                                                        </p>
+                                                        </span>
                                                     @endif
                                                 @endforeach
                                             @endforeach
                                         @endif
                                     </td>
                                     <td>
+                                        @if (in_array("academics/exam.assign" ,$pageAccessData))
                                         <a class="btn btn-success btn-xs"
-                                           href="{{url('academics/exam/name/assign/view/'.$name->id)}}"
-                                           data-target="#globalModal" data-toggle="modal"
-                                           data-modal-size="modal-lg">A</a>
-                                        <a class="btn btn-success btn-xs"
-                                           href="/academics/edit/exam/name/{{$name->id}}"
-                                           data-target="#globalModal" data-toggle="modal"
-                                           data-modal-size="modal-lg"><i class="fa fa-edit"></i></a>
+                                        href="{{url('academics/exam/name/assign/view/'.$name->id)}}"
+                                        data-target="#globalModal" data-toggle="modal"
+                                        data-modal-size="modal-md">A</a>
+                                        @endif
+                                        @if (in_array("academics/exam.edit" ,$pageAccessData))
+                                        <a class="btn btn-primary btn-xs"
+                                        href="/academics/edit/exam/name/{{$name->id}}"
+                                        data-target="#globalModal" data-toggle="modal"
+                                        data-modal-size="modal-md"><i class="fa fa-edit"></i></a>
+                                        @endif
+                                        @if (in_array("academics/exam.delete" ,$pageAccessData))
                                         <a href="/academics/delete/exam/{{$name->id}}" class="btn btn-danger btn-xs"
                                             onclick="return confirm('Are you sure to Delete?')" data-placement="top"
                                             data-content="delete"><i class="fa fa-trash-o"></i></a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -177,6 +204,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
         <div class="modal" id="globalModal" tabindex="-1" role="dialog" aria-labelledby="esModalLabel"
              aria-hidden="true">

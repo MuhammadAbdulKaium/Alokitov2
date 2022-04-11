@@ -12,4 +12,16 @@ class ExamMark extends Model
     protected $table = 'cadet_exam_marks';
 
     protected $guarded = [];
+
+
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id', 'id');
+    }
+
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class, 'batch_id', 'id');
+    }
 }
