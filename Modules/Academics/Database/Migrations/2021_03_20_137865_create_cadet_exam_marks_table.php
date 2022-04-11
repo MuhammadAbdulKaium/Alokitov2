@@ -23,9 +23,9 @@ class CreateCadetExamMarksTable extends Migration
             $table->integer('section_id');
             $table->integer('student_id');
             $table->integer('subject_marks_id');
-            $table->integer('total_mark')->nullable();
-            $table->integer('total_conversion_mark')->nullable();
-            $table->integer('on_100')->nullable();
+            $table->float('total_mark')->nullable();
+            $table->float('total_conversion_mark')->nullable();
+            $table->float('on_100')->nullable();
             $table->longText('breakdown_mark');
             $table->timestamps();
             $table->softDeletes();
@@ -34,6 +34,7 @@ class CreateCadetExamMarksTable extends Migration
             $table->integer('deleted_by')->nullable();
             $table->integer('campus_id');
             $table->integer('institute_id');
+            $table->integer('exam_list_id');
         });
     }
 

@@ -245,16 +245,15 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::post('/manage/assessments/exam/status', 'ExamController@getExamStatus');
     Route::post('/manage/assessments/exam/status/update', 'ExamController@updateExamStatus');
     Route::get('/exam-category/exam', 'ExamController@examCategoryExam');
-    Route::get('/edit/exam-category/exam/{id}', 'ExamController@editExamCategoryExam');
-    Route::post('/update/exam/category/{id}', 'ExamController@updateExamCategoryExam');
-    Route::get('/delete/exam/category/{id}', 'ExamController@deleteExamCategory');
-    Route::get('/exam/name/assign/view/{id}', 'ExamController@examAssignView');
-    Route::get('/edit/exam/name/{id}', 'ExamController@editExamName');
-    Route::post('/update/exam/name/{id}', 'ExamController@updateExamName');
-    Route::get('/delete/exam/{id}', 'ExamController@deleteExamName');
+    Route::get('/edit/exam-category/exam/{id}', ['access' => ['academics/exam-category.edit'], 'uses' => 'ExamController@editExamCategoryExam']);
+    Route::post('/update/exam/category/{id}', ['access' => ['academics/exam-category.edit'], 'uses' => 'ExamController@updateExamCategoryExam']);
+    Route::get('/delete/exam/category/{id}', ['access' => ['academics/exam-category.edit'], 'uses' => 'ExamController@deleteExamCategory']);
+    Route::get('/exam/name/assign/view/{id}', ['access' => ['academics/exam.assign'], 'uses' => 'ExamController@examAssignView']);
+    Route::get('/edit/exam/name/{id}', ['access' => ['academics/exam.edit'], 'uses' => 'ExamController@editExamName']);
+    Route::post('/update/exam/name/{id}', ['access' => ['academics/exam.edit'], 'uses' => 'ExamController@updateExamName']);
+    Route::get('/delete/exam/{id}', ['access' => ['academics/exam.delete'], 'uses' => 'ExamController@deleteExamName']);
     Route::post('/exam/class/assign/{id}', 'ExamController@examClassAssign');
-    Route::get('/exam/seatPlan', 'ExamController@examSeatPlan');
-    
+
 
     Route::post('/exam-category/store', 'ExamController@storeExamCategory');
     Route::post('/exam-name/store', 'ExamController@storeExamName');
@@ -263,9 +262,31 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::get('/exam/marks', 'ExamController@examMarks');
     Route::get('/exam/set/marks', 'ExamController@examSetMarks');
     Route::post('/exam/set/marks/post', 'ExamController@examSetMarksPost');
+    Route::post('/exam/set/all/marks/post', 'ExamController@examSetAllMarksPost');
     Route::get('/exam/marks/entry/', 'ExamController@examMarksEntry');
     Route::post('/exam/save/student/marks', 'ExamController@examSaveStudentMarks');
+    Route::post('/exam/delete/student/marks', 'ExamController@examDeleteStudentMarks');
+
+    Route::get('/exam/list', 'ExamController@examList');
+    Route::get('/exam/send-for-approval/{id}', 'ExamController@examSendForApproval');
     
+    //tabulation routes by dev9
+
+    Route::get('/exam/tabulation-sheet', 'TabulationSheetController@tabulationSheet');
+    Route::get('/exam/tabulation-sheet-pdf', 'TabulationSheetController@tabulationSheetPdf');
+
+    Route::get('/exam/final-sheet', 'BoardExamResultController@finalSheet');
+    Route::get('/exam/final-sheet-pdf', 'BoardExamResultController@finalSheetPdf');
+
+    //Board Exam Result Routes
+    Route::get('/exam/board-exam-result', 'BoardExamResultController@boardExamResult');
+    Route::get('/exam/board-exam-search-class', 'BoardExamResultController@boardExamSearchClass');
+    Route::post('/exam/save/student/board-exam', 'BoardExamResultController@publicExamSaveStudentMarks');
+
+    //Board Exam Result Ajax Routes
+
+    Route::post('/exam/board-exam-result/search-students', 'BoardExamResultController@searchPublicExamStudent');
+
     // Exam Mark Ajax Routes
     Route::get('/exam/search-semester', 'ExamController@examSearchSemester');
     Route::get('/exam/search-exam', 'ExamController@examSearchExam');
@@ -273,7 +294,7 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::get('/exam/search-forms', 'ExamController@examSearchForms');
     Route::get('/exam/search-subjects', 'ExamController@examSearchSubjects');
     Route::get('/exam/search-subjects/from-marks', 'ExamController@searchSubjectsFromMarks');
-    Route::post('/exam/student/search/', 'ExamController@examStudentSearch');
+    Route::get('/exam/student/search/', 'ExamController@examStudentSearch');
 
     // Exam Schedule routes
     Route::get('/exam/schedules', 'ExamController@examSchedules');
@@ -281,6 +302,7 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::get('/exam/search-classes/from-exam', 'ExamController@examSearchClassesFromExam');
     Route::get('/exam/search-schedule', 'ExamController@examSearchSchedule');
     Route::get('/exam/save-schedule', 'ExamController@examSaveSchedule');
+    Route::get('/exam/save/all/schedules', 'ExamController@saveAllExamSchedules');
 
     // Exam Attendance routes
     Route::get('/exam/attendance', 'ExamController@examAttendance');
@@ -289,6 +311,35 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::get('/exam/search-mark-parameters-from/exam-schedules', 'ExamController@searchMarkParametersFromExamSchedule');
     Route::get('/exam/search-students/for-attendance', 'ExamController@searchStudentsForAttendance');
     Route::get('/exam/save-students-attendance', 'ExamController@saveStudentsAttendance');
+    Route::post('/exam/print/attendance/sheet', 'ExamController@printAttendanceSheet');
+
+    //Exam Final Result By Dev9
+    Route::get('/exam/term-exam', 'ExamFinalController@index');
+    Route::get('/exam/term-exam-pdf', 'ExamFinalController@termEndExamResultPdf');
+    Route::get('/exam/term-exam-details', 'ExamFinalController@termEndExamResults');
+    Route::get('/exam/term-exam-details-pdf', 'ExamFinalController@termEndExamResultDetailsPdf');
+
+    // Exam Seat Plan
+    Route::get('/exam/seatPlan', 'ExamSeatPlanController@index');
+    Route::get('/exam/from/exam-category', 'ExamSeatPlanController@examFromExamCategory');
+    Route::get('/search/exam-seat', 'ExamSeatPlanController@searchExamSeat');
+    Route::get('/get/students/from/sections', 'ExamSeatPlanController@getStudentsFromSections');
+    Route::get('/get/seat/plan/view', 'ExamSeatPlanController@getSeatPlanView');
+    Route::get('/schedule/wise/criteria/from/subject', 'ExamSeatPlanController@scheduleWiseCriteriaFromSubject');
+    Route::post('/save/seat/plan', 'ExamSeatPlanController@saveSeatPlan');
+    Route::post('/print/seat/plan', 'ExamSeatPlanController@printSeatPlan');
+    Route::get('/invigilator/history/{yearId}/{termId}/{examId}/{ids}', ['access' => ['academics/exam/invigilator.history'], 'uses' => 'ExamSeatPlanController@invigilatorHistory']);
+
+
+    // Tabulation Sheet Routes
+    Route::get('/exam/tabulation-sheet/{type}/{listId?}', ['access' => ['academics/exam/tabulation-sheet/exam', 'academics/exam/tabulation-sheet/term', 'academics/exam/tabulation-sheet/year'], 'uses' => 'TabulationSheetController@index']);
+    Route::post('/exam/tabulation-sheet-exam/search-marks', 'TabulationSheetController@examSheetSearchMarks');
+    Route::get('/exam/tabulation-sheet-exam/approve', 'TabulationSheetController@examResultApprove');
+    Route::post('/exam/tabulation-sheet-term/search-marks', 'TabulationSheetController@termSheetSearchMarks');
+    Route::post('/exam/tabulation-sheet-term-summary/search-marks', 'TabulationSheetController@termSummarySheetSearchMarks');
+    Route::post('/exam/tabulation-sheet-year/search-marks', 'TabulationSheetController@yearSheetSearchMarks');
+    Route::get('/exam/from/year', 'TabulationSheetController@examFromYear');
+    Route::get('/profile/academic2/exam-result/{std_id}/{batch}/{section}/{academicYear}/{termId}/{examId}', 'TabulationSheetController@getStudentProfileSingleExamInfo')->middleware('std-profile-permission'); //home
 
 
 

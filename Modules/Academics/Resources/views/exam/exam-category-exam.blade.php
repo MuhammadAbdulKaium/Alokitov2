@@ -32,9 +32,9 @@
             @endif
         </div>
         <div class="row">
-            @if (in_array(3000 ,$pageAccessData))
+            {{-- @if (in_array(3000 ,$pageAccessData)) --}}
             <div class="col-sm-4">
-                @if (in_array("academics/exam-category/store" ,$pageAccessData))
+                {{-- @if (in_array("academics/exam-category/store" ,$pageAccessData)) --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-plus-square"></i> Add Exam Category </h3>
@@ -65,7 +65,7 @@
                         </form>
                     </div>
                 </div>
-                @endif
+                {{-- @endif --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-search"></i> Exam Category List </h3>
@@ -87,16 +87,16 @@
                                     <td>{{$cat->exam_category_name}}</td>
                                     <td>{{$cat->alias}}</td>
                                     <td>
-                                        @if (in_array("academics/exam-category.edit" ,$pageAccessData))
+                                        {{-- @if (in_array("academics/exam-category.edit" ,$pageAccessData)) --}}
                                         <a href="/academics/edit/exam-category/exam/{{$cat->id}}" data-target="#globalModal" 
                                             class="btn btn-primary btn-xs" data-toggle="modal" data-modal-size="modal-sm" 
                                             tabindex="-1"><i class="fa fa-edit"></i></a>
-                                        @endif
-                                        @if (in_array("academics/exam-category.delete" ,$pageAccessData))
+                                        {{-- @endif --}}
+                                        {{-- @if (in_array("academics/exam-category.delete" ,$pageAccessData)) --}}
                                         <a href="/academics/delete/exam/category/{{$cat->id}}" class="btn btn-danger btn-xs"
                                             onclick="return confirm('Are you sure to Delete?')" data-placement="top"
                                             data-content="delete"><i class="fa fa-trash-o"></i></a>
-                                        @endif
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -105,10 +105,10 @@
                     </div>
                 </div>
             </div>    
-            @endif
-            @if (in_array(3200 ,$pageAccessData))
+            {{-- @endif --}}
+            {{-- @if (in_array(3200 ,$pageAccessData)) --}}
             <div class="col-sm-8">
-                @if (in_array("academics/exam-name/store" ,$pageAccessData))
+                {{-- @if (in_array("academics/exam-name/store" ,$pageAccessData)) --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-plus-square"></i> Add Exam </h3>
@@ -141,7 +141,7 @@
                         </form>
                     </div>
                 </div>
-                @endif
+                {{-- @endif --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-search"></i> Exam List </h3>
@@ -179,23 +179,23 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if (in_array("academics/exam.assign" ,$pageAccessData))
+                                        {{-- @if (in_array("academics/exam.assign" ,$pageAccessData)) --}}
                                         <a class="btn btn-success btn-xs"
                                         href="{{url('academics/exam/name/assign/view/'.$name->id)}}"
                                         data-target="#globalModal" data-toggle="modal"
                                         data-modal-size="modal-md">A</a>
-                                        @endif
-                                        @if (in_array("academics/exam.edit" ,$pageAccessData))
+                                        {{-- @endif --}}
+                                        {{-- @if (in_array("academics/exam.edit" ,$pageAccessData)) --}}
                                         <a class="btn btn-primary btn-xs"
                                         href="/academics/edit/exam/name/{{$name->id}}"
                                         data-target="#globalModal" data-toggle="modal"
                                         data-modal-size="modal-md"><i class="fa fa-edit"></i></a>
-                                        @endif
-                                        @if (in_array("academics/exam.delete" ,$pageAccessData))
+                                        {{-- @endif --}}
+                                        {{-- @if (in_array("academics/exam.delete" ,$pageAccessData)) --}}
                                         <a href="/academics/delete/exam/{{$name->id}}" class="btn btn-danger btn-xs"
                                             onclick="return confirm('Are you sure to Delete?')" data-placement="top"
                                             data-content="delete"><i class="fa fa-trash-o"></i></a>
-                                        @endif
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                             @endforeach
@@ -204,7 +204,7 @@
                     </div>
                 </div>
             </div>
-            @endif
+            {{-- @endif --}}
         </div>
         <div class="modal" id="globalModal" tabindex="-1" role="dialog" aria-labelledby="esModalLabel"
              aria-hidden="true">
