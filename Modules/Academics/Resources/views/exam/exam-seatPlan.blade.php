@@ -128,9 +128,12 @@
             <button class="print-seat-plan-form-print-btn" style="display: none"></button>
         </form>
 
-        <input type="hidden" class="can_check_invigilator_history" value="{{ (in_array("academics/exam/invigilator.history" ,$pageAccessData))?true:false }}">
-        <input type="hidden" class="can_save" value="{{ (in_array("academics/save/seat/plan" ,$pageAccessData))?true:false }}">
-        <input type="hidden" class="can_print" value="{{ (in_array("academics/print/seat/plan" ,$pageAccessData))?true:false }}">
+        {{-- <input type="hidden" class="can_check_invigilator_history" value="{{ (in_array("academics/exam/invigilator.history" ,$pageAccessData))?true:false }}"> --}}
+        <input type="hidden" class="can_check_invigilator_history" value="{{ true }}">
+        {{-- <input type="hidden" class="can_save" value="{{ (in_array("academics/save/seat/plan" ,$pageAccessData))?true:false }}"> --}}
+        <input type="hidden" class="can_save" value="{{ true }}">
+        {{-- <input type="hidden" class="can_print" value="{{ (in_array("academics/print/seat/plan" ,$pageAccessData))?true:false }}"> --}}
+        <input type="hidden" class="can_print" value="{{ true }}">
     </section>
 </div>
 @endsection

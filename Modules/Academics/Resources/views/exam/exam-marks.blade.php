@@ -108,9 +108,9 @@
                                 <td><input type="number" class="form-control parameter-field all-field-full-mark" data-param-id="{{$examMarkParameter->id}}" disabled></td>
                             @endforeach
                             <td rowspan="3" style="vertical-align: middle">
-                                @if (in_array("academics/exam/set/marks/post" ,$pageAccessData))
+                                {{-- @if (in_array("academics/exam/set/marks/post" ,$pageAccessData)) --}}
                                 <button type="button" id="marks-all-save-btn" class="btn btn-primary">Save All</button>
-                                @endif
+                                {{-- @endif --}}
                             </td>
                         </tr>
                         <tr>
@@ -167,9 +167,9 @@
                                         <td scope="col"><input type="checkbox" {{($previousParamMark)?'checked':''}} class="parameter-check" data-param-id="{{$examMarkParameter->id}}" value="{{$examMarkParameter->id}}"> {{$examMarkParameter->name}}</td>
                                     @endforeach
                                     <td rowspan="4" style="vertical-align: middle">
-                                        @if (in_array("academics/exam/set/marks/post" ,$pageAccessData))
+                                        {{-- @if (in_array("academics/exam/set/marks/post" ,$pageAccessData)) --}}
                                         <button type="button" class="btn btn-success marks-save-btn">{{($previousMark)?'Update':'Save'}}</button>
-                                        @endif
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                                 <tr>

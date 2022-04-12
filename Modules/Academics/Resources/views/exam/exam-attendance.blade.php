@@ -78,15 +78,15 @@
                             </select>
                         </div>
                         <div class="col-sm-2">
-                            @if (in_array(4300 ,$pageAccessData))
+                            {{-- @if (in_array(4300 ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary search-attendance-sheet-button" type="button"><i class="fa fa-search"></i></button>
-                            @endif
-                            @if (in_array(4350 ,$pageAccessData))
+                            {{-- @endif --}}
+                            {{-- @if (in_array(4350 ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary view-attendance-sheet-button" type="button"><i class="fa fa-eye"></i></button>
-                            @endif
-                            @if (in_array("academics/exam/print/attendance/sheet" ,$pageAccessData))
+                            {{-- @endif --}}
+                            {{-- @if (in_array("academics/exam/print/attendance/sheet" ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary"><i class="fa fa-print"></i></button>
-                            @endif
+                            {{-- @endif --}}
                         </div>
                     </div>
                 </form>
@@ -107,7 +107,8 @@
             </div>
         </div>
 
-        <input type="hidden" class="can_save" value="{{ (in_array("academics/exam/save-students-attendance" ,$pageAccessData))?true:false }}">
+        {{-- <input type="hidden" class="can_save" value="{{ (in_array("academics/exam/save-students-attendance" ,$pageAccessData))?true:false }}"> --}}
+        <input type="hidden" class="can_save" value="{{ true }}">
     </section>
 </div>
 @endsection

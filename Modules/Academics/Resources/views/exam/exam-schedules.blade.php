@@ -62,15 +62,15 @@
                         </select>
                     </div>
                     <div class="col-sm-2">
-                        @if (in_array(3750 ,$pageAccessData))
+                        {{-- @if (in_array(3750 ,$pageAccessData)) --}}
                         <button class="btn btn-sm btn-primary search-schedule-button"><i class="fa fa-search"></i></button>
-                        @endif
-                        @if (in_array(3800 ,$pageAccessData))
+                        {{-- @endif --}}
+                        {{-- @if (in_array(3800 ,$pageAccessData)) --}}
                         <button class="btn btn-sm btn-primary view-schedule-button"><i class="fa fa-eye"></i></button>
-                        @endif
-                        @if (in_array(3850 ,$pageAccessData))
+                        {{-- @endif --}}
+                        {{-- @if (in_array(3850 ,$pageAccessData)) --}}
                         <button class="btn btn-sm btn-primary print-schedule-button"><i class="fa fa-print"></i></button>
-                        @endif
+                        {{-- @endif --}}
                     </div>
                 </div>
 
@@ -96,7 +96,8 @@
             <input type="submit" class="hidden_print_btn" style="display: none">
         </form>
 
-        <input type="hidden" class="can_save" value="{{ (in_array("academics/exam/save-schedule" ,$pageAccessData))?true:false }}">
+        {{-- <input type="hidden" class="can_save" value="{{ (in_array("academics/exam/save-schedule" ,$pageAccessData))?true:false }}"> --}}
+        <input type="hidden" class="can_save" value="{{ true }}">
     </section>
 </div>
 @endsection

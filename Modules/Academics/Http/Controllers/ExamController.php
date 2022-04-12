@@ -1905,9 +1905,12 @@ class ExamController extends Controller
             'subject_id' => $request->subjectId,
         ])->first();
 
-        $examSchedule = json_decode($examScheduleRow->schedules, true);
-
-        return ExamMarkParameter::whereIn('id', array_keys($examSchedule))->get();
+        if ($examScheduleRow) {
+            $examSchedule = json_decode($examScheduleRow->schedules, true);
+            return ExamMarkParameter::whereIn('id', array_keys($examSchedule))->get();
+        }else{
+            return [];
+        }
     }
 
     public function searchMarkParametersFromExamSchedule(Request $request)
@@ -1939,7 +1942,6 @@ class ExamController extends Controller
             ['campus_id', $this->academicHelper->getCampus()],
             ['institute_id', $this->academicHelper->getInstitute()],
         ])->first();
-
 
         if ($classSubject) {
             $stdIds = $this->academicHelper->stdIdsHasTheSub($request->batchId, $request->sectionId, $request->subjectId);
