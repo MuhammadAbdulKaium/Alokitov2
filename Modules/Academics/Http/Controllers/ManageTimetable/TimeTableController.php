@@ -3,7 +3,9 @@
 namespace Modules\Academics\Http\Controllers\ManageTimetable;
 
 use App;
+use App\Helpers\UserAccessHelper;
 use Excel;
+use Modules\Academics\Entities\Section;
 use Redirect;
 use Session;
 use Validator;
@@ -26,6 +28,7 @@ use Modules\Academics\Entities\ClassTeacherAssign;
 
 class TimeTableController extends Controller
 {
+    private  $section;
     private $timeTable;
     private $academicsLevel;
     private $classSubject;
@@ -37,11 +40,13 @@ class TimeTableController extends Controller
     private $academicHelper;
     private $studentEnrollment;
     private $classTeacherAssign;
+    use UserAccessHelper;
 
 
     // constructor
-    public function __construct(TimeTable $timeTable,ClassTeacherAssign $classTeacherAssign, AcademicsLevel $academicsLevel, ClassSubject $classSubject, SubjectTeacher $subjectTeacher, ClassPeriod $classPeriod, ClassSectionPeriod $classSectionPeriodCategory, ClassPeriodCategory $classPeriodCategory, AcademicHelper $academicHelper, EmployeeInformation $employeeInformation, StudentEnrollment $studentEnrollment)
+    public function __construct(Section $section, TimeTable $timeTable, ClassTeacherAssign $classTeacherAssign, AcademicsLevel $academicsLevel, ClassSubject $classSubject, SubjectTeacher $subjectTeacher, ClassPeriod $classPeriod, ClassSectionPeriod $classSectionPeriodCategory, ClassPeriodCategory $classPeriodCategory, AcademicHelper $academicHelper, EmployeeInformation $employeeInformation, StudentEnrollment $studentEnrollment)
     {
+        $this->section = $section;
         $this->timeTable = $timeTable;
         $this->classSubject = $classSubject;
         $this->employeeInformation = $employeeInformation;
@@ -56,74 +61,118 @@ class TimeTableController extends Controller
     }
 
 
-    public function index($tabId)
+    public function index(Request $request, $tabId)
     {
-
+        $pageAccessData = self::linkAccess($request);
         // all academics levels
         $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
         // all related class period categories
         $classPeriodCategories = $this->getAcademicClassPeriodCategory();
 
-        if($tabId=='manage'){
+        if ($tabId == 'manage') {
             // return view with academicsLevels
-            return view('academics::manage-timetable.manage', compact('allAcademicsLevel'))->with('page', 'manage');
-        }elseif($tabId=='timetable'){
+            return view('academics::manage-timetable.manage', compact('allAcademicsLevel', 'pageAccessData'))->with('page', 'manage');
+        } elseif ($tabId == 'timetable') {
             // return view with academicsLevels
-            return view('academics::manage-timetable.timetable', compact('allAcademicsLevel'))->with('page', 'timetable');
-        }elseif($tabId=='settings'){
+            return view('academics::manage-timetable.timetable', compact('allAcademicsLevel', 'pageAccessData'))->with('page', 'timetable');
+        } elseif ($tabId == 'settings') {
             // return view with academicsLevels
-            return view('academics::manage-timetable.settings', compact('classPeriodCategories'))->with('page', 'settings');
-        }elseif($tabId=='routine'){
+            return view('academics::manage-timetable.settings', compact('classPeriodCategories', 'pageAccessData'))->with('page', 'settings');
+        } elseif ($tabId == 'routine') {
             // return view with academicsLevels
-            return view('academics::manage-timetable.routine', compact('allAcademicsLevel'))->with('page', 'routine');
-        }
-        elseif($tabId=='class-teacher-assign'){
+            return view('academics::manage-timetable.routine', compact('allAcademicsLevel', 'pageAccessData'))->with('page', 'routine');
+        } elseif ($tabId == 'class-teacher-assign') {
 
+
+            $empList = EmployeeInformation::with('singleUser', 'singleDesignation', 'singleDepartment')->where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get()->keyBy('id');
+
+            $sections = $this->getAll();
             // class teacehr assign
-            $classTeacherList=$this->classTeacherAssign->where('institute_id',institution_id())->where('campus_id',campus_id())->orderBy('batch_id','asc')->get();
-            return view('academics::manage-timetable.class-teacher-assign', compact('classTeacherList'))->with('page', 'class-teacher-assign');
-        }else{
+            $classTeacherList = $this->classTeacherAssign->where('institute_id', institution_id())->where('campus_id', campus_id())->orderBy('batch_id', 'asc')->get();
+            $teacherArray = $classTeacherList->groupBy('section_id');
+
+            return view('academics::manage-timetable.class-teacher-assign', compact('teacherArray', 'empList', 'classTeacherList', 'sections', 'pageAccessData'))->with('page', 'class-teacher-assign');
+        } else {
             return "Page not found";
         }
     }
-
+    public function getAll()
+    {
+        return $sectionList = $this->section->with('divisions')->get();
+    }
 
     // class teacher assign
-    public function  classTeacherAssignModal(){
-        $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id',campus_id())->where('status',1)->get();
+    public function  classTeacherAssignModal()
+    {
+        $empList = EmployeeInformation::where('institute_id', institution_id())->where('campus_id', campus_id())->where('status', 1)->get();
         $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
-        return view('academics::manage-timetable.modals.class-teacher-assign-modal', compact('empList','allAcademicsLevel'));
+        return view('academics::manage-timetable.modals.class-teacher-assign-modal', compact('empList', 'allAcademicsLevel'));
     }
 
 
     // class teacher assign
-    public function classTeacherAssign(Request $request){
-        $classTeacherProfile=$this->classTeacherAssign
-            ->where('institute_id',institution_id())
-            ->where('campus_id',campus_id())
-            ->where('teacher_id',$request->teacher_id)
-            ->where('batch_id',$request->batch)
-            ->where('section_id',$request->section)
-            ->first();
-        if(empty($classTeacherProfile)) {
-            $classTeacherAssignOBj= new $this->classTeacherAssign;
-            $classTeacherAssignOBj->institute_id=institution_id();
-            $classTeacherAssignOBj->campus_id=campus_id();
-            $classTeacherAssignOBj->teacher_id=$request->teacher_id;
-            $classTeacherAssignOBj->batch_id=$request->batch;
-            $classTeacherAssignOBj->section_id=$request->section;
-            $classTeacherAssignOBj->save();
+    public function classTeacherAssign(Request $request)
+    {
+        //return $request;
+        $classTeachers = $this->classTeacherAssign
+            ->where('institute_id', institution_id())
+            ->where('campus_id', campus_id())
+            ->where('batch_id', $request->batch)
+            ->where('section_id', $request->section)
+            ->get()->pluck('teacher_id');
+        //return $classTeachers;
+        $teacherArray = (array)$request->teacherID;
+        //return var_dump($teacherArray);
+        for ($i = 0; $i < sizeof($classTeachers); $i++) {
+            if (in_array($classTeachers[$i], $teacherArray)) {
+                unset($teacherArray[$i]);
+            } else {
 
-            Session::flash('success', 'Class Teacher  Successfully Assigned');
-        } else {
-            Session::flash('warning', 'Class Teacher Already Assigned');
-        }
+                $removeTeacher = $this->classTeacherAssign->where('institute_id', institution_id())
+                    ->where('campus_id', campus_id())
+                    ->where('teacher_id', $classTeachers[$i])
+                    ->where('batch_id', $request->batch)
+                    ->where('section_id', $request->section)
+                    ->first();
+
+                ClassTeacherAssign::find($removeTeacher->id)->delete();
+                //unset($classTeachers[$i]);
+
+            }
+        };
+
+
+        foreach ($teacherArray as $key => $teacher) {
+
+            $classTeacherAssignOBj = new $this->classTeacherAssign;
+            $classTeacherAssignOBj->institute_id = institution_id();
+            $classTeacherAssignOBj->campus_id = campus_id();
+            $classTeacherAssignOBj->teacher_id = $teacher;
+            $classTeacherAssignOBj->batch_id = $request->batch;
+            $classTeacherAssignOBj->section_id = $request->section;
+            $classTeacherAssignOBj->save();
+        };
+        $classTeachers = $this->classTeacherAssign
+            ->where('institute_id', institution_id())
+            ->where('campus_id', campus_id())
+            ->where('batch_id', $request->batch)
+            ->where('section_id', $request->section)
+            ->where('deleted_at', null)
+            ->get()->pluck('teacher_id');
+        //return $classTeachers;
+        //return $request->teacherID;
+        //var_dump($classTeachers);
+
+
+        Session::flash('success', 'Class Teacher  Successfully Assigned');
+
         return redirect()->back();
     }
 
     // delete class teacher
-    public function classTeacherDelete($id) {
-        $classTeacherProfile=$this->classTeacherAssign->find($id);
+    public function classTeacherDelete($id)
+    {
+        $classTeacherProfile = $this->classTeacherAssign->find($id);
         if (!empty($classTeacherProfile)) {
             $classTeacherProfile->delete();
             Session::flash('success', 'Class Teacher  Successfully Assigned');
@@ -136,39 +185,39 @@ class TimeTableController extends Controller
 
     ////////////////////////////////////////////////////////// Timetable //////////////////////////////////////////////////////////
 
-//    public function findClassSectionTimetable(Request $request)
-//    {
-//        $batch = $request->input('class_id');
-//        $section = $request->input('section_id');
-//        $shift = $request->input('shift_id');
-//
-//        // all timetables
-//        $allTimetables = $this->timeTable->where(['batch'=>$batch,'section'=>$section,'shift'=>$shift])->get();
-//        // all class periods
-//        $allClassPeriods = $this->getAcademicClassPeriods();
-//        // all class subject
-//        $allClassSubjects = $this->classSubject->where(['class_id'=>$batch,'section_id'=>$section])->get();
-//        // return view
-//        return view('academics::manage-timetable.modals.dashboard-class-section-timetable', compact('allClassPeriods', 'allClassSubjects', 'allTimetables'));
-//    }
+    //    public function findClassSectionTimetable(Request $request)
+    //    {
+    //        $batch = $request->input('class_id');
+    //        $section = $request->input('section_id');
+    //        $shift = $request->input('shift_id');
+    //
+    //        // all timetables
+    //        $allTimetables = $this->timeTable->where(['batch'=>$batch,'section'=>$section,'shift'=>$shift])->get();
+    //        // all class periods
+    //        $allClassPeriods = $this->getAcademicClassPeriods();
+    //        // all class subject
+    //        $allClassSubjects = $this->classSubject->where(['class_id'=>$batch,'section_id'=>$section])->get();
+    //        // return view
+    //        return view('academics::manage-timetable.modals.dashboard-class-section-timetable', compact('allClassPeriods', 'allClassSubjects', 'allTimetables'));
+    //    }
 
     public function findTeacher($csId)
     {
         // all class subject teachers
-        $subjectTeachers = $this->subjectTeacher->where(['class_subject_id'=>$csId,'is_active'=>1])->get();
+        $subjectTeachers = $this->subjectTeacher->where(['class_subject_id' => $csId, 'is_active' => 1])->get();
         // $response data
         $responseArray = array();
         // looping
-        foreach ($subjectTeachers as $teacher){
+        foreach ($subjectTeachers as $teacher) {
             $teacherProfile = $teacher->employee();
             // make response array
-            $responseArray[] = ['cs_teacher_id'=>$teacher->id,'id'=>$teacherProfile->id, 'name'=>$teacherProfile->first_name." ".$teacherProfile->middle_name." ".$teacherProfile->last_name];
+            $responseArray[] = ['cs_teacher_id' => $teacher->id, 'id' => $teacherProfile->id, 'name' => $teacherProfile->first_name . " " . $teacherProfile->middle_name . " " . $teacherProfile->last_name];
         }
 
         return $responseArray;
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     public function storeTimetable(Request $request)
@@ -189,15 +238,15 @@ class TimeTableController extends Controller
         $timetableId =  $request->input('timetable');
 
         // checking
-        if($timetableId>0){
+        if ($timetableId > 0) {
             // find timetable profile
             $timetableProfile = $this->timeTable->findOrFail($timetableId);
-        }else{
+        } else {
             // new object of timetable profile
             $timetableProfile = new $this->timeTable();
         }
         // checking timetable
-        if($timetableProfile){
+        if ($timetableProfile) {
             // input timetable details
             $timetableProfile->day = $request->input('day');
             $timetableProfile->period = $request->input('period');
@@ -214,75 +263,74 @@ class TimeTableController extends Controller
             // save timetable
             $timetableProfileSubmitted = $timetableProfile->save();
             // checking
-            if($timetableProfileSubmitted){
+            if ($timetableProfileSubmitted) {
                 // success msg
-                return array('status'=>'success', 'timetable_id'=>$timetableProfile->id);
-            }else{
-                return array('status'=>'failed');
+                return array('status' => 'success', 'timetable_id' => $timetableProfile->id);
+            } else {
+                return array('status' => 'failed');
             }
-        }else{
-            return array('status'=>'failed');
+        } else {
+            return array('status' => 'failed');
         }
-
     }
 
-//    public function checkTeacherAvailablity($day, $teacher, $shift, $period)
-//    {
-//        // my period profile
-//        $myPeriodProfile = $this->classPeriod->find($period);
-//        $myPeriodStartHour = $myPeriodProfile->period_start_hour;
-//        $myPeriodStartMin = $myPeriodProfile->period_start_min;
-//        $myPeriodStartMin = $myPeriodProfile->period_start_min;
-//        $myPeriodStartMeridiem = $myPeriodProfile->period_start_meridiem;
-//        $myPeriodEndHour = $myPeriodProfile->period_end_hour;
-//        $myPeriodEndMin = $myPeriodProfile->period_end_min;
-//        $myPeriodEndMeridiem= $myPeriodProfile->period_end_meridiem;
-//
-//
-//        // teacher-day-shift timetables
-//        $teacherTimetables = $this->timeTable->where(['day' => $day, 'teacher' => $teacher, 'shift' => $shift])->get();
-//
-//        if($teacherTimetables->count()>0){
-//            $teacherChecker = array();
-//
-//            // looping
-//            foreach ($teacherTimetables as $timetable) {
-//                $periodProfile = $timetable->classPeriod();
-//                $periodStartHour = $periodProfile->period_start_hour;
-//                $periodStartMin = $periodProfile->period_start_min;
-//                $periodStartMeridiem = $periodProfile->period_start_meridiem;
-//                $periodEndHour = $periodProfile->period_end_hour;
-//                $periodEndMin = $periodProfile->period_end_min;
-//                $periodEndMeridiem= $periodProfile->period_end_meridiem;
-//
-//                if ($periodStartHour == $myPeriodStartHour && $periodStartMin == $myPeriodStartMin
-//                    && $periodStartMeridiem == $myPeriodStartMeridiem && $periodEndMin == $myPeriodEndMin) {
-//                    $teacherChecker[]= array(
-//                        'msg' => 'This teacher already booked in this class period',
-//                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
-//                        'time' => $periodStartHour . ":" . $periodStartMin
-//                    );
-//                }elseif ($periodStartHour <= $myPeriodStartHour && $periodStartMin <= $myPeriodStartMin
-//                    && $periodEndHour <= $myPeriodEndHour && $periodEndMin >= $myPeriodEndMin){
-//                    $teacherChecker[]= array(
-//                        'msg' => 'This teacher already booked in this class period',
-//                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
-//                        'time' => $periodStartHour . ":" . $periodStartMin
-//                    );
-//                }
-//                else{
-//                    $teacherChecker[]= array(
-//                        'msg' => 'This teacher is not booked in this class period',
-//                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
-//                        'time' => $periodStartHour . ":" . $periodStartMin
-//                    );
-//                }
-//            }
-//            return array('status' => 'test', 'result' =>$teacherChecker);
-//        }else{
-//            return array('status' => 'test', 'result' =>"teacher is available");
-//        }
-//    }
+    //    public function checkTeacherAvailablity($day, $teacher, $shift, $period)
+    //    {
+    //        // my period profile
+    //        $myPeriodProfile = $this->classPeriod->find($period);
+    //        $myPeriodStartHour = $myPeriodProfile->period_start_hour;
+    //        $myPeriodStartMin = $myPeriodProfile->period_start_min;
+    //        $myPeriodStartMin = $myPeriodProfile->period_start_min;
+    //        $myPeriodStartMeridiem = $myPeriodProfile->period_start_meridiem;
+    //        $myPeriodEndHour = $myPeriodProfile->period_end_hour;
+    //        $myPeriodEndMin = $myPeriodProfile->period_end_min;
+    //        $myPeriodEndMeridiem= $myPeriodProfile->period_end_meridiem;
+    //
+    //
+    //        // teacher-day-shift timetables
+    //        $teacherTimetables = $this->timeTable->where(['day' => $day, 'teacher' => $teacher, 'shift' => $shift])->get();
+    //
+    //        if($teacherTimetables->count()>0){
+    //            $teacherChecker = array();
+    //
+    //            // looping
+    //            foreach ($teacherTimetables as $timetable) {
+    //                $periodProfile = $timetable->classPeriod();
+    //                $periodStartHour = $periodProfile->period_start_hour;
+    //                $periodStartMin = $periodProfile->period_start_min;
+    //                $periodStartMeridiem = $periodProfile->period_start_meridiem;
+    //                $periodEndHour = $periodProfile->period_end_hour;
+    //                $periodEndMin = $periodProfile->period_end_min;
+    //                $periodEndMeridiem= $periodProfile->period_end_meridiem;
+    //
+    //                if ($periodStartHour == $myPeriodStartHour && $periodStartMin == $myPeriodStartMin
+    //                    && $periodStartMeridiem == $myPeriodStartMeridiem && $periodEndMin == $myPeriodEndMin) {
+    //                    $teacherChecker[]= array(
+    //                        'msg' => 'This teacher already booked in this class period',
+    //                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
+    //                        'time' => $periodStartHour . ":" . $periodStartMin
+    //                    );
+    //                }elseif ($periodStartHour <= $myPeriodStartHour && $periodStartMin <= $myPeriodStartMin
+    //                    && $periodEndHour <= $myPeriodEndHour && $periodEndMin >= $myPeriodEndMin){
+    //                    $teacherChecker[]= array(
+    //                        'msg' => 'This teacher already booked in this class period',
+    //                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
+    //                        'time' => $periodStartHour . ":" . $periodStartMin
+    //                    );
+    //                }
+    //                else{
+    //                    $teacherChecker[]= array(
+    //                        'msg' => 'This teacher is not booked in this class period',
+    //                        'myTime' => $myPeriodStartHour . ":" . $myPeriodStartMin,
+    //                        'time' => $periodStartHour . ":" . $periodStartMin
+    //                    );
+    //                }
+    //            }
+    //            return array('status' => 'test', 'result' =>$teacherChecker);
+    //        }else{
+    //            return array('status' => 'test', 'result' =>"teacher is available");
+    //        }
+    //    }
 
     ///////////////////// Manage Timetable  /////////////////////
     // get class section timetable
@@ -297,11 +345,11 @@ class TimeTableController extends Controller
         $returnType = $request->input('return_type', 'view');
 
         // checking return type
-        if($returnType=="json"){
+        if ($returnType == "json") {
             // $academicYear = $request->input('year');
             $campus = $request->input('campus');
             $institute = $request->input('institute');
-        }else{
+        } else {
             // $academicYear = $this->academicHelper->getAcademicYear();
             $campus = $this->academicHelper->getCampus();
             $institute = $this->academicHelper->getInstitute();
@@ -309,12 +357,12 @@ class TimeTableController extends Controller
 
         // all timetables
         $allTimetables = $this->timeTable->where([
-            'batch'=>$batch,
-            'section'=>$section,
-            'shift'=>$shift,
+            'batch' => $batch,
+            'section' => $section,
+            'shift' => $shift,
             //'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // batch section assigned period id
@@ -324,17 +372,17 @@ class TimeTableController extends Controller
         $allClassPeriods = $this->getAcademicClassPeriods($batchSectionPeriodId, $institute, $campus, null);
         // $allClassPeriods = $this->getAcademicClassPeriods($batchSectionPeriodId, $institute, $campus, $academicYear);
         // all class subject
-        $allClassSubjects = $this->classSubject->where(['class_id'=>$batch,'section_id'=>$section])->get();
+        $allClassSubjects = $this->classSubject->where(['class_id' => $batch, 'section_id' => $section])->get();
 
         // checking
-        if($returnType=="json"){
+        if ($returnType == "json") {
             // return with variables for api request response
-            return ['period_id'=>$batchSectionPeriodId,'periods'=>$allClassPeriods,'subjects'=>$allClassSubjects, 'timetable'=>$allTimetables];
-        }else{
+            return ['period_id' => $batchSectionPeriodId, 'periods' => $allClassPeriods, 'subjects' => $allClassSubjects, 'timetable' => $allTimetables];
+        } else {
             // check request type
-            if($requestType=='dashboard'){
+            if ($requestType == 'dashboard') {
                 return view('academics::manage-timetable.modals.dashboard-class-section-timetable', compact('allClassPeriods', 'allClassSubjects', 'allTimetables', 'batchSectionPeriodId'));
-            }else{
+            } else {
                 // return view
                 return view('academics::manage-timetable.modals.class-section-timetable', compact('allClassPeriods', 'allClassSubjects', 'allTimetables', 'batchSectionPeriodId'));
             }
@@ -355,12 +403,12 @@ class TimeTableController extends Controller
 
         // all timetables
         $allTimetables = $this->timeTable->where([
-            'batch'=>$batch,
-            'section'=>$section,
-            'shift'=>$shift,
+            'batch' => $batch,
+            'section' => $section,
+            'shift' => $shift,
             //'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // batch section assigned period id
@@ -370,23 +418,23 @@ class TimeTableController extends Controller
         $allClassPeriods = $this->getAcademicClassPeriods($batchSectionPeriodId, $institute, $campus, null);
         // $allClassPeriods = $this->getAcademicClassPeriods($batchSectionPeriodId, $institute, $campus, $academicYear);
         // all class subject
-        $allClassSubjects = $this->classSubject->where(['class_id'=>$batch,'section_id'=>$section])->get();
+        $allClassSubjects = $this->classSubject->where(['class_id' => $batch, 'section_id' => $section])->get();
 
         // looping for class subject teacher list
         $classTeacherList = array();
         // looping
-        foreach ($allClassSubjects as $classSubject){
+        foreach ($allClassSubjects as $classSubject) {
             // subject teacher list
             $subjectTeacherList = $classSubject->teacher();
             // looping
-            foreach ($subjectTeacherList as $classTeacher){
+            foreach ($subjectTeacherList as $classTeacher) {
                 // teacher profile
                 $teacher = $classTeacher->employee();
                 // add teacher to the list
                 $classTeacherList[] = (object)[
-                    'id'=>$teacher->id,
-                    'name'=>$teacher->first_name." ".$teacher->middle_name." ".$teacher->last_name,
-                    'alias'=>$teacher->alias
+                    'id' => $teacher->id,
+                    'name' => $teacher->first_name . " " . $teacher->middle_name . " " . $teacher->last_name,
+                    'alias' => $teacher->alias
                 ];
             }
         }
@@ -397,10 +445,10 @@ class TimeTableController extends Controller
         // institute info
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // compact variables
-        $compactedVariables = compact('allClassPeriods', 'allClassSubjects', 'allTimetables', 'batchSectionPeriodId', 'classTeacherList','batchProfile','sectionProfile', 'instituteInfo');
+        $compactedVariables = compact('allClassPeriods', 'allClassSubjects', 'allTimetables', 'batchSectionPeriodId', 'classTeacherList', 'batchProfile', 'sectionProfile', 'instituteInfo');
 
         // checking page request types
-        if($requestType=='download'){
+        if ($requestType == 'download') {
             // share variables with view
             view()->share($compactedVariables);
             // generate pdf
@@ -409,12 +457,10 @@ class TimeTableController extends Controller
             $pdf->loadView('academics::manage-timetable.reports.report-class-section-teacher-day-timetable')->setPaper('a4', 'portrait');
             // return with pdf file
             return $pdf->download('teacher-class-section-day-routine.pdf');
-
-        }else{
+        } else {
             // return view with variable
             return view('academics::manage-timetable.modals.routine', $compactedVariables);
         }
-
     }
 
 
@@ -422,7 +468,12 @@ class TimeTableController extends Controller
     public function classSectionTimeTableManager(Request $request)
     {
         // subject list
-        $subjectList= $this->classSubject->where(['class_id'=>$request->input('batch'),'section_id'=>$request->input('section')])->get(['id', 'subject_id']);
+        $subjectList = $this->classSubject->where([
+            'class_id' => $request->input('batch'),
+            'section_id' => $request->input('section'),
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get(['id', 'subject_id']);
         // return view
         return view('academics::manage-timetable.modals.manage', compact('subjectList'));
     }
@@ -447,13 +498,13 @@ class TimeTableController extends Controller
         $section = $classSubjectProfile->section_id;
         // all timetables
         $teacherTimeTables = $this->timeTable->where([
-            'batch'=>$batch,
-            'section'=>$section,
-            'subject'=>$classSubjectProfile->id,
-            'teacher'=>$teacherProfile->id,
+            'batch' => $batch,
+            'section' => $section,
+            'subject' => $classSubjectProfile->id,
+            'teacher' => $teacherProfile->id,
             // 'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
 
@@ -477,18 +528,17 @@ class TimeTableController extends Controller
         $institute = $this->academicHelper->getInstitute();
 
         // teacherProfile
-        $teacherProfile = $this->employeeInformation->where(['id'=>$teacherId, 'campus_id'=>$campus, 'institute_id'=>$institute])->first();
+        $teacherProfile = $this->employeeInformation->where(['id' => $teacherId, 'campus_id' => $campus, 'institute_id' => $institute])->first();
         // all timetables
         $teacherTimeTables = $this->timeTable->where([
-            'teacher'=>$teacherId,
+            'teacher' => $teacherId,
             // 'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // return view
         return view('employee::pages.modals.employee-timetable', compact('teacherTimeTables', 'teacherProfile'));
-
     }
 
     // get class teacher timetable report
@@ -500,13 +550,13 @@ class TimeTableController extends Controller
         $institute = $this->academicHelper->getInstitute();
 
         // teacherProfile
-//        $teacherProfile = $this->subjectTeacher->where('employee_id', $teacherId)->first()->employee();
+        //        $teacherProfile = $this->subjectTeacher->where('employee_id', $teacherId)->first()->employee();
         // all timetables
         $teacherTimeTables = $this->timeTable->where([
-            'teacher'=>$teacherId,
+            'teacher' => $teacherId,
             //'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // instituteInfo
@@ -518,7 +568,7 @@ class TimeTableController extends Controller
         // load view
         $pdf->loadView('academics::manage-timetable.reports.report-teacher-timetable')->setPaper('a4', 'portrait');
         return $pdf->stream();
-//        return $pdf->download('teacher-class-routine.pdf');
+        //        return $pdf->download('teacher-class-routine.pdf');
     }
 
 
@@ -538,11 +588,11 @@ class TimeTableController extends Controller
 
         // std timetables
         $stdTimeTables = $this->timeTable->where([
-            'batch'=>$batch,
-            'section'=>$section,
+            'batch' => $batch,
+            'section' => $section,
             // 'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // batch section assigned period id
@@ -571,11 +621,11 @@ class TimeTableController extends Controller
 
         // std timetables
         $stdTimeTables = $this->timeTable->where([
-            'batch'=>$batch,
-            'section'=>$section,
+            'batch' => $batch,
+            'section' => $section,
             // 'academic_year'=>$academicYear,
-            'campus'=>$campus,
-            'institute'=>$institute
+            'campus' => $campus,
+            'institute' => $institute
         ])->get();
 
         // batch section assigned period id
@@ -587,7 +637,7 @@ class TimeTableController extends Controller
         // instituteInfo
         $instituteInfo = $this->getInstituteProfile();
         // share all variables with the view
-        view()->share(compact('stdTimeTables', 'allClassPeriods', 'instituteInfo' , 'batchSectionPeriodId'));
+        view()->share(compact('stdTimeTables', 'allClassPeriods', 'instituteInfo', 'batchSectionPeriodId'));
         // generate pdf
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('academics::manage-timetable.reports.report-student-timetable')->setPaper('a4', 'portrait');
@@ -607,7 +657,7 @@ class TimeTableController extends Controller
     public function storePeriod(Request $request)
     {
 
-//        return $request->all();
+        //        return $request->all();
 
         // validator
         $validator = Validator::make($request->all(), [
@@ -626,19 +676,19 @@ class TimeTableController extends Controller
         // checking validator
         if ($validator->passes()) {
             // checking input action type
-            if($request->input('action_type')=="create"){
+            if ($request->input('action_type') == "create") {
                 // create class period
                 $classPeriodProfile = new $this->classPeriod();
-            }else{
+            } else {
                 // find class period
                 $classPeriodProfile = $this->classPeriod->findOrFail($request->input('period_id'));
             }
 
             // checking classPeriodProfile existence
-            if($classPeriodProfile){
+            if ($classPeriodProfile) {
                 // store profile details
                 $classPeriodProfile->campus = $this->getInstituteCampusId();
-                $classPeriodProfile->institute =$this->getInstituteId();
+                $classPeriodProfile->institute = $this->getInstituteId();
                 // $classPeriodProfile->academic_year = $this->getAcademicYearId();
                 $classPeriodProfile->period_name = $request->input('period_name');
                 $classPeriodProfile->period_category = $request->input('period_category');
@@ -663,17 +713,16 @@ class TimeTableController extends Controller
                     Session::flash('warning', 'Unable to perform the action');
                     return redirect()->back();
                 }
-            }else{
+            } else {
                 // warning message
                 Session::flash('warning', 'Unable to create or update ClassPeriodProfile');
                 return redirect()->back();
             }
-        }else{
+        } else {
             // warning message
             Session::flash('warning', 'Invalid information');
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
     }
 
 
@@ -696,7 +745,7 @@ class TimeTableController extends Controller
         // deleting classPeriodProfile
         $classPeriodProfileDeleted = $classPeriodProfile->delete();
         // checking
-        if($classPeriodProfileDeleted){
+        if ($classPeriodProfileDeleted) {
             // success message
             Session::flash('success', 'Class Period Deleted Successfully');
             return redirect()->back();
@@ -728,16 +777,16 @@ class TimeTableController extends Controller
         // checking validator
         if ($validator->passes()) {
             // checking input action type
-            if($request->input('type')=="create"){
+            if ($request->input('type') == "create") {
                 // create class period category
                 $categoryProfile = new $this->classPeriodCategory();
-            }else{
+            } else {
                 // update class period category
                 $categoryProfile = $this->classPeriodCategory->findOrFail($request->input('cat_id'));
             }
 
             // checking classPeriodProfile existence
-            if($categoryProfile){
+            if ($categoryProfile) {
                 // store profile details
                 $categoryProfile->campus = $this->getInstituteCampusId();
                 $categoryProfile->institute = $this->getInstituteId();
@@ -756,14 +805,12 @@ class TimeTableController extends Controller
                     Session::flash('warning', 'Unable to perform the action');
                     return redirect()->back();
                 }
-            }else{
+            } else {
                 // warning message
                 Session::flash('warning', 'Unable to create or find ClassPeriodCategoryProfile');
                 return redirect()->back();
             }
-
-
-        }else{
+        } else {
             // warning message
             Session::flash('warning', 'Invalid information');
             return redirect()->back()->withErrors($validator)->withInput();
@@ -787,7 +834,7 @@ class TimeTableController extends Controller
         // deleting categoryProfile
         $categoryProfileDeleted = $categoryProfile->delete();
         // checking
-        if($categoryProfileDeleted){
+        if ($categoryProfileDeleted) {
             // success message
             Session::flash('success', 'Class Period Category Deleted Successfully');
             return redirect()->back();
@@ -828,47 +875,47 @@ class TimeTableController extends Controller
         $section = $request->input('section');
         $shift = $request->input('shift');
         // checking
-        if($request->input('request_type')=='check'){
+        if ($request->input('request_type') == 'check') {
             $classSectionPeriodCategory = $this->classSectionPeriodCategory->where([
                 //'academic_year'=>$academicYear,
-                'institute_id'=>$institute,
-                'campus_id'=>$campus,
-                'academic_level'=>$academicLevel,
-                'batch'=>$batch,
-                'section'=>$section,
-                'cs_shift'=>$shift,
+                'institute_id' => $institute,
+                'campus_id' => $campus,
+                'academic_level' => $academicLevel,
+                'batch' => $batch,
+                'section' => $section,
+                'cs_shift' => $shift,
             ])->first();
 
             // category list
-            $categoryList = $this->classPeriodCategory->where([ 'institute'=>$institute, 'campus'=>$campus])->get();
+            $categoryList = $this->classPeriodCategory->where(['institute' => $institute, 'campus' => $campus])->get();
             // $categoryList = $this->classPeriodCategory->where([ 'institute'=>$institute, 'campus'=>$campus, 'academic_year'=>$academicYear])->get();
             // checking
-            if($classSectionPeriodCategory){
+            if ($classSectionPeriodCategory) {
                 return [
-                    'status'=>'success',
-                    'msg'=>'class period is assigned',
+                    'status' => 'success',
+                    'msg' => 'class period is assigned',
                     'csp_id' => $classSectionPeriodCategory->cs_period_category,
-                    'cat_id'=>$classSectionPeriodCategory->id,
-                    'cat_name'=>$classSectionPeriodCategory->periodCategory()->name,
-                    'cat_list'=>$categoryList,
+                    'cat_id' => $classSectionPeriodCategory->id,
+                    'cat_name' => $classSectionPeriodCategory->periodCategory()->name,
+                    'cat_list' => $categoryList,
                 ];
-            }else{
+            } else {
                 return [
-                    'status'=>'failed',
-                    'msg'=>'class period is not assigned',
-                    'cat_id'=>0,
-                    'cat_list'=>$categoryList,
+                    'status' => 'failed',
+                    'msg' => 'class period is not assigned',
+                    'cat_id' => 0,
+                    'cat_list' => $categoryList,
                 ];
             }
-        }else{
+        } else {
             // period_category_id
             $periodCategoryId = $request->input('period_category_id');
             $csPeriodId = $request->input('cs_period_id');
             // checking
-            if($csPeriodId>0){
+            if ($csPeriodId > 0) {
                 // class section period assign profile
                 $classSectionPeriodProfile = $this->classSectionPeriodCategory->find($csPeriodId);
-            }else{
+            } else {
                 // class section period assign profile
                 $classSectionPeriodProfile = new $this->classSectionPeriodCategory();
             }
@@ -884,11 +931,11 @@ class TimeTableController extends Controller
             $classSectionPeriodProfile->save();
 
             // checking
-            if($classSectionPeriodProfile){
+            if ($classSectionPeriodProfile) {
                 //$year = $this->academicHelper->findYear($academicYear);
-                return ['status'=>'success', 'msg'=>'class period is assigned', 'cat_id'=>$classSectionPeriodProfile->id];
-            }else{
-                return ['status'=>'failed', 'msg'=>'unable to assign class period category'];
+                return ['status' => 'success', 'msg' => 'class period is assigned', 'cat_id' => $classSectionPeriodProfile->id];
+            } else {
+                return ['status' => 'failed', 'msg' => 'unable to assign class period category'];
             }
         }
     }
@@ -899,10 +946,10 @@ class TimeTableController extends Controller
         $classSectionPeriodCategory = $this->classSectionPeriodCategory->find($id);
         $classSectionPeriodCategoryRemoved = $classSectionPeriodCategory->delete();
         // checking
-        if($classSectionPeriodCategoryRemoved){
-            return ['status'=>'success', 'msg'=>'class section period removed'];
-        }else{
-            return ['status'=>'failed', 'msg'=>'Unable to remove class section period'];
+        if ($classSectionPeriodCategoryRemoved) {
+            return ['status' => 'success', 'msg' => 'class section period removed'];
+        } else {
+            return ['status' => 'failed', 'msg' => 'Unable to remove class section period'];
         }
     }
 
@@ -926,7 +973,7 @@ class TimeTableController extends Controller
         return $this->classPeriodCategory->where([
             'institute' => $this->getInstituteId(),
             'campus' => $this->getInstituteCampusId(),
-//            'academic_year' => $this->getAcademicYearId(),
+            //            'academic_year' => $this->getAcademicYearId(),
         ])->get();
     }
 
@@ -943,7 +990,7 @@ class TimeTableController extends Controller
             'cs_shift' => $shift,
         ])->first();
         // return variable
-        return $batchSectionPeriodProfile?$batchSectionPeriodProfile->cs_period_category:0;
+        return $batchSectionPeriodProfile ? $batchSectionPeriodProfile->cs_period_category : 0;
     }
 
     public function getAcademicYearId()
@@ -971,40 +1018,40 @@ class TimeTableController extends Controller
 
 
 
-//    /**
-//     * @param $day
-//     * @param $teacher
-//     * @param $shift
-//     * @param $period
-//     * @return array
-//     */
-//    public function checkTeacherAvailablity($day, $teacher, $shift, $period)
-//    {
-//        // my period profile
-//        $myPeriodProfile = $this->classPeriod->find($period);
-//        $myPeriodStartHour = $myPeriodProfile->period_start_hour;
-//        $myPeriodStartMin = $myPeriodProfile->period_start_min;
-//
-//        // teacher-day-shift timetables
-//        $teacherTimetables = $this->timeTable->where(['day' => $day, 'teacher' => $teacher, 'shift' => $shift])->get();
-//
-//        // looping
-//        foreach ($teacherTimetables as $timetable) {
-//            $periodProfile = $timetable->classPeriod();
-//            $periodStartHour = $periodProfile->period_start_hour;
-//            $periodStartMin = $periodProfile->period_start_min;
-//
-//            if ($periodStartHour >= $myPeriodStartHour && $periodStartMin >= $myPeriodStartMin) {
-//                return array('status' => 'test', 'result' => array(
-//                    'msg' => 'This teacher already book in this class period',
-//                    'myTime' => $myPeriodStartHour . " " . $myPeriodStartMin,
-//                    'time' => $periodStartHour . " " . $periodStartMin
-//                ));
-//            } else {
-//                return array('status' => 'test', 'result' => "This teacher is not booked in this class period");
-//            }
-//
-//        }
-//    }
+    //    /**
+    //     * @param $day
+    //     * @param $teacher
+    //     * @param $shift
+    //     * @param $period
+    //     * @return array
+    //     */
+    //    public function checkTeacherAvailablity($day, $teacher, $shift, $period)
+    //    {
+    //        // my period profile
+    //        $myPeriodProfile = $this->classPeriod->find($period);
+    //        $myPeriodStartHour = $myPeriodProfile->period_start_hour;
+    //        $myPeriodStartMin = $myPeriodProfile->period_start_min;
+    //
+    //        // teacher-day-shift timetables
+    //        $teacherTimetables = $this->timeTable->where(['day' => $day, 'teacher' => $teacher, 'shift' => $shift])->get();
+    //
+    //        // looping
+    //        foreach ($teacherTimetables as $timetable) {
+    //            $periodProfile = $timetable->classPeriod();
+    //            $periodStartHour = $periodProfile->period_start_hour;
+    //            $periodStartMin = $periodProfile->period_start_min;
+    //
+    //            if ($periodStartHour >= $myPeriodStartHour && $periodStartMin >= $myPeriodStartMin) {
+    //                return array('status' => 'test', 'result' => array(
+    //                    'msg' => 'This teacher already book in this class period',
+    //                    'myTime' => $myPeriodStartHour . " " . $myPeriodStartMin,
+    //                    'time' => $periodStartHour . " " . $periodStartMin
+    //                ));
+    //            } else {
+    //                return array('status' => 'test', 'result' => "This teacher is not booked in this class period");
+    //            }
+    //
+    //        }
+    //    }
 
 }

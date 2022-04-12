@@ -1,6 +1,32 @@
 
 @extends('layouts.master')
+@section('css')
+    <style>
 
+
+    .select2-selection__choice{
+    margin-top: 0px!important;
+    padding-right: 5px!important;
+    padding-left: 5px!important;
+
+    border:none!important;
+    border-radius: 4px!important;
+        color: black!important;
+
+    }
+
+    .select2-selection__choice__remove{
+    border: none!important;
+    border-radius: 0!important;
+    padding: 0 2px!important;
+    }
+
+    .select2-selection__choice__remove:hover{
+    background-color: transparent!important;
+    color: #ef5454 !important;
+    }
+    </style>
+@endsection
 <!-- page content -->
 @section('content')
     <div class="content-wrapper">
@@ -30,11 +56,21 @@
                 <div class="panel-body">
                     <div>
                         <ul class="nav-tabs margin-bottom nav">
+                            {{-- @if (in_array('academics/timetable/timetable', $pageAccessData)) --}}
                             <li @if($page == "timetable") class="active" @endif><a href="/academics/timetable/timetable">Timetable</a></li>
+                            {{-- @endif --}}
+                            {{-- @if (in_array('academics/timetable/manage', $pageAccessData)) --}}
                             <li @if($page == "manage") class="active" @endif><a href="/academics/timetable/manage">Manage</a></li>
+                            {{-- @endif --}}
+                            {{-- @if (in_array('academics/timetable/setting', $pageAccessData)) --}}
                             <li @if($page == "settings") class="active" @endif><a href="/academics/timetable/settings">Settings</a></li>
+                            {{-- @endif --}}
+                            {{-- @if (in_array('academics/timetable/routine', $pageAccessData)) --}}
                             <li @if($page == "routine") class="active" @endif><a href="/academics/timetable/routine">Routine</a></li>
-                            <li @if($page == "class-teacher-assign") class="active" @endif><a href="/academics/timetable/class-teacher-assign">Class Teacher Assign</a></li>
+                            {{-- @endif --}}
+                            {{-- @if (in_array('academics/timetable/class-teacher-assign', $pageAccessData)) --}}
+                            <li @if($page == "class-teacher-assign") class="active" @endif><a href="/academics/timetable/class-teacher-assign"> Assign Form Master</a></li>
+                            {{-- @endif --}}
                         </ul>
                         <!-- page content div -->
                         @yield('page-content')
