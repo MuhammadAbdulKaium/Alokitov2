@@ -2,11 +2,13 @@
     <div class="col-md-12">
         <form id="class_section_fourth_subject_assign_form" method="POST">
             <input type="hidden" name="_token" value="{{csrf_token()}}">
+            {{-- <input type="hidden" name="can_save" value="{{ (in_array("academics/manage/class/section/fourth/subject/store" ,$pageAccessData))?true:false }}"> --}}
+            <input type="hidden" name="can_save" value="{{ true }}">
             <div class="box-body">
                 @php $batchString = 'Class'; @endphp
                 <div class="row text-center">
                     <div class="col-sm-10 col-md-offset-1">
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="academic_level">Academic Level</label>
                                 <select id="academic_level" class="form-control academicLevel" name="academic_level">
@@ -17,12 +19,15 @@
                                 </select>
                                 <div class="help-block"></div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="batch">{{$batchString}}</label>
                                 <select id="batch" class="form-control academicBatch" name="batch" onchange="">
                                     <option value="" selected disabled>--- Select {{$batchString}} ---</option>
+                                    @foreach ($batches as $batch)
+                                        <option value="{{ $batch->id }}">{{ $batch->batch_name }}</option>
+                                    @endforeach
                                 </select>
                                 <div class="help-block"></div>
                             </div>
@@ -46,6 +51,7 @@
                 </div>
             </div>
         </form>
+
     </div>
 </div>
 

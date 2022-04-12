@@ -243,7 +243,9 @@
             {{--submit button--}}
             <div class="modal-footer">
                 <button type="reset" class="btn btn-default pull-left">Reset</button>
+                @if ($canSave)
                 <button type="submit" class="btn btn-success pull-right">Submit</button>
+                @endif
             </div>
         </form>
 
@@ -337,7 +339,7 @@
         </script>
     @else
         <div class=" col-md-12 text-center alert bg-warning text-warning" style="margin-bottom:0px;">
-            <i class="fa fa-warning"></i> No Compulsory Subject found
+            <i class="fa fa-warning"></i> No students found
         </div>
     @endif
 

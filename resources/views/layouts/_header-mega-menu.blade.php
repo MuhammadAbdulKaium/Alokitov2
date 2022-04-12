@@ -65,7 +65,7 @@ background:#0b460b !important;
                                     <li><a href="{{url('/academics/exam/marks/entry')}}"><i class="fa fa-sort-alpha-asc"></i> Exam Marks Entry</a></li>
                                  </ul>
                               </li>
-                              <li><a href="{{url('academics/manage')}}"><i class="fa fa-book "></i>Manage Academics</a></li>
+                              <li><a href="{{url('academics/manage/subject')}}"><i class="fa fa-book "></i>Manage Academics</a></li>
                               @role(['super-admin'])
                                  <li><a href="{{url('academics/manage/assessments/grade-setup')}}"><i class="fa fa-book "></i>Manage Assessments</a></li>
                               @endrole

@@ -163,13 +163,14 @@ Route::group(['middleware' => ['web', 'auth', 'access-permission'], 'prefix' => 
     Route::post('manage/section/store', 'ManageAcademicsController@storeSection');
     // manage subject
     Route::get('manage/class/subject/section', 'ManageAcademicsController@allClassSubject');
-    Route::get('manage/subject/{batchId}', 'ManageAcademicsController@addSubject');
+    Route::get('manage/subject', 'ManageAcademicsController@addSubject');
     Route::post('manage/subject/store', 'ManageAcademicsController@storeSubject');
     // assign teacher
     Route::get('manage/subjcet/teacher/view/{id}', 'ManageAcademicsController@viewAssingedTeacher');
     Route::get('manage/subjcet/teacher/delete/{id}', 'ManageAcademicsController@deleteAssingedTeacher');
     Route::get('manage/subjcet/teacher/assign/{id}', 'ManageAcademicsController@assingTeacher');
     Route::post('manage/subjcet/teacher/store', 'ManageAcademicsController@storeAssingTeacher');
+    Route::get('get/form/from/academics-batch', 'ManageAcademicsController@getFormFromAcademicsBatch');
 
     // find class section fourth (4th) subject list
     Route::post('/manage/class/section/fourth/subject/list', 'ManageAcademicsController@getClassSectionAdditionalSubjectList');

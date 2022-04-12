@@ -1,6 +1,6 @@
 
 <div class="row">
-    <form id="#" action="{{url('academics/manage/subject/store')}}" method="post">
+    <form id="class_subject_form" action="{{url('academics/manage/subject/store')}}" method="post">
         <div class="col-md-3">
             <div class="box box-solid">
                 <div class="et">
@@ -29,6 +29,8 @@
                                                     <input type="checkbox" id='{{$allSubjects[($x).""]["id"]}}' onclick="addSubject(this.id)">
                                                     <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_s' value='{{$allSubjects[($x).""]["subject_name"]}}'>
                                                     <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_c' value='{{$allSubjects[($x).""]["subject_code"]}}'>
+                                                    <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_sg' value='@if($allSubjects[($x).""]["check_sub_group_assign_single"]){{$allSubjects[($x).""]["check_sub_group_assign_single"]["subject_group_single"]["id"]}}@endif'>
+                                                    <input type="hidden" >
                                                     {{$allSubjects[($x).""]["subject_name"]}}
                                                 </label>
                                             </div>
@@ -43,6 +45,7 @@
                                                     <input type="checkbox" id='{{$allSubjects[($x+1).""]["id"]}}' onclick="addSubject(this.id)">
                                                     <input type="hidden" id='{{$allSubjects[($x+1).""]["id"]}}_s' value='{{$allSubjects[($x+1).""]["subject_name"]}}'>
                                                     <input type="hidden" id='{{$allSubjects[($x+1).""]["id"]}}_c' value='{{$allSubjects[($x+1).""]["subject_code"]}}'>
+                                                    <input type="hidden" id='{{$allSubjects[($x+1).""]["id"]}}_sg' value='@if($allSubjects[($x+1).""]["check_sub_group_assign_single"]){{$allSubjects[($x+1).""]["check_sub_group_assign_single"]["subject_group_single"]["id"]}}@endif'>
                                                     {{$allSubjects[($x+1).""]["subject_name"]}}
                                                 </label>
                                             </div>
@@ -79,16 +82,41 @@
                             <th class="col-md-3">
                                 {{$batchString}}:
                                 <select class="form-control" id="batch_id" name="batch_id" required>
-                                    <option value="{{$batchProfile->id}}" selected>{{$batchProfile->batch_name}} @if($batchProfile->get_division())({{$batchProfile->get_division()->name}})@endif</option>
+                                    <option value="">--Choose Batch--</option>
+                                    @php
+                                        $selectedBatch = null;
+                                    @endphp
+                                    @foreach ($batches as $batch)
+                                        @php
+                                            $selected = "";
+                                            if(Session::get('batchId')){
+                                                if (Session::get('batchId') == $batch->id) {
+                                                    $selected = "selected";
+                                                    $selectedBatch = $batch;
+                                                }
+                                            }
+                                        @endphp
+                                        <option value="{{$batch->id}}" {{ $selected }}>{{$batch->batch_name}}</option>
+                                    @endforeach
                                 </select>
                             </th>
                             <th class="col-md-3">
                                 Section:
                                 <select class="form-control section_id" id="section_id" name="section_id" required>
-                                    <option value="" selected disabled>-- Select Section -- </option>
-                                    @foreach($batchProfile->section() as $section)
-                                        <option value="{{$section->id}}" {{$sectionId==$section->id?'selected':''}}>{{$section->section_name}}</option>
-                                    @endforeach
+                                    <option value="" disabled selected>-- Select Section --</option>
+                                    @if (Session::get('batchId'))
+                                        @foreach ($selectedBatch->section() as $section)
+                                            @php
+                                                $selected = "";
+                                                if(Session::get('sectionId')){
+                                                    if (Session::get('sectionId') == $section->id) {
+                                                        $selected = "selected";
+                                                    }
+                                                }
+                                            @endphp
+                                            <option value="{{ $section->id }}" {{ $selected }}>{{ $section->section_name }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </th>
 
@@ -112,24 +140,24 @@
                         <thead>
                         <tr id="tableHead" class="hide">
                             <th width="1%"> <input id="count_all_class_subject" type="checkbox"></th>
-                            <th width="10%" class="text-left">Subject Name</th>
+                            <th width="9%" class="text-left">Subject Name</th>
                             <th width="6%">Code</th>
-                            <th width="4%">Pass Mark</th>
-                            <th width="5%">Exam Mark</th>
                             <th width="9%">Type</th>
-                            <th width="10%">Group</th>
-                            <th width="8%">List</th>
-                            <th width="5%">Action</th>
+                            <th width="9%">Group</th>
+                            <th width="7%">List</th>
+                            <th width="15%">Assigned Teachers</th>
                         </tr>
                         </thead>
                         <tbody id="tableBody" class="hide"></tbody>
+                        {{-- @if (in_array("academics/manage/subject/store" ,$pageAccessData)) --}}
                         <tfoot id="tableFoot" class="hide">
-                        <tr>
-                            <td colspan="7">
-                                <button type="submit" class="btn btn-info pull-right">Submit</button>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="7">
+                                    <button type="button" class="btn btn-info pull-right subject_form_submit_btn">Submit</button>
+                                </td>
+                            </tr>
                         </tfoot>
+                        {{-- @endif --}}
                     </table>
                 </div>
             </div>
