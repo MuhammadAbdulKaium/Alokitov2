@@ -23,6 +23,8 @@ class CreateCadetExamNameTable extends Migration
             $table->softDeletes();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
+            $table->integer('campus_id');
+            $table->integer('institute_id');
         });
     }
 
