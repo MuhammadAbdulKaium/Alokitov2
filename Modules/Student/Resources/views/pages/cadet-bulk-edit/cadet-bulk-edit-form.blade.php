@@ -89,7 +89,7 @@
                                                 <td>
                                                     <input name="user_name[{{ $studentInfo->std_id }}]"
                                                         value="{{ $studentInfo->singleUser->username }}" type="text"
-                                                        class="form-control input" readonly>
+                                                        class="form-control input">
                                                 </td>
 
                                                 <td class="">
@@ -299,7 +299,7 @@
                                                 @endphp
                                                 @if ($studentInfo->singleStudent->singleParent)
                                                     @foreach ($studentInfo->singleStudent->singleParent as $parent)
-                                                        @if($parent->singleGuardian)
+                                                        @if ($parent->singleGuardian)
                                                             @if ($parent->singleGuardian->type == 1)
                                                                 @php
                                                                     $fatherName = $parent->singleGuardian->first_name;
@@ -613,7 +613,7 @@
                                                         <td>
                                                             <input name="user_name[{{ $studentInfo->std_id }}]"
                                                                 value="{{ $studentInfo->singleUser->username }}"
-                                                                type="text" class="form-control input" readonly>
+                                                                type="text" class="form-control input" >
                                                         </td>
                                                     @endif
 
@@ -862,28 +862,28 @@
                                                         $motherContact = '';
                                                         $motherEmail = '';
                                                     @endphp
-                                                     @if ($studentInfo->singleStudent->singleParent)
-                                                     @foreach ($studentInfo->singleStudent->singleParent as $parent)
-                                                         @if($parent->singleGuardian)
-                                                             @if ($parent->singleGuardian->type == 1)
-                                                                 @php
-                                                                     $fatherName = $parent->singleGuardian->first_name;
-                                                                     $fatcherOCCPation = $parent->singleGuardian->occupation;
-                                                                     $fatherContact = $parent->singleGuardian->mobile;
-                                                                     $fatherEmail = $parent->singleGuardian->email;
-                                                                 @endphp
-                                                             @endif
-                                                             @if ($parent->singleGuardian->type == 0)
-                                                                 @php
-                                                                     $motherName = $parent->singleGuardian->first_name;
-                                                                     $motherOccpation = $parent->singleGuardian->occupation;
-                                                                     $motherContact = $parent->singleGuardian->mobile;
-                                                                     $motherEmail = $parent->singleGuardian->email;
-                                                                 @endphp
-                                                             @endif
-                                                         @endif
-                                                     @endforeach
-                                                 @endif
+                                                    @if ($studentInfo->singleStudent->singleParent)
+                                                        @foreach ($studentInfo->singleStudent->singleParent as $parent)
+                                                            @if ($parent->singleGuardian)
+                                                                @if ($parent->singleGuardian->type == 1)
+                                                                    @php
+                                                                        $fatherName = $parent->singleGuardian->first_name;
+                                                                        $fatcherOCCPation = $parent->singleGuardian->occupation;
+                                                                        $fatherContact = $parent->singleGuardian->mobile;
+                                                                        $fatherEmail = $parent->singleGuardian->email;
+                                                                    @endphp
+                                                                @endif
+                                                                @if ($parent->singleGuardian->type == 0)
+                                                                    @php
+                                                                        $motherName = $parent->singleGuardian->first_name;
+                                                                        $motherOccpation = $parent->singleGuardian->occupation;
+                                                                        $motherContact = $parent->singleGuardian->mobile;
+                                                                        $motherEmail = $parent->singleGuardian->email;
+                                                                    @endphp
+                                                                @endif
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
                                                     @if ($form == 'FatherName')
                                                         <td class="">
                                                             <input name="fathername[{{ $studentInfo->std_id }}]"

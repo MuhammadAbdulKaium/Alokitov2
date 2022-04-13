@@ -46,7 +46,7 @@
 										<img class="center-block img-circle img-thumbnail img-responsive" src="{{URL::asset('assets/users/images/user-default.png')}}" alt="No Image" style="width:50px;height:50px">
 									@endif
 								</td>
-								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->email}}</a></td>
+								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->username}}</a></td>
 								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->first_name}} {{$data->last_name}}</a></td>
 								<td><a href="/student/profile/personal/{{$data->std_id}}" target="_blank">{{$data->bn_fullname}}</a></td>
 								<td>{{$data->student()->dob}}</td>
