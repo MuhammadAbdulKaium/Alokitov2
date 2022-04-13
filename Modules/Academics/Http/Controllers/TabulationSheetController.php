@@ -51,7 +51,10 @@ class TabulationSheetController extends Controller
         $exams = ExamName::all();
         $batches = Batch::all();
         $termExamCategory = ExamCategory::where('alias', 'term-end')->first();
-        $termExams = $termExamCategory->examNames;
+        $termExams = [];
+        if ($termExamCategory) {
+            $termExams = $termExamCategory->examNames;
+        }
         
         if ($type == "exam") {
             $examList = ($listId)?ExamList::findOrFail($listId):null;
@@ -193,16 +196,16 @@ class TabulationSheetController extends Controller
                 'batch_id' => $request->batchId,
                 'section_id' => $sectionId,
             ])->first();
-            if ($examList) {
-                $approvalAccess = $this->academicHelper->getApprovalInfo('exam_result', $examList);
-                $approvalStatus = $approvalAccess['approval_access'];
-                $approvalLogs = AcademicsApprovalLog::with('user')->where([
-                    'campus_id' => $this->academicHelper->getCampus(),
-                    'institute_id' => $this->academicHelper->getInstitute(),
-                    'menu_id' => $examList->id,
-                    'menu_type' => 'exam_result',
-                ])->get();
-            }
+            // if ($examList) {
+            //     $approvalAccess = $this->academicHelper->getApprovalInfo('exam_result', $examList);
+            //     $approvalStatus = $approvalAccess['approval_access'];
+            //     $approvalLogs = AcademicsApprovalLog::with('user')->where([
+            //         'campus_id' => $this->academicHelper->getCampus(),
+            //         'institute_id' => $this->academicHelper->getInstitute(),
+            //         'menu_id' => $examList->id,
+            //         'menu_type' => 'exam_result',
+            //     ])->get();
+            // }
         }
 
         // Getting Students start

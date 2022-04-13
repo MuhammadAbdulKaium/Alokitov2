@@ -63,6 +63,7 @@ background:#0b460b !important;
                                     <li><a href="{{url('/academics/exam/attendance')}}"><i class="fa fa-sort-alpha-asc"></i> Exam Attendance</a></li>
                                     <li><a href="{{url('/academics/exam/seatPlan')}}"><i class="fa fa-sort-alpha-asc"></i> Exam Seat Plan</a></li>
                                     <li><a href="{{url('/academics/exam/marks/entry')}}"><i class="fa fa-sort-alpha-asc"></i> Exam Marks Entry</a></li>
+                                    <li><a href="{{url('/academics/exam/list')}}"><i class="fa fa-sort-alpha-asc"></i> Exam List</a></li>
                                  </ul>
                               </li>
                               <li><a href="{{url('academics/manage/subject')}}"><i class="fa fa-book "></i>Manage Academics</a></li>
@@ -105,7 +106,14 @@ background:#0b460b !important;
 
                         </li>
                         <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a></li>
-                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
+                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="{{url('academics/exam/tabulation-sheet/exam')}}"><i class="fa fa-calendar"></i> Tabulation Sheet(Exam)</a></li>
+                              <li><a href="{{url('academics/exam/tabulation-sheet/term-summary')}}"><i class="fa fa-calendar"></i> Tabulation Sheet(Term) - Summary</a></li>                              
+                              <li><a href="{{url('academics/exam/tabulation-sheet/term')}}"><i class="fa fa-calendar"></i> Tabulation Sheet(Term) - Details</a></li>                            
+                              <li><a href="{{url('academics/exam/tabulation-sheet/year')}}"><i class="fa fa-calendar"></i> Tabulation Sheet(Year)</a></li>                              
+                           </ul>   
+                        </li>
                      </ul>
 
                   </li>

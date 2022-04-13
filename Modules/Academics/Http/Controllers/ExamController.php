@@ -775,8 +775,11 @@ class ExamController extends Controller
         $type = $request->type;
 
         $batch = Batch::findOrFail($getClass);
+        $grades = null;
 
-        $grades = (sizeof($batch->grade) > 0) ? $batch->grade[0]->allDetails() : null;
+        if ($batch->grade) {
+            $grades = (sizeof($batch->grade) > 0) ? $batch->grade[0]->allDetails() : null;
+        }
 
         // Student getting start
         $examList = ExamList::where([
@@ -2120,67 +2123,68 @@ class ExamController extends Controller
             ])->pluck('section_id')->toArray();
         }
 
-        $approvalLogs = AcademicsApprovalLog::with('user')->where([
-            'campus_id' => $this->academicHelper->getCampus(),
-            'institute_id' => $this->academicHelper->getInstitute(),
-            // 'menu_id' => $examList->id,
-            'menu_type' => 'exam_result',
-        ])->get()->groupBy('menu_id');
+        // $approvalLogs = AcademicsApprovalLog::with('user')->where([
+        //     'campus_id' => $this->academicHelper->getCampus(),
+        //     'institute_id' => $this->academicHelper->getInstitute(),
+        //     // 'menu_id' => $examList->id,
+        //     'menu_type' => 'exam_result',
+        // ])->get()->groupBy('menu_id');
 
-        $examListHasApproval = [];
-        foreach ($examLists as $examList) {
-            $approval_info = $this->academicHelper->getApprovalInfo('exam_result', $examList);
-            $approval_access = $approval_info['approval_access'];
-            $lastStep = $approval_info['last_step'];
+        // $examListHasApproval = [];
+        // foreach ($examLists as $examList) {
+        //     $approval_info = $this->academicHelper->getApprovalInfo('exam_result', $examList);
+        //     $approval_access = $approval_info['approval_access'];
+        //     $lastStep = $approval_info['last_step'];
             
-            $examListHasApproval[$examList->id]['has_approval'] = $approval_access;
+        //     $examListHasApproval[$examList->id]['has_approval'] = $approval_access;
 
-            $approved_by = [];
-            if ($examList->publish_status == 2) {
-                $approvalHistoryInfo = ApprovalNotification::where([
-                    'campus_id' => $this->academicHelper->getCampus(),
-                    'institute_id' => $this->academicHelper->getInstitute(),
-                    'unique_name' => 'exam_result',
-                    'menu_id' => $examList->id,
-                ])->first();
-                $allUsers = $this->academicHelper->getAllUsers();
-                if ($approvalHistoryInfo) {
-                    if ($approvalHistoryInfo->approval_info) {
-                        $approvalDatas = json_decode($approvalHistoryInfo->approval_info);
-                        foreach ($approvalDatas as $key => $approvalData) {
-                            $persons = [];
-                            $userApproved = [];
-                            foreach ($approvalData->users_approved as $userinfo) {
-                                $userApproved[$userinfo->user_id] = true;
-                                if (isset($allUsers[$userinfo->user_id])) {
-                                    $user = $allUsers[$userinfo->user_id];
-                                    $persons[] = $user->name . ' on ' . Carbon::parse($userinfo->approved_at)->diffForHumans();
-                                }
-                            }
-                            $personTxt = implode(", ", $persons);
-                            $approved_by[] = "Step " . $key . ': Approved by- ' . $personTxt;
-                        }
-                    }
-                }
-            } else {
-                for($i=1;$i<=$lastStep;$i++){
-                    $personTxt = '';
-                    $persons = [];
-                    if (isset($approvalLogs[$examList->id])) {
-                        $approval_logs = $approvalLogs[$examList->id]->where('approval_layer', $i);
-                        foreach ($approval_logs as $log) {
-                            $persons[] = $log->user->name . ' on ' . Carbon::parse($log->created_at)->diffForHumans();
-                        }
-                        $personTxt = implode(", ", $persons);
-                    }
-                    $approved_by[] = "Step " . $i . ': approved by- ' . $personTxt;
-                }
-            }
+        //     $approved_by = [];
+        //     if ($examList->publish_status == 2) {
+        //         $approvalHistoryInfo = ApprovalNotification::where([
+        //             'campus_id' => $this->academicHelper->getCampus(),
+        //             'institute_id' => $this->academicHelper->getInstitute(),
+        //             'unique_name' => 'exam_result',
+        //             'menu_id' => $examList->id,
+        //         ])->first();
+        //         $allUsers = $this->academicHelper->getAllUsers();
+        //         if ($approvalHistoryInfo) {
+        //             if ($approvalHistoryInfo->approval_info) {
+        //                 $approvalDatas = json_decode($approvalHistoryInfo->approval_info);
+        //                 foreach ($approvalDatas as $key => $approvalData) {
+        //                     $persons = [];
+        //                     $userApproved = [];
+        //                     foreach ($approvalData->users_approved as $userinfo) {
+        //                         $userApproved[$userinfo->user_id] = true;
+        //                         if (isset($allUsers[$userinfo->user_id])) {
+        //                             $user = $allUsers[$userinfo->user_id];
+        //                             $persons[] = $user->name . ' on ' . Carbon::parse($userinfo->approved_at)->diffForHumans();
+        //                         }
+        //                     }
+        //                     $personTxt = implode(", ", $persons);
+        //                     $approved_by[] = "Step " . $key . ': Approved by- ' . $personTxt;
+        //                 }
+        //             }
+        //         }
+        //     } else {
+        //         for($i=1;$i<=$lastStep;$i++){
+        //             $personTxt = '';
+        //             $persons = [];
+        //             if (isset($approvalLogs[$examList->id])) {
+        //                 $approval_logs = $approvalLogs[$examList->id]->where('approval_layer', $i);
+        //                 foreach ($approval_logs as $log) {
+        //                     $persons[] = $log->user->name . ' on ' . Carbon::parse($log->created_at)->diffForHumans();
+        //                 }
+        //                 $personTxt = implode(", ", $persons);
+        //             }
+        //             $approved_by[] = "Step " . $i . ': approved by- ' . $personTxt;
+        //         }
+        //     }
             
-            $examListHasApproval[$examList->id]['approval_text'] = implode(",<br>", $approved_by);
-        }
+        //     $examListHasApproval[$examList->id]['approval_text'] = implode(",<br>", $approved_by);
+        // }
 
-        return view('academics::exam.exam-list', compact('examLists', 'approvalLogs', 'allSectionPermitted', 'permittedSectionIds', 'examListHasApproval'));
+        // return view('academics::exam.exam-list', compact('examLists', 'approvalLogs', 'allSectionPermitted', 'permittedSectionIds', 'examListHasApproval'));
+        return view('academics::exam.exam-list', compact('examLists', 'allSectionPermitted', 'permittedSectionIds'));
     }
 
     public function examSendForApproval($id)

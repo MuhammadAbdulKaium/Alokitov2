@@ -39,8 +39,8 @@
                         <th>Term</th>
                         <th>Class</th>
                         <th>Form</th>
-                        <th>Status</th>
-                        <th>Approval Steps</th>
+                        {{-- <th>Status</th> --}}
+                        {{-- <th>Approval Steps</th> --}}
                         <th>Action</th>
                     </thead>
                     <tbody>
@@ -52,7 +52,7 @@
                                 <td>{{ $examList->term->name }}</td>
                                 <td>{{ $examList->batch->batch_name }}</td>
                                 <td>{{ $examList->section->section_name }}</td>
-                                <td>
+                                {{-- <td>
                                     @if ($examList->publish_status == 1)
                                         <span class="text-warning">Pending</span>
                                     @elseif ($examList->publish_status == 2)
@@ -60,11 +60,11 @@
                                     @elseif ($examList->publish_status == 3)
                                         <span class="text-danger">Rejected</span>
                                     @endif
-                                </td>
-                                <td>{!! $examListHasApproval[$examList->id]['approval_text'] !!}</td>
+                                </td> --}}
+                                {{-- <td>{!! $examListHasApproval[$examList->id]['approval_text'] !!}</td> --}}
                                 <td>
                                     <a href="{{ url('/academics/exam/tabulation-sheet/exam/'.$examList->id) }}" class="btn btn-xs btn-info" target="_blank"><i class="fa fa-file"></i></a>
-                                    @if ($allSectionPermitted && $examList->publish_status == 0 || in_array($examList->section->id, $permittedSectionIds))
+                                    {{-- @if ($allSectionPermitted && $examList->publish_status == 0 || in_array($examList->section->id, $permittedSectionIds))
                                         <a href="{{ url('/academics/exam/send-for-approval/'.$examList->id) }}" class="btn btn-xs btn-primary">Send For Approval</a>
                                     @endif
                                     @if($examListHasApproval[$examList->id]['has_approval'])
@@ -72,7 +72,7 @@
                                             <button class="btn btn-xs btn-success" id="exam-approve-btn" 
                                             data-exam-list-id="{{ $examList->id }}">Approve</button>
                                         @endif
-                                    @endif
+                                    @endif --}}
                                 </td>
                             </tr>
                         @endforeach

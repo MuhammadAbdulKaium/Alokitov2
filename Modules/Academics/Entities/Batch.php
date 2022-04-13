@@ -15,24 +15,24 @@ class Batch extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'academics_year_id', 'academics_level_id','division_id', 'batch_name','batch_alias', 'start_date', 'end_date','campus','institute'
+        'academics_year_id', 'academics_level_id', 'division_id', 'batch_name', 'batch_alias', 'start_date', 'end_date', 'campus', 'institute'
     ];
 
-//    public function academicsYear()
-//    {
-//        // getting user
-//        $academicsYear = $this->belongsTo('Modules\Academics\Entities\AcademicsYear', 'academics_year_id', 'id')->first();
-//
-//         var_dump(($academicsYear));
-//        // checking
-//        if ($academicsYear) {
-//            // return user info
-//            return $academicsYear;
-//        } else {
-//            // return false
-//            return false;
-//        }
-//    }
+    //    public function academicsYear()
+    //    {
+    //        // getting user
+    //        $academicsYear = $this->belongsTo('Modules\Academics\Entities\AcademicsYear', 'academics_year_id', 'id')->first();
+    //
+    //         var_dump(($academicsYear));
+    //        // checking
+    //        if ($academicsYear) {
+    //            // return user info
+    //            return $academicsYear;
+    //        } else {
+    //            // return false
+    //            return false;
+    //        }
+    //    }
     public function academicsYear()
     {
         $academicsYear = $this->belongsTo('Modules\Academics\Entities\AcademicsYear', 'academics_year_id', 'id')->first();
@@ -103,27 +103,38 @@ class Batch extends Model
     }
 
 
-    public function payableAmount(){
-       return StudentPyamentView::where(['batch'=>$this->id])->get()->sum('payable_amount');
+    public function payableAmount()
+    {
+        return StudentPyamentView::where(['batch' => $this->id])->get()->sum('payable_amount');
     }
 
-    public function paidAmount(){
-        return StudentPyamentView::where(['batch'=>$this->id])->get()->sum('payed_amount');
+    public function paidAmount()
+    {
+        return StudentPyamentView::where(['batch' => $this->id])->get()->sum('payed_amount');
     }
 
-    public function discountAmount(){
-        return StudentPyamentView::where(['batch'=>$this->id])->get()->sum('discount');
+    public function discountAmount()
+    {
+        return StudentPyamentView::where(['batch' => $this->id])->get()->sum('discount');
     }
 
 
 
-    public static function getBatchNameById($id){
-        $batchProfile= Batch::find($id);
+    public static function getBatchNameById($id)
+    {
+        $batchProfile = Batch::find($id);
         return $batchProfile->batch_name;
     }
 
     public function divisions()
     {
         return $this->belongsToMany('Modules\Academics\Entities\Division', 'batch_division', 'batch_id', 'division_id');
+    }
+
+
+
+    public function grade()
+    {
+        return $this->belongsToMany(Grade::class, 'academics_class_grade_scales', 'batch_id', 'scale_id');
     }
 }

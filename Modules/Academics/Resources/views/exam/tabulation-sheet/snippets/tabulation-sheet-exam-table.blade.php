@@ -122,7 +122,7 @@ $rowNumber=0;
             </div>
         </div>
     </div>
-    <div class="drug-tooltip">
+    {{-- <div class="drug-tooltip">
         <span class="tooltip-open-text">Approval Info</span>
         <div class="drug-tooltip-details">
             <span class="drug-tooltip-cross-btn">X</span>
@@ -157,7 +157,7 @@ $rowNumber=0;
     @if ($approvalStatus && $examList->publish_status == 1)
         <button class="btn btn-xs btn-success" id="exam-approve-btn" 
         data-exam-list-id="{{ ($examList)?$examList->id:0 }}">Approve this Exam</button>
-    @endif
+    @endif --}}
 </div>
 <table class="table table-bordered ">
     <thead style="background: #dee2e6;">

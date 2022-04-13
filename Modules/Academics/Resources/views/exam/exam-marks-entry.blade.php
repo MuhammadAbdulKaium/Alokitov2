@@ -42,7 +42,8 @@
                     @csrf
 
                     <input type="hidden" name="type" class="select-type">
-                    <input type="hidden" name="can_save" value="{{ (in_array("academics/exam/save/student/marks" ,$pageAccessData))?true:false }}">
+                    {{-- <input type="hidden" name="can_save" value="{{ (in_array("academics/exam/save/student/marks" ,$pageAccessData))?true:false }}"> --}}
+                    <input type="hidden" name="can_save" value="{{ true }}">
 
                     <div class="row"  style="margin-bottom: 50px">
                         <div class="col-sm-1">
@@ -123,15 +124,15 @@
                             </select>
                         </div>
                         <div class="col-sm-2">
-                            @if (in_array(4550 ,$pageAccessData))
+                            {{-- @if (in_array(4550 ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary search-btn" type="button"><i class="fa fa-search"></i></button>
-                            @endif
-                            @if (in_array(4600 ,$pageAccessData))
+                            {{-- @endif --}}
+                            {{-- @if (in_array(4600 ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary view-btn" type="button"><i class="fa fa-eye"></i></button>
-                            @endif
-                            @if (in_array(4650 ,$pageAccessData))
+                            {{-- @endif --}}
+                            {{-- @if (in_array(4650 ,$pageAccessData)) --}}
                             <button class="btn btn-sm btn-primary print-btn" type="button"><i class="fa fa-print"></i></button>
-                            @endif
+                            {{-- @endif --}}
                             <button class="print-submit-btn" type="submit" style="display: none"></button>
                         </div>
                     </div>
@@ -303,6 +304,7 @@
                     },
 
                     success:function(data){
+                        console.log(data);
                         // hide waiting dialog
                         waitingDialog.hide();
                         // checking
