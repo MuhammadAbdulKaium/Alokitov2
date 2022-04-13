@@ -13,6 +13,18 @@
                 <li class="active">Class</li>
             </ul>
         </section>
+        <div id="p0" data-pjax-container="" data-pjax-push-state data-pjax-timeout="10000">
+            @if(Session::has('message'))
+                <p class="alert alert-success alert-auto-hide dism " style="text-align: center">
+                    <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" aria-label="close">&times;</a>{{ Session::get('message') }}
+                </p>
+            @endif
+            @if(Session::has('error'))
+                <p class="alert alert-danger alert-auto-hide dism " style="text-align: center">
+                    <a href="#" class="close" style="text-decoration:none" data-dismiss="alert" aria-label="close">&times;</a>{{ Session::get('error') }}
+                </p>
+            @endif
+        </div>
         <section class="content">
             <div class="box box-solid">
                 <div>
