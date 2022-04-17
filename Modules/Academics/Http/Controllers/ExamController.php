@@ -128,10 +128,18 @@ class ExamController extends Controller
     }
     public function updateExamCategoryExam(Request $request, $id)
     {
-        $examCategory = ExamCategory::where('id', '=', $id)->first();
+        $examCategory = ExamCategory::findOrFail($id);
 
-        $sameNameCategory = ExamCategory::where('exam_category_name', $request->exam_category_name)->first();
-        $sameAliasCategory = ExamCategory::where('alias', $request->alias)->first();
+        $sameNameCategory = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_category_name' => $request->exam_category_name
+        ])->first();
+        $sameAliasCategory = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'alias' => $request->alias
+        ])->first();
 
         if ($sameNameCategory || $sameAliasCategory) {
             if ($sameNameCategory->id != $examCategory->id) {
@@ -152,11 +160,14 @@ class ExamController extends Controller
         if ($categoryUpdate) {
             Session::flash('message', 'Exam Category Update successfully!');
             return redirect()->back();
+        }else{
+            Session::flash('errorMessage', 'Error updating Exam Category.');
+            return redirect()->back();
         }
     }
     public function deleteExamCategory($id)
     {
-        $examCategory = ExamCategory::where('id', '=', $id)->first();
+        $examCategory = ExamCategory::findOrFail($id);
         $examName = ExamName::where('exam_category_id', '=', $id)->first();
         if ($examName) {
             Session::flash('errorMessage', 'Exam Category Can not be deleted, dependencies on Exam Name!');
@@ -757,8 +768,14 @@ class ExamController extends Controller
         $pageAccessData = self::linkAccess($request);
 
         $academicYears = $this->academicHelper->getAllAcademicYears();
-        $semesters = Semester::all();
-        $examNames = ExamName::all();
+        $semesters = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $examNames = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-marks-entry', compact('pageAccessData', 'academicYears', 'semesters', 'examNames'));
     }
@@ -1107,9 +1124,18 @@ class ExamController extends Controller
     {
         $pageAccessData = self::linkAccess($request);
 
-        $category = ExamCategory::all();
-        $examName = ExamName::all();
-        $batches = Batch::all();
+        $category = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $examName = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $batches = Batch::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-category-exam', compact('pageAccessData', 'category', 'examName', 'batches'));
     }
@@ -1121,12 +1147,18 @@ class ExamController extends Controller
 
     public function getAllExamNames()
     {
-        return ExamName::all();
+        return ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
     }
 
     public function getAllBatch()
     {
-        return Batch::all();
+        return Batch::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
     }
 
     public function getSubjectsFromBatch($batchId)
@@ -1200,14 +1232,20 @@ class ExamController extends Controller
 
     public function getExamNamesFromTerm($termId)
     {
-        return ExamName::all();
+        return ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
     }
 
     public function examMarks(Request $request)
     {
         $pageAccessData = self::linkAccess($request);
 
-        $examNames = ExamName::all();
+        $examNames = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-marks', compact('pageAccessData', 'examNames'));
     }
@@ -1224,7 +1262,10 @@ class ExamController extends Controller
         if ($validator->passes()) {
             $examMarkParameters = $this->getExamMarkParameters();
 
-            $examNames = ExamName::all();
+            $examNames = ExamName::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->get();
             $batches = $this->getBatchesFromExamName($request->examId);
             $selectedBatch = Batch::findOrFail($request->batchId);
             $allSection = $selectedBatch->section();
@@ -1293,8 +1334,14 @@ class ExamController extends Controller
     {
         $examAssign = ExamName::where('id', '=', $id)->first();
         $sections = Section::with('singleBatch')->get();
-        $category = ExamCategory::all();
-        $batches = Batch::all();
+        $category = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $batches = Batch::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
         $eXamId = $id;
         //        $exam=ExamName::find($id);
         return view('academics::exam.modal.exam-assign-class', compact('batches', 'sections', 'eXamId', 'examAssign'));
@@ -1325,7 +1372,10 @@ class ExamController extends Controller
     }
     public function editExamName($id)
     {
-        $category = ExamCategory::all();
+        $category = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
         $semester = Semester::get();
         $examName = ExamName::where('id', '=', $id)->first();
         return view('academics::exam.modal.edit-exam-name', compact('category', 'semester', 'examName'));
@@ -1337,9 +1387,13 @@ class ExamController extends Controller
             'exam_category_id' => 'required',
         ]);
 
-        $examNameDetails = ExamName::where('id', '=', $id)->first();
+        $examNameDetails = ExamName::findOrFail($id);
 
-        $sameNameExam = ExamName::where('exam_name', $request->exam_name)->first();
+        $sameNameExam = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_name' => $request->exam_name
+        ])->first();
 
         if ($sameNameExam) {
             if ($sameNameExam->id != $examNameDetails->id) {
@@ -1512,7 +1566,10 @@ class ExamController extends Controller
     public function examSetAllMarksPost(Request $request)
     {
         $errors = [];
-        $subjects = Subject::all()->keyBy('id');
+        $subjects = Subject::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get()->keyBy('id');
 
         foreach ($request->data as $subjectId => $data) {
             $examMarks = ExamMark::where([
@@ -1578,7 +1635,10 @@ class ExamController extends Controller
 
     public function getExamCategories()
     {
-        return ExamCategory::all();
+        return ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
     }
 
     public function getClassesFromSubject($subjectId)
@@ -1627,8 +1687,14 @@ class ExamController extends Controller
 
         $academicYears = $this->academicHelper->getAllAcademicYears();
         $examCategories = $this->getExamCategories();
-        $terms = Semester::all();
-        $exams = ExamName::all();
+        $terms = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $exams = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-schedules', compact('pageAccessData', 'academicYears', 'examCategories', 'terms', 'exams'));
     }
@@ -1819,6 +1885,8 @@ class ExamController extends Controller
                 'exam_category_name' => $request->exam_category_name,
                 'alias' => $request->alias,
                 'created_by' => Auth::id(),
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
             ]);
 
             if ($examCategory) {
@@ -1851,7 +1919,9 @@ class ExamController extends Controller
                 'exam_name' => $request->exam_name,
                 'exam_category_id' => $request->exam_category_id,
                 'effective_on' => $request->effective_on == 'on' ? 1 : 0,
-                'created_by' => Auth::id()
+                'created_by' => Auth::id(),
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
             ]);
 
             if ($examName) {
@@ -1875,8 +1945,14 @@ class ExamController extends Controller
         $pageAccessData = self::linkAccess($request);
 
         $academicYears = $this->academicHelper->getAllAcademicYears();
-        $terms = Semester::all();
-        $exams = ExamName::all();
+        $terms = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $exams = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-attendance', compact('pageAccessData', 'academicYears', 'terms', 'exams'));
     }

@@ -152,11 +152,17 @@ class ManageAcademicsController extends Controller
         //All batch section and division list
         $allBatchSectionDivision = $this->sectionController->findBatchSection();
         // all Subjects;
-        $allSubjects = $this->subjcet->with('checkSubGroupAssignSingle.subjectGroupSingle')->get()->toArray();
+        $allSubjects = $this->subjcet->with('checkSubGroupAssignSingle.subjectGroupSingle')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get()->toArray();
 
         $user = Auth::user();
         $employeeId = ($user->employee()) ? $user->employee()->id : null;
-        $batches = $this->batch->get();
+        $batches = $this->batch->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         if (!($user->role()->id == 1 || $user->role()->id == 6)) {
             if ($employeeId) {
