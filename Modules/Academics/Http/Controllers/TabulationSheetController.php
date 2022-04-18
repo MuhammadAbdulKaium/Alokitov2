@@ -799,65 +799,66 @@ class TabulationSheetController extends Controller
         
         DB::beginTransaction();
         try {
-            if ($approvalData->publish_status == 1) {
-                $approval_info = $this->academicHelper->getApprovalInfo('exam_result', $approvalData);
+            // if ($approvalData->publish_status == 1) {
+            if ($approvalData->publish_status == 0 || $approvalData->publish_status == 1) {
+                // $approval_info = $this->academicHelper->getApprovalInfo('exam_result', $approvalData);
                 $step = $approvalData->step;
-                $approval_access = $approval_info['approval_access'];
-                $last_step = $approval_info['last_step'];
-                if($approval_access){
-                    $approvalLayerPassed = $this->academicHelper->approvalLayerPassed('exam_result', $approvalData, true);
+                // $approval_access = $approval_info['approval_access'];
+                // $last_step = $approval_info['last_step'];
+                // if($approval_access){
+                //     $approvalLayerPassed = $this->academicHelper->approvalLayerPassed('exam_result', $approvalData, true);
 
-                    if ($approvalLayerPassed) {
-                        // Notification level update for level of approval start
-                        ApprovalNotification::where([
-                            'unique_name' => 'exam_result',
-                            'menu_id' => $request->exam_list_id,
-                            'action_status' => 0,
-                            'campus_id' => $this->academicHelper->getCampus(),
-                            'institute_id' => $this->academicHelper->getInstitute(),
-                        ])->update(['approval_level' => $step+1]);
-                        // Notification level update for level of approval end
-                        if($step==$last_step){
+                //     if ($approvalLayerPassed) {
+                //         // Notification level update for level of approval start
+                //         ApprovalNotification::where([
+                //             'unique_name' => 'exam_result',
+                //             'menu_id' => $request->exam_list_id,
+                //             'action_status' => 0,
+                //             'campus_id' => $this->academicHelper->getCampus(),
+                //             'institute_id' => $this->academicHelper->getInstitute(),
+                //         ])->update(['approval_level' => $step+1]);
+                //         // Notification level update for level of approval end
+                //         if($step==$last_step){
                             $updateData = [
                                 'publish_status'=>2,
                                 'step'=>$step+1
                             ];
                             // Notification status update for level of approval start
-                            $approvalHistoryInfo = $this->academicHelper->generateApprovalHistoryInfo('exam_result', $approvalData);
-                            ApprovalNotification::where([
-                                'unique_name' => 'exam_result',
-                                'menu_id' => $request->exam_list_id,
-                                'action_status' => 0,
-                                'campus_id' => $this->academicHelper->getCampus(),
-                                'institute_id' => $this->academicHelper->getInstitute(),
-                            ])->update([
-                                'action_status' => 1,
-                                'approval_info' => json_encode($approvalHistoryInfo)
-                            ]);
-                            // Notification status update for level of approval end
-                        }else{ // end if($step==$last_step){
-                            $updateData = [
-                                'step'=>$step+1
-                            ];
-                        }
+                        //     $approvalHistoryInfo = $this->academicHelper->generateApprovalHistoryInfo('exam_result', $approvalData);
+                        //     ApprovalNotification::where([
+                        //         'unique_name' => 'exam_result',
+                        //         'menu_id' => $request->exam_list_id,
+                        //         'action_status' => 0,
+                        //         'campus_id' => $this->academicHelper->getCampus(),
+                        //         'institute_id' => $this->academicHelper->getInstitute(),
+                        //     ])->update([
+                        //         'action_status' => 1,
+                        //         'approval_info' => json_encode($approvalHistoryInfo)
+                        //     ]);
+                        //     // Notification status update for level of approval end
+                        // }else{ // end if($step==$last_step){
+                        //     $updateData = [
+                        //         'step'=>$step+1
+                        //     ];
+                        // }
                         $approvalData->update($updateData); 
-                    }
+                    // }
                     
-                    AcademicsApprovalLog::create([
-                        'menu_id' => $approvalData->id,
-                        'menu_type' => 'exam_result',
-                        'user_id' => $auth_user_id,
-                        'approval_layer' => $step,
-                        'action_status' => 1,
-                        'created_by' => $auth_user_id,
-                        'campus_id' => $this->academicHelper->getCampus(),
-                        'institute_id' => $this->academicHelper->getInstitute(),
-                    ]);
+                    // AcademicsApprovalLog::create([
+                    //     'menu_id' => $approvalData->id,
+                    //     'menu_type' => 'exam_result',
+                    //     'user_id' => $auth_user_id,
+                    //     'approval_layer' => $step,
+                    //     'action_status' => 1,
+                    //     'created_by' => $auth_user_id,
+                    //     'campus_id' => $this->academicHelper->getCampus(),
+                    //     'institute_id' => $this->academicHelper->getInstitute(),
+                    // ]);
                     DB::commit();
                     $output = ['status' => 1, 'message' => 'Exam Result successfully approved'];
-                } else { // end if($approval_access && $approvalData->approval_level==$step){
-                    $output = ['status' => 0, 'message' => 'Sory you have no approval'];
-                }
+                // } else { // end if($approval_access && $approvalData->approval_level==$step){
+                //     $output = ['status' => 0, 'message' => 'Sorry you have no approval'];
+                // }
             } else { // end if($approvalData->status==0)
                 if ($approvalData->status == 3) {
                     $output = ['status' => 0, 'message' => 'Exam Result already rejected'];

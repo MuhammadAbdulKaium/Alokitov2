@@ -141,7 +141,7 @@ $rowNumber=0;
                 </ul>
             </div>
         </div>
-    </div>
+    </div> --}}
     @if($examList)    
         <div class="" style="margin: 0 10px">
             @if ($examList->publish_status) Status: @endif
@@ -154,7 +154,7 @@ $rowNumber=0;
             @endif
         </div>
     @endif
-    @if ($approvalStatus && $examList->publish_status == 1)
+    {{-- @if ($approvalStatus && $examList->publish_status == 0)
         <button class="btn btn-xs btn-success" id="exam-approve-btn" 
         data-exam-list-id="{{ ($examList)?$examList->id:0 }}">Approve this Exam</button>
     @endif --}}
