@@ -1875,9 +1875,31 @@ class ExamController extends Controller
     public function storeExamCategory(Request $request)
     {
         $validatedData = $request->validate([
-            'exam_category_name' => 'required|max:255|unique:cadet_exam_category,exam_category_name',
-            'alias' => 'required|max:255|unique:cadet_exam_category,alias',
+            'exam_category_name' => 'required|max:255',
+            'alias' => 'required|max:255',
         ]);
+
+        $sameExamCatName = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_category_name' => $request->exam_category_name
+        ])->get();
+
+        $sameExamCatAlias = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'alias' => $request->alias
+        ])->get();
+
+        if (sizeOf($sameExamCatName) > 0) {
+            Session::flash('errorMessage', 'Sorry! There is already an exam exist with this name!');
+            return redirect()->back();
+        }
+
+        if (sizeOf($sameExamCatAlias) > 0) {
+            Session::flash('errorMessage', 'Sorry! There is already an exam exist with this alias!');
+            return redirect()->back();
+        }
 
         DB::beginTransaction();
         try {
@@ -1906,7 +1928,11 @@ class ExamController extends Controller
             'exam_name' => 'required|max:255',
             'exam_category_id' => 'required',
         ]);
-        $sameNameExam = ExamName::where('exam_name', $request->exam_name)->get();
+        $sameNameExam = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_name' => $request->exam_name
+        ])->get();
 
         if (sizeOf($sameNameExam) > 0) {
             Session::flash('errorMessage', 'Sorry! There is already an exam exist with this name.');
