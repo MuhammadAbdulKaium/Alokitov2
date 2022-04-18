@@ -33,7 +33,7 @@
         </div>
         <div class="row">
             {{-- @if (in_array(3000 ,$pageAccessData)) --}}
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 {{-- @if (in_array("academics/exam-category/store" ,$pageAccessData)) --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">
@@ -44,21 +44,38 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-sm-5">
+                                <div class="col-sm-7">
                                     <label for="">Category Name</label>
                                     <input type="text" class="form-control" name="exam_category_name" required>
                                     @error('exam_category_name')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-sm-4">
+                                <div class="col-sm-5">
                                     <label for="">Alias</label>
                                     <input type="text" class="form-control" name="alias" required>
                                     @error('alias')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-sm-3">
+                            </div>
+
+                            <div class="row" style="margin-top: 10px">
+                                <div class="col-sm-4">
+                                    <label for="">Mode</label>
+                                    <select class="form-control" name="exam_category_id">
+                                        <option value="avg">Average</option>
+                                        <option value="best_count">Best Count</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label for="">Best Count</label>
+                                    <input type="number" class="form-control" name="best_count" disabled>
+                                </div>
+                                <div class="col-sm-2" style="margin-top: 20px">
+                                    <input type="checkbox" name="effective_on" checked> Effective
+                                </div>
+                                <div class="col-sm-2">
                                     <button class="btn btn-success" style="margin-top: 23px">Save</button>
                                 </div>
                             </div>
@@ -107,7 +124,7 @@
             </div>    
             {{-- @endif --}}
             {{-- @if (in_array(3200 ,$pageAccessData)) --}}
-            <div class="col-sm-8">
+            <div class="col-sm-7">
                 {{-- @if (in_array("academics/exam-name/store" ,$pageAccessData)) --}}
                 <div class="box box-solid">
                     <div class="box-header with-border">

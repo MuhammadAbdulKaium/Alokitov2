@@ -1895,7 +1895,7 @@ class ExamController extends Controller
             Session::flash('errorMessage', 'Sorry! There is already an exam exist with this name!');
             return redirect()->back();
         }
-
+  
         if (sizeOf($sameExamCatAlias) > 0) {
             Session::flash('errorMessage', 'Sorry! There is already an exam exist with this alias!');
             return redirect()->back();
