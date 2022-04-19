@@ -47,10 +47,24 @@ class TabulationSheetController extends Controller
     public function index($type, $listId=null)
     {
         $academicYears = $this->academicHelper->getAllAcademicYears();
-        $terms = Semester::where('status', 1)->get();
-        $exams = ExamName::all();
-        $batches = Batch::all();
-        $termExamCategory = ExamCategory::where('alias', 'term-end')->first();
+        $terms = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'status' => 1
+        ])->get();
+        $exams = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $batches = Batch::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
+        $termExamCategory = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'alias' => 'term-end'
+        ])->first();
         $termExams = [];
         if ($termExamCategory) {
             $termExams = $termExamCategory->examNames;
@@ -108,10 +122,14 @@ class TabulationSheetController extends Controller
 
     public function examFromYear(Request $request)
     {
-        $semesterIds = Semester::where('academic_year_id', $request->yearId)->pluck('id');
+        $semesterIds = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'academic_year_id' => $request->yearId
+        ])->pluck('id');
         return ExamName::whereIn('term_id', $semesterIds)->where([
-            'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute(),
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
         ])->get();
     }
 
@@ -171,7 +189,10 @@ class TabulationSheetController extends Controller
         $sem = Semester::findOrFail($semesterId);
 
         $exam = ExamName::findOrFail($request->examId);
-        $batch = Batch::with('grade')->whereIn('id', $request->batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $request->batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
@@ -275,8 +296,14 @@ class TabulationSheetController extends Controller
         $examIds = array_keys($examMarks->groupBy('exam_id')->toArray());
 
         if (sizeof($examIds) > 0) {
-            $effectiveExamIds = ExamName::where('effective_on', 1)->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
-            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->whereIn('id', array_keys($effectiveExamIds))->get() : [];
+            $effectiveExamIds = ExamName::where('effective_on', 1)->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
+            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', array_keys($effectiveExamIds))->get() : [];
         } else {
             $effectiveExamIds = [];
             $examCategories = [];
@@ -307,7 +334,10 @@ class TabulationSheetController extends Controller
             ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
         $sem = Semester::findOrFail($semesterId);
-        $batch = Batch::with('grade')->whereIn('id', $request->batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $request->batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
@@ -317,7 +347,11 @@ class TabulationSheetController extends Controller
             'institute_id' => $this->academicHelper->getInstitute(),
         ])->get()->keyBy('id');
 
-        $termFinalExamCategory = ExamCategory::where('alias', 'term-end')->first();
+        $termFinalExamCategory = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'alias' => 'term-end'
+        ])->first();
 
 
         $sheetData = $this->getTermWiseMarkSheet(
@@ -410,8 +444,14 @@ class TabulationSheetController extends Controller
         $examIds = array_keys($examMarks->groupBy('exam_id')->toArray());
 
         if (sizeof($examIds) > 0) {
-            $effectiveExamIds = ExamName::where('effective_on', 1)->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
-            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->whereIn('id', array_keys($effectiveExamIds))->get() : [];
+            $effectiveExamIds = ExamName::where('effective_on', 1)->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
+            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', array_keys($effectiveExamIds))->get() : [];
         } else {
             $effectiveExamIds = [];
             $examCategories = [];
@@ -439,7 +479,10 @@ class TabulationSheetController extends Controller
             ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
         $sem = Semester::findOrFail($semesterId);
-        $batch = Batch::with('grade')->whereIn('id', $request->batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $request->batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
@@ -502,8 +545,14 @@ class TabulationSheetController extends Controller
         $examIds = array_keys($allExamMarks->groupBy('exam_id')->toArray());
 
         if (sizeof($examIds) > 0) {
-            $effectiveExamIds = ExamName::where('effective_on', 1)->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
-            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->whereIn('id', array_keys($effectiveExamIds))->get() : [];
+            $effectiveExamIds = ExamName::where('effective_on', 1)->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
+            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', array_keys($effectiveExamIds))->get() : [];
         } else {
             $effectiveExamIds = [];
             $examCategories = [];
@@ -530,7 +579,10 @@ class TabulationSheetController extends Controller
             ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id')
             ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
-        $batch = Batch::with('grade')->whereIn('id', $request->batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $request->batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
@@ -540,7 +592,11 @@ class TabulationSheetController extends Controller
             'institute_id' => $this->academicHelper->getInstitute(),
         ])->get()->keyBy('id');
 
-        $allSemesters = Semester::where('status', 1)->get();
+        $allSemesters = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'status' => 1
+        ])->get();
 
         //Calculating marksheet data starts
         $sheetData = [];

@@ -141,11 +141,14 @@ class ExamController extends Controller
             'alias' => $request->alias
         ])->first();
 
-        if ($sameNameCategory || $sameAliasCategory) {
+        if ($sameNameCategory) {
             if ($sameNameCategory->id != $examCategory->id) {
                 Session::flash('errorMessage', 'Sorry! There is already an exam category exist with this name.');
                 return redirect()->back();
             }
+        }
+
+        if ($sameAliasCategory) {
             if ($sameAliasCategory->id != $examCategory->id) {
                 Session::flash('errorMessage', 'Sorry! There is already an exam category exist with this alias.');
                 return redirect()->back();
@@ -154,7 +157,9 @@ class ExamController extends Controller
 
         $categoryUpdate = $examCategory->update([
             'exam_category_name' => $request->exam_category_name,
-            'alias' => $request->alias
+            'alias' => $request->alias,
+            'best_count' => ($request->best_count)?$request->best_count:0,
+            'effective' => ($request->effective == 'yes')?$request->effective:'no',
         ]);
 
         if ($categoryUpdate) {
@@ -1903,9 +1908,11 @@ class ExamController extends Controller
 
         DB::beginTransaction();
         try {
-            $examCategory = ExamCategory::insert([
+            $examCategory = ExamCategory::create([
                 'exam_category_name' => $request->exam_category_name,
                 'alias' => $request->alias,
+                'best_count' => ($request->best_count)?$request->best_count:0,
+                'effective' => ($request->effective == 'yes')?$request->effective:'no',
                 'created_by' => Auth::id(),
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),

@@ -328,7 +328,10 @@ trait ExamHelper
         //Elective Optional Subject student ids end
 
         $exam = ExamName::findOrFail($examId);
-        $batch = Batch::with('grade')->whereIn('id', $batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
@@ -442,8 +445,14 @@ trait ExamHelper
         $examIds = array_keys($examMarks->groupBy('exam_id')->toArray());
 
         if (sizeof($examIds) > 0) {
-            $effectiveExamIds = ExamName::where('effective_on', 1)->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
-            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->whereIn('id', array_keys($effectiveExamIds))->get() : [];
+            $effectiveExamIds = ExamName::where('effective_on', 1)->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
+            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', array_keys($effectiveExamIds))->get() : [];
         } else {
             $effectiveExamIds = [];
             $examCategories = [];
@@ -468,13 +477,19 @@ trait ExamHelper
             ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id')
             ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
-        $batch = Batch::with('grade')->whereIn('id', $batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;
         }
 
-        $termFinalExamCategory = ExamCategory::where('alias', 'term-end')->first();
+        $termFinalExamCategory = ExamCategory::where('alias', 'term-end')->where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->first();
 
         //Calculating marksheet data starts
         $sheetData = [];
@@ -583,8 +598,14 @@ trait ExamHelper
         $examIds = array_keys($examMarks->groupBy('exam_id')->toArray());
 
         if (sizeof($examIds) > 0) {
-            $effectiveExamIds = ExamName::where('effective_on', 1)->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
-            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->whereIn('id', array_keys($effectiveExamIds))->get() : [];
+            $effectiveExamIds = ExamName::where('effective_on', 1)->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', $examIds)->get()->groupBy('exam_category_id')->toArray();
+            $examCategories = (sizeof($effectiveExamIds) > 0) ? ExamCategory::with('examNames')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+            ])->whereIn('id', array_keys($effectiveExamIds))->get() : [];
         } else {
             $effectiveExamIds = [];
             $examCategories = [];
@@ -609,7 +630,10 @@ trait ExamHelper
             ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
         $sem = Semester::findOrFail($semesterId);
-        $batch = Batch::with('grade')->whereIn('id', $batchId)->get();
+        $batch = Batch::with('grade')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->whereIn('id', $batchId)->get();
         $grades = [];
         foreach ($batch as $ba) {
             $grades[$ba->id] = (sizeof($ba->grade) > 0) ? $ba->grade[0]->allDetails() : null;

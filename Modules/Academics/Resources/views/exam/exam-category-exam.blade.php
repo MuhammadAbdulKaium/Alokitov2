@@ -63,17 +63,17 @@
                             <div class="row" style="margin-top: 10px">
                                 <div class="col-sm-4">
                                     <label for="">Mode</label>
-                                    <select class="form-control" name="exam_category_id">
+                                    <select class="form-control" id="cal_mode_field" name="result_cal_mode">
                                         <option value="avg">Average</option>
                                         <option value="best_count">Best Count</option>
                                     </select>
                                 </div>
                                 <div class="col-sm-4">
                                     <label for="">Best Count</label>
-                                    <input type="number" class="form-control" name="best_count" disabled>
+                                    <input type="number" class="form-control" id="best_count_field" name="best_count" disabled>
                                 </div>
                                 <div class="col-sm-2" style="margin-top: 20px">
-                                    <input type="checkbox" name="effective_on" checked> Effective
+                                    <input type="checkbox" name="effective" value="yes" checked> Effective
                                 </div>
                                 <div class="col-sm-2">
                                     <button class="btn btn-success" style="margin-top: 23px">Save</button>
@@ -94,6 +94,8 @@
                                     <th>#</th>
                                     <th scope="col">Category Name</th>
                                     <th scope="col">Alias</th>
+                                    <th scope="col">Res. Cal. Mode</th>
+                                    <th scope="col">Effective?</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -104,9 +106,23 @@
                                     <td>{{$cat->exam_category_name}}</td>
                                     <td>{{$cat->alias}}</td>
                                     <td>
+                                        @if ($cat->best_count == 0)
+                                            Average
+                                        @else
+                                            Best {{ $cat->best_count }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($cat->effective == 'yes')
+                                            Yes
+                                        @else
+                                            No
+                                        @endif
+                                    </td>
+                                    <td>
                                         {{-- @if (in_array("academics/exam-category.edit" ,$pageAccessData)) --}}
                                         <a href="/academics/edit/exam-category/exam/{{$cat->id}}" data-target="#globalModal" 
-                                            class="btn btn-primary btn-xs" data-toggle="modal" data-modal-size="modal-sm" 
+                                            class="btn btn-primary btn-xs" data-toggle="modal" data-modal-size="modal-md" 
                                             tabindex="-1"><i class="fa fa-edit"></i></a>
                                         {{-- @endif --}}
                                         {{-- @if (in_array("academics/exam-category.delete" ,$pageAccessData)) --}}
@@ -252,6 +268,24 @@
             $(this).slideUp('slow', function() {
                 $(this).remove();
             });
+        });
+
+        $('#cal_mode_field').change(function () {
+            if ($(this).val() == 'best_count') {
+                $('#best_count_field').attr('disabled', false);
+            }else{
+                $('#best_count_field').val('');
+                $('#best_count_field').attr('disabled', true);
+            }
+        });
+
+        $(document).on('change', '#edit_cal_mode_field', function () {
+            if ($(this).val() == 'best_count') {
+                $('#edit_best_count_field').attr('disabled', false);
+            }else{
+                $('#edit_best_count_field').val('');
+                $('#edit_best_count_field').attr('disabled', true);
+            }
         });
     })
 </script>

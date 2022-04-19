@@ -6,15 +6,30 @@
     </div>
     <div class="modal-body">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-sm-7">
                 <label for="">Exam Category Name</label>
                 <input type="text" class="form-control" name="exam_category_name" value="{{$examCategory->exam_category_name}}" required>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
+            <div class="col-sm-5">
                 <label for="">Alias</label>
                 <input type="text" class="form-control" name="alias" value="{{$examCategory->alias}}" required>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px">
+            <div class="col-sm-6">
+                <label for="">Mode</label>
+                <select class="form-control" id="edit_cal_mode_field" name="result_cal_mode">
+                    <option value="avg">Average</option>
+                    <option value="best_count" {{ ($examCategory->best_count != 0)?'selected':'' }}>Best Count</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <label for="">Best Count</label>
+                <input type="number" class="form-control" id="edit_best_count_field" name="best_count" value="{{ ($examCategory->best_count != 0)?$examCategory->best_count:'' }}" {{ ($examCategory->best_count == 0)?'disabled':'' }}>
+            </div>
+            <div class="col-sm-2" style="margin-top: 20px">
+                <input type="checkbox" name="effective" value="yes" {{ ($examCategory->effective == 'yes')?'checked':'' }}> Effective
             </div>
         </div>
     </div>
