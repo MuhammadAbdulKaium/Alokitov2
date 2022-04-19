@@ -15,7 +15,12 @@ use Modules\Student\Entities\StudentInformation;
 use Modules\Student\Entities\StudentEnrollment;
 use Modules\Student\Entities\StdEnrollHistory;
 use App\Http\Controllers\Helpers\AcademicHelper;
-
+use App\Subject;
+use Modules\Academics\Entities\AcademicsYear;
+use Modules\Academics\Entities\ExamList;
+use Modules\Academics\Entities\ExamMark;
+use Modules\Academics\Entities\ExamName;
+use Modules\Academics\Entities\Semester;
 
 class StudentEnrollController extends Controller
 {
@@ -43,15 +48,45 @@ class StudentEnrollController extends Controller
     }
     public function getStudentAcademics2($id)
     {
+        // $pageAccessData = self::linkAccess($request, ['manualRoute' => 'student/manage']);
         // student information
         $personalInfo = $this->studentInformation->findOrFail($id);
         $activity = CadetPerformanceActivity::where('cadet_category_id', 19)->get();
-        $academics=CadetAssesment::where('student_id',$id)
-            ->where('type',19)
+        $academics = CadetAssesment::where('student_id', $id)
+            ->where('type', 19)
             ->orderBy('date', 'DESC')
             ->get();
         // return view with variables
-        return view('student::pages.student-profile.student-academic3', compact('personalInfo','academics', 'activity'))->with('page', 'academics')->with('std_id',$id);
+
+        $examMarks = ExamMark::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'student_id' => $id
+        ])->get()->groupBy('exam_id')->toArray();
+        $examLists = ExamList::with('year', 'term', 'batch', 'section')->where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'publish_status' => 2
+        ])->whereIn('exam_id', array_keys($examMarks))->latest()->get();
+
+        $years = $this->academicHelper->getAllAcademicYears();
+        $terms = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'status' => 1
+        ])->get();
+        $exams = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
+
+        $subjects = Subject::where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
+
+        // return view('student::pages.student-profile.student-academic3', compact('pageAccessData', 'personalInfo', 'academics', 'activity', 'examLists', 'years', 'terms', 'exams', 'subjects'))->with('page', 'examResult')->with('std_id', $id);
+        return view('student::pages.student-profile.student-academic3', compact('personalInfo', 'academics', 'activity', 'examLists', 'years', 'terms', 'exams', 'subjects'))->with('page', 'examResult')->with('std_id', $id);
     }
 
     public function getStudentAcademicsSubject($id,$item){
