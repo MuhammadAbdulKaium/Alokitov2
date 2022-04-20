@@ -141,11 +141,14 @@ trait ExamHelper
             $isFail = false;
 
             foreach ($examCategories as $examCategory) {
-                $examIds = $examCategory->examNames->pluck('id');
+                $examIds = $examCategory->examNames->where('effective_on', 1)->pluck('id');
                 $mark = null;
                 $passMark = null;
                 $fullMark = null;
                 if (isset($examMarks[$subject['id']])) {
+                    if ($examCategory->best_count>0) {
+                        $examIds = $examMarks[$subject['id']]->where('student_id', $stdId)->whereIn('exam_id', $examIds)->sortByDesc('total_conversion_mark')->take($examCategory->best_count)->pluck('exam_id');
+                    }
                     $mark = $examMarks[$subject['id']]->where('student_id', $stdId)->whereIn('exam_id', $examIds)->avg('total_conversion_mark');
                 }
                 $sheetData[$subject['id']][$examCategory->id] = [

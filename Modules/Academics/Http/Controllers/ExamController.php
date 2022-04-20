@@ -1355,7 +1355,31 @@ class ExamController extends Controller
     public function examClassAssign(Request $request, $id)
     {
         //        $classJson = json_encode($request->sections);
-        $examName = ExamName::find($id);
+        $examName = ExamName::findOrFail($id);
+
+        $existingBatches = [];
+        if($examName->classes){
+            $existingBatches = $examName->classes;
+        }
+        $newBatches = [];
+        if($request->sections){
+            $newBatches = $request->sections;
+        }
+
+        foreach ($existingBatches as $existingBatch) {
+            if (!in_array($existingBatch, $newBatches)) {
+                $subjectMark = SubjectMark::where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'exam_id' => $examName->id,
+                    'batch_id' => $existingBatch,
+                ])->first();
+                if($subjectMark){
+                    Session::flash('errorMessage', 'Can not unassign class, subject mapping found!');
+                    return redirect()->back();
+                }
+            }
+        }
 
         if ($examName) {
             DB::beginTransaction();
@@ -1366,7 +1390,7 @@ class ExamController extends Controller
 
                 if ($sectionEntry) {
                     DB::commit();
-                    Session::flash('message', 'New Exam Category created successfully.');
+                    Session::flash('message', 'Classes assigned successfully to exam!');
                     return redirect()->back();
                 }
             } catch (\Exception $e) {
