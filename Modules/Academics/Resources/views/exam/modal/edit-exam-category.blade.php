@@ -28,9 +28,6 @@
                 <label for="">Best Count</label>
                 <input type="number" class="form-control" id="edit_best_count_field" name="best_count" value="{{ ($examCategory->best_count != 0)?$examCategory->best_count:'' }}" {{ ($examCategory->best_count == 0)?'disabled':'' }}>
             </div>
-            <div class="col-sm-2" style="margin-top: 20px">
-                <input type="checkbox" name="effective" value="yes" {{ ($examCategory->effective == 'yes')?'checked':'' }}> Effective
-            </div>
         </div>
     </div>
     <div class="modal-footer">

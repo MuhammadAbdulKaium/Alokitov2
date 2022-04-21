@@ -171,7 +171,6 @@ class ExamController extends Controller
             'exam_category_name' => $request->exam_category_name,
             'alias' => $request->alias,
             'best_count' => ($request->best_count)?$request->best_count:0,
-            'effective' => ($request->effective == 'yes')?$request->effective:'no',
         ]);
 
         if ($categoryUpdate) {
@@ -1958,7 +1957,6 @@ class ExamController extends Controller
                 'exam_category_name' => $request->exam_category_name,
                 'alias' => $request->alias,
                 'best_count' => ($request->best_count)?$request->best_count:0,
-                'effective' => ($request->effective == 'yes')?$request->effective:'no',
                 'created_by' => Auth::id(),
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),

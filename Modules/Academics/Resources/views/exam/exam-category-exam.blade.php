@@ -61,7 +61,7 @@
                             </div>
 
                             <div class="row" style="margin-top: 10px">
-                                <div class="col-sm-4">
+                                <div class="col-sm-5">
                                     <label for="">Mode</label>
                                     <select class="form-control" id="cal_mode_field" name="result_cal_mode">
                                         <option value="avg">Average</option>
@@ -71,9 +71,6 @@
                                 <div class="col-sm-4">
                                     <label for="">Best Count</label>
                                     <input type="number" class="form-control" id="best_count_field" name="best_count" disabled>
-                                </div>
-                                <div class="col-sm-2" style="margin-top: 20px">
-                                    <input type="checkbox" name="effective" value="yes" checked> Effective
                                 </div>
                                 <div class="col-sm-2">
                                     <button class="btn btn-success" style="margin-top: 23px">Save</button>
@@ -95,7 +92,6 @@
                                     <th scope="col">Category Name</th>
                                     <th scope="col">Alias</th>
                                     <th scope="col">Res. Cal. Mode</th>
-                                    <th scope="col">Effective?</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -110,13 +106,6 @@
                                             Average
                                         @else
                                             Best {{ $cat->best_count }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($cat->effective == 'yes')
-                                            Yes
-                                        @else
-                                            No
                                         @endif
                                     </td>
                                     <td>

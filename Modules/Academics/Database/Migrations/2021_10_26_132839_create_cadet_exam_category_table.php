@@ -18,7 +18,6 @@ class CreateCadetExamCategoryTable extends Migration
             $table->string('exam_category_name');
             $table->string('alias');
             $table->integer('best_count')->default(0)->comment('0-Average, Greater then 0 is best count.');
-            $table->enum('effective', ['yes', 'no'])->default('no');
             $table->timestamps();
             $table->softDeletes();
             $table->integer('created_by')->nullable();
