@@ -130,6 +130,18 @@ class ExamController extends Controller
     {
         $examCategory = ExamCategory::findOrFail($id);
 
+        foreach ($examCategory->examNames as $exam) {
+            $examMark = ExamMark::where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'exam_id' => $exam->id
+            ])->first();
+            if ($examMark) {
+                Session::flash('errorMessage', 'Sorry! Marks found can not update this exam category.');
+                return redirect()->back();
+            }
+        }
+
         $sameNameCategory = ExamCategory::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
@@ -1417,6 +1429,16 @@ class ExamController extends Controller
         ]);
 
         $examNameDetails = ExamName::findOrFail($id);
+
+        $examMark = ExamMark::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'exam_id' => $examNameDetails->id
+        ])->first();
+        if ($examMark) {
+            Session::flash('errorMessage', 'Sorry! Marks found can not update this exam.');
+            return redirect()->back();
+        }
 
         $sameNameExam = ExamName::where([
             'campus_id' => $this->academicHelper->getCampus(),
