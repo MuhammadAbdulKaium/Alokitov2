@@ -84,6 +84,12 @@
                             <button class="print-submit-btn" type="submit" style="display: none"></button>
                         </div>
                     </div>
+                    <div class="row g-4">
+                        <div class="col-12 text-right">
+                            <button class="btn btn-sm btn-success print-summary" type="button"><i class="fa fa-print"></i> Progress Summary</button>
+                            <button class="btn btn-sm btn-primary print-details" type="button"><i class="fa fa-print"></i> Progress Details</button>
+                        </div>
+                    </div>
                 </form>
 
                 <div class="marks-table-holder table-responsive">
@@ -215,6 +221,14 @@
 
         $('.print-btn').click(function () {
             $('.select-type').val('print');
+            $('.print-submit-btn').click();
+        });
+        $('.print-summary').click(function () {
+            $('.select-type').val('summary');
+            $('.print-submit-btn').click();
+        });
+        $('.print-details').click(function () {
+            $('.select-type').val('details');
             $('.print-submit-btn').click();
         });
     });

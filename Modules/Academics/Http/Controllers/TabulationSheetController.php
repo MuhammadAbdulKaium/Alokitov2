@@ -44,7 +44,7 @@ class TabulationSheetController extends Controller
     }
 
 
-    public function index($type, $listId=null)
+    public function index($type, $listId = null)
     {
         $academicYears = $this->academicHelper->getAllAcademicYears();
         $terms = Semester::where([
@@ -69,9 +69,9 @@ class TabulationSheetController extends Controller
         if ($termExamCategory) {
             $termExams = $termExamCategory->examNames;
         }
-        
+
         if ($type == "exam") {
-            $examList = ($listId)?ExamList::findOrFail($listId):null;
+            $examList = ($listId) ? ExamList::findOrFail($listId) : null;
             return view('academics::exam.tabulation-sheet.tabulation-sheet-exam', compact('academicYears', 'terms', 'exams', 'examList'));
         } else if ($type == "term") {
             return view('academics::exam.tabulation-sheet.tabulation-sheet-term', compact('academicYears', 'terms', 'termExams', 'batches'));
@@ -205,9 +205,11 @@ class TabulationSheetController extends Controller
 
 
         $sheetData = $this->getExamWiseMarkSheet($request->yearId, $semesterId, $request->examId, $request->batchId, $sectionId);
-        $examList = null; $approvalStatus = false; $approvalLogs = [];
+        $examList = null;
+        $approvalStatus = false;
+        $approvalLogs = [];
 
-        if (sizeof($request->batchId)<2 && $sectionId) {
+        if (sizeof($request->batchId) < 2 && $sectionId) {
             $examList = ExamList::where([
                 'campus_id' => $this->academicHelper->getCampus(),
                 'institute_id' => $this->academicHelper->getInstitute(),
@@ -234,7 +236,7 @@ class TabulationSheetController extends Controller
         $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent')->where([
             'campus' => $this->academicHelper->getCampus(),
             'institute' => $this->academicHelper->getInstitute(),
-        ])->whereIn('std_id', $stdIds)->get();        
+        ])->whereIn('std_id', $stdIds)->get();
         // Getting Students end
 
         $examMarks = $examMarks->groupBy('subject_id');
@@ -260,7 +262,7 @@ class TabulationSheetController extends Controller
         $sectionId = $request->sectionId;
         $academicsYear = AcademicsYear::findOrFail($request->yearId);
 
-        $examMarks = ExamMark::where([
+         $examMarks = ExamMark::where([
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
             'academic_year_id' => $request->yearId,
@@ -314,7 +316,7 @@ class TabulationSheetController extends Controller
         $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent')->where([
             'campus' => $this->academicHelper->getCampus(),
             'institute' => $this->academicHelper->getInstitute(),
-        ])->whereIn('std_id', $stdIds)->get();        
+        ])->whereIn('std_id', $stdIds)->get();
         // Getting Students end
 
         $examMarksExamWise = $examMarks->where('exam_id', $request->examId)->groupBy('subject_id');
@@ -330,8 +332,8 @@ class TabulationSheetController extends Controller
         $criterias = ExamMarkParameter::all()->keyBy('id');
 
         $subjects = Subject::leftJoin('subject_group_assign', 'subject_group_assign.sub_id', '=', 'subject.id')
-            ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id')
-            ->whereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
+            ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id', 'subject_group_assign.deleted_at')
+            ->WhereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
         $sem = Semester::findOrFail($semesterId);
         $batch = Batch::with('grade')->where([
@@ -388,6 +390,34 @@ class TabulationSheetController extends Controller
                 'examCategories',
                 'termFinalExamCategory'
             ))->setPaper('a2', 'landscape');
+            return $pdf->stream();
+        } else if ($request->type == "summary") {
+             $studentInfo = ExamMark::with('Student.singleStudent.singleParent.singleGuardian', 'batch', 'subject', 'examName')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'academic_year_id' => $request->yearId,
+                'semester_id' => $request->termId,
+                'exam_id' => $request->examId
+            ])->whereIn('batch_id', $request->batchId)->get();
+            $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+            // return view('academics::exam.tabulation-sheet.print-tabulation-sheet.summary-print',compact('studentInfo','institute'));
+            // die();
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.summary-print', compact('institute'))->setPaper('a4', 'landscape');
+            return $pdf->stream();
+        } else if ($request->type == "details") {
+            $studentInfo = ExamMark::with('Student.singleStudent.singleParent.singleGuardian', 'batch', 'subject', 'examName')->where([
+                'campus_id' => $this->academicHelper->getCampus(),
+                'institute_id' => $this->academicHelper->getInstitute(),
+                'academic_year_id' => $request->yearId,
+                'semester_id' => $request->termId,
+                'exam_id' => $request->examId
+            ])->whereIn('batch_id', $request->batchId)->get();
+            $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+            // return view('academics::exam.tabulation-sheet.print-tabulation-sheet.summary-print',compact('studentInfo','institute'));
+            // die();
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.details-print', compact('studentInfo','institute'))->setPaper('a4', 'landscape');
             return $pdf->stream();
         } else {
             return view('academics::exam.tabulation-sheet.snippets.tabulation-sheet-term-table', compact(
@@ -462,7 +492,7 @@ class TabulationSheetController extends Controller
         $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent')->where([
             'campus' => $this->academicHelper->getCampus(),
             'institute' => $this->academicHelper->getInstitute(),
-        ])->whereIn('std_id', $stdIds)->get();        
+        ])->whereIn('std_id', $stdIds)->get();
         // Getting Students end
 
         $examMarks = $examMarks->groupBy('subject_id');
@@ -563,7 +593,7 @@ class TabulationSheetController extends Controller
         $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent')->where([
             'campus' => $this->academicHelper->getCampus(),
             'institute' => $this->academicHelper->getInstitute(),
-        ])->whereIn('std_id', $stdIds)->get();        
+        ])->whereIn('std_id', $stdIds)->get();
         // Getting Students end
 
         $examMarks = $allExamMarks->groupBy('subject_id');
@@ -649,7 +679,7 @@ class TabulationSheetController extends Controller
                         if ($subjectTotal !== null) {
                             $sheetData[$student->std_id][$key][$subject['id']]['totalAvg'] = ($i && $subjectTotal) ? round($subjectTotal / $i, 2) : null;
                             $grandTotal += ($i) ? $subjectTotal / $i : 0;
-                        } else{
+                        } else {
                             $sheetData[$student->std_id][$key][$subject['id']]['totalAvg'] = null;
                         }
                         $grandTotalFullMark += ($i) ? $subjectTotalFullMark / $i : 0;
@@ -668,7 +698,7 @@ class TabulationSheetController extends Controller
                     if ($totalMark !== null) {
                         $sheetData[$student->std_id][$key]['totalAvg'] = ($j && $totalMark) ? round($totalMark / $j, 2) : null;
                         $grandTotal += ($j) ? $totalMark / $j : 0;
-                    } else{
+                    } else {
                         $sheetData[$student->std_id][$key]['totalAvg'] = null;
                     }
                     $grandTotalFullMark += ($j) ? $totalFullMark / $j : 0;
@@ -699,7 +729,7 @@ class TabulationSheetController extends Controller
         foreach ($stdMarks as $key => $stdMark) {
             if ($sheetData[$key]['hasMark']) {
                 $sheetData[$key]['position'] = $i++;
-            } else{
+            } else {
                 $sheetData[$key]['position'] = null;
             }
         }
@@ -852,7 +882,7 @@ class TabulationSheetController extends Controller
     {
         $auth_user_id = Auth::user()->id;
         $approvalData = ExamList::findOrFail($request->exam_list_id);
-        
+
         DB::beginTransaction();
         try {
             // if ($approvalData->publish_status == 1) {
@@ -875,43 +905,43 @@ class TabulationSheetController extends Controller
                 //         ])->update(['approval_level' => $step+1]);
                 //         // Notification level update for level of approval end
                 //         if($step==$last_step){
-                            $updateData = [
-                                'publish_status'=>2,
-                                'step'=>$step+1
-                            ];
-                            // Notification status update for level of approval start
-                        //     $approvalHistoryInfo = $this->academicHelper->generateApprovalHistoryInfo('exam_result', $approvalData);
-                        //     ApprovalNotification::where([
-                        //         'unique_name' => 'exam_result',
-                        //         'menu_id' => $request->exam_list_id,
-                        //         'action_status' => 0,
-                        //         'campus_id' => $this->academicHelper->getCampus(),
-                        //         'institute_id' => $this->academicHelper->getInstitute(),
-                        //     ])->update([
-                        //         'action_status' => 1,
-                        //         'approval_info' => json_encode($approvalHistoryInfo)
-                        //     ]);
-                        //     // Notification status update for level of approval end
-                        // }else{ // end if($step==$last_step){
-                        //     $updateData = [
-                        //         'step'=>$step+1
-                        //     ];
-                        // }
-                        $approvalData->update($updateData); 
-                    // }
-                    
-                    // AcademicsApprovalLog::create([
-                    //     'menu_id' => $approvalData->id,
-                    //     'menu_type' => 'exam_result',
-                    //     'user_id' => $auth_user_id,
-                    //     'approval_layer' => $step,
-                    //     'action_status' => 1,
-                    //     'created_by' => $auth_user_id,
-                    //     'campus_id' => $this->academicHelper->getCampus(),
-                    //     'institute_id' => $this->academicHelper->getInstitute(),
-                    // ]);
-                    DB::commit();
-                    $output = ['status' => 1, 'message' => 'Exam Result successfully approved'];
+                $updateData = [
+                    'publish_status' => 2,
+                    'step' => $step + 1
+                ];
+                // Notification status update for level of approval start
+                //     $approvalHistoryInfo = $this->academicHelper->generateApprovalHistoryInfo('exam_result', $approvalData);
+                //     ApprovalNotification::where([
+                //         'unique_name' => 'exam_result',
+                //         'menu_id' => $request->exam_list_id,
+                //         'action_status' => 0,
+                //         'campus_id' => $this->academicHelper->getCampus(),
+                //         'institute_id' => $this->academicHelper->getInstitute(),
+                //     ])->update([
+                //         'action_status' => 1,
+                //         'approval_info' => json_encode($approvalHistoryInfo)
+                //     ]);
+                //     // Notification status update for level of approval end
+                // }else{ // end if($step==$last_step){
+                //     $updateData = [
+                //         'step'=>$step+1
+                //     ];
+                // }
+                $approvalData->update($updateData);
+                // }
+
+                // AcademicsApprovalLog::create([
+                //     'menu_id' => $approvalData->id,
+                //     'menu_type' => 'exam_result',
+                //     'user_id' => $auth_user_id,
+                //     'approval_layer' => $step,
+                //     'action_status' => 1,
+                //     'created_by' => $auth_user_id,
+                //     'campus_id' => $this->academicHelper->getCampus(),
+                //     'institute_id' => $this->academicHelper->getInstitute(),
+                // ]);
+                DB::commit();
+                $output = ['status' => 1, 'message' => 'Exam Result successfully approved'];
                 // } else { // end if($approval_access && $approvalData->approval_level==$step){
                 //     $output = ['status' => 0, 'message' => 'Sorry you have no approval'];
                 // }
