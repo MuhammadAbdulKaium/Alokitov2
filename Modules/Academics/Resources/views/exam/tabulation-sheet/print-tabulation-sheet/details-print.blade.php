@@ -175,8 +175,8 @@
     </style>
 </head>
 <body>
-        @if (sizeof($studentInfo)>0)
-            @foreach ($studentInfo as $student )
+        @if (sizeof($students)>0)
+            @foreach ($students as $student )
                 
             <div class="header clearfix">
                 <div class="header-left">
@@ -185,22 +185,17 @@
                             <img src="{{ public_path('assets/users/images/' . $institute->logo) }}" alt="logo">
                         </div>
                         @php
-                            if($student->Student->singleStudent){
-                                $studentFullName = $student->Student->singleStudent->first_name.' '. $student->Student->singleStudent->middle_name.' '. $student->Student->singleStudent->last_name;
-                            }else {
-                                $studentFullName = " ";
-                            }
-                            if($student->Student->singleStudent->singleParent){
+                            $studentFullName = $student->first_name.' '. $student->middle_name.' '. $student->last_name;
+                            if($student->singleParent){
                                 $fatherName = " ";
                                 $motherName = " ";
-                                foreach ($student->Student->singleStudent->singleParent as $key => $guardian) {
+                                foreach ($student->singleParent as $key => $guardian) {
                                     if($guardian->singleGuardian->type == 1){
                                         $fatherName = $guardian->singleGuardian->title.' '.$guardian->singleGuardian->first_name.' '.$guardian->singleGuardian->last_name;
                                     }
                                     if($guardian->singleGuardian->type == 0){
                                         $motherName = $guardian->singleGuardian->title.' '.$guardian->singleGuardian->first_name.' '.$guardian->singleGuardian->last_name;
                                     }
-                                  
                                 }
                             }
                         @endphp
@@ -208,7 +203,7 @@
                             <p><b>Name of Student :</b> {{$studentFullName}} </p>
                             <p><b>Father's Name<span class="tab-1">:</span> </b> {{$fatherName}} </p>
                             <p><b>Mother's Name<span class="tab-2">:</span> </b> {{$motherName}} </p>
-                            <p><b>Class<span class="tab-3">:</span> </b> {{$student->batch->batch_name}} </p>
+                            <p><b>Class<span class="tab-3">:</span> </b> @if(isset($studentEnrollments[$student->std_id])) {{($studentEnrollments[$student->std_id]->singleBatch)?$studentEnrollments[$student->std_id]->singleBatch->batch_name:""}} @endif </p>
                             <p><b>Roll<span class="tab-4">:</span> </b></p>
                         </div>
                     </div>
@@ -227,56 +222,32 @@
                 </div>
                 <div class="header-right">
                     <div class="grade-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Marks (%)</th>
-                                    <th>Grade</th>
-                                    <th>Point</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>80-100</td>
-                                    <td>A+</td>
-                                    <td>5</td>
-                                </tr>
-                                <tr>
-                                    <td>70-79</td>
-                                    <td>A</td>
-                                    <td>4</td>
-                                </tr>
-                                <tr>
-                                    <td>60-69</td>
-                                    <td>A-</td>
-                                    <td>3.5</td>
-                                </tr>
-                                <tr>
-                                    <td>50-59</td>
-                                    <td>B</td>
-                                    <td>3</td>
-                                </tr>
-                                <tr>
-                                    <td>40-49</td>
-                                    <td>C</td>
-                                    <td>2</td>
-                                </tr>
-                                <tr>
-                                    <td>33-39</td>
-                                    <td>D</td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>0-32</td>
-                                    <td>F</td>
-                                    <td>0</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        @foreach ($batch as $ba)
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>LP</th>
+                                        <th>GP</th>
+                                        <th>Marks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($grades[$ba->id])
+                                        @foreach($grades[$ba->id] as $grade)
+                                            <tr>
+                                                <td>{{$grade->name}} </td>
+                                                <td>{{$grade->points}} </td>
+                                                <td> {{$grade->min_per}} - {{$grade->max_per}} </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        @endforeach
                     </div>
                     <div class="exam-detail">
-                        <p><b>Exam :</b> {{$student->examName->exam_name}} </p>
-                        <p><b>Duration :</b> 14 Nov, 2019 - 28 Nov, 2019 </p>
+                        <p><b>Exam :</b> {{$examName->exam_name}} </p>
+                        {{-- <p><b>Duration :</b> 14 Nov, 2019 - 28 Nov, 2019 </p> --}}
                     </div>
                 </div>
             </div>
@@ -288,38 +259,65 @@
                             <tr>
                                 <th>Subject</th>
                                 <th>Mark</th>
-                                <th>Tutorial</th>
-                                <th>W/A</th>
-                                <th>CW</th>
-                                <th>MCQ</th>
-                                <th>W/A</th>
+                                @foreach ($examCategories as $examCategory)
+                                    @if ($termFinalExamCategory->id != $examCategory->id)
+                                        <th>{{ $examCategory->exam_category_name }}</th>
+                                    @endif
+                                @endforeach
+                                @foreach($criteriaUniqueIds as $uniqueId)
+                                    <th>
+                                        {{$criteriasAll[$uniqueId]->name}}
+                                    </th>
+                                @endforeach
                                 <th>Total</th>
-                                <th>Highest</th>
+                                <th>AVG</th>
                                 <th>Grade</th>
                                 <th>Point</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($subjects as $key => $subjectGroup)
+                                @foreach ($subjectGroup as $subject)
+                                    <tr>
+                                        <td>{{ $subject['subject_name'] }}</td>
+                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['totalFullMark'] }}</td>
+                                        @foreach ($examCategories as $examCategory)
+                                            @if ($termFinalExamCategory->id != $examCategory->id)
+                                                <td style="color: {{ ($sheetData[$student->std_id][$key][$subject['id']][$examCategory->id]['isFail'])?'red':'black' }}">
+                                                    {{ $sheetData[$student->std_id][$key][$subject['id']][$examCategory->id]['mark'] }} /
+                                                    {{ $sheetData[$student->std_id][$key][$subject['id']][$examCategory->id]['fullMark'] }}
+                                                </td>
+                                            @endif
+                                        @endforeach
+                                        @foreach($criteriaUniqueIds as $uniqueId)
+                                            @isset($sheetData[$student->std_id][$key][$subject['id']])
+                                                @php
+                                                    $marks = json_decode($subjectMarksExamWise[$subject['id']]->marks, 1);
+                                                @endphp
+                                                @isset($sheetData[$student->std_id][$key][$subject['id']][$termFinalExamCategory->id]['details'][$uniqueId])
+                                                    <td rowspan="1" ><span style="color: {{ $sheetData[$student->std_id][$key][$subject['id']][$termFinalExamCategory->id]['details'][$uniqueId]['color'] }}">
+                                                        {{ $sheetData[$student->std_id][$key][$subject['id']][$termFinalExamCategory->id]['details'][$uniqueId]['mark'] }} /
+                                                        {{ $sheetData[$student->std_id][$key][$subject['id']][$termFinalExamCategory->id]['details'][$uniqueId]['fullMark'] }}
+                                                    </span></td>
+                                                @else
+                                                    <td></td>
+                                                @endisset
+                                            @endisset
+                                        @endforeach
+                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['totalMark'] }}</td>
+                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['avgMark'] }}</td>
+                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['grade'] }}</td>
+                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['gradePoint'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endforeach
                             <tr>
-                                <td>Bangle 1st</td>
-                                <td>100</td>
-                                <td><span class="color-red">/120</span></td>
-                                <td><span class="color-red">0/120</span></td>
-                                <td>45/70</td>
-                                <td>18/30</td>
-                                <td>50.4/80</td>
-                                <td><span class="color-red">50.4</span></td>
-                                <td>-</td>
-                                <td><span class="color-red">F</span></td>
-                                <td><span class="color-red">0</span></td>
-                            </tr>
-                            <tr>
-                                <td colspan="11" class="tabel_footer">
+                                <td colspan="9" class="tabel_footer">
                                    <i>
-                                       <b>Total:700,</b>
-                                       <b>Obtained: 277.33,</b>
+                                       <b>Total: {{ $sheetData[$student->std_id]['grandTotalFullMark'] }},</b>
+                                       <b>Obtained: {{ $sheetData[$student->std_id]['grandTotal'] }},</b>
                                        <b>Highest: N/A, </b>
-                                       <b>Percent: 39.62%,</b>
+                                       <b>Percent: {{ $sheetData[$student->std_id]['avg'] }}%,</b>
                                        <b>Failed in 7 subject</b>
                                    </i>
                                 </td>

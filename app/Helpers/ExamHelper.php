@@ -36,6 +36,7 @@ trait ExamHelper
                 }
             }
             $marks = json_decode($subjectMarks[$subjectId]->marks, 1);
+            $parameterFullMarks = $marks['fullMarks'];
             $parameterPassMarks = $marks['passMarks'];
 
             foreach ($marks['fullMarks'] as $key => $mark) {
@@ -51,6 +52,7 @@ trait ExamHelper
 
                 $data[$key] = [
                     'color' => ($thisIsFail) ? 'red' : 'black',
+                    'fullMark' => (isset($parameterFullMarks[$key])) ? round($parameterFullMarks[$key] * $convertPoint, 2) : null,
                     'mark' => (isset($breakdownMark[$key])) ? round($breakdownMark[$key] * $convertPoint, 2) : null
                 ];
             }
@@ -130,7 +132,7 @@ trait ExamHelper
         $grandTotalAvgMark = null;
         $totalGroupFullMark = null;
         $failedInGroup = false;
-        $isFail = false;
+        $grandIsFail = false;
         $totalExamCatHasMarks = 0;
 
         foreach ($subjectGroup as $subject) {
@@ -153,6 +155,7 @@ trait ExamHelper
                 }
                 $sheetData[$subject['id']][$examCategory->id] = [
                     'mark' => null,
+                    'fullMark' => null,
                     'isFail' => false
                 ];
                 if ($mark !== null) {
@@ -164,6 +167,7 @@ trait ExamHelper
                     $hasMark = true;
                     $totalExamCatHasMarks++;
                     $sheetData[$subject['id']][$examCategory->id]['mark'] = round($mark, 2);
+                    $sheetData[$subject['id']][$examCategory->id]['fullMark'] = round($fullMark, 2);
                     if (($passMark > $mark) || $this->isFailedInCriterias($examIds, $examMarks[$subject['id']]->where('student_id', $stdId), $subjectMarks[$subject['id']])) {
                         $failedInOneExam = true;
                         $failedInGroup = true;
@@ -188,6 +192,9 @@ trait ExamHelper
                         $sheetData[$subject['id']]['grade'] = grade($grades, ($totalMark * $totalMarkConversion));
                         $sheetData[$subject['id']]['gradePoint'] = gradePoint($grades, ($totalMark * $totalMarkConversion));
                         $isFail = (gradePoint($grades, ($totalMark * $totalMarkConversion)) == 0) ? true : false;
+                        if($isFail){
+                            $grandIsFail = true;
+                        }
                     } else {
                         $sheetData[$subject['id']]['grade'] = "";
                         $sheetData[$subject['id']]['gradePoint'] = "";
@@ -196,6 +203,7 @@ trait ExamHelper
                     if ($failedInOneExam) {
                         if (($totalMark < ($totalFullMark * 0.6)) || ($totalExamCatHasMarks < 2)) {
                             $isFail = true;
+                            $grandIsFail = true;
                             $sheetData[$subject['id']]['grade'] = ($grades) ? grade($grades, 0) : "";
                             $sheetData[$subject['id']]['gradePoint'] = ($grades) ? gradePoint($grades, 0) : "";
                         }
@@ -234,6 +242,9 @@ trait ExamHelper
                     $sheetData['grade'] = grade($grades, ($groupTotal / sizeof($subjectGroup)) * $totalGroupMarkConversion);
                     $sheetData['gradePoint'] = gradePoint($grades, ($groupTotal / sizeof($subjectGroup)) * $totalGroupMarkConversion);
                     $isFail = (gradePoint($grades, ($groupTotal / sizeof($subjectGroup)) * $totalGroupMarkConversion) == 0) ? true : false;
+                    if($isFail){
+                        $grandIsFail = true;
+                    }
                 } else {
                     $sheetData['grade'] = "";
                     $sheetData['gradePoint'] = "";
@@ -242,6 +253,7 @@ trait ExamHelper
                 if ($failedInGroup && ($groupTotal !== null)) {
                     if (($groupTotal / sizeof($subjectGroup) < (($totalGroupFullMark / sizeof($subjectGroup)) * 0.6)) || ($totalExamCatHasMarks < 2)) {
                         $isFail = true;
+                        $grandIsFail = true;
                         $sheetData['grade'] = ($grades) ? grade($grades, 0) : "";
                         $sheetData['gradePoint'] = ($grades) ? gradePoint($grades, 0) : "";
                     }
@@ -259,7 +271,7 @@ trait ExamHelper
         $sheetData['grandTotal'] = ($grandTotal!==null)?round($grandTotal, 2):null;
         $sheetData['grandTotalFullMark'] = round($grandTotalFullMark, 2);
         $sheetData['grandTotalAvgMark'] = ($grandTotalAvgMark!==null)?round($grandTotalAvgMark, 2):null;
-        $sheetData['isFail'] = $isFail;
+        $sheetData['isFail'] = $grandIsFail;
 
         return $sheetData;
     }
@@ -545,6 +557,7 @@ trait ExamHelper
                 $sheetData[$student->std_id]['gradePoint'] = ($gradesBatchWise) ? gradePoint($gradesBatchWise, 0) : null;
                 $sheetData[$student->std_id]['grade'] = ($gradesBatchWise) ? grade($gradesBatchWise, 0) : null;
             }
+            $sheetData[$student->std_id]['grandTotalFullMark'] = $grandTotalFullMark;
             $sheetData[$student->std_id]['hasMark'] = ($totalSubjects) ? true : false;
             $sheetData[$student->std_id]['isFail'] = $isFail;
         }

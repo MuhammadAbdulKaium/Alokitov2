@@ -261,6 +261,14 @@ class TabulationSheetController extends Controller
         $semesterId = $request->termId;
         $sectionId = $request->sectionId;
         $academicsYear = AcademicsYear::findOrFail($request->yearId);
+        $examName = ExamName::findOrFail($request->examId);
+        $examLists = ExamList::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+            'academic_year_id' => $request->yearId,
+            'term_id' => $semesterId,
+            'exam_id' => $examName->id
+        ])->get()->keyBy('batch_id');
 
          $examMarks = ExamMark::where([
             'campus_id' => $this->academicHelper->getCampus(),
@@ -313,7 +321,7 @@ class TabulationSheetController extends Controller
 
         // Getting Students start
         $stdIds = $examMarks->pluck('student_id')->toArray();
-        $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent')->where([
+        $students = StudentProfileView::with('singleUser', 'singleStudent', 'singleBatch', 'singleSection', 'singleSection', 'singleYear', 'singleEnroll.admissionYear', 'roomStudent', 'singleParent.singleGuardian')->where([
             'campus' => $this->academicHelper->getCampus(),
             'institute' => $this->academicHelper->getInstitute(),
         ])->whereIn('std_id', $stdIds)->get();
@@ -332,7 +340,7 @@ class TabulationSheetController extends Controller
         $criterias = ExamMarkParameter::all()->keyBy('id');
 
         $subjects = Subject::leftJoin('subject_group_assign', 'subject_group_assign.sub_id', '=', 'subject.id')
-            ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id', 'subject_group_assign.deleted_at')
+            ->select('subject.id', 'subject.subject_name', 'subject.subject_code', 'subject.subject_alias', 'subject_group_assign.sub_id', 'subject_group_assign.sub_group_id')
             ->WhereIn('subject.id', array_keys($examMarks->toArray()))->get()->groupBy('sub_group_id')->toArray();
 
         $sem = Semester::findOrFail($semesterId);
@@ -363,6 +371,21 @@ class TabulationSheetController extends Controller
             $request->batchId,
             $sectionId,
         );
+
+        $criteriaUniqueIds = [];
+        foreach ($subjects as $key => $subjectGroup) {
+            foreach ($subjectGroup as $subject) {
+                if (isset($subjectMarksExamWise[$subject['id']])) {
+                    $marks = json_decode($subjectMarksExamWise[$subject['id']]['marks'], 1);
+                    $conversionPoint = ($subjectMarksExamWise[$subject['id']]['full_marks'] != 0) ? $subjectMarksExamWise[$subject['id']]['full_mark_conversion'] / $subjectMarksExamWise[$subject['id']]['full_marks'] : 0;
+                    foreach ($marks['fullMarks'] as $key => $mark) {
+                        array_push($criteriaUniqueIds, $key);
+                    }
+                }
+            }
+        }
+        $criteriaUniqueIds = array_unique($criteriaUniqueIds);
+        $criteriasAll = ExamMarkParameter::get()->keyBy('id');
 
         // return $sheetData;
 
@@ -406,18 +429,23 @@ class TabulationSheetController extends Controller
             $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.summary-print', compact('institute'))->setPaper('a4', 'landscape');
             return $pdf->stream();
         } else if ($request->type == "details") {
-            $studentInfo = ExamMark::with('Student.singleStudent.singleParent.singleGuardian', 'batch', 'subject', 'examName')->where([
-                'campus_id' => $this->academicHelper->getCampus(),
-                'institute_id' => $this->academicHelper->getInstitute(),
-                'academic_year_id' => $request->yearId,
-                'semester_id' => $request->termId,
-                'exam_id' => $request->examId
-            ])->whereIn('batch_id', $request->batchId)->get();
-            $institute = Institute::findOrFail($this->academicHelper->getInstitute());
-            // return view('academics::exam.tabulation-sheet.print-tabulation-sheet.summary-print',compact('studentInfo','institute'));
-            // die();
             $pdf = App::make('dompdf.wrapper');
-            $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.details-print', compact('studentInfo','institute'))->setPaper('a4', 'landscape');
+            $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.details-print', compact(
+                'students',
+                'studentEnrollments',
+                'examName',
+                'subjects',
+                'batch',
+                'grades',
+                'criteriaUniqueIds',
+                'criteriasAll',
+                'examCategories',
+                'termFinalExamCategory',
+                'sheetData',
+                'subjectMarks',
+                'subjectMarksExamWise',
+                'institute'
+            ))->setPaper('a4', 'landscape');
             return $pdf->stream();
         } else {
             return view('academics::exam.tabulation-sheet.snippets.tabulation-sheet-term-table', compact(

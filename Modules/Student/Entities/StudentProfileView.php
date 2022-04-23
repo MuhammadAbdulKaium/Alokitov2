@@ -213,4 +213,9 @@ class StudentProfileView extends Model
     {
         return $this->belongsTo(RoomStudent::class, 'std_id', 'student_id');
     }
+
+    public function singleParent()
+    {
+        return $this->hasMany('Modules\Student\Entities\StudentParent', 'std_id', 'std_id');
+    }
 }
