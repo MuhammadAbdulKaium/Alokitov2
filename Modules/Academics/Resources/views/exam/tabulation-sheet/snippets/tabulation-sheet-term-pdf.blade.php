@@ -151,7 +151,7 @@
         </div>
 
         <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0">
-            <table class="table-bordered">
+            <table class="" style="border: none;text-align: left">
                 @php
                     $count=0
                 @endphp
@@ -175,7 +175,7 @@
             </table>
         </div>
         <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0;">
-            <table class="table-bordered">
+            <table class="" style="border: none">
                 @php
                     $count=0
                 @endphp
