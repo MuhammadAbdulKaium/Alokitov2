@@ -150,9 +150,9 @@
 
         </div>
 
-        <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;text-align:left!important;margin: 0">
-            <table class="" style="border: none;text-align: left">
-                {{-- @php
+        <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0">
+            <table class="table-bordered">
+                @php
                     $count=0
                 @endphp
                 @foreach ($subjects as $key => $subjectGroup)
@@ -171,12 +171,12 @@
                             </tr>
                         @endif
                     @endforeach
-                @endforeach --}}
+                @endforeach
             </table>
         </div>
         <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0;">
-            <table class="" style="border: none">
-                {{-- @php
+            <table class="table-bordered">
+                @php
                     $count=0
                 @endphp
                 @foreach ($subjects as $key => $subjectGroup)
@@ -195,7 +195,7 @@
                             </tr>
                         @endif
                     @endforeach
-                @endforeach --}}
+                @endforeach
             </table>
         </div>
     </div>
