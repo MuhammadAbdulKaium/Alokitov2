@@ -85,8 +85,8 @@
                         </div>
                     </div>
                     <div class="row g-4">
-                        <div class="col-12 text-right">
-                            <button class="btn btn-sm btn-success print-summary" type="button"><i class="fa fa-print"></i> Progress Summary</button>
+                        <div class="col-12 text-right" style="margin-right: 10px">
+                            {{-- <button class="btn btn-sm btn-success print-summary" type="button"><i class="fa fa-print"></i> Progress Summary</button> --}}
                             <button class="btn btn-sm btn-primary print-details" type="button"><i class="fa fa-print"></i> Progress Details</button>
                         </div>
                     </div>

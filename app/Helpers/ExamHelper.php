@@ -696,6 +696,7 @@ trait ExamHelper
             if ($isFail) {
                 $sheetData[$student->std_id]['grade'] = ($gradesBatchWise) ? grade($gradesBatchWise, 0) : "";
             }
+            $sheetData[$student->std_id]['grandTotalFullMark'] = $grandTotalFullMark;
             $sheetData[$student->std_id]['hasMark'] = ($totalSubjects) ? true : false;
             $sheetData[$student->std_id]['isFail'] = $isFail;
         }

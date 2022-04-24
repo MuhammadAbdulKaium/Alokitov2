@@ -403,6 +403,7 @@ function ordinal($number) {
 
 function grade($allGrades, $mark)
 {
+    $mark = round($mark);
     $grades = $allGrades->where('min_per', '<=', $mark)->where('max_per', '>=', $mark);
     if (sizeof($grades) > 0) {
         foreach ($grades as $key => $grade) {
@@ -415,6 +416,7 @@ function grade($allGrades, $mark)
 
 function gradePoint($allGrades, $mark)
 {
+    $mark = round($mark);
     $grades = $allGrades->where('min_per', '<=', $mark)->where('max_per', '>=', $mark);
     if (sizeof($grades) > 0) {
         foreach ($grades as $key => $grade) {

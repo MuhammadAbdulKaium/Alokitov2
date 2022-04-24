@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Progress Report Details</title>
     <style>
          .page-break {
             page-break-after: always;
@@ -204,7 +204,7 @@
                             <p><b>Father's Name<span class="tab-1">:</span> </b> {{$fatherName}} </p>
                             <p><b>Mother's Name<span class="tab-2">:</span> </b> {{$motherName}} </p>
                             <p><b>Class<span class="tab-3">:</span> </b> @if(isset($studentEnrollments[$student->std_id])) {{($studentEnrollments[$student->std_id]->singleBatch)?$studentEnrollments[$student->std_id]->singleBatch->batch_name:""}} @endif </p>
-                            <p><b>Roll<span class="tab-4">:</span> </b></p>
+                            <p><b>Roll<span class="tab-4">:</span> </b>{{ $student->gr_no }}</p>
                         </div>
                     </div>
                 </div>
@@ -277,10 +277,19 @@
                         </thead>
                         <tbody>
                             @foreach ($subjects as $key => $subjectGroup)
+                                @php
+                                    $rowspan = sizeof($subjectGroup);
+                                @endphp
                                 @foreach ($subjectGroup as $subject)
                                     <tr>
                                         <td>{{ $subject['subject_name'] }}</td>
-                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['totalFullMark'] }}</td>
+                                        @if ($key)
+                                            @if ($rowspan)    
+                                                <td rowspan="{{ $rowspan }}">{{ $sheetData[$student->std_id][$key]['grandTotalFullMark'] }}</td>
+                                            @endif
+                                        @else
+                                            <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['totalFullMark'] }}</td>
+                                        @endif
                                         @foreach ($examCategories as $examCategory)
                                             @if ($termFinalExamCategory->id != $examCategory->id)
                                                 <td style="color: {{ ($sheetData[$student->std_id][$key][$subject['id']][$examCategory->id]['isFail'])?'red':'black' }}">
@@ -304,10 +313,22 @@
                                                 @endisset
                                             @endisset
                                         @endforeach
-                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['totalMark'] }}</td>
-                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['avgMark'] }}</td>
-                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['grade'] }}</td>
-                                        <td>{{ $sheetData[$student->std_id][$key][$subject['id']]['gradePoint'] }}</td>
+                                        @if ($key)
+                                            @if ($rowspan)    
+                                                <td rowspan="{{ $rowspan }}" style="{{ ($sheetData[$student->std_id][$key]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key]['totalMark'] }}</td>
+                                                <td rowspan="{{ $rowspan }}" style="{{ ($sheetData[$student->std_id][$key]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key]['avgMark'] }}</td>
+                                                <td rowspan="{{ $rowspan }}" style="{{ ($sheetData[$student->std_id][$key]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key]['grade'] }}</td>
+                                                <td rowspan="{{ $rowspan }}" style="{{ ($sheetData[$student->std_id][$key]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key]['gradePoint'] }}</td> 
+                                            @endif
+                                            @php
+                                                $rowspan = false;
+                                            @endphp
+                                        @else
+                                            <td style="{{ ($sheetData[$student->std_id][$key][$subject['id']]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key][$subject['id']]['totalMark'] }}</td>
+                                            <td style="{{ ($sheetData[$student->std_id][$key][$subject['id']]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key][$subject['id']]['avgMark'] }}</td>
+                                            <td style="{{ ($sheetData[$student->std_id][$key][$subject['id']]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key][$subject['id']]['grade'] }}</td>
+                                            <td style="{{ ($sheetData[$student->std_id][$key][$subject['id']]['isFail'])?'color: red':'' }}">{{ $sheetData[$student->std_id][$key][$subject['id']]['gradePoint'] }}</td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             @endforeach
@@ -316,13 +337,12 @@
                                    <i>
                                        <b>Total: {{ $sheetData[$student->std_id]['grandTotalFullMark'] }},</b>
                                        <b>Obtained: {{ $sheetData[$student->std_id]['grandTotal'] }},</b>
-                                       <b>Highest: N/A, </b>
+                                       {{-- <b>Highest: N/A, </b> --}}
                                        <b>Percent: {{ $sheetData[$student->std_id]['avg'] }}%,</b>
-                                       <b>Failed in 7 subject</b>
+                                       {{-- <b>Failed in 7 subject</b> --}}
                                    </i>
                                 </td>
                             </tr>
-                            
                         </tbody>
                         
                     </table>
