@@ -294,7 +294,10 @@ class ManageAcademicsController extends Controller
             'campus_id' => $this->academicHelper->getCampus(),
             'institute_id' => $this->academicHelper->getInstitute(),
         ])->orderBy('sorting_order', 'ASC')->get();
-        $subjectGroupList = $this->subjectGroup->get();
+        $subjectGroupList = $this->subjectGroup->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute()
+        ])->get();
 
         // checking subject group list
         if ($subjectGroupList and $subjectGroupList->count() > 0) {
