@@ -87,7 +87,7 @@
     </style>
 </head>
 <body >
-<footer >
+{{-- <footer >
     <div style="padding:.5rem">
         <span  >Printed from <b>CCIS</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
 
@@ -108,10 +108,10 @@
 </script>
 
 
-</footer>
+</footer> --}}
 
 <main>
-    <div class="header clearfix" >
+    {{-- <div class="header clearfix" >
         <div class="logo">
             <img src="{{ public_path('assets/users/images/'.$institute->logo) }}" height="60px!important"  alt="">
         </div>
@@ -202,7 +202,7 @@
 
             </table>
         </div>
-    </div>
+    </div> --}}
     <div>
         <h3>
             Selected Parameters: Academic Year :{{ $academicsYear->year_name }}
