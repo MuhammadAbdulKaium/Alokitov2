@@ -150,30 +150,28 @@
 
         </div>
 
-        <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px;text-align:left!important;margin: 0">
+        <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;text-align:left!important;margin: 0">
             <table class="" style="border: none;text-align: left">
                 @php
                     $count=0
                 @endphp
-                <tbody>
-                    @foreach ($subjects as $key => $subjectGroup)
-                        @foreach ($subjectGroup as $subject)
-                            @php
-                            ($count++)
-                            @endphp
-                            @if($count>=9)
-                                <tr style="border: none;text-align: left!important;" class="p-0 m-0" >
-                                    <td class="p-0 m-0">
-                                        <span class="t-l">{{$subject['subject_name']}}</span>
-                                    </td>
-                                    <td class="p-0 m-0">
-                                        <span>{{ $subject['subject_code']}}</span><br>
-                                    </td>
-                                </tr>
-                            @endif
-                        @endforeach
-                    @endforeach
-                </tbody>
+                @foreach ($subjects as $key => $subjectGroup)
+                    {{-- @foreach ($subjectGroup as $subject)
+                        @php
+                        ($count++)
+                        @endphp
+                        @if($count>=9)
+                            <tr style="border: none;text-align: left!important;" class="p-0 m-0" >
+                                <td class="p-0 m-0">
+                                    <span class="t-l">{{$subject['subject_name']}}</span>
+                                </td>
+                                <td class="p-0 m-0">
+                                    <span>{{ $subject['subject_code']}}</span><br>
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach --}}
+                @endforeach
             </table>
         </div>
         <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0;">
@@ -181,25 +179,23 @@
                 @php
                     $count=0
                 @endphp
-                <tbody>
-                    @foreach ($subjects as $key => $subjectGroup)
-                        @foreach ($subjectGroup as $subject)
-                            @php
-                            ($count++)
-                            @endphp
-                            @if($count<9)
-                                <tr style="border: none;text-align: left!important;" class="p-0 m-0" >
-                                    <td class="p-0 m-0">
-                                        <span class="t-l">{{$subject['subject_name']}}</span>
-                                    </td>
-                                    <td class="p-0 m-0">
-                                        <span>{{ $subject['subject_code']}}</span><br>
-                                    </td>
-                                </tr>
-                            @endif
-                        @endforeach
-                    @endforeach
-                </tbody>
+                @foreach ($subjects as $key => $subjectGroup)
+                    {{-- @foreach ($subjectGroup as $subject)
+                        @php
+                        ($count++)
+                        @endphp
+                        @if($count<9)
+                            <tr style="border: none;text-align: left!important;" class="p-0 m-0" >
+                                <td class="p-0 m-0">
+                                    <span class="t-l">{{$subject['subject_name']}}</span>
+                                </td>
+                                <td class="p-0 m-0">
+                                    <span>{{ $subject['subject_code']}}</span><br>
+                                </td>
+                            </tr>
+                        @endif
+                    @endforeach --}}
+                @endforeach
             </table>
         </div>
     </div>
