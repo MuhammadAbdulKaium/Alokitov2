@@ -56,7 +56,7 @@ class BatchController extends Controller
         $institute = $this->academicHelper->getInstitute();
         $year = $this->academicHelper->getAcademicYear();
         // division list
-        $divisions = $this->division->where(['campus'=>$campus, 'institute'=>$institute])->get();
+        $divisions = $this->division->where(['campus' => $campus, 'institute' => $institute])->get();
         // academic details
         $academicLevels = $this->academicHelper->getAllAcademicLevel();
         // $academicYear = $this->academicHelper->getAllAcademicYears();
@@ -69,8 +69,8 @@ class BatchController extends Controller
     public function getAll()
     {
         return $batches = $this->batch->where([
-            'campus'=> $this->academicHelper->getCampus(),
-            'institute'=>$this->academicHelper->getInstitute()
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute()
         ])->with('divisions')->get();
     }
 
@@ -93,7 +93,7 @@ class BatchController extends Controller
         $batch = new Batch();
         // store requested profile name
 
-//        $batch = Batch::find($id);
+        //        $batch = Batch::find($id);
 
         // store requested profile name
         $validator = Validator::make($request->all(), [
@@ -141,20 +141,18 @@ class BatchController extends Controller
                 Session::flash('message', 'Success!Data has been saved successfully.');
             } else {
                 Session::flash('message', 'Failed!Data has not been saved successfully.');
-
             }
             return redirect()->back();
         } else {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
     }
     public function show($id)
     {
         $batch     = new Batch();
         $pageTitle = 'Batch Information View';
         $batch     = $batch->where('id', $id)->get();
-//        return $batch;
+        //        return $batch;
         $insertOrEdit = 'edit';
         return view('academics::batch.view', compact('insertOrEdit', 'batch', 'pageTitle'));
     }
@@ -166,12 +164,11 @@ class BatchController extends Controller
         $campus = $this->academicHelper->getCampus();
         $institute = $this->academicHelper->getInstitute();
         // academic level list
-        $academicLevel = $this->academicsLevel->where(['campus_id'=> $campus, 'institute_id'=> $institute, 'is_active'=>1])->get();
+        $academicLevel = $this->academicsLevel->where(['campus_id' => $campus, 'institute_id' => $institute, 'is_active' => 1])->get();
         // division
-        $divisions = $this->division->where(['campus'=>$campus, 'institute'=>$institute])->get();
+        $divisions = $this->division->where(['campus' => $campus, 'institute' => $institute])->get();
         $insertEdit = 'edit';
-        return view('academics::batch.edit', compact( 'academicLevel', 'batch', 'pageTitle', 'divisions'));
-
+        return view('academics::batch.edit', compact('academicLevel', 'batch', 'pageTitle', 'divisions'));
     }
     public function update(Request $request, $id)
     {
@@ -189,17 +186,17 @@ class BatchController extends Controller
         // $batch->start_date         = date('Y-m-d', strtotime($request->input('start_date')));
         // $batch->end_date           = date('Y-m-d', strtotime($request->input('end_date')));
         $batch->batch_name         = $request->input('batch_name');
-        if($division=='on'){
-            $batch->division_id = $divisionId ;
+        if ($division == 'on') {
+            $batch->division_id = $divisionId;
 
             $batch->divisions()->sync($request->divisions);
 
-                if (isset($request->divisions)) {
-                    foreach ($batch->section() as $section) {
+            if (isset($request->divisions)) {
+                foreach ($batch->section() as $section) {
                     $section->divisions()->sync($request->divisions);
                 }
             }
-        }else{
+        } else {
             $batch->division_id = NULL;
 
             $batch->divisions()->detach();
@@ -222,31 +219,34 @@ class BatchController extends Controller
      */
     public function delete($id)
     {
-        $batchDeleted = $this->batch->find($id)->delete();
-        // checking
-        if ($batchDeleted) {
-            Session::flash('message', 'Batch deleted successfully.');
+        $section = Section::where('batch_id', $id)->get();
+        if (sizeof($section) > 0) {
+            Session::flash('error', "Section Found under this Batch. Can't Delete");
         } else {
-            Session::flash('message', 'Unable to Delete batch');
+
+            $batchDeleted = $this->batch->find($id)->delete();
+            // checking
+            if ($batchDeleted) {
+                Session::flash('message', 'Batch deleted successfully.');
+            } else {
+                Session::flash('message', 'Unable to Delete batch');
+            }
         }
         return redirect()->back();
-
     }
 
     public function batch_status_change($id)
     {
         $table = new Batch();
-        $current=$table->where('id', $id)->first();
-//        return $current;
-        $currentStatus=$current->status;
-        if ($currentStatus==0){
-            $status= $table->where('id', $id)->update(['status' => 1]);
+        $current = $table->where('id', $id)->first();
+        //        return $current;
+        $currentStatus = $current->status;
+        if ($currentStatus == 0) {
+            $status = $table->where('id', $id)->update(['status' => 1]);
+        } else {
+            $status = $table->where('id', $id)->update(['status' => 0]);
         }
-        else{
-            $status= $table->where('id', $id)->update(['status' => 0]);
-        }
-        try
-        {
+        try {
             if ($status) {
 
                 Session::flash('message', 'Success!Status has been changed successfully.');
@@ -254,9 +254,7 @@ class BatchController extends Controller
 
                 Session::flash('message', 'Failed!Status has not been changed successfully.');
             }
-
         } catch (Exception $e) {
-
         }
         $pageTitle    = "Batch Information";
         $insertOrEdit = 'insert'; //To identify insert
@@ -275,15 +273,15 @@ class BatchController extends Controller
         // response array
         $data = array();
         // all batch
-        $allBatch = $this->batch->where(['academics_level_id'=>$academicLevelId, 'campus'=> $campusId, 'institute'=>$instituteId])->orderBy('batch_name','ASC')->get();
+        $allBatch = $this->batch->where(['academics_level_id' => $academicLevelId, 'campus' => $campusId, 'institute' => $instituteId])->orderBy('batch_name', 'ASC')->get();
         // looping for adding division into the batch name
         foreach ($allBatch as $batch) {
             if (sizeof($batch->divisions) != 0) {
                 $divisions = '';
                 foreach ($batch->divisions as $key => $division) {
-                    if ($key != sizeof($batch->divisions)-1){
-                        $divisions .= $division->name.", ";
-                    }else{
+                    if ($key != sizeof($batch->divisions) - 1) {
+                        $divisions .= $division->name . ", ";
+                    } else {
                         $divisions .= $division->name;
                     }
                 }
@@ -296,5 +294,4 @@ class BatchController extends Controller
         //then sent this data to ajax success
         return $data;
     }
-
 }

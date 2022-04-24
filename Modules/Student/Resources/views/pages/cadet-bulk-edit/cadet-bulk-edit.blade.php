@@ -76,7 +76,6 @@
                                 <label for="">Search Multiple Field</label>
                                 <select class="form-control select-form js-example-basic-multiple" name="selectForm[]"
                                     multiple="multiple" style="color: #000;">
-                                    <option value="">__Select__</option>
                                     <option value="CadetNumber">Student Number</option>
                                     <option value="FirstName">First Name</option>
                                     <option value="LastName">Last Name</option>
@@ -177,7 +176,7 @@
                     beforeSend: function() {},
 
                     success: function(data) {
-                        var txt = '<option value="">Select Section*</option>';
+                        var txt = '<option value="0">Select Section*</option>';
                         data.forEach(element => {
                             txt += '<option value="' + element.id + '">' + element
                                 .section_name + '</option>';
@@ -194,6 +193,7 @@
 
 
             var selectForm = [];
+
             function searchStudents() {
                 // var yearId = $('.select-year').val();
                 var classId = $('.select-class').val();
@@ -220,7 +220,7 @@
                         },
 
                         success: function(data) {
-                            console.log(data);
+                            // console.log(data);
                             // hide waiting dialog
                             waitingDialog.hide();
                             var std_list_container_row = $('#std_list_container_row');
@@ -237,10 +237,7 @@
                             alert(JSON.stringify(data));
                         }
                     });
-                    // if (!newSelectForm.length > 0) {
-                    //     Swal.fire('Error!', 'Select A.Y or Ad.Y or A.l or Batch or Section Multiple Field!', 'error');
-                    // } else {
-                    // }
+
 
                 } else {
                     $_token = "{{ csrf_token() }}";
@@ -260,7 +257,7 @@
                         },
 
                         success: function(data) {
-                            console.log(data);
+                            // console.log(data);
                             // hide waiting dialog
                             waitingDialog.hide();
                             var std_list_container_row = $('#std_list_container_row');
@@ -302,21 +299,26 @@
                 e.preventDefault();
                 var first_name = true;
                 var language = true;
+                var userName = true;
 
                 $('input[name^=upload]').each(function() {
                     if ($(this).is(':checked')) {
                         var tr = $(this).parent().parent();
                         var languageVal = tr.find('input[name^=language]').val();
-                        if (!languageVal && selectForm.indexOf("Language") !== -1) {
+                        if (!languageVal && selectForm?.indexOf("Language") !== -1) {
                             language = false;
                         }
                         var nameVal = tr.find('input[name^=first_name]').val();
-                        if (!nameVal && selectForm.indexOf("FirstName") !== -1) {
+                        if (!nameVal && selectForm?.indexOf("FirstName") !== -1) {
                             first_name = false;
+                        }
+                        var userVal = tr.find('input[name^=user_name]').val();
+                        if (!userVal && selectForm?.indexOf("CadetNumber") !== -1) {
+                            userName = false;
                         }
                     }
                 })
-              
+
                 console.log(language);
                 // ajax request
                 if (!first_name) {
@@ -328,6 +330,11 @@
                     Toast.fire({
                         icon: "error",
                         title: "Language Field is required"
+                    });
+                } else if (!userName) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Student Number Field is required"
                     });
                 } else {
                     $.ajax({
@@ -346,7 +353,7 @@
                         success: function(data) {
                             // console.log(data);
                             waitingDialog.hide();
-                            console.log(data);
+                            // console.log(data);
                             if (data.errors) {
                                 Toast.fire({
                                     icon: 'error',

@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Modules\Academics\Entities\AcademicsLevel;
 use Modules\Academics\Entities\AcademicsYear;
 use App\Http\Controllers\Helpers\AcademicHelper;
+use Modules\Academics\Entities\Batch;
 use Validator;
 
 
@@ -180,14 +181,21 @@ class AcademicsLevelController extends Controller
 
     public function delete(Request $request, $id)
     {
-        // find academic level profile
-        $academicLevel = AcademicsLevel::find($id);
-        // delete and checking
-        if ($academicLevel->delete()) {
-            Session::flash('message', 'Success ! Academic Level Updated ');
+        $batch = Batch::where('academics_level_id', $id)->get();
+        if (sizeof($batch) > 0) {
+            Session::flash('error', "Batch Found under this Level. Can't Delete");
         } else {
-            Session::flash('message', 'Unable to Update Academic Level');
+            // find academic level profile
+            $academicLevel = AcademicsLevel::find($id);
+            // delete and checking
+            if ($academicLevel->delete()) {
+                Session::flash('message', 'Success ! Academic Level Updated ');
+            } else {
+                Session::flash('message', 'Unable to Update Academic Level');
+            }
         }
+      
+
         // return back
         return redirect()->back();
     }
