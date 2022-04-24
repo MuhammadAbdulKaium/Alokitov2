@@ -153,32 +153,8 @@
             @endforeach
         </div>
 
-        <div style="float: right;width: 10%;font-size: xx-small;padding-left: 4px;margin: 0">
-            <table class="" style="border: none">
-                @php
-                    $count=0
-                @endphp
-                @foreach ($subjects as $subject)
-                    @php
-
-                    ($count++)
-                    @endphp
-                    @if($count>=9)
-                        <tr style="border: none;text-align: left" class="p-0 m-0">
-                            <td class="p-0 m-0">
-                                <span>{{$subject->subject_name}}</span>
-                            </td  >
-                            <td class="p-0 m-0">
-                                <span>{{ $subject->subject_alias}} </span><br>
-                            </td>
-                        </tr>
-                    @endif
-                @endforeach
-
-            </table>
-        </div>
         <div style="float: right;width: 10%;font-size: xx-small;padding-left:4px ;margin: 0">
-            <table class="" style="border: none">
+            <table class="table-bordered">
                 @php
                     $count=0
                 @endphp
@@ -201,7 +177,32 @@
 
             </table>
         </div>
+        @if ($count>=9)
+        <div style="float: right;width: 10%;font-size: xx-small;padding-left: 4px;margin: 0">
+            <table class="table-bordered">
+                @php
+                    $count=0
+                @endphp
+                @foreach ($subjects as $subject)
+                    @php
 
+                    ($count++)
+                    @endphp
+                    @if($count>=9)
+                        <tr style="border: none;text-align: left" class="p-0 m-0">
+                            <td class="p-0 m-0">
+                                <span>{{$subject->subject_name}}</span>
+                            </td  >
+                            <td class="p-0 m-0">
+                                <span>{{ $subject->subject_alias}} </span><br>
+                            </td>
+                        </tr>
+                    @endif
+                @endforeach
+
+            </table>
+        </div>
+        @endif
     </div>
     <div>
         <h3>
