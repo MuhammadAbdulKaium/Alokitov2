@@ -89,7 +89,7 @@
 <body >
 <footer >
     <div style="padding:.5rem">
-        <span  >Printed from <b>CCIS</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
+        <span  >Printed from <b>Alokito ERP</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
 
     </div>
     <script type="text/php">
