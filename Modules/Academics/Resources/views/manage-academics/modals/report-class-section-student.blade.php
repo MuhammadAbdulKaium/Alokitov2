@@ -149,6 +149,7 @@
         // request for section list using batch id
         jQuery(document).on('change','.academicBatch',function(){
             // get academic level id
+			console.log("Changing Academic Level")
             var batch_id = $(this).val();
             var div = $(this).parent();
             var op="";

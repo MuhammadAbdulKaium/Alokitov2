@@ -180,7 +180,7 @@
             <div class="temp_one_font_side">
                 <div class="temp_one_all_content">
                     <div class="tem_id_header">
-                        <img class="school-logo" src="{{asset('/assets/users/images/'.$instituteInfo->logo)}}">
+                        <img class="school-logo" src="{{public_path().'/assets/users/images/'.$instituteInfo->logo}}">
                     </div>
                     <p class="temp_one_institute_name">{{$instituteInfo->institute_name}}</p>
                     <p class="temp_one_address_name">{{$instituteInfo->address1}}</p>
@@ -192,7 +192,7 @@
                         @if($studentInfo->singelAttachment('PROFILE_PHOTO'))
                             <img class="temp_one_profile_pic" style="height:60px;width: 70px" src="{{asset('/assets/users/images/'.$studentInfo->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}">
                         @else
-                            <img  src="{{asset('/assets/users/images/user-default.png')}}" style="height:60px;">
+                            <img  src="{{public_path().'/assets/users/images/user-default.png'}}" style="height:60px;">
                         @endif
                     </div>
                     <p class="temp_one_student_name">{{$stdInfo->first_name." ".$stdInfo->middle_name." ".$stdInfo->last_name}}</p>
@@ -211,7 +211,8 @@
                         </tr>
                     </table>
                     <div class="temp_one_principal_section">
-                        <img class="temp_one_principal_sig" style="height: 30px" width="45px" src="{{URL::to('/assets/signature',$templateProfile->signature)}}">
+                        <img class="temp_one_principal_sig" style="height: 30px" width="45px"
+                             src="{{public_path().'/assets/signature',$templateProfile->signature}}">
                         <p class="temp_one_principal">Principal</p>
                     </div>
                 </div>
@@ -261,7 +262,8 @@
             </div>
         </div>
         @php $count++; @endphp
-        @if($count==4)
+        @if($count==2)
+            @break
             @php $count=0; @endphp
             <div style="page-break-after:always;"></div>
         @endif

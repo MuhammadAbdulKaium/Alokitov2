@@ -94,20 +94,21 @@
                     @endif
                 </td>
                 <td>
-                    @php $studentSscInfo=json_decode($enroll->registerStudent()->ssc,true) @endphp
-                    2017-02-12 <br/>
-                    {{$enroll->gr_no}}
-                    {{--<p>{{$studentSscInfo['exam_info'][]}}</p>--}}
+
                 </td>
 
                 <td>
+                    @isset($studentSscInfo)
                     {{$studentSscInfo['exam_info']['exam_reg']}} <br/>
                     {{$studentSscInfo['exam_info']['exam_roll']}} <br/>
                     {{$studentSscInfo['exam_info']['exam_session']}}
+                        @endif
                 </td>
                 <td>
+                    @isset($studentSscInfo)
                     {{$studentSscInfo['exam_info']['exam_year']}} <br/>
                     {{ucfirst($studentSscInfo['exam_info']['exam_board'])}}
+                    @endif
                 </td>
 
                 <td>

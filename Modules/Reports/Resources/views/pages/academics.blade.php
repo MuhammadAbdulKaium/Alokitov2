@@ -146,6 +146,7 @@
 									<a href="/reports/academics/class/section/average/religion" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-lg"><i class="fa fa-download"></i></a>
 								</td>
 							</tr>
+							@role(['super-admin'])
 							<tr>
 								<td>Report Card</td>
 								<td width="15%" class="text-center">
@@ -153,6 +154,16 @@
 									<a href="/academics/manage/assessments/report-card/download/" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"><i class="fa fa-download"></i></a>
 								</td>
 							</tr>
+							<tr>
+								<td>Event Report</td>
+								<td width="15%" class="text-center">
+									<a href="#"><i class="fa fa-file-text"></i></a>
+									<a href="/reports/event/report" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">
+										<i class="fa fa-download"></i>
+									</a>
+								</td>
+							</tr>
+							@endrole
 							<tr>
 								<td>Contact Report</td>
 								<td width="15%" class="text-center">
@@ -181,15 +192,7 @@
 									{{--<a href="#"><i class="fa fa-download"></i></a>--}}
 								{{--</td>--}}
 							{{--</tr>--}}
-							<tr>
-								<td>Event Report</td>
-								<td width="15%" class="text-center">
-									<a href="#"><i class="fa fa-file-text"></i></a>
-									<a href="/reports/event/report" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">
-										<i class="fa fa-download"></i>
-									</a>
-								</td>
-							</tr>
+
 							</tbody>
 						</table>
 						 {{--teacher section --}}

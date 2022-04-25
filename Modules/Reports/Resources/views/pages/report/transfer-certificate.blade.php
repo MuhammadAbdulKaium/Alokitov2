@@ -278,6 +278,11 @@
                 <input id="dob" type="hidden" name="dob"  value="{{$testimonialInfoArray->dob}}" >
                 <input id="year4" type="hidden" name="year4" value="{{$testimonialInfoArray->year4}}"  >
                 <input id="class4" type="hidden" name="class4" value="{{$testimonialInfoArray->class4}}"  >
+                <input id="class4" type="hidden" name="character" value="{{$testimonialInfoArray->character}}"  >
+                <input id="class4" type="hidden" name="behavior" value="{{$testimonialInfoArray->behavior}}"  >
+                <input id="class4" type="hidden" name="attendance" value="{{$testimonialInfoArray->attendance}}"  >
+                <input id="class4" type="hidden" name="talent" value="{{$testimonialInfoArray->talent}}"  >
+                <input id="leave" type="hidden" name="leave_message" value="{{$testimonialInfoArray->leave_message}}"  >
                 <button type="submit" class="btn btn-success" style="margin-top: -120px; float: right; margin-right: 40px">Download</button>
             </form>
 
@@ -309,4 +314,4 @@
 </script>
 
 
-</body></html></html>
+</body></html>

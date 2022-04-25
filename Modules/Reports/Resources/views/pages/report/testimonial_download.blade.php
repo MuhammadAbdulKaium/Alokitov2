@@ -91,8 +91,7 @@
             padding-left: 10%;
             padding-right: 10%;
             width: 100%;
-            margin-left: auto;
-            margin-right: auto;
+           
             background: url("https://demo.inilabs.net/school/v3.5/uploads/images/certificate-defualt.jpg") no-repeat !important;
             background-size: 100% 100% !important;
             -webkit-print-color-adjust: exact;
@@ -101,12 +100,10 @@
         @media print {
             .testimonial {
                 min-height: 550px;
-                margin-left: auto;
-                margin-right: auto;
+
                 padding: 10%;
                 width: 100%;
-                margin-left: auto;
-                margin-right: auto;
+
                 background: url("https://demo.inilabs.net/school/v3.5/uploads/images/certificate-defualt.jpg") no-repeat !important;
                 background-size: 100% 100% !important;
                 -webkit-print-color-adjust: exact;
@@ -188,15 +185,20 @@
             font-size: 17px;
             text-align: center;
         }
+        .t-c {
+            text-align: center;
+            font-size: large;
+        }
+
     </style>
 </head>
-<body>
+<body style="padding: 5px!important;margin: 5px!important;">
 
-<div class="row">
-    <div class="col-sm-12">
+<div class="row"  >
+    <div  class="col-sm-12">
         <div id="printablediv">
             <div class="testimonial">
-                <div class="mainTestimonial">
+<!--                <div class="mainTestimonial">
                     <div class="row" style="width: 100%; float: left;">
                         <div class="topHeadingLeft col-sm-4" style="width: 32%; float: left">ক্রমিক নং: 1<br>কেন্দ্র কোড:{{$instituteProfile->center_code}}<br>জেলা কোড: {{$instituteProfile->zilla_code}}</div>
 
@@ -205,19 +207,71 @@
                         <div class="topHeadingRight col-sm-4" style="width: 20%; float: right">EIIN:{{$instituteProfile->eiin_code}} <br> তারিখ: ১২-০১-২০১৮</div>
                     </div>
                     <div class="row" style="width: 100%; text-align: center">
-                        <span class="topHeadingMiddle" style="margin-top: 40px"><img class="topHeadingMiddleImg" src="{{asset('/assets/users/images/'.$instituteProfile->logo)}}"></span>
+                        <img class="topHeadingMiddleImg" src="{{public_path().'/assets/users/images/'
+                            .$instituteProfile->logo}}" alt="">
+                        <span class="topHeadingMiddle" style="margin-top: 40px">
+                           </span>
                     </div>
+                </div>-->
+    <table style="table-layout: fixed;width: 100%">
+        <tr>
+            <td colspan="3" class="t-c">
+                <div class="t-c">
+                    ক্রমিক নং: 1<br>কেন্দ্র কোড:{{$instituteProfile->center_code}}<br>জেলা
+                    কোড: {{$instituteProfile->zilla_code}}
                 </div>
+            </td>
+            <td colspan="3" class="t-c">
+                <div class="t-c" style="text-align: left">
+                    বিদ্যালয়ের কোড: {{$instituteProfile->institute_code}} <br>
+                    উপজেলা  কোড:{{$instituteProfile->upazila_code}}
+                </div>
+            </td>
+            <td colspan="3" class="t-c">
+                <div>
+                    EIIN:{{$instituteProfile->eiin_code}}
+                <!--                            <br> তারিখ: ১২-০১-২০১৮-->
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td  colspan=""></td>
+            <td></td>
+
+            <td></td>
+            <td></td><td>
+
+            </td>
+            <td><img style="height: 60px; width: 60px;" src="{{public_path()
+                    .'/assets/users/images/'
+                    .$instituteProfile->logo}}"
+                     alt=""></td>
+
+
+            <td></td>
+
+        </tr>
+
+    </table>
                 <div class="headSection">
-                    <div class="row" >
-                        <h3>প্রশংসা পত্র</h3>
+                    <div class="row"  >
+                        <br>
                         <h2 class="top_heading_title">{{$instituteProfile->institute_name}}<br></h2>
-                        <div class="col-sm-12 mainMiddleTextCenter"><span class="mainMiddleText">{{$instituteProfile->address1}}<br></span></div>
+                        <div class="col-sm-12 mainMiddleTextCenter">
+                            <span class="mainMiddleText">{{$instituteProfile->address1}}<br></span>
+                        </div>
+                        <div style="text-align: center">
+                            <b style="font-weight: bolder;font-size: xx-large;text-align: center">প্রশংসা পত্র</b>
+
+                        </div>
                     </div>
                 </div>
 
                 <div class="testimonialInfo">
                     <p class="testimonialContent">
+
+
+
                         প্রত্যয়ন করা যায়তেছে যে ,{{$testimonialInfoArray->std_name}}
                         পিতা: {{$testimonialInfoArray->father}},
                         মাতা: {{$testimonialInfoArray->mother}},

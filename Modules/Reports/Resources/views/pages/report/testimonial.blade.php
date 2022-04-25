@@ -201,16 +201,23 @@
                         <span class="topHeadingRight">EIIN:{{$instituteProfile->eiin_code}} <br> তারিখ: ১২-০১-২০১৮</span>
                     </div>
                     <div class="row">
-                        <span class="topHeadingMiddle" style="margin-top: 40px"><img class="topHeadingMiddleImg" src="{{URL::asset('assets/users/images/'.$instituteProfile->logo)}}"></span>
+                        <div class="topHeadingMiddle" style="margin:40px 0px">
+                            <img class="topHeadingMiddleImg"
+                                 src="{{public_path().'/assets/users/images/'.$instituteProfile->logo}}"></div>
                     </div>
                 </div>
 
 
                 <div class="headSection">
                     <div class="row" >
-                        <h4 style="margin-left: 20px; font-size: 18px; font-weight: bold">প্রশংসা পত্র<br></h4>
-                        <h2 class="top_heading_title" style="margin-top: -30px">{{$instituteProfile->institute_name}}<br></h2>
+                        <br>
+                        <h2 class="top_heading_title" style="margin-top:
+                        10px">{{$instituteProfile->institute_name}}<br></h2>
                         <div class="col-sm-12 mainMiddleTextCenter"><span class="mainMiddleText">{{$instituteProfile->address1}}<br></span></div>
+                      <div class="text-center">
+                          <h4 style="margin-left: 20px; font-size: 18px; font-weight: bold">প্রশংসা পত্র<br></h4>
+                      </div>
+
                     </div>
                 </div>
 

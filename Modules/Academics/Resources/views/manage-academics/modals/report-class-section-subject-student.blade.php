@@ -80,7 +80,7 @@
 					<select id="doc_type" class="form-control" name="download_type" required>
 						<option value="" disabled selected>--- Select Type ---</option>
 						<option value="pdf">PDF</option>
-						<option value="excel">Excel</option>
+<!--						<option value="excel">Excel</option>-->
 					</select>
 					<div class="help-block"></div>
 				</div>
@@ -97,7 +97,7 @@
 <script src="{{ asset('js/bootstrap-datepicker.js') }}" type="text/javascript"></script>
 
 <script type="text/javascript">
-    $(function() { // document ready
+    $(function() {
 
         // request for batch list using level id
         jQuery(document).on('change','.academicLevel',function(){
@@ -193,6 +193,7 @@
                 },
 
                 success:function(data){
+					console.log(data);
                     op+='<option value="" selected disabled>--- Select Subject ---</option>';
                     for(var i=0;i<data.length;i++){
                         op+='<option value="'+data[i].id+'">'+data[i].sub_name+'</option>';
@@ -206,7 +207,7 @@
                     $('#section_name').val(section_name);
 
                     // semester list reset
-                    resetSemester();
+
                 },
                 error:function(){
                     // statements

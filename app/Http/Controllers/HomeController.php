@@ -228,7 +228,11 @@ class HomeController extends Controller
 
             // student today's attendance info
             // $attendanceInfo = $this->reportsController->todayAttendanceInfo();
-            $attendanceInfo = $this->attendanceUploadController->dailyAttendanceReport();
+         $attendanceInfo = $this->attendanceUploadController->dailyAttendanceReport();
+
+
+
+            //return $attendanceInfo;
             //$attendanceInfo = $this->attendanceUploadController->dailyAttendanceReportByDevice();
 
             // institute profile

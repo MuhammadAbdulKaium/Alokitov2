@@ -728,12 +728,37 @@ class AttendanceUploadController extends Controller
         // today's date
         $todayDate = Carbon::today()->toDateString();
         // find today's attendance
-        $attendanceList = $this->attendanceList($todayDate, null, null, null, null, $academicYearId, $campusId, $instituteId);
+       // $attendanceList = $this->attendanceList($todayDate, null, null, null, null, $academicYearId, $campusId,
+        //    $instituteId);
+        $attendanceList= DB::table('student_attendance_view_one')
+            ->where([
+                'campus'=> $this->academicHelper->getCampus(),
+                'institute'=> $this->academicHelper->getInstitute(),
+                'attendance_date'=>$todayDate
+
+            ])->pluck('student_id')->toArray();
+        $attendanceListArray= DB::table('student_attendance_view_one')
+            ->where([
+                'campus'=> $this->academicHelper->getCampus(),
+                'institute'=> $this->academicHelper->getInstitute(),
+                'attendance_date'=>$todayDate
+
+            ])->get();
+
+
+
         // find campus-institute student list
         $studentList = $this->studentProfileView->where(['campus' => $campusId, 'institute' => $instituteId])->get();
+       $attArray=[];
+        foreach ($attendanceListArray as $attendance){
+            $attArray[$attendance->student_id]=$attendance->attendacnce_type;
+        }
+       // return $attArray[8193];
         // checking student list
+        //dd($attendanceList);
         if ($studentList->count() > 0) {
             // attendance details
+
             $totalStd = 0;
             $totalPresent = 0;
             $totalAbsent = 0;
@@ -748,13 +773,26 @@ class AttendanceUploadController extends Controller
 
             // std list looping
             foreach ($studentList as $stdProfile) {
+                //return $attendanceList;
+               if(in_array($stdProfile->std_id,$attendanceList)){
+                  // return  gettype($attendanceListArray);
+                   $std_id=$stdProfile->std_id;
+                   if($attArray[$std_id]==1){
+                       $attendanceType = 1;
+                   }else{
+                       $attendanceType = 0;
+                   }
+
+               }else{
+                   $attendanceType = 0;
+               }
                 // std id and gender
                 $stdId = $stdProfile->std_id;
                 $stdGender = $stdProfile->gender;
                 // attendance type
-                $attendanceType = 0;
+
                 // checking stdId in attendance list
-                if (array_key_exists($stdId, $attendanceList)) $attendanceType = 1;
+                //if (array_key_exists($stdId, $attendanceList)) $attendanceType = 1;
                 // attendance list
                 $totalStd += 1;
                 if ($attendanceType == 0) $totalAbsent += 1;

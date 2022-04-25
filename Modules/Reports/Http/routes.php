@@ -60,7 +60,7 @@ Route::group(['middleware' => ['web', 'auth','access-permission'], 'prefix' => '
 
 
     // student id card section
-    Route::post('/student/id-card', 'StudentIdCardController@getStdIdCardList');
+        Route::post('/student/id-card', 'StudentIdCardController@getStdIdCardList');
     Route::post('/student/id-card/download', 'StudentIdCardController@downloadStdIdCardList');
     // student id card setting
     Route::post('/student/id-card/setting','StudentIdCardController@storeTemplateSetting');

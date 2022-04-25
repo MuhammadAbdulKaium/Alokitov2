@@ -44,8 +44,10 @@ use Excel;
 use App;
 use MPDF;
 use View;
+use MPDFGEN;
 use Modules\Setting\Entities\IdCardSetting;
 use Modules\Academics\Entities\BatchSemester;
+
 // use Illuminate\Support\Facades\App;
 
 class ReportsController extends Controller
@@ -85,28 +87,27 @@ class ReportsController extends Controller
     private $gradeCategory;
 
 
-
-    public function __construct(AcademicsLevel $academicsLevel, BatchSemester $batchSemester, GradeCategory $gradeCategory, IdCardSetting $idCardSetting, StudentWaiver $studentWaiver, StudentProfileView $studentProfileView, Fees $fees, FeesInvoice $feesInvoice, Batch $batch, ClassSubject $classSubject, StudentInformation $studentInformation, StudentEnrollment $studentEnrollment, StudentAttendance $studentAttendance, StudentAttendanceDetails $studentAttendanceDetails, AttendanceManageView $attendanceManageView, AttendanceSetting $attendanceSetting, AttendanceViewOne $attendanceViewOne, Section $section, AttendanceViewTwo $attendanceViewTwo, AcademicHelper $academicHelper,AcademicsYear $academicsYear, ApplicantResult $applicantResult, ApplicantExamSetting $examSetting, AcademicsReportController $academicsReportController, StudentAttendanceReportController $studentAttendanceReportController, Semester $semester, AttendanceUploadController $attendanceUploadController, IdCardTemplate $idCardTemplate, ReportCardSetting $reportCardSetting, AdditionalSubject $additionalSubject, GradeDetails $gradeDetails, Grade $grade, AssessmentsController $assessmentsController)
+    public function __construct(AcademicsLevel $academicsLevel, BatchSemester $batchSemester, GradeCategory $gradeCategory, IdCardSetting $idCardSetting, StudentWaiver $studentWaiver, StudentProfileView $studentProfileView, Fees $fees, FeesInvoice $feesInvoice, Batch $batch, ClassSubject $classSubject, StudentInformation $studentInformation, StudentEnrollment $studentEnrollment, StudentAttendance $studentAttendance, StudentAttendanceDetails $studentAttendanceDetails, AttendanceManageView $attendanceManageView, AttendanceSetting $attendanceSetting, AttendanceViewOne $attendanceViewOne, Section $section, AttendanceViewTwo $attendanceViewTwo, AcademicHelper $academicHelper, AcademicsYear $academicsYear, ApplicantResult $applicantResult, ApplicantExamSetting $examSetting, AcademicsReportController $academicsReportController, StudentAttendanceReportController $studentAttendanceReportController, Semester $semester, AttendanceUploadController $attendanceUploadController, IdCardTemplate $idCardTemplate, ReportCardSetting $reportCardSetting, AdditionalSubject $additionalSubject, GradeDetails $gradeDetails, Grade $grade, AssessmentsController $assessmentsController)
     {
-        $this->academicsReportController           = $academicsReportController;
-        $this->studentAttendanceReportController           = $studentAttendanceReportController;
-        $this->academicsYear           = $academicsYear;
-        $this->academicsLevel           = $academicsLevel;
-        $this->classSubject             = $classSubject;
-        $this->studentEnrollment        = $studentEnrollment;
-        $this->studentInformation       = $studentInformation;
-        $this->studentAttendance        = $studentAttendance;
+        $this->academicsReportController = $academicsReportController;
+        $this->studentAttendanceReportController = $studentAttendanceReportController;
+        $this->academicsYear = $academicsYear;
+        $this->academicsLevel = $academicsLevel;
+        $this->classSubject = $classSubject;
+        $this->studentEnrollment = $studentEnrollment;
+        $this->studentInformation = $studentInformation;
+        $this->studentAttendance = $studentAttendance;
         $this->studentAttendanceDetails = $studentAttendanceDetails;
-        $this->attendanceManageView     = $attendanceManageView;
-        $this->attendanceSetting     = $attendanceSetting;
-        $this->attendanceViewOne     = $attendanceViewOne;
-        $this->attendanceViewTwo     = $attendanceViewTwo;
-        $this->academicHelper     = $academicHelper;
-        $this->batch     = $batch;
-        $this->section     = $section;
-        $this->feesInvoice     = $feesInvoice;
-        $this->fees     = $fees;
-        $this->studentProfileView     = $studentProfileView;
+        $this->attendanceManageView = $attendanceManageView;
+        $this->attendanceSetting = $attendanceSetting;
+        $this->attendanceViewOne = $attendanceViewOne;
+        $this->attendanceViewTwo = $attendanceViewTwo;
+        $this->academicHelper = $academicHelper;
+        $this->batch = $batch;
+        $this->section = $section;
+        $this->feesInvoice = $feesInvoice;
+        $this->fees = $fees;
+        $this->studentProfileView = $studentProfileView;
         $this->applicantResult = $applicantResult;
         $this->examSetting = $examSetting;
         $this->semester = $semester;
@@ -127,8 +128,8 @@ class ReportsController extends Controller
     public function index()
     {
         // student information
-        $all    = $this->studentInformation->gender('all');
-        $male   = $this->studentInformation->gender('male');
+        $all = $this->studentInformation->gender('all');
+        $male = $this->studentInformation->gender('male');
         $female = $this->studentInformation->gender('female');
         // return veiw with variables
         return view('reports::pages.academics', compact('all', 'male', 'female'))->with('page', 'academics');
@@ -137,23 +138,23 @@ class ReportsController extends Controller
     // all pages
     public function allReports($tabId)
     {
-        $instituteId=$this->academicHelper->getInstitute();
-        $campus_id=$this->academicHelper->getCampus();
+        $instituteId = $this->academicHelper->getInstitute();
+        $campus_id = $this->academicHelper->getCampus();
         $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
         $academicYears = $this->academicHelper->getAllAcademicYears();
         $allsemester = $this->academicHelper->getAcademicSemester();
 
         // gradeCategory
         $allGradeCategory = $this->gradeCategory->where([
-            'institute'=>$this->academicHelper->getInstitute(), 'campus'=>$this->academicHelper->getCampus(), 'is_sba'=>0
+            'institute' => $this->academicHelper->getInstitute(), 'campus' => $this->academicHelper->getCampus(), 'is_sba' => 0
         ])->orderBy('created_at', 'ASC')->get();
 
         switch ($tabId) {
 
             case 'academics':
                 // student information
-                $all    = $this->studentInformation->gender('all');
-                $male   = $this->studentInformation->gender('male');
+                $all = $this->studentInformation->gender('all');
+                $male = $this->studentInformation->gender('male');
                 $female = $this->studentInformation->gender('female');
                 // academic info
                 $academicInfo = $this->academicHelper->getAcademicInfo();
@@ -173,15 +174,14 @@ class ReportsController extends Controller
 
             case 'id-card':
                 // $academic_levels
-                $academic_levels = $this->academicsLevel->where(['campus_id'=>$campus_id, 'institute_id'=>$instituteId])->get();
+                $academic_levels = $this->academicsLevel->where(['campus_id' => $campus_id, 'institute_id' => $instituteId])->get();
                 // instituteInfo
                 $instituteInfo = $this->academicHelper->getInstituteProfile();
                 // institute information
-                $templateProfile = $this->idCardSetting->where(['campus_id'=>$campus_id, 'institution_id'=>$instituteId])->first();
+                $templateProfile = $this->idCardSetting->where(['campus_id' => $campus_id, 'institution_id' => $instituteId])->first();
                 // return view with variables
                 return view('reports::pages.id-card', compact('academic_levels', 'templateProfile', 'instituteInfo'))->with('page', 'id-card');
                 break;
-
 
 
             case 'waiver':
@@ -199,16 +199,15 @@ class ReportsController extends Controller
 
             case 'college-report':
                 // return view with variables
-                return view('reports::pages.college-report', compact('allAcademicsLevel','allGradeCategory','allsemester'))->with('page', 'college-report');
+                return view('reports::pages.college-report', compact('allAcademicsLevel', 'allGradeCategory', 'allsemester'))->with('page', 'college-report');
                 break;
-
 
 
             case 'documents':
                 $academicYears = $this->academicHelper->getAllAcademicYears();
                 $instituteProfile = $this->academicHelper->getInstituteProfile();
                 // return view with variables
-                return view('reports::pages.documents', compact('academicYears','instituteProfile'))->with('page', 'documents');
+                return view('reports::pages.documents', compact('academicYears', 'instituteProfile'))->with('page', 'documents');
                 break;
 
             case 'admission':
@@ -382,10 +381,10 @@ class ReportsController extends Controller
 
             case 'invoice':
                 // return view with variables
-                $searchInvoice="";
-                $academicYear=$this->academicHelper->getAllAcademicYears();
-                $feesinvoices=$this->feesInvoice->orderBy('id','desc')->paginate(10);
-                return view('reports::pages.invoice',compact('searchInvoice','feesinvoices','academicYear'))->with('page', 'invoice');
+                $searchInvoice = "";
+                $academicYear = $this->academicHelper->getAllAcademicYears();
+                $feesinvoices = $this->feesInvoice->orderBy('id', 'desc')->paginate(10);
+                return view('reports::pages.invoice', compact('searchInvoice', 'feesinvoices', 'academicYear'))->with('page', 'invoice');
                 break;
 
 
@@ -437,18 +436,18 @@ class ReportsController extends Controller
         $instProfile = $this->academicHelper->findInstitute($instId);
         $campProfile = $this->academicHelper->findCampusWithInstId($campId, $instId);
         // checking
-        if($instProfile && $campProfile){
+        if ($instProfile && $campProfile) {
             // institute student information
             $totalStd = $this->studentInformation->gender('all');
             $maleStd = $this->studentInformation->gender('male_count');
-            $femaleStd =  $this->studentInformation->gender('female_count');
+            $femaleStd = $this->studentInformation->gender('female_count');
 
             // today's date
             $todayDate = Carbon::today()->toDateString();
             // institute attendance setting
-            $attendanceSettings = $this->attendanceSetting->where(['institution_id' => $instId, 'campus_id' =>$campId])->first();
+            $attendanceSettings = $this->attendanceSetting->where(['institution_id' => $instId, 'campus_id' => $campId])->first();
             // checking
-            if($attendanceSettings && $totalStd > 0){
+            if ($attendanceSettings && $totalStd > 0) {
                 // checking Attendance Settings
                 if ($attendanceSettings->subject_wise == 0) {
                     $attendanceProfile = $this->attendanceViewOne;
@@ -478,23 +477,23 @@ class ReportsController extends Controller
                     'total_male_std' => $maleStd,
                     'total_female_std' => $femaleStd,
 
-                    'total_present_std' => substr(number_format($totalPresent, $precision+1, '.', ''), 0, -1),
-                    'total_absent_std' =>  substr(number_format(($totalStd-$totalPresent), $precision+1, '.', ''), 0, -1),
+                    'total_present_std' => substr(number_format($totalPresent, $precision + 1, '.', ''), 0, -1),
+                    'total_absent_std' => substr(number_format(($totalStd - $totalPresent), $precision + 1, '.', ''), 0, -1),
 
-                    'total_present_percentage' => substr(number_format(($totalPresent * 100 / $totalStd), $precision+1, '.', ''), 0, -1),
-                    'total_absent_percentage' =>  substr(number_format((100 - ($totalPresent * 100 / $totalStd)), $precision+1, '.', ''), 0, -1),
+                    'total_present_percentage' => substr(number_format(($totalPresent * 100 / $totalStd), $precision + 1, '.', ''), 0, -1),
+                    'total_absent_percentage' => substr(number_format((100 - ($totalPresent * 100 / $totalStd)), $precision + 1, '.', ''), 0, -1),
 
-                    'male_present_percentage' => substr(number_format(($totalMalePresent * 100 / $maleStd), $precision+1, '.', ''), 0, -1),
-                    'male_absent_percentage' =>  substr(number_format((100 - ($totalMalePresent * 100 / $maleStd)), $precision+1, '.', ''), 0, -1),
+                    'male_present_percentage' => substr(number_format(($totalMalePresent * 100 / $maleStd), $precision + 1, '.', ''), 0, -1),
+                    'male_absent_percentage' => substr(number_format((100 - ($totalMalePresent * 100 / $maleStd)), $precision + 1, '.', ''), 0, -1),
 
-                    'female_present_percentage' =>  substr(number_format(($totalFemalePresent * 100 / $femaleStd), $precision+1, '.', ''), 0, -1),
-                    'female_absent_percentage' => substr(number_format((100 - ($totalFemalePresent * 100 / $femaleStd)), $precision+1, '.', ''), 0, -1)
+                    'female_present_percentage' => substr(number_format(($totalFemalePresent * 100 / $femaleStd), $precision + 1, '.', ''), 0, -1),
+                    'female_absent_percentage' => substr(number_format((100 - ($totalFemalePresent * 100 / $femaleStd)), $precision + 1, '.', ''), 0, -1)
                 ];
-            }else{
-                return ['status'=>'failed', 'msg'=>'No student or attendance setting found'];
+            } else {
+                return ['status' => 'failed', 'msg' => 'No student or attendance setting found'];
             }
-        }else{
-            return ['status'=>'failed', 'msg'=>'Invalid information'];
+        } else {
+            return ['status' => 'failed', 'msg' => 'Invalid information'];
         }
     }
 
@@ -504,21 +503,21 @@ class ReportsController extends Controller
         // institute student information
         $totalStd = $this->studentInformation->gender('all');
         $maleStd = $this->studentInformation->gender('male_count');
-        $femaleStd =  $this->studentInformation->gender('female_count');
+        $femaleStd = $this->studentInformation->gender('female_count');
 
         // today's date
         $todayDate = Carbon::today()->toDateString();
         $attendanceSettings = $this->attendanceSetting->where(['institution_id' => $this->getInstituteId(), 'campus_id' => $this->getInstituteCampusId()])->first();
         // checking std count
-        if($totalStd > 0){
+        if ($totalStd > 0) {
             // checking attendance setting
-            if($attendanceSettings){
+            if ($attendanceSettings) {
                 // qry
                 $qry = [
                     'attendance_date' => $todayDate,
-                    'institute'=>$this->academicHelper->getInstitute(),
-                    'campus'=>$this->academicHelper->getCampus(),
-                    'academic_year'=>$this->academicHelper->getAcademicYear()
+                    'institute' => $this->academicHelper->getInstitute(),
+                    'campus' => $this->academicHelper->getCampus(),
+                    'academic_year' => $this->academicHelper->getAcademicYear()
                 ];
 
                 // checking Attendance Settings
@@ -545,38 +544,38 @@ class ReportsController extends Controller
                 // precision count
                 $precision = 3;
                 return $attendanceInfo = (object)[
-                    'status'=>'success',
+                    'status' => 'success',
                     'total_std' => $totalStd,
                     'total_male_std' => $maleStd,
                     'total_female_std' => $femaleStd,
 
-                    'total_present_std' => substr(number_format($totalPresent, $precision+1, '.', ''), 0, -1),
-                    'total_absent_std' =>  substr(number_format(($totalStd-$totalPresent), $precision+1, '.', ''), 0, -1),
+                    'total_present_std' => substr(number_format($totalPresent, $precision + 1, '.', ''), 0, -1),
+                    'total_absent_std' => substr(number_format(($totalStd - $totalPresent), $precision + 1, '.', ''), 0, -1),
 
-                    'total_present_percentage' => substr(number_format(($totalPresent * 100 / $totalStd), $precision+1, '.', ''), 0, -1),
-                    'total_absent_percentage' =>  substr(number_format((100 - ($totalPresent * 100 / $totalStd)), $precision+1, '.', ''), 0, -1),
+                    'total_present_percentage' => substr(number_format(($totalPresent * 100 / $totalStd), $precision + 1, '.', ''), 0, -1),
+                    'total_absent_percentage' => substr(number_format((100 - ($totalPresent * 100 / $totalStd)), $precision + 1, '.', ''), 0, -1),
 
-                    'male_present_percentage' => substr(number_format(($totalMalePresent * 100 / $maleStd), $precision+1, '.', ''), 0, -1),
-                    'male_absent_percentage' =>  substr(number_format((100 - ($totalMalePresent * 100 / $maleStd)), $precision+1, '.', ''), 0, -1),
+                    'male_present_percentage' => substr(number_format(($totalMalePresent * 100 / $maleStd), $precision + 1, '.', ''), 0, -1),
+                    'male_absent_percentage' => substr(number_format((100 - ($totalMalePresent * 100 / $maleStd)), $precision + 1, '.', ''), 0, -1),
 
-                    'female_present_percentage' =>  substr(number_format(($totalFemalePresent * 100 / $femaleStd), $precision+1, '.', ''), 0, -1),
-                    'female_absent_percentage' => substr(number_format((100 - ($totalFemalePresent * 100 / $femaleStd)), $precision+1, '.', ''), 0, -1)
+                    'female_present_percentage' => substr(number_format(($totalFemalePresent * 100 / $femaleStd), $precision + 1, '.', ''), 0, -1),
+                    'female_absent_percentage' => substr(number_format((100 - ($totalFemalePresent * 100 / $femaleStd)), $precision + 1, '.', ''), 0, -1)
                 ];
-            }else{
+            } else {
                 return (object)[
-                    'status'=>'failed',
-                    'error_type'=>'att_setting',
+                    'status' => 'failed',
+                    'error_type' => 'att_setting',
                     'total_std' => $totalStd,
                     'total_male_std' => $maleStd,
                     'total_female_std' => $femaleStd,
-                    'msg'=>'No Attendance settings found for this campus/institute'
+                    'msg' => 'No Attendance settings found for this campus/institute'
                 ];
             }
-        }else{
+        } else {
             return (object)[
-                'status'=>'failed',
-                'error_type'=>'no_std',
-                'msg'=>'No Student found for this campus/institute'
+                'status' => 'failed',
+                'error_type' => 'no_std',
+                'msg' => 'No Student found for this campus/institute'
             ];
         }
 
@@ -593,6 +592,7 @@ class ReportsController extends Controller
     {
         return $this->academicHelper->getInstitute();
     }
+
     public function getInstituteProfile()
     {
         return $this->academicHelper->getInstituteProfile();
@@ -616,10 +616,11 @@ class ReportsController extends Controller
 
     //invoice report feltering
 
-    public  function invoiceFiltering(Request $request) {
+    public function invoiceFiltering(Request $request)
+    {
 
-        $instituteId=$this->academicHelper->getInstitute();
-        $campus_id=$this->academicHelper->getCampus();
+        $instituteId = $this->academicHelper->getInstitute();
+        $campus_id = $this->academicHelper->getCampus();
 
         $academics_years = $request->input('academic_year');
         $academics_level = $request->input('academic_level');
@@ -640,24 +641,23 @@ class ReportsController extends Controller
 
             $to_date = $to_date->endOfDay();
         }
-        $conditionArray=array();
+        $conditionArray = array();
 
         $conditionArray['academic_year'] = $academics_years;
 
-        if(!empty($academics_level)) {
+        if (!empty($academics_level)) {
             $conditionArray['academic_level'] = $academics_level;
         }
 
-        if(!empty($batch)) {
+        if (!empty($batch)) {
             $conditionArray['batch'] = $batch;
         }
 
-        if(!empty($section)) {
+        if (!empty($section)) {
             $conditionArray['section'] = $section;
         }
 
 //        return $conditionArray;
-
 
 
 //        return $to_date->endOfDay();;
@@ -680,17 +680,17 @@ class ReportsController extends Controller
 //        return $studentIdlist;
 
 
-        if ($invoice_status==1 || $invoice_status==2 || $invoice_status==4) {
+        if ($invoice_status == 1 || $invoice_status == 2 || $invoice_status == 4) {
             $allSearchInputs['invoice_status'] = $invoice_status;
             $allSearchInputs['invoice_status'] = $invoice_status;
         }
-        if($invoice_type==2 || $invoice_type==1) {
+        if ($invoice_type == 2 || $invoice_type == 1) {
             $allSearchInputs['invoice_type'] = $invoice_type;
         }
 
         if (!empty($from_date) && !empty($to_date)) {
 
-            $allFeesInvoices = $this->feesInvoice->where($allSearchInputs)->where('institution_id',$instituteId)->where('campus_id',$campus_id)->whereIn('payer_id',$studentIdlist)->whereBetween('created_at', [$from_date, $to_date])->paginate(10);
+            $allFeesInvoices = $this->feesInvoice->where($allSearchInputs)->where('institution_id', $instituteId)->where('campus_id', $campus_id)->whereIn('payer_id', $studentIdlist)->whereBetween('created_at', [$from_date, $to_date])->paginate(10);
         }
 
 //
@@ -698,15 +698,15 @@ class ReportsController extends Controller
 
         if ($allFeesInvoices) {
             // all inputs
-            $allInputs =[
+            $allInputs = [
                 'search_start_date' => $from_date,
                 'search_end_date' => $to_date,
-                'invoice_status'=>$invoice_status,
+                'invoice_status' => $invoice_status,
             ];
             // return view
-            $allInputs=(Object)$allInputs;
-            $searchInvoice=1;
-            return view('reports::pages.modals.invoice_search', compact('searchInvoice','allFeesInvoices','allInputs'))->with('page', 'invoice');
+            $allInputs = (object)$allInputs;
+            $searchInvoice = 1;
+            return view('reports::pages.modals.invoice_search', compact('searchInvoice', 'allFeesInvoices', 'allInputs'))->with('page', 'invoice');
             // return redirect()->back()->with(compact('state'))->withInput();
 
         }
@@ -714,17 +714,17 @@ class ReportsController extends Controller
     }
 
 
-
     // download invoice report pdf or excel
 
-    public  function  importInvoicePdforExcel(Request $request){
+    public function importInvoicePdforExcel(Request $request)
+    {
 //        return $request->all();
-        $reportTitle='Fees Invoice Reports';
+        $reportTitle = 'Fees Invoice Reports';
 
-        $instituteInfo=$this->academicHelper->getInstituteProfile();
+        $instituteInfo = $this->academicHelper->getInstituteProfile();
 
-        $instituteId=$this->academicHelper->getInstitute();
-        $campus_id=$this->academicHelper->getCampus();
+        $instituteId = $this->academicHelper->getInstitute();
+        $campus_id = $this->academicHelper->getCampus();
 
         $academics_years = $request->input('academic_year');
         $academics_level = $request->input('academic_level');
@@ -752,22 +752,21 @@ class ReportsController extends Controller
 
             $to_date = $to_date->endOfDay();
         }
-        $conditionArray=array();
+        $conditionArray = array();
 
         $conditionArray['academic_year'] = $academics_years;
 
-        if(!empty($academics_level)) {
+        if (!empty($academics_level)) {
             $conditionArray['academic_level'] = $academics_level;
         }
 
-        if(!empty($batch)) {
+        if (!empty($batch)) {
             $conditionArray['batch'] = $batch;
         }
 
-        if(!empty($section)) {
+        if (!empty($section)) {
             $conditionArray['section'] = $section;
         }
-
 
 
 //        return $to_date->endOfDay();;
@@ -792,18 +791,18 @@ class ReportsController extends Controller
             $allSearchInputs['invoice_status'] = $invoice_status;
 
         }
-        if($invoice_type==2 || $invoice_type==1) {
+        if ($invoice_type == 2 || $invoice_type == 1) {
             $allSearchInputs['invoice_type'] = $invoice_type;
         }
 
 
         if (!empty($from_date) && !empty($to_date)) {
 
-            $allFeesInvoices = $this->feesInvoice->where($allSearchInputs)->where('institution_id',$instituteId)->where('campus_id',$campus_id)->whereIn('payer_id',$studentIdlist)->whereBetween('created_at', [$from_date, $to_date])->get();
+            $allFeesInvoices = $this->feesInvoice->where($allSearchInputs)->where('institution_id', $instituteId)->where('campus_id', $campus_id)->whereIn('payer_id', $studentIdlist)->whereBetween('created_at', [$from_date, $to_date])->get();
         }
 
 
-        $allInputs =[
+        $allInputs = [
             'academics_years' => $academics_years_name,
             'academics_level' => $academics_level_name,
             'academics_level_value' => $academics_level,
@@ -814,18 +813,18 @@ class ReportsController extends Controller
             'search_start_date' => $from_date,
             'search_start_date' => $from_date,
             'search_end_date' => $to_date,
-            'invoice_status'=>$invoice_status,
+            'invoice_status' => $invoice_status,
         ];
 
-        $allInputs = (Object)$allInputs;
+        $allInputs = (object)$allInputs;
 //        var_dump ($allInputs);
 //        exit();
 
 
-        $report_type=$request->input('report_type');
-        if($report_type=="pdf") {
+        $report_type = $request->input('report_type');
+        if ($report_type == "pdf") {
             // $allFeesInvoices = $this->feesInvoice->where($allSearchInputs)->where('institution_id',$instituteId)->where('campus_id',$campus_id)->whereBetween('created_at', [$from_date, $to_date])->get();
-            view()->share(compact('allFeesInvoices','allInputs', 'instituteInfo','report_type','reportTitle'));
+            view()->share(compact('allFeesInvoices', 'allInputs', 'instituteInfo', 'report_type', 'reportTitle'));
 
             //generate PDf
             $pdf = App::make('dompdf.wrapper');
@@ -837,7 +836,7 @@ class ReportsController extends Controller
         } else {
 
 
-            view()->share(compact('allFeesInvoices','allInputs','report_type'));
+            view()->share(compact('allFeesInvoices', 'allInputs', 'report_type'));
             //generate excel
             return Excel::create('invoice_report', function ($excel) {
                 $excel->sheet('invoice_report', function ($sheet) {
@@ -866,16 +865,16 @@ class ReportsController extends Controller
     {
         // sql qry
         $qry = [
-            'academic_year'  => $request->input('academic_year'),
+            'academic_year' => $request->input('academic_year'),
             'academic_level' => $request->input('academic_level'),
-            'batch'          => $request->input('batch'),
-            'campus_id'      => $this->academicHelper->getCampus(),
-            'institute_id'   => $this->academicHelper->getInstitute(),
+            'batch' => $request->input('batch'),
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
         ];
         // exam settings
-        if($examTakenSettingProfile = $this->examSetting->where($qry)->first()){
+        if ($examTakenSettingProfile = $this->examSetting->where($qry)->first()) {
             $examTaken = $examTakenSettingProfile->exam_taken;
-        }else{
+        } else {
             $examTaken = 0;
         }
         // generate applicant result sheet
@@ -934,9 +933,10 @@ class ReportsController extends Controller
 
 
     // fees monthly report model
-    public  function  feesMonthlyReportView(){
-        $academicsYears=$this->academicsYear->all();
-        return view('fees::pages.monthly_fees_report',compact('academicsYears'));
+    public function feesMonthlyReportView()
+    {
+        $academicsYears = $this->academicsYear->all();
+        return view('fees::pages.monthly_fees_report', compact('academicsYears'));
     }
 
 
@@ -946,20 +946,36 @@ class ReportsController extends Controller
         return view('reports::pages.modals.fine-fees-report-modal');
     }
 
-    public function  feesDetailsReports() {
+    public function feesDetailsReports()
+    {
         return view('fees::pages.modal.fees_details_report');
     }
 
 
     public function customisedTestimonials(Request $request)
     {
+       // return $request->all();
         // testimonialInfoArray
-        $testimonialInfoArray = json_encode($request->all());
+        $info['border_color']=$request->border_color ;
+        $info['s_name']=$request-> s_name;
+        $info['gender']=$request->gender ;
+        $info['f_name']=$request-> f_name;
+        $info['m_name']=$request-> m_name;
+        $info['village']=$request-> village;
+        $info['post']=$request->post ;
+        $info['upzilla']=$request->upzilla ;
+        $info['zilla']=$request-> zilla;
+        $info['exam']=$request-> exam;
+        $info['board']=$request->board ;
+       $testimonialInfoArray = json_encode($request->all());
+      // return $testimonialInfoArray;
         // institute profile
         $instituteProfile = $this->academicHelper->getInstituteProfile();
         //generate PDf
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('reports::pages.report.testimonial-english',compact('testimonialInfoArray','instituteProfile'))->setPaper('a4','landscape');
+     $pdf->loadView('reports::pages.report.testimonial-english',compact('testimonialInfoArray','instituteProfile'))->setPaper('a4','landscape');
+    //   return view('reports::pages.report.testimonial-english',compact('testimonialInfoArray', 'instituteProfile'));
+
         return $pdf->stream();
         // $downloadFileName = "testimonial_en_file.pdf";
         // return $pdf->download($downloadFileName);
@@ -968,49 +984,59 @@ class ReportsController extends Controller
     }
 
 
-    public function  getTestimonialReport(Request $request) {
+    public function getTestimonialReport(Request $request)
+    {
 //
 
-        $download= $request->input('download');
-        $instituteProfile= $this->academicHelper->getInstituteProfile();
-        $testimonialInfo=$request->all();
-        $testimonialInfoArray=array(
-            'std_name'=>$request->input('std_name'),
-            'father'=>$request->input('father'),
-            'mother'=>$request->input('mother'),
-            'village'=>$request->input('village'),
-            'post'=>$request->input('post'),
-            'upzilla'=>$request->input('upzilla'),
-            'zilla'=>$request->input('zilla'),
-            'class1'=>$request->input('class1'),
-            'class2'=>$request->input('class2'),
-            'year1'=>$request->input('year1'),
-            'year2'=>$request->input('year2'),
-            'year3'=>$request->input('year3'),
-            'class3'=>$request->input('class3'),
-            'gpa'=>$request->input('gpa'),
-            'dob'=>$request->input('dob'),
-            'year4'=>$request->input('year4'),
-            'class4'=>$request->input('class4'),
+        $download = $request->input('download');
+        $instituteProfile = $this->academicHelper->getInstituteProfile();
+        $testimonialInfo = $request->all();
+        $testimonialInfoArray = array(
+            'std_name' => $request->input('std_name'),
+            'father' => $request->input('father'),
+            'mother' => $request->input('mother'),
+            'village' => $request->input('village'),
+            'post' => $request->input('post'),
+            'upzilla' => $request->input('upzilla'),
+            'zilla' => $request->input('zilla'),
+            'class1' => $request->input('class1'),
+            'class2' => $request->input('class2'),
+            'year1' => $request->input('year1'),
+            'year2' => $request->input('year2'),
+            'year3' => $request->input('year3'),
+            'class3' => $request->input('class3'),
+            'gpa' => $request->input('gpa'),
+            'dob' => $request->input('dob'),
+            'year4' => $request->input('year4'),
+            'class4' => $request->input('class4'),
         );
-        $testimonialInfoArray=(object)$testimonialInfoArray;
-        if($download=="preview") {
-            return view('reports::pages.report.testimonial',compact('testimonialInfoArray','instituteProfile'));
+        $testimonialInfoArray = (object)$testimonialInfoArray;
+        if ($download == "preview") {
+            return view('reports::pages.report.testimonial', compact('testimonialInfoArray', 'instituteProfile'));
 
         } else {
             //generate PDf
-//        $pdf = App::make('dompdf.wrapper');
-//        $pdf->loadView('reports::pages.report.testimonial_download',compact('testimonialInfoArray','instituteProfile'))->setPaper('a4','landscape');
-//        // return $pdf->stream();
+//     $pdf = App::make('dompdf.wrapper');
+//       $pdf->loadView('reports::pages.report.testimonial-bn',compact('testimonialInfoArray','instituteProfile'))
+//           ->setPaper('a4','landscape');
+//       return $pdf->stream();
 //        $downloadFileName = "testimonial_file.pdf";
 //        return $pdf->download($downloadFileName);
 
             //generate PDf
-            $pdf = App::make('mpdf.wrapper');
-            $pdf->loadView('reports::pages.report.testimonial_download', compact('testimonialInfoArray', 'instituteProfile'));
-            $view = View::make('reports::pages.report.testimonial_download', compact('testimonialInfoArray', 'instituteProfile'));
+           // $pdf = App::make('mpdf.wrapper');
+            $pdf=MPDFGEN::loadView('reports::pages.report.testimonial_download',
+                compact('testimonialInfoArray', 'instituteProfile'),
+                [],[
+
+                ]);
+        //return $pdf->stream('document.pdf');
+            $view = View::make('reports::pages.report.tc-download', compact('testimonialInfoArray', 'instituteProfile'));
             $html = $view->render();
-            $mpdf = new MPDF('utf-8', 'A4-L', 12, 'SolaimanLipi', '0', '0', '0', '0');
+            $mpdf = new MPDF\Mpdf([ 'mode' => 'utf-8',
+                'format' => 'A4-L',
+                'orientation' => 'L'
+                ]);
             $mpdf->autoScriptToLang = true;// Mandatory
             $mpdf->autoLangToFont = true;//Mandatory
             $mpdf->WriteHTML($html);
@@ -1021,42 +1047,43 @@ class ReportsController extends Controller
     }
 
 
-
     // download and preview transfer certificate report
 
-    public function  getTransferCertificateReport(Request $request) {
+    public function getTransferCertificateReport(Request $request)
+    {
 //
 
-        $download= $request->input('download');
-        $instituteProfile= $this->academicHelper->getInstituteProfile();
+        $download = $request->input('download');
+        $instituteProfile = $this->academicHelper->getInstituteProfile();
 //        return $testimonialInfo=$request->all();
-        $testimonialInfoArray=array(
-            'std_name'=>$request->input('std_name'),
-            'father'=>$request->input('father'),
-            'mother'=>$request->input('mother'),
-            'village'=>$request->input('village'),
-            'post'=>$request->input('post'),
-            'upzilla'=>$request->input('upzilla'),
-            'zilla'=>$request->input('zilla'),
-            'class1'=>$request->input('class1'),
-            'class2'=>$request->input('class2'),
-            'year1'=>$request->input('year1'),
-            'year2'=>$request->input('year2'),
-            'year3'=>$request->input('year3'),
-            'class3'=>$request->input('class3'),
-            'gpa'=>$request->input('gpa'),
-            'dob'=>$request->input('dob'),
-            'year4'=>$request->input('year4'),
-            'class4'=>$request->input('class4'),
-            'character'=>$request->input('character'),
-            'behavior'=>$request->input('behavior'),
-            'attendance'=>$request->input('attendance'),
-            'talent'=>$request->input('talent'),
-            'leave_message'=>$request->input('leave_message')
+        $testimonialInfoArray = array(
+            'std_name' => $request->input('std_name'),
+            'father' => $request->input('father'),
+            'mother' => $request->input('mother'),
+            'village' => $request->input('village'),
+            'post' => $request->input('post'),
+            'upzilla' => $request->input('upzilla'),
+            'zilla' => $request->input('zilla'),
+            'class1' => $request->input('class1'),
+            'class2' => $request->input('class2'),
+            'year1' => $request->input('year1'),
+            'year2' => $request->input('year2'),
+            'year3' => $request->input('year3'),
+            'class3' => $request->input('class3'),
+            'gpa' => $request->input('gpa'),
+            'dob' => $request->input('dob'),
+            'year4' => $request->input('year4'),
+            'class4' => $request->input('class4'),
+            'character' => $request->input('character'),
+            'behavior' => $request->input('behavior'),
+            'attendance' => $request->input('attendance'),
+            'talent' => $request->input('talent'),
+            'leave_message' => $request->input('leave_message')
         );
-        $testimonialInfoArray=(object)$testimonialInfoArray;
-        if($download=="preview") {
-            return view('reports::pages.report.transfer-certificate',compact('testimonialInfoArray','instituteProfile'));
+        //return $request->all();
+        $testimonialInfoArray = (object)$testimonialInfoArray;
+        if ($download == "preview") {
+            return view('reports::pages.report.transfer-certificate', compact('testimonialInfoArray', 'instituteProfile'));
 
         } else {
             //generate PDf
@@ -1067,11 +1094,15 @@ class ReportsController extends Controller
 //        return $pdf->download($downloadFileName);
 
             //generate PDf
+           // dd (testimonialInfoArray);
+
             $pdf = App::make('mpdf.wrapper');
             $pdf->loadView('reports::pages.report.transfer-certificate_download', compact('testimonialInfoArray', 'instituteProfile'));
             $view = View::make('reports::pages.report.transfer-certificate_download', compact('testimonialInfoArray', 'instituteProfile'));
             $html = $view->render();
-            $mpdf = new MPDF('utf-8', 'A4-L', 12, 'SolaimanLipi', '0', '0', '0', '0');
+
+            //$mpdf=new \Mpdf\Mpdf()
+            $mpdf = new MPDF\Mpdf(['orientation' => 'L']);
             $mpdf->autoScriptToLang = true;// Mandatory
             $mpdf->autoLangToFont = true;//Mandatory
             $mpdf->WriteHTML($html);
@@ -1097,12 +1128,12 @@ class ReportsController extends Controller
         $instituteId = $this->academicHelper->getInstitute();
 
         // checking campus and institute details
-        if($campusId==20 AND $instituteId==19){
+        if ($campusId == 20 and $instituteId == 19) {
             // find batch section subject list
             $classSubjectList = (object)$this->academicHelper->findClassSectionGroupSubjectList($section, $batch, $campusId, $instituteId);
             // return view with variables
             return view('reports::pages.includes.admit-card-college', compact('classSubjectList'));
-        }else{
+        } else {
             // find batch section subject list
             $classSubjectList = (object)$this->studentAttendanceReportController->getClsssSectionSubjectList($batch, $section);
             // return view with variables
@@ -1126,7 +1157,7 @@ class ReportsController extends Controller
         // instituteInfo
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // Report Card Setting
-        $reportCardSetting = $this->reportCardSetting->where(['institute'=>$institute, 'campus'=> $campus])->first();
+        $reportCardSetting = $this->reportCardSetting->where(['institute' => $institute, 'campus' => $campus])->first();
 
         // find semester
         $semesterProfile = $this->semester->find($semester);
@@ -1168,7 +1199,7 @@ class ReportsController extends Controller
         // instituteInfo
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // Report Card Setting
-        $reportCardSetting = $this->reportCardSetting->where(['institute'=>$institute, 'campus'=> $campus])->first();
+        $reportCardSetting = $this->reportCardSetting->where(['institute' => $institute, 'campus' => $campus])->first();
 
         // find semester
         $semesterProfile = $this->semester->find($semester);
@@ -1185,9 +1216,9 @@ class ReportsController extends Controller
         view()->share(compact('studentList', 'examRoutine', 'instituteInfo', 'semesterProfile', 'reportCardSetting', 'campus'));
 
         // checking admit card type
-        if($campus==28 AND $institute==27){
+        if ($campus == 28 and $institute == 27) {
             $html = view('reports::pages.report.admit-card-two');
-        }else{
+        } else {
             $html = view('reports::pages.report.admit-card');
         }
         $pdf = App::make('snappy.pdf.wrapper');
@@ -1199,39 +1230,39 @@ class ReportsController extends Controller
 
     // class section testimonial search
 
-    public function  searchStudentClassSectionTestimonial(Request $request) {
+    public function searchStudentClassSectionTestimonial(Request $request)
+    {
 
 
         $result = array();
         // batch section student list
         $studentList = $this->studentProfileView->where([
-            'academic_year'=> $request->input('academic_year'),
-            'academic_level'=> $request->input('academic_level'),
-            'batch'=> $request->input('batch'),
-            'section'=> $request->input('section'),
-            'campus'=> $this->academicHelper->getCampus(),
-            'institute'=> $this->academicHelper->getInstitute(),
+            'academic_year' => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch' => $request->input('batch'),
+            'section' => $request->input('section'),
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
         ])->get();
 
-        $resultType=3;
+        $resultType = 3;
 
-        foreach ($studentList as $std){
+        foreach ($studentList as $std) {
             $result[$std->std_id]['profile'][] = $std;
-            $stdGuaridiansList= $std->student()->myGuardians();
+            $stdGuaridiansList = $std->student()->myGuardians();
             $address = $std->user()->singleAddress("STUDENT_PRESENT_ADDRESS");
             $resultProfile = $std->testimonial_result($resultType);
             $dob = $std->student()->dob;
-            $result[$std->std_id]['dob'][]= $dob;
-            $result[$std->std_id]['address'][]= $address;
-            $result[$std->std_id]['testimonial_result'][]= $resultProfile;
-            foreach ($stdGuaridiansList as $stdGuaridian){
+            $result[$std->std_id]['dob'][] = $dob;
+            $result[$std->std_id]['address'][] = $address;
+            $result[$std->std_id]['testimonial_result'][] = $resultProfile;
+            foreach ($stdGuaridiansList as $stdGuaridian) {
                 $guaridian = $stdGuaridian->guardian();
-                $result[$std->std_id]['guardian'][]= $guaridian;
+                $result[$std->std_id]['guardian'][] = $guaridian;
             }
         }
 
-        $studentList=$result;
-
+        $studentList = $result;
 
 
 //        return $studentList;
@@ -1240,45 +1271,49 @@ class ReportsController extends Controller
         $instituteInfo = $this->academicHelper->getInstituteProfile();
 
         // return view with variables
-        return view('reports::pages.modals.testimonial-class-section', compact('studentList', 'instituteInfo'));
+        //return $studentList;
+        return view('reports::pages.modals.testimonial-class-section',
+            compact('studentList', 'instituteInfo'));
 
     }
 
 
     // testimonial Result Download
 
-    public function  getTestimonialResult (Request $request) {
+    public function getTestimonialResult(Request $request)
+    {
+       // return $request;
 
         $result = array();
         // batch section student list
         $studentList = $this->studentProfileView->where([
-            'academic_year'=> $request->input('academic_year'),
-            'academic_level'=> $request->input('academic_level'),
-            'batch'=> $request->input('batch'),
-            'section'=> $request->input('section'),
-            'campus'=> $this->academicHelper->getCampus(),
-            'institute'=> $this->academicHelper->getInstitute(),
+            'academic_year' => $request->input('academic_year'),
+            'academic_level' => $request->input('academic_level'),
+            'batch' => $request->input('batch'),
+            'section' => $request->input('section'),
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
         ])->get();
 
-        $resultType=3;
+        $resultType = 3;
 
-        foreach ($studentList as $std){
+        foreach ($studentList as $std) {
             $result[$std->std_id]['profile'][] = $std;
-            $stdGuaridiansList= $std->student()->myGuardians();
+            $stdGuaridiansList = $std->student()->myGuardians();
             $address = $std->user()->singleAddress("STUDENT_PRESENT_ADDRESS");
             $resultProfile = $std->testimonial_result($resultType);
             $dob = $std->student()->dob;
-            $result[$std->std_id]['dob'][]= $dob;
-            $result[$std->std_id]['address'][]= $address;
-            $result[$std->std_id]['testimonial_result'][]= $resultProfile;
-            foreach ($stdGuaridiansList as $stdGuaridian){
+            $result[$std->std_id]['dob'][] = $dob;
+            $result[$std->std_id]['address'][] = $address;
+            $result[$std->std_id]['testimonial_result'][] = $resultProfile;
+            foreach ($stdGuaridiansList as $stdGuaridian) {
                 $guaridian = $stdGuaridian->guardian();
-                $result[$std->std_id]['guardian'][]= $guaridian;
+                $result[$std->std_id]['guardian'][] = $guaridian;
             }
         }
 
 
-        $studentList=$result;
+        $studentList = $result;
 
 
 //        return $studentList;
@@ -1287,11 +1322,18 @@ class ReportsController extends Controller
         $instituteInfo = $this->academicHelper->getInstituteProfile();
 
         //generate PDf
+        /*ini_set('max_execution_time', '300');
+        ini_set("pcre.backtrack_limit", "5000000");
+        ini_set('memory_limit', '44M');*/
         $pdf = App::make('mpdf.wrapper');
-        $pdf->loadView('reports::pages.report.testimonial_result', compact('studentList', 'instituteInfo','rom'));
-        $view = View::make('reports::pages.report.testimonial_result', compact('studentList', 'instituteInfo','rom'));
+        $pdf->loadView('reports::pages.report.testimonial_result', compact('studentList', 'instituteInfo'));
+        $view = View::make('reports::pages.report.testimonial_result', compact('studentList', 'instituteInfo'));
         $html = $view->render();
-        $mpdf = new MPDF('utf-8', 'A4-L', 12, 'SolaimanLipi', '0', '0', '30', '');
+        $mpdf = new MPDF\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L',
+            'orientation' => 'L'
+        ]);
         $mpdf->autoScriptToLang = true;// Mandatory
         $mpdf->autoLangToFont = true;//Mandatory
         $mpdf->WriteHTML($html);
@@ -1300,32 +1342,32 @@ class ReportsController extends Controller
     }
 
 
-
-    public function  searchStudentWaiverClassSection(Request $request) {
+    public function searchStudentWaiverClassSection(Request $request)
+    {
 //     return   $request->all();
-        $academic_year=$request->input('academic_year');
-        $academic_level=$request->input('academic_level');
-        $batch=$request->input('batch');
-        $section=$request->input('section');
-        $waiver_type=$request->input('waiver_type');
+        $academic_year = $request->input('academic_year');
+        $academic_level = $request->input('academic_level');
+        $batch = $request->input('batch');
+        $section = $request->input('section');
+        $waiver_type = $request->input('waiver_type');
 
         $conditionArray['institute'] = $this->academicHelper->getInstitute();
         $conditionArray['campus'] = $this->academicHelper->getCampus();
-        $conditionArray=array();
+        $conditionArray = array();
 
-        if(!empty($academic_year)) {
+        if (!empty($academic_year)) {
             $conditionArray['academic_year'] = $academic_year;
         }
 
-        if(!empty($academic_level)) {
+        if (!empty($academic_level)) {
             $conditionArray['academic_level'] = $academic_level;
         }
 
-        if(!empty($batch)) {
+        if (!empty($batch)) {
             $conditionArray['batch'] = $batch;
         }
 
-        if(!empty($section)) {
+        if (!empty($section)) {
             $conditionArray['section'] = $section;
         }
 //         return $conditionArray;
@@ -1333,10 +1375,10 @@ class ReportsController extends Controller
 
         $studentList = $this->studentProfileView->where($conditionArray)->get(['std_id']);
 
-        $studendList= $studentList->toArray();
-        $studendIdList=array_pluck($studendList, 'std_id');
+        $studendList = $studentList->toArray();
+        $studendIdList = array_pluck($studendList, 'std_id');
 
-        $studentWaiverList= $this->studentWaiver->where('waiver_type',$waiver_type)->whereIn('std_id',$studendIdList)->paginate(20);
+        $studentWaiverList = $this->studentWaiver->where('waiver_type', $waiver_type)->whereIn('std_id', $studendIdList)->paginate(20);
 
         return view('reports::pages.modals.waiver_search', compact('studentWaiverList'));
 
@@ -1344,40 +1386,40 @@ class ReportsController extends Controller
     }
 
 
-
     // waiver report downlaod class section wise
 
-    public function  studentWaiverReportExport(Request $request) {
+    public function studentWaiverReportExport(Request $request)
+    {
 //        return $request->all();
 
-        $instituteProfile=$this->academicHelper->getInstituteProfile();
-        $academic_year=$request->input('academic_year');
-        $academic_level=$request->input('academic_level');
-        $batch=$request->input('batch');
-        $section=$request->input('section');
-        $waiver_type=$request->input('waiver_type');
+        $instituteProfile = $this->academicHelper->getInstituteProfile();
+        $academic_year = $request->input('academic_year');
+        $academic_level = $request->input('academic_level');
+        $batch = $request->input('batch');
+        $section = $request->input('section');
+        $waiver_type = $request->input('waiver_type');
 
         $conditionArray['institute'] = $this->academicHelper->getInstitute();
         $conditionArray['campus'] = $this->academicHelper->getCampus();
-        $conditionArray=array();
+        $conditionArray = array();
 
         $conditionArray['academic_year'] = $academic_year;
         $conditionArray['academic_level'] = $academic_level;
         $conditionArray['batch'] = $batch;
 
 
-        if($section>0) {
+        if ($section > 0) {
             $conditionArray['section'] = $section;
         }
         $studentList = $this->studentProfileView->where($conditionArray)->get(['std_id']);
 
-        $studendList= $studentList->toArray();
-        $studendIdList=array_pluck($studendList, 'std_id');
+        $studendList = $studentList->toArray();
+        $studendIdList = array_pluck($studendList, 'std_id');
 
-        $studentWaivers= $this->studentWaiver->where('waiver_type',$waiver_type)->whereIn('std_id',$studendIdList)->get();
+        $studentWaivers = $this->studentWaiver->where('waiver_type', $waiver_type)->whereIn('std_id', $studendIdList)->get();
 
 
-        view()->share(compact('instituteProfile','studentWaivers','waiver_type','batch','section'));
+        view()->share(compact('instituteProfile', 'studentWaivers', 'waiver_type', 'batch', 'section'));
 
         //generate PDf
         $pdf = App::make('dompdf.wrapper');
@@ -1387,52 +1429,51 @@ class ReportsController extends Controller
         return $pdf->download($downloadFileName);
 
 
-
     }
 
 
-    public function sitPlanView(Request $request){
+    public function sitPlanView(Request $request)
+    {
 
         // instititue information
-        $examName=$request->semester;
-        $instituteInfo=$this->academicHelper->getInstituteProfile();
-        $studentList=$this->studentProfileView
-            ->where('batch',$request->batch)
-            ->where('section',$request->section)
-            ->where('academic_level',$request->academic_level)
-            ->where('academic_year',$request->academic_year)
+        $examName = $request->semester;
+        $instituteInfo = $this->academicHelper->getInstituteProfile();
+        $studentList = $this->studentProfileView
+            ->where('batch', $request->batch)
+            ->where('section', $request->section)
+            ->where('academic_level', $request->academic_level)
+            ->where('academic_year', $request->academic_year)
             ->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')
             ->get();
 
-        return view('reports::pages.report.sitplan.sitplanview',compact('studentList','instituteInfo','examName'));
+        return view('reports::pages.report.sitplan.sitplanview', compact('studentList', 'instituteInfo', 'examName'));
     }
 
 
-
-
-    public function examAttSheet(Request $request){
+    public function examAttSheet(Request $request)
+    {
         // institute information
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // student list
-        $studentList=$this->studentProfileView
-            ->where('batch',$request->batch)
-            ->where('section',$request->section)
-            ->where('academic_level',$request->academic_level)
-            ->where('academic_year',$request->academic_year)
+        $studentList = $this->studentProfileView
+            ->where('batch', $request->batch)
+            ->where('section', $request->section)
+            ->where('academic_level', $request->academic_level)
+            ->where('academic_year', $request->academic_year)
             ->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')
-            ->get(['username','std_id', 'gr_no', 'first_name', 'middle_name', 'last_name', 'bn_fullname', 'batch', 'section']);
+            ->get(['username', 'std_id', 'gr_no', 'first_name', 'middle_name', 'last_name', 'bn_fullname', 'batch', 'section']);
 
         // checking institute and campus
-        if(campus_id()==20 AND institution_id()==19){
+        if (campus_id() == 20 and institution_id() == 19) {
             // additionalSubject
             $additionalArrayList = $this->academicHelper->findClassSectionAdditionalSubjectList($request->section, $request->batch, campus_id(), institution_id(), 'group');
             // batch semester get
-            $batchSemseterList=$this->batchSemester->where('batch',$request->batch)->where('academic_year',$request->academic_year)->get();
+            $batchSemseterList = $this->batchSemester->where('batch', $request->batch)->where('academic_year', $request->academic_year)->get();
             // class subject list
             $classSubjectList = (object)$this->academicHelper->findClassSectionGroupSubjectList($request->section, $request->batch, campus_id(), institution_id());
             // return view with variables
-            return view('reports::pages.report.examsheet.index1',compact('studentList','instituteInfo','batchSemseterList','additionalArrayList','classSubjectList'));
-        }else{
+            return view('reports::pages.report.examsheet.index1', compact('studentList', 'instituteInfo', 'batchSemseterList', 'additionalArrayList', 'classSubjectList'));
+        } else {
             // semester profile / examination profile
             $semesterProfile = $this->academicHelper->getSemester($request->input('semester'));
             // additionalSubject
@@ -1440,7 +1481,7 @@ class ReportsController extends Controller
             // class subject list
             $classSubjectList = $this->academicHelper->findClassSectionSubjectList($request->section, $request->batch, campus_id(), institution_id());
             // return view with variables
-            return view('reports::pages.report.examsheet.exam-attendance-sheet',compact('studentList','instituteInfo','semesterProfile','additionalArrayList','classSubjectList'));
+            return view('reports::pages.report.examsheet.exam-attendance-sheet', compact('studentList', 'instituteInfo', 'semesterProfile', 'additionalArrayList', 'classSubjectList'));
         }
     }
 
@@ -1468,20 +1509,21 @@ class ReportsController extends Controller
 
 
     // chirto 2.1
-    public function collegeResultReport(Request $request){
-        $instituteInfo=$this->academicHelper->getInstituteProfile();
+    public function collegeResultReport(Request $request)
+    {
+        $instituteInfo = $this->academicHelper->getInstituteProfile();
 
         $level = $request->academic_level;
         $batch = $request->batch;
-        $section =  $request->section;
+        $section = $request->section;
         $subject = $request->subject;
-        $semester =$request->semester;
+        $semester = $request->semester;
         $category = $request->category;
         // class subject profile
         $classSubjectProfile = $this->academicHelper->getClassSubject($subject);
-        $classSubjectGroup = $classSubjectProfile?$classSubjectProfile->subject_group:0;
+        $classSubjectGroup = $classSubjectProfile ? $classSubjectProfile->subject_group : 0;
 
-        $academicYear=$this->academicHelper->getAcademicYearProfile();
+        $academicYear = $this->academicHelper->getAcademicYearProfile();
         $subjectName = $this->academicHelper->getClassSubject($subject)->subject();
         $batchName = $this->academicHelper->findBatch($batch);
         $semesterName = $this->academicHelper->getSemester($semester);
@@ -1494,19 +1536,19 @@ class ReportsController extends Controller
         // grade scale scale details
         $gradeScaleDetails = $this->gradeDetails->where('grade_id', $scaleId)->orderBy('sorting_order', 'ASC')->get();
         // grading scale
-        $gradeScale = $this->grade->orderBy('name', 'ASC')->where('id',$scaleId)->first(['id', 'name', 'grade_scale_id']);
+        $gradeScale = $this->grade->orderBy('name', 'ASC')->where('id', $scaleId)->first(['id', 'name', 'grade_scale_id']);
         // find grade scale category list
-        $allCategoryList = $gradeScale->assessmentsCount()?$gradeScale->assessmentCategory():[];
+        $allCategoryList = $gradeScale->assessmentsCount() ? $gradeScale->assessmentCategory() : [];
         // find category details array list
         $catDetailArrayList = $this->assessmentsController->getCategoryDetails($allCategoryList, $gradeScale);
 
         // class subject profile
         $classSubjectProfile = $this->academicHelper->getClassSubject($subject);
         // student list
-        $classStdList =  $this->assessmentsController->getClsssSectionStudentList($batch, $section);
+        $classStdList = $this->assessmentsController->getClsssSectionStudentList($batch, $section);
         $classSubStdList = $this->academicHelper->getAdditionalSubjectStdList($subject, $section, $batch, $campus, $institute);
         // find subject student from class student list
-        $studentList =  $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList, $classStdList);
+        $studentList = $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList, $classStdList);
 
 //        // student list
 //        $studentList = $this->studentProfileView->where([
@@ -1517,24 +1559,25 @@ class ReportsController extends Controller
         $additionalSubArrayList = $this->academicHelper->findClassSectionAdditionalSubjectList($section, $batch, $campus, $institute);
 
         // tabulation sheet
-        $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege($section, $batch, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, $subject,null, "SUB_SINGLE_RESULT");
+        $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege($section, $batch, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, $subject, null, "SUB_SINGLE_RESULT");
 
 
-        return view('reports::pages.report.college-result.student-report', compact('studentList','tabulationSheet', 'category', 'subject', 'classSubjectGroup', 'catDetailArrayList', 'subjectName', 'batchName', 'semesterName','instituteInfo', 'academicYear'));
+        return view('reports::pages.report.college-result.student-report', compact('studentList', 'tabulationSheet', 'category', 'subject', 'classSubjectGroup', 'catDetailArrayList', 'subjectName', 'batchName', 'semesterName', 'instituteInfo', 'academicYear'));
 
     }
 
     //chirto 3
-    public function  collegeSubjectWiseSummery(Request $request) {
-        $instituteInfo=$this->academicHelper->getInstituteProfile();
+    public function collegeSubjectWiseSummery(Request $request)
+    {
+        $instituteInfo = $this->academicHelper->getInstituteProfile();
         // request details
         $level = $request->academic_level;
         $batch = $request->batch;
 //        $section =  $request->section;
-        $semester =$request->semester;
+        $semester = $request->semester;
         $category = $request->category;
 
-        $academicYear=$this->academicHelper->getAcademicYearProfile();
+        $academicYear = $this->academicHelper->getAcademicYearProfile();
         $batchName = $this->academicHelper->findBatch($batch);
         $semesterName = $this->academicHelper->getSemester($semester);
 
@@ -1552,18 +1595,19 @@ class ReportsController extends Controller
         // subject group result list
         $subGroupResultList = array();
         // sublist array list
-        foreach ($classSubGroupArrayList as $groupSubId=>$groupSubDetail){
+        foreach ($classSubGroupArrayList as $groupSubId => $groupSubDetail) {
             $subGroupResultList[$groupSubId] = $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege(null, $batch, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null, $groupSubId, "SUB_GROUP_RESULT");
         }
 
 
         // return view with variables
-        return view('reports::pages.report.college-result.subject-summery',compact('classSubGroupArrayList','subGroupResultList','instituteInfo', 'academicYear', 'batchName', 'semesterName'));
+        return view('reports::pages.report.college-result.subject-summery', compact('classSubGroupArrayList', 'subGroupResultList', 'instituteInfo', 'academicYear', 'batchName', 'semesterName'));
     }
 
     //4444
-    public function  collegeResultSummery(Request $request) {
-        $semester =$request->semester;
+    public function collegeResultSummery(Request $request)
+    {
+        $semester = $request->semester;
         $category = $request->category;
 
         // institute and campus
@@ -1572,13 +1616,13 @@ class ReportsController extends Controller
         $allBatch = $this->academicHelper->getBatchList();
 
 
-        $instituteInfo=$this->academicHelper->getInstituteProfile();
-        $academicYear=$this->academicHelper->getAcademicYearProfile();
+        $instituteInfo = $this->academicHelper->getInstituteProfile();
+        $academicYear = $this->academicHelper->getAcademicYearProfile();
         $semesterName = $this->academicHelper->getSemester($semester);
 
         $subSummaryResultList = array();
         // sublist array list
-        foreach ($allBatch as $batchId=>$groupSubDetail){
+        foreach ($allBatch as $batchId => $groupSubDetail) {
             // scale id
             $scaleId = $this->assessmentsController->getGradeScaleId($batchId, null);
             // grade scale scale details
@@ -1586,35 +1630,36 @@ class ReportsController extends Controller
             // additional subject list
             $additionalSubArrayList = $this->academicHelper->findClassSectionAdditionalSubjectList(null, $batchId, $campus, $institute);
 
-            $subSummaryResultList[$batchId] = $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege(null, $batchId, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null, null,"SUMMERY_RESULT");
+            $subSummaryResultList[$batchId] = $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege(null, $batchId, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null, null, "SUMMERY_RESULT");
         }
 
-        return view('reports::pages.report.college-result.result-summery',compact('subSummaryResultList','allBatch','instituteInfo', 'academicYear', 'semesterName'));
+        return view('reports::pages.report.college-result.result-summery', compact('subSummaryResultList', 'allBatch', 'instituteInfo', 'academicYear', 'semesterName'));
     }
 
 
-    public function  collegeSummeryofGrade() {
+    public function collegeSummeryofGrade()
+    {
         return view('reports::pages.report.college-result.summery-grade');
     }
 
-    public function  tutorialExamReport(Request $request) {
+    public function tutorialExamReport(Request $request)
+    {
 //        return $request->all();
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         $acdemicYear = $this->academicHelper->getAcademicYearProfile();
 
         $level = $request->academic_level;
         $batch = $request->batch;
-        $section =  $request->section;
-        $semester =$request->semester;
+        $section = $request->section;
+        $semester = $request->semester;
         $category = $request->category;
         $category_name = $request->category_name;
 
-        if(!empty($request->std_id)) {
+        if (!empty($request->std_id)) {
             $myStdId = $request->std_id;
-        }else {
-            $myStdId=null;
+        } else {
+            $myStdId = null;
         }
-
 
 
         // institute and campus
@@ -1625,19 +1670,19 @@ class ReportsController extends Controller
         // grade scale scale details
         $gradeScaleDetails = $this->gradeDetails->where('grade_id', $scaleId)->orderBy('sorting_order', 'ASC')->get();
         // grading scale
-        $gradeScale = $this->grade->orderBy('name', 'ASC')->where('id',$scaleId)->first(['id', 'name', 'grade_scale_id']);
+        $gradeScale = $this->grade->orderBy('name', 'ASC')->where('id', $scaleId)->first(['id', 'name', 'grade_scale_id']);
         // find grade scale category list
-        $allCategoryList = $gradeScale->assessmentsCount()?$gradeScale->assessmentCategory():[];
+        $allCategoryList = $gradeScale->assessmentsCount() ? $gradeScale->assessmentCategory() : [];
         // find category details array list
         $catDetailArrayList = $this->assessmentsController->getCategoryDetails($allCategoryList, $gradeScale);
         // Class subject list
         $classSubGroupArrayList = $this->academicHelper->findClassSectionGroupSubjectList($section, $batch, $campus, $institute);
         // additional subject list
-        $additionalSubArrayList = $this->academicHelper->findClassSectionAdditionalSubjectList($section, $batch, $campus, $institute);;
+        $additionalSubArrayList = $this->academicHelper->findClassSectionAdditionalSubjectList($section, $batch, $campus, $institute);
 
 
         $studentList = $this->studentProfileView->where([
-            'batch'=>$batch,'section'=>$section, 'academic_level'=>$level, 'campus'=>$campus, 'institute'=>$institute
+            'batch' => $batch, 'section' => $section, 'academic_level' => $level, 'campus' => $campus, 'institute' => $institute
         ])->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc');
 
         // checking student
@@ -1645,21 +1690,23 @@ class ReportsController extends Controller
 //            $studentList->where(['std_id'=>$myStdId]);
 //        }
 
-        $studentList =  $studentList->get();
+        $studentList = $studentList->get();
 
         // tabulation sheet
-        $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege($section, $batch, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null,null, null, null);
+        $tabulationSheet = $this->assessmentsController->getTabulationMarkSheetForCollege($section, $batch, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null, null, null, null);
 
 
-        return view('reports::pages.report.college-result.tutorial-exam', compact('catDetailArrayList','tabulationSheet','classSubGroupArrayList','myStdId', 'category', 'studentList','instituteInfo','acdemicYear','category_name'));
+        return view('reports::pages.report.college-result.tutorial-exam', compact('catDetailArrayList', 'tabulationSheet', 'classSubGroupArrayList', 'myStdId', 'category', 'studentList', 'instituteInfo', 'acdemicYear', 'category_name'));
     }
 
 
-    public function  testExamReport() {
+    public function testExamReport()
+    {
         return view('reports::pages.report.college-result.test-exam');
     }
 
-    public function  hscExamReport(Request $request) {
+    public function hscExamReport(Request $request)
+    {
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         $acdemicYear = $this->academicHelper->getAcademicYearProfile();
         //        return $request->all();
@@ -1672,7 +1719,7 @@ class ReportsController extends Controller
 
 //        $level = 68;
 //        $batch = 218;
-        $semester =$request->semester;
+        $semester = $request->semester;
         $category = $request->category;
         $categoryName = $request->category_name;
         $semesterName = $request->semester_name;
@@ -1685,10 +1732,10 @@ class ReportsController extends Controller
 
         $boardTypeResultList = array();
         // sublist array list
-        foreach ($allBatch as $batchId=>$groupSubDetail) {
+        foreach ($allBatch as $batchId => $groupSubDetail) {
             // student list
             $boardTypeResultList[$batchId]['student'] = $this->stdArrayMaker($this->studentProfileView->where([
-                'batch'=>$batchId, 'campus'=>$campus, 'institute'=>$institute
+                'batch' => $batchId, 'campus' => $campus, 'institute' => $institute
             ])->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')->get(['std_id', 'gr_no']));
             // scale id
             $scaleId = $this->assessmentsController->getGradeScaleId($batchId, null);
@@ -1700,7 +1747,7 @@ class ReportsController extends Controller
             $boardTypeResultList[$batchId]['result'] = $this->assessmentsController->getTabulationMarkSheetForCollege(null, $batchId, $category, $semester, $additionalSubArrayList, $gradeScaleDetails, $campus, $institute, null, null, 'BOARD_RESULT', null);
         }
 
-        return view('reports::pages.report.college-result.hscexam-report',compact('boardTypeResultList', 'allBatch','categoryName','instituteInfo','acdemicYear','semesterName'));
+        return view('reports::pages.report.college-result.hscexam-report', compact('boardTypeResultList', 'allBatch', 'categoryName', 'instituteInfo', 'acdemicYear', 'semesterName'));
     }
 
 
@@ -1709,18 +1756,14 @@ class ReportsController extends Controller
 
         $studentArrayList = [];
 
-        foreach ($studentList as $std){
-            $studentArrayList[$std->std_id]= $std->gr_no;
+        foreach ($studentList as $std) {
+            $studentArrayList[$std->std_id] = $std->gr_no;
         }
 
         return $studentArrayList;
     }
 
     // SUMMERY_RESULT
-
-
-
-
 
 
 }

@@ -26,23 +26,30 @@
                             <li @if($page == "academics") class="active" @endif  id="#">
                                 <a href="{{url('/reports/academics')}}">Academics</a>
                             </li>
+
+                            @role(['super-admin'])
                             <li @if($page == "attendance") class="active" @endif  id="#">
                                 <a href="{{url('/reports/attendance')}}">Attendance</a>
                             </li>
                             <li @if($page == "result") class="active" @endif id="#">
                                 <a href="{{url('/reports/result')}}">Result</a>
                             </li>
-
+                            @endrole
+                            @role(['super-admin'])
                             <li @if($page == "fees") class="active" @endif id="#">
                                 <a href="{{url('/reports/fees')}}">Fees</a>
                             </li>
-
+                            @endrole
+                            @role(['super-admin'])
                             <li @if($page == "invoice") class="active" @endif id="#">
                                 <a href="{{url('/reports/invoice')}}">Invoice</a>
                             </li>
+                            @endrole
+                            @role(['super-admin'])
                             <li @if($page == "admission") class="active" @endif id="#">
                                 <a href="{{url('/reports/admission')}}">Admission</a>
                             </li>
+                            @endrole
                             <li @if($page == "id-card") class="active" @endif id="#">
                                 <a href="{{url('/reports/id-card')}}">ID Card</a>
                             </li>
@@ -52,7 +59,7 @@
                             <li @if($page == "admit-card") class="active" @endif id="#">
                                 <a href="{{url('/reports/admit-card')}}">Admit Card</a>
                             </li>
-
+                            @role(['super-admin'])
                             <li @if($page == "sitplan") class="active" @endif id="#">
                                 <a href="{{url('/reports/sitplan')}}">Seat Plan</a>
                             </li>
@@ -66,13 +73,14 @@
                             <li class="{{$page=='enrollment'?'active':''}}" id="#">
                                 <a href="{{url('/reports/enrollment')}}">Enrollment</a>
                             </li>
-
                             <li class="{{$page=='employee'?'active':''}}" id="#">
                                 <a href="{{url('/reports/employee')}}">Employee</a>
                             </li>
                             <li class="{{$page=='college-'?'active':''}}" id="#">
                                 <a href="{{url('/reports/college-report')}}">College Report</a>
                             </li>
+                            @endrole
+
 
                             {{--<li id="#">--}}
                                 {{--<a href="#">Communication 4</a>--}}

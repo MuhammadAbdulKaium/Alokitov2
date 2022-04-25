@@ -1163,7 +1163,9 @@ class AssessmentsController extends Controller
         $classStdList =  $this->getClsssSectionStudentList($batch, $section);
         $classSubStdList = $this->academicHelper->getAdditionalSubjectStdList($subject, $section, $batch, $campusId, $instituteId);
         // find subject student from class student list
-        $studentList =  $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList, $classStdList);
+            $studentList =  $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList,
+        $classStdList);
+
         // share all variables with the view
         view()->share(compact('instituteInfo','studentList', 'myRequest'));
 

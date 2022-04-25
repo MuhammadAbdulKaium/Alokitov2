@@ -21,10 +21,11 @@
 
 		.imageOpacity {
 			opacity: 0.1;
-			width: 450px;
-			height: 450px;
+			width: 425px;
+			height: 425px;
 			position: absolute;
 			margin:125px 0px 0px 270px;
+			/*border-radius: 50%;*/
 		}
 
 		.myContainer {position: relative;}
@@ -35,7 +36,10 @@
 
 <div class="row myContainer">
 	{{--water mark logo--}}
-	<img class="imageOpacity" src="{{URL::asset('assets/users/images/'.$instituteProfile->logo)}}">
+
+	<img class="imageOpacity"
+		 src="{{public_path().'/assets/users/images/'.$instituteProfile->logo}}"  >
+
 
 	<div class="col-md-12 text-center">
 		<div class="col-md-3 float-left">
@@ -59,7 +63,8 @@
 	<br/>
 	<br/>
 	<div class="col-md-12 text-center clear">
-		<img src="{{URL::asset('assets/users/images/'.$instituteProfile->logo)}}" height="80px" width="80px" style="border-radius:50%" alt="profile" class="pro-pic">
+		<img src="{{public_path().'/assets/users/images/'.$instituteProfile->logo}}"
+		style="border-radius:50%;height:80px;width: 80px;" alt="profile" class="pro-pic">
 		<h3><strong>{{strtoupper($instituteProfile->institute_name)}}</strong></h3>
 		<h4><strong>{{$instituteProfile->address1}}</strong></h4>
 		<br/>
@@ -77,7 +82,7 @@
 		<p> I wish {{$testimonial->gender=="son"?"his":"her"}} all success in life. </p>
 	</div>
 	<br/>
-	<br/>
+
 	<div style="padding-top: 17px" class="col-sm-6 text-left">
 		<p> Prepared by <strong>{{$testimonial->writer}} </strong> <br/> Date: <strong> {{date('d M, Y', strtotime($testimonial->date))}} </strong></p>
 	</div>

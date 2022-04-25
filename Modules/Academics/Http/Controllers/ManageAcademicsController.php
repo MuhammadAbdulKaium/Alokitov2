@@ -286,9 +286,9 @@ class ManageAcademicsController extends Controller
         $class = $request->input('class_id');
         $section = $request->input('section_id');
         // response array
-        $data = array();
+      $data = array();
         // all class subject
-        $allClassSubject = $this->classSubject->where(['class_id' => $class, 'section_id' => $section])->orderBy('sorting_order', 'ASC')->get();
+     $allClassSubject = $this->classSubject->where(['class_id' => $class, 'section_id' => $section])->orderBy('sorting_order', 'ASC')->get();
         // active user information
         $userInfo = Auth::user();
         // checking user role
@@ -296,7 +296,8 @@ class ManageAcademicsController extends Controller
             // find user employee profile
             $teacherInfoProfile = $userInfo->employee();
             // find class teacher subject list
-            $classTeacherSubjects = $this->subjectTeacher->where(['employee_id' => $teacherInfoProfile->id, 'is_active' => 1])->get();
+            $classTeacherSubjects = $this->subjectTeacher
+                ->where(['employee_id' => $teacherInfoProfile->id, 'is_active' => 1])->get();
             // Teacher subject looping for finding subjects of this class-section
             foreach ($classTeacherSubjects as $teacherSubject) {
                 // find class subject profile anc checking

@@ -61,6 +61,8 @@ class ClassAttendanceSummaryReportController extends Controller
     // find class section attendance report by date range
     public function classSectionAttendanceReportByDateRange(Request $request)
     {
+        //return $request->all();
+       // return "Mazharul sir";
         // request details
         $level = $request->input('academic_level');
         $batch = $request->input('batch');
@@ -87,15 +89,18 @@ class ClassAttendanceSummaryReportController extends Controller
         // institute information
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // class section dept id
-        $stdDeptId = $this->studentDepartment->where(['academic_level'=>$level, 'academic_batch'=>$batch, 'campus_id'=>$campus, 'institute_id'=>$institute])->first();
+      $stdDeptId = $this->studentDepartment->where(['academic_level'=>$level, 'academic_batch'=>$batch, 'campus_id'=>$campus, 'institute_id'=>$institute])->first();
 
         // find all weekOffDays with campus and institute
-        $allWeekOffDayList = $this->weekOffDay
-            ->where(['dept_id' => $stdDeptId->dept_id, 'academic_year' => $academicYear, 'campus_id' => $campus, 'institute_id' => $institute])
+//       /* $allWeekOffDayList = $this->weekOffDay
+//            ->where(['dept_id' => $stdDeptId->dept_id, 'academic_year' => $academicYear, 'campus_id' => $campus, 'institute_id' => $institute])
+//            ->whereBetween('date', [$startDate, $endDate])->orderBy('date', 'ASC')->get(['id', 'date'])->count();*/
+ $allWeekOffDayList = $this->weekOffDay
+            ->where([ 'academic_year' => $academicYear, 'campus_id' => $campus, 'institute_id' => $institute])
             ->whereBetween('date', [$startDate, $endDate])->orderBy('date', 'ASC')->get(['id', 'date'])->count();
 
         // find all holidays with campus and institute
-        $allHolidayList = $this->holidayDetails
+ $allHolidayList = $this->holidayDetails
             ->where(['academic_year' => $academicYear, 'campus_id' => $campus, 'institute_id' => $institute])
             ->whereBetween('date', [$startDate, $endDate])->orderBy('date', 'ASC')->get(['id', 'date'])->count();
 
@@ -106,7 +111,7 @@ class ClassAttendanceSummaryReportController extends Controller
             })->leftJoin('student_enrollments as e', 'e.std_id', '=', 's.id')
             ->select('s.id as std_id','s.first_name as first_name','s.middle_name as middle_name','s.last_name as last_name','e.gr_no as gr_no','a.entry_date_time as entry_date_time')
             ->where(['e.academic_level'=>$level, 'e.batch'=>$batch, 'e.section'=>$section, 'e.academic_year'=>$academicYear, 's.status'=>1, 's.institute'=>$institute, 's.campus'=>$campus])->orderByRaw('LENGTH(e.gr_no) asc')->orderBy('e.gr_no', 'asc')->get();
-
+       // return $studentArrayList;
         //  attendance array list maker
         foreach ($attendanceList as $index=>$attendance){
             // checking and input student details

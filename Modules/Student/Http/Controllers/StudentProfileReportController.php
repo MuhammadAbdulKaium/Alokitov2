@@ -332,7 +332,7 @@ class StudentProfileReportController extends Controller
         }
 
         $attendances = $this->attendanceManageView->orderBy('attendance_date', 'ASC')->where(['student_id' => $studnetId, 'class_id' => $studentBatch, 'section_id' => $studentSection])->whereNull('deleted_at')->get();
-        return $attendances;
+       // return $attendances;
 
         // $pdf = App::make('dompdf.wrapper');
         // $pdf->loadHTML('<h1>Test</h1>');
@@ -364,7 +364,7 @@ class StudentProfileReportController extends Controller
             return $pdf->download('attendance.pdf');
         }
 
-        return $html;
+       // return $html;
         return $pdf->stream('testfile')->header('Content-Type', 'application/pdf');
 
         return view('student::pages.reports.attendance', compact('studentInfo', 'studentAttendanceList', 'academicSubjects'));

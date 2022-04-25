@@ -1153,20 +1153,42 @@ class AssessmentsController extends Controller
         $section = $request->input('section');
         $subject = $request->input('subject');
         $downloadType = $request->input('download_type', 'pdf');
-        $myRequest = $request->all();
+          $myRequest = $request->all();
         // institute details
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
         $academicYear = $this->academicHelper->getAcademicYear();
         $instituteInfo = $this->academicHelper->getInstituteProfile();
         // class subject profile
-        $classSubjectProfile = $this->academicHelper->getClassSubject($subject);
+   $classSubjectProfile = $this->academicHelper->getClassSubject($subject);
         // student list
-        $classStdList =  $this->getClsssSectionStudentList($batch, $section, $academic_year);
+        $studentList = array();
+        // class section students
+        $classSectionStudent = $this->studentProfileView->where([
+            'status'=>1, 'batch'=>$batch, 'section'=>$section,
+            'campus'=>$this->academicHelper->getCampus(), 'institute'=>$this->academicHelper->getInstitute(),
+        ])->orderByRaw('LENGTH(gr_no) asc')->orderBy('gr_no', 'asc')->get();
+
+        // looping for adding division into the batch name
+        foreach ($classSectionStudent as $student) {
+            // find student profile
+            $myProfile = $student->student();
+            // student array list
+            $studentList[] = [
+                'id' => $student->std_id, 'gr_no' => $student->gr_no, 'status' => $student->status,
+                'name' => $student->first_name." ".$student->middle_name." ".$student->last_name,
+                'username' => $student->username,
+                'gender' => $student->gender,
+                'phone' => $myProfile->phone,
+            ];
+        }
+         $classStdList = $studentList;
+
         
         $classSubStdList = $this->academicHelper->getAdditionalSubjectStdList($subject, $section, $batch, $campusId, $instituteId);
         // find subject student from class student list
-        $studentList =  $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList, $classStdList);
+       $studentList =  $this->academicHelper->getClassSubjectStudentList($classSubjectProfile, $classSubStdList,
+    $classStdList);
         // share all variables with the view
         view()->share(compact('instituteInfo','studentList', 'myRequest'));
 
@@ -1182,6 +1204,7 @@ class AssessmentsController extends Controller
             // return $pdf->download('fileName');
         }else{
             //generate excel
+
             Excel::create($request->batch_name.' - '.$request->section_name.' - '.$request->subject_name, function ($excel) {
                 $excel->sheet('Class Subject Student Report', function ($sheet) {
                     // Font family
@@ -2377,8 +2400,9 @@ class AssessmentsController extends Controller
                 ];
             }
             // return student list
-            return $studentList;
-       }else{
+           // return $studentList;
+       }else
+       {
 
 
          // response array

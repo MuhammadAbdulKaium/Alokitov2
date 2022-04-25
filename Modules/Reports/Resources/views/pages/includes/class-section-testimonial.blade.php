@@ -99,9 +99,11 @@
         beforeSend: function() {
         // show waiting dialog
         {{--waitingDialog.show('Loading...');--}}
+
         },
 
         success: function (data) {
+        console.log(data);
         {{--alert(JSON.stringify(data));--}}
         {{--statements--}}
         var applicant_reports_container_row=  $('#applicant_reports_container_row');
@@ -111,6 +113,8 @@
         },
 
         error:function(data){
+        console.log(data);
+
         alert(JSON.stringify(data));
         }
         });

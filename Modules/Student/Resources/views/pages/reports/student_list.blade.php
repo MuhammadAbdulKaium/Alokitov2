@@ -196,11 +196,11 @@
                     <td>
                         {{--<img class="img-thumbnail" src="images/st6.jpg" alt="Profile iamge">--}}
                         @if($stdProfile->singelAttachment('PROFILE_PHOTO'))
-                            <img width="50px" height="45px" class="img-thumbnail" src="{{asset('/assets/users/images/'.$stdProfile->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}">
-                            {{--<img width="50px" height="45px" class="img-thumbnail" src="{{public_path().'/assets/users/images/'.$stdProfile->singelAttachment('PROFILE_PHOTO')->singleContent()->name}}">--}}
+                            <img style="width:50px;height: 50px"  class="img-thumbnail"
+                                 src="{{public_path()
+                            .'/assets/users/images/'.$stdProfile->singelAttachment('PROFILE_PHOTO')->singleContent()->name}}">
                         @else
-                            <img width="50px" height="45px" class="img-thumbnail" src="{{asset('/assets/users/images/user-default.png')}}">
-                            {{--<img width="50px" height="45px" class="img-thumbnail" src="{{public_path().'/assets/users/images/user-default.png'}}">--}}
+                           <img style="width:50px;height: 50px"  class="img-thumbnail" src="{{public_path().'/assets/users/images/user-default.png'}}">
                         @endif
 
                     </td>

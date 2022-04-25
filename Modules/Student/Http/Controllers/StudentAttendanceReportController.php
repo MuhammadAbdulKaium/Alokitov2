@@ -211,6 +211,7 @@ class StudentAttendanceReportController extends Controller
 
     public function attendanceReport(Request $request)
     {
+        return "Test";
 
         $studnetId = $request->input('std_id');
         $fromDate  = $request->input('from_date');

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -205,7 +206,7 @@
 <div class="row">
     <div class="col-sm-12">
         <div id="printablediv">
-<!--            <div style="background: yellow" class="testimonial">
+        <!--            <div style="background: yellow" class="testimonial">
                 <div class="mainTestimonial">
                     <div class="row" style="width: 100%; float: left;">
                         <div class="topHeadingLeft col-sm-4" style="width: 32%; float: left">ক্রমিক নং: 1<br>কেন্দ্র
@@ -241,7 +242,7 @@
                     <td colspan="3" class="t-c">
                         <div>
                             EIIN:{{$instituteProfile->eiin_code}}
-<!--                            <br> তারিখ: ১২-০১-২০১৮-->
+                        <!--                            <br> তারিখ: ১২-০১-২০১৮-->
                         </div>
                     </td>
                 </tr>
@@ -264,20 +265,23 @@
                 </tr>
 
             </table>
-  
+
 
 
             <div  class="headSection">
                 <div class="row">
-                    <h2 class="top_heading_title">বিদ্যালয় পরিত্যাগের ছাড়পত্র</h2>
+
                     <h4 class="top_heading_title_4">{{$instituteProfile->institute_name}}<br></h4>
                     <div class="col-sm-12 mainMiddleTextCenter"><span class="mainMiddleText">{{$instituteProfile->address1}}<br></span>
                     </div>
+                    <h2 class="top_heading_title">প্রশংসা পত্র</h2>
                 </div>
             </div>
 
             <div class="testimonialInfo">
                 <p class="testimonialContent">
+
+
                     প্রত্যয়ন করা যায়তেছে যে ,{{$testimonialInfoArray->std_name}}
                     পিতা: {{$testimonialInfoArray->father}},
                     মাতা: {{$testimonialInfoArray->mother}},
@@ -291,15 +295,9 @@
                     সাল হইতে {{$testimonialInfoArray->year2}}
                     সাল পর্যন্ত অধ্যয়নরত ছিল । সে {{$testimonialInfoArray->year3}}
                     সাল {{$testimonialInfoArray->class3}}
-                    শ্রেণীর বার্ষিক পরীক্ষা পরীক্ষা়য় সফল্যর সাথে উত্তীর্ণ হইয়াছে / হয় নাই । এই পরীক্ষা সি. জি. পি.
-                    এ. {{$testimonialInfoArray->gpa}}
-                    পাইয়াছে । তাহার জন্ম তারিখ ভর্তি বহি বর্ণনায় তাহার নিকট হয়তে বিদ্যালয় যাবতীয়
-                    পাওনা {{$testimonialInfoArray->year4}} পর্যন্ত বুঝিয়া লওয়া হইয়াছে । সে এই
-                    বিদ্যালয়ে {{$testimonialInfoArray->class4}} শ্রেণী পর্যন্ত লেখাপড়া করিয়াছে ।
-                    <br> <br><b>এই বিদ্যালয় অধ্যয়ন কালে তাঁহার স্বভাব-চরিত্র সম্পর্কে তথ্যাদি নিম্নে দেওয়া হল :</b> <b>
-                        তাহার চরিত্র {{$testimonialInfoArray->character}}, আচরন {{$testimonialInfoArray->behavior}},
-                        উপস্থিতি {{$testimonialInfoArray->attendance}}, বুদ্ধিমত্তা {{$testimonialInfoArray->talent}}
-                        <br> <b>বিদ্যালয় পরিত্যাগের কারণ:</b>{{$testimonialInfoArray->leave_message}}
+                    শ্রেণীর বার্ষিক  পরীক্ষা পরীক্ষা়য় সফল্যর সাথে উত্তীর্ণ হইয়াছে / হয় নাই  । এই পরীক্ষা সি. জি. পি. এ. {{$testimonialInfoArray->gpa}}
+                    পাইয়াছে । তাহার জন্ম তারিখ  ভর্তি বহি বর্ণনায় তাহার নিকট হয়তে বিদ্যালয় যাবতীয় পাওনা  {{$testimonialInfoArray->year4}} পর্যন্ত বুঝিয়া লওয়া হইয়াছে । সে এই বিদ্যালয়ে {{$testimonialInfoArray->class4}}  শ্রেণী পর্যন্ত লেখাপড়া করিয়াছে ।
+                    আমার জানামতে সে বিদ্যালয় অধ্যায়নকালে রাষ্ট্র বিরোধী বা আইন পরিপ্ন্থী কোনো কাজে জড়িত ছিল না।   সে চরিত্রবান।   তাহার জীবনের উন্নতি কামনা করি ।
 
             </div>
 

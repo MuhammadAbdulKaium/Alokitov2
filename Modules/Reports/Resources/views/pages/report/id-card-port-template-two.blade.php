@@ -44,7 +44,7 @@
 			border-radius: 5px;
 			margin-bottom: 5px;
 			width: {{$tempSetting?($tempType==1?($tempSetting->width.'px'):'250px'):'250px'}};
-			height: {{$tempSetting?($tempType==1?($tempSetting->height.'px'):'350px'):'350px'}};
+			height: {{$tempSetting?($tempType==1?($tempSetting->height.'px'):'350px'):'400px'}};
 			background-color: {{$tempSetting?($tempType==1?($tempSetting->color):'#a3cde7'):'#a3cde7'}};
 			-webkit-box-shadow: 3px 0px 162px -17px rgba(194,186,194,0.76);
 			-moz-box-shadow: 3px 0px 162px -17px rgba(194,186,194,0.76);
@@ -287,7 +287,7 @@
 						<br/>
 						<br/>
 						<div class="col-sm-12 inst-info" style="clear: both">
-							<b class="inst-name-portrait">{{$instituteInfo->institute_name}} GG</b> <br/>
+							<b class="inst-name-portrait">{{$instituteInfo->institute_name}}</b> <br/>
 							{{--{{$instituteInfo->address1}}--}}
 						</div>
 					</div>
@@ -331,12 +331,16 @@
 								@endif
 								</tbody>
 							</table>
+							<br>
+							<br>
+							<br>
+
 						</div>
 					</div>
 				</div>
 				<div class="id-card-two">
 					<div class="row std-info-portrait">
-						<div class="col-md-12">
+						<div class="col-md-12" >
 							<p class="text-center text-bold">Student Information</p>
 							<hr/>
 							{{--parents information--}}
@@ -354,26 +358,31 @@
 								<span class="std-address-portrait">{{$studentInfo->phone}} (home)</span><br/>
 								<span class="std-address-portrait">01717375219 (office)</span>
 							</p>
-							<br/>
-							<br/>
-							<p class="text-center">
-								.......................... <br/>Principal
-							</p>
-
-							{{--<p>--}}
-							{{--<strong>Address:</strong> <br/>--}}
-							{{--<span>Venus Complex, Kha-199/2-199/4, Bir Uttam Rafiqul Islam Ave, Dhaka-1213.</span>--}}
-							{{--</p>--}}
 						</div>
 						<div class="col-md-12">
-							<hr/>
-							<p class="text-center text-bold">{{$instituteInfo->address1}}</p>
+							<hr>
+							<br>
+							<br>
+							<p class="text-center">
+								@if($templateProfile->signature!=null)
+									<img class="temp_one_principal_sig" style="height: 30px" width="45px"
+										 src="{{public_path().'/assets/signature',$templateProfile->signature}}">
+								@else
+									..........................
+									@endif
+
+								 <br/>Principal
+							</p>
+							<p  class="text-center
+							text-bold">{{$instituteInfo->address1}}</p>
 						</div>
+
 					</div>
 				</div>
 			</div>
-			<div style="page-break-after:always;"></div>
+
 		</div>
+		<div style="page-break-after:always;"></div>
 	@endforeach
 </div>
 

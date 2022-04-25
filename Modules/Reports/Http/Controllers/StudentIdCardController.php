@@ -34,7 +34,7 @@ class StudentIdCardController extends Controller
     // get batch section student ic card list
     public function getStdIdCardList(Request $request)
     {
-//        return $request->all();
+      // return $request->all();
         // institute details
         $campusId = $this->academicHelper->getCampus();
         $instituteId = $this->academicHelper->getInstitute();
@@ -57,7 +57,15 @@ class StudentIdCardController extends Controller
          $templateProfile = $this->idCardSetting->where(['campus_id'=>$campusId, 'institution_id'=>$instituteId])->first() ;
         $this->data['templateProfile']=$templateProfile;
         $this->data['campusId']=$campusId;
-        return $this->idcardViewByInstituteId($instituteId,$this->data);
+        //download all id card
+        $data=$this->data;
+        $pdf = App::make('dompdf.wrapper');
+
+      //  $pdf -> loadView('reports::pages.report.id-card-land-test',compact('data'));
+        $pdf->loadView('reports::pages.report.id-card-port-template-two',$data)->setPaper('a4');
+
+        return $pdf->stream('class_section_student_id_card.pdf');
+       // return $this->idcardViewByInstituteId($instituteId,$this->data);
     }
 
     // get batch section student ic card list
@@ -196,7 +204,7 @@ class StudentIdCardController extends Controller
 
     /// template id wise template view
     public function idcardViewByInstituteId($instituteID,$data){
-        return view('reports::pages.report.id-card.'.$instituteID,$data);
+        return view('reports::pages.report.id-card.2',$data);
     }
 
 
