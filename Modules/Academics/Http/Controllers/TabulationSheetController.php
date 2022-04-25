@@ -430,6 +430,8 @@ class TabulationSheetController extends Controller
             return $pdf->stream();
         } else if ($request->type == "details") {
             $pdf = App::make('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $user = Auth::user();
             $pdf->loadView('academics::exam.tabulation-sheet.print-tabulation-sheet.details-print', compact(
                 'students',
                 'studentEnrollments',
@@ -444,7 +446,8 @@ class TabulationSheetController extends Controller
                 'sheetData',
                 'subjectMarks',
                 'subjectMarksExamWise',
-                'institute'
+                'institute',
+                'user'
             ))->setPaper('a4', 'landscape');
             return $pdf->stream();
         } else {

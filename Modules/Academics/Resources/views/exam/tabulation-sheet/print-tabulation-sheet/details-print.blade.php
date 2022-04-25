@@ -6,8 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Progress Report Details</title>
     <style>
-         .page-break {
+        .page-break {
             page-break-after: always;
+        }
+
+        .page-break:last-child {
+            page-break-after: never;
         }
           .clearfix {
             overflow: auto;
@@ -172,9 +176,42 @@
             margin: 10px auto;
         }
         /* signature Style End */
+
+        footer {
+            position: fixed;
+            bottom: -60px;
+            left: 0px;
+            right: 0px;
+            font-size: medium;
+            background-color: #002d00;
+            color: white;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
+    <footer >
+        <div style="padding:.5rem">
+            <span  >Printed from <b>CCIS</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
+    
+        </div>
+        <script type="text/php">
+        if (isset($pdf)) {
+            $x = 730;
+            $y = 574;
+            $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
+            $font = null;
+            $size = 14;
+            $color = array(255,255,255);
+            $word_space = 0.0;  //  default
+            $char_space = 0.0;  //  default
+            $angle = 0.0;   //  default
+            $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+        }
+    </script>
+    
+    
+    </footer>
         @if (sizeof($students)>0)
             @foreach ($students as $student )
                 
