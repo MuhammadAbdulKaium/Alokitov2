@@ -264,10 +264,10 @@
                 },
                 datatype: 'application/json',
                 beforeSend: function() {
-                    waitingDialog.show('Loading...');
+                    // waitingDialog.show('Loading...');
                 },
                 success: function(data) {
-                    waitingDialog.hide();
+                    // waitingDialog.hide();
                     signatoryConfigForm(0, reportName);
                     var signatoryNumber = $('#signatory-number').val();
                     $('#signatory-number').val(signatoryNumber - 1)
@@ -277,7 +277,7 @@
                     });
                 },
                 error: function(data) {
-                    waitingDialog.hide();
+                    // waitingDialog.hide();
                     // alert(JSON.stringify(data));
                 }
             })
