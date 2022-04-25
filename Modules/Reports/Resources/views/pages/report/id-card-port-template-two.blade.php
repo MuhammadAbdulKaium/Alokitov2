@@ -364,12 +364,9 @@
 							<br>
 							<br>
 							<p class="text-center">
-								@if($templateProfile->signature!=null)
-									<img class="temp_one_principal_sig" style="height: 30px" width="45px"
-										 src="{{public_path().'/assets/signature',$templateProfile->signature}}">
-								@else
+
 									..........................
-									@endif
+
 
 								 <br/>Principal
 							</p>

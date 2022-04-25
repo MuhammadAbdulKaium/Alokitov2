@@ -56,10 +56,11 @@
                             <li @if($page == "documents") class="active" @endif id="#">
                                 <a href="{{url('/reports/documents')}}">Documents</a>
                             </li>
+
+                            @role(['super-admin'])
                             <li @if($page == "admit-card") class="active" @endif id="#">
                                 <a href="{{url('/reports/admit-card')}}">Admit Card</a>
                             </li>
-                            @role(['super-admin'])
                             <li @if($page == "sitplan") class="active" @endif id="#">
                                 <a href="{{url('/reports/sitplan')}}">Seat Plan</a>
                             </li>
