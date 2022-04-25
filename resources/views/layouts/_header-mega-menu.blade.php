@@ -501,53 +501,45 @@ background:#0b460b !important;
                   <li><a href="#"><span class="fa fa-line-chart icon-margin"></span> Reports and Printing <span class="caret"></span></a>
 
                      <ul class="dropdown-menus">
-                        <li><a href="#"><i class="fa fa-puzzle-piece" aria-hidden="true"></i> SOP Setup <span class="caret"></span></a>
-
+                        <li><a href="/reports/academics"><i class="fa fa-line-chart"></i>Academics<span class="caret"></span></a>
                            <ul class="dropdown-menus">
-                              <li><a href="/reports/academics"><i class="fa fa-line-chart"></i>Academics<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Student Reports</a></li>
-                                    <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Teacher Reports</a></li>
-                                    <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Parents Reports</a></li>
-                                    <li><a href="/reports/id-card"><i class="fa fa-bar-chart"></i> ID Card</a></li>
-                                    <li><a href="/reports/sitplan"><i class="fa fa-bar-chart"></i> Seat Plan</a></li>
-                                    <li><a href="/reports/admit-card"><i class="fa fa-bar-chart"></i> Admit Card</a></li>
-                                    <li><a href="/reports/documents#transfer_certificate"><i class="fa fa-bar-chart"></i> Transfer Certificate</a></li>
-                                    <li><a href="/reports/documents"><i class="fa fa-bar-chart"></i> Testimonial</a></li>
-                                 </ul>
-                              </li>
-                              <li><a href="/reports/attendance"><i class="fa fa-building-o"></i> Attendance<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="{{url('/reports/attendance')}}"><i class="fa fa-users"></i> Student Attendance</a></li>
-                                    <li><a href="{{url('/report/attendance')}}"><i class="fa fa-users"></i> Class Section Attendance</a></li>
-                                    <li><a href="{{url('/report/attendance')}}"><i class="fa fa-users"></i> Student Absent Days Report</a></li>
-                                 </ul>
-                              </li>
-                              <li><a href="/reports/result"><i class="fa fa-check-square-o"></i> Result<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="/reports/result"><i class="fa fa-file"></i> Report Card (Details)</a></li>
-                                    <li><a href="/reports/result"><i class="fa fa-file"></i> Report Card (Summary)</a></li>
-                                 </ul>
-                              </li>
-                              <li><a href="/reports/admission"><i class = "fa fa-calendar-o" aria-hidden="true"></i> Admission<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="/reports/admission"><i class = "fa fa-bank" aria-hidden="true"></i> Admission Reports</a></li>
-                                 </ul>
-                              </li>
-                              <li><a href="/reports/fees"><i class="fa fa-check-square-o"></i> Fees And Invoice<span class="caret"></span></a>
-                                 <ul class="dropdown-menus">
-                                    <li><a href="/fees/report/date-wise-fees"><i class="fa fa-money"></i>Fees Reports (Daily)</a></li>
-                                    <li><a href="/reports/fees"><i class="fa fa-money"></i> Fees Report (Details)</a></li>
-                                    <li><a href="/reports/invoice"><i class="fa fa-money"></i> Invoice Report</a></li>
-                                    <li><a href="/fees/report/index"><i class="fa fa-money"></i> Fees Reports (Level Wise)</a></li>
-                                 </ul>
-                              </li>
-                           </ul>
+                              <li><a href="/reports/academics"><i class="fa fa-bar-chart"></i> Academics Reports</a></li>
 
+                              <li><a href="/reports/id-card"><i class="fa fa-bar-chart"></i> ID Card</a></li>
+
+                              <li><a href="/reports/documents#transfer_certificate"><i class="fa fa-bar-chart"></i> Transfer Certificate</a></li>
+                              <li><a href="/reports/documents"><i class="fa fa-bar-chart"></i> Testimonial</a></li>
+                           </ul>
                         </li>
-                        <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i>  Operations <span class="caret"></span></a></li>
-                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
-                     </ul>
+                        @if($user->hasRole('super-admin'))
+                        <li><a href="/reports/attendance"><i class="fa fa-building-o"></i> Attendance<span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="{{url('/reports/attendance')}}"><i class="fa fa-users"></i> Student Attendance</a></li>
+                              <li><a href="{{url('/report/attendance')}}"><i class="fa fa-users"></i> Class Section Attendance</a></li>
+                              <li><a href="{{url('/report/attendance')}}"><i class="fa fa-users"></i> Student Absent Days Report</a></li>
+                           </ul>
+                        </li>
+                        <li><a href="/reports/result"><i class="fa fa-check-square-o"></i> Result<span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="/reports/result"><i class="fa fa-file"></i> Report Card (Details)</a></li>
+                              <li><a href="/reports/result"><i class="fa fa-file"></i> Report Card (Summary)</a></li>
+                           </ul>
+                        </li>
+                        <li><a href="/reports/admission"><i class = "fa fa-calendar-o" aria-hidden="true"></i> Admission<span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="/reports/admission"><i class = "fa fa-bank" aria-hidden="true"></i> Admission Reports</a></li>
+                           </ul>
+                        </li>
+                        <li><a href="/reports/fees"><i class="fa fa-check-square-o"></i> Fees And Invoice<span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="/fees/report/date-wise-fees"><i class="fa fa-money"></i>Fees Reports (Daily)</a></li>
+                              <li><a href="/reports/fees"><i class="fa fa-money"></i> Fees Report (Details)</a></li>
+                              <li><a href="/reports/invoice"><i class="fa fa-money"></i> Invoice Report</a></li>
+                              <li><a href="/fees/report/index"><i class="fa fa-money"></i> Fees Reports (Level Wise)</a></li>
+                           </ul>
+                        </li>
+                           @endif
+                       </ul>
 
                   </li>
                   {{-- <li><a href="#"><span class="fa fa-wrench icon-margin"></span> Administration <span class="caret"></span></a>
