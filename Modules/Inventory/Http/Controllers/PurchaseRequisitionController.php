@@ -17,7 +17,10 @@ use App\Helpers\InventoryHelper;
 use App\User;
 use Illuminate\Validation\Rule;
 use DateTime;
-
+use App;
+use App\Http\Controllers\Helpers\AcademicHelper;
+use Modules\Accounts\Entities\SignatoryConfig;
+use Modules\Setting\Entities\Institute;
 
 class PurchaseRequisitionController extends Controller
 {
@@ -27,9 +30,10 @@ class PurchaseRequisitionController extends Controller
      */
 
     use InventoryHelper;
-
-    public function __construct(Request $request)
+    private $academicHelper;
+    public function __construct(Request $request, AcademicHelper $academicHelper)
     {
+        $this->academicHelper = $academicHelper;
         $this->middleware(function ($request, $next) {
             $user_id = Auth::user()->id;
             $this->AccessStore = self::UserAccessStore($user_id);
@@ -424,6 +428,36 @@ class PurchaseRequisitionController extends Controller
             $data = ['status'=>0, 'message'=>"voucher not found"];
         }
         return response()->json($data);
+    }
+    public function print($id)
+    {
+        $item_list = self::getItemList($this);
+        $item_ids = $item_list->pluck('item_id')->all();
+        $voucherInfo  = PurchaseRequisitionInfoModel::module()->valid()
+            ->join('setting_campus', 'setting_campus.id', '=', 'inventory_purchase_requisition_info.campus_id')
+            ->leftJoin('users', 'inventory_purchase_requisition_info.requisition_by', '=', 'users.id')
+            ->select('inventory_purchase_requisition_info.*', DB::raw("DATE_FORMAT(date,'%d/%m/%Y') AS req_date, DATE_FORMAT(due_date,'%d/%m/%Y') AS due_date_formate"), 'users.name', 'setting_campus.name as campus_name')
+            ->where('inventory_purchase_requisition_info.id', $id)
+            ->first();
+        if (!empty($voucherInfo)) {
+            $voucherDetailsData = PurchaseRequisitionDetailsModel::module()->itemAccess($item_ids)->valid()
+                ->join('cadet_stock_products', 'cadet_stock_products.id', '=', 'inventory_purchase_requisition_details.item_id')
+                ->join('cadet_inventory_uom', 'cadet_inventory_uom.id', 'cadet_stock_products.unit')
+                ->select('inventory_purchase_requisition_details.*', 'cadet_stock_products.product_name', 'cadet_inventory_uom.symbol_name as uom', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'))
+                ->where('req_id', $id)->get();
+        }
+        $institute = Institute::findOrFail(self::getInstituteId());
+        $pdf = App::make('dompdf.wrapper');
+        $signatories = SignatoryConfig::with('employeeInfo.singleUser', 'employeeInfo.singleDesignation', 'employeeInfo.singleDepartment')->where([
+            ['reportName', 'purchase-requisition'],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()]
+        ]);
+        $totalSignatory = $signatories->count();
+        $signatories = $signatories->get();
+
+        $pdf->loadView('inventory::purchase.purchaseRequisition.purchase-requisition-print', compact('voucherDetailsData', 'voucherInfo', 'institute', 'totalSignatory', 'signatories'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
     }
 
     public function voucherApproval(Request $request, $id=0)

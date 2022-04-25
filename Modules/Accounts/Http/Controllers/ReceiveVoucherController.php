@@ -20,6 +20,8 @@ use App\Helpers\AccountsHelper;
 use App\User;
 use Illuminate\Validation\Rule;
 use DateTime;
+use App;
+use Modules\Accounts\Entities\SignatoryConfig;
 
 class ReceiveVoucherController extends Controller
 {
@@ -591,5 +593,58 @@ class ReceiveVoucherController extends Controller
         return response()->json($output);
     }
 
+    public function print($id)
+    {
+        $voucherInfo = AccountsTransactionModel::findOrFail($id);
+        $voucherInfo->trans_date = DateTime::createFromFormat('Y-m-d', $voucherInfo->trans_date)->format('d/m/Y');
+        $voucherDebitData = SubsidiaryCalculationModel::where('transaction_id', $id)->where('tras_ledger_type', 'debit')->get();
+        $voucherCreditData = SubsidiaryCalculationModel::where('transaction_id', $id)->where('tras_ledger_type', 'credit')->get();
 
+        $dr_ledger_ids = $voucherDebitData->pluck('sub_ledger')->all();
+        $cr_ledger_ids = $voucherCreditData->pluck('sub_ledger')->all();
+        $merge_ledger_ids = collect($dr_ledger_ids)->merge($cr_ledger_ids)->all();
+        $ledger_ids = collect($merge_ledger_ids)->unique()->values()->all();
+        $chartOfAccounts = ChartOfAccount::whereIn('id', $ledger_ids)->get()->keyBy('id')->all();
+
+        $totalDebit = 0;
+        foreach ($voucherDebitData as $v) {
+            $totalDebit += $v->debit_amount;
+            $dr_accounts = $chartOfAccounts[$v->sub_ledger];
+            $v->dr_accountCode = '[' . $dr_accounts->{$this->acc_code_col} . '] ' . $dr_accounts->account_name;
+            $v->dr_amount = $v->debit_amount;
+            $v->dr_sub_ledger = $v->sub_ledger;
+            $v->cr_sub_ledger = (!empty($v->particular_sub_ledger_id)) ? $v->particular_sub_ledger_id : 0;
+        }
+        $totalCredit = 0;
+        foreach ($voucherCreditData as $v) {
+            $totalCredit += $v->credit_amount;
+            $cr_accounts = $chartOfAccounts[$v->sub_ledger];
+            $v->cr_accountCode = '[' . $cr_accounts->{$this->acc_code_col} . '] ' . $cr_accounts->account_name;
+            $v->cr_amount = $v->credit_amount;
+            $v->cr_sub_ledger = $v->sub_ledger;
+            $v->dr_sub_ledger = (!empty($v->particular_sub_ledger_id)) ? $v->particular_sub_ledger_id : 0;
+        }
+        $voucherInfo->voucherDebitData = $voucherDebitData;
+        $voucherInfo->voucherCreditData = $voucherCreditData;
+        $voucherInfo->totalDebit = $totalDebit;
+        $voucherInfo->totalCredit = $totalCredit;
+        $data['formData'] = $voucherInfo;
+        $institute = Institute::findOrFail(self::getInstituteId());
+
+        $data['formData']['institute_name'] = $institute->institute_name;
+        $data['formData']['institute_logo'] = $institute->logo;
+        $data['formData']['institute_address1'] = $institute->address1;
+        $data['formData']['institute_address2'] = $institute->address2;
+        $data['formData']['campus'] = Campus::findOrFail(self::getCampusId())->name;
+        $signatories = SignatoryConfig::with('employeeInfo.singleUser', 'employeeInfo.singleDesignation', 'employeeInfo.singleDepartment')->where([
+            ['reportName','receive'],
+            ['campus_id',self::getCampusId()],
+            ['institute_id',self::getInstituteId()]
+        ]);
+        $totalSignatory = $signatories->count();
+        $signatories = $signatories->get();
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('accounts::receive-voucher.receive-voucher-pdf', compact('data', 'totalSignatory', 'signatories'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
 }

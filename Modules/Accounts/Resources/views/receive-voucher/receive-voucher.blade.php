@@ -63,7 +63,13 @@
                                 
                             </div>
                             <div class="row" style="margin-bottom: 10px">
-                                <div class="col-sm-10"></div>
+                                <div class="col-sm-9"></div>
+                                <div class="col-sm-1">
+                                    <a class="btn btn-success btn-xs"
+                                    href="{{url('accounts/signatory-config-data',"receive")}}"
+                                    data-target="#globalModal" data-toggle="modal"
+                                    data-modal-size="modal-lg">signatory-config</a>
+                                </div>
                                 <div class="col-sm-1">
                                     <button class="btn btn-primary" @click="getResults(1)"><i class="fa fa-search"></i> Search</button>
                                 </div>
@@ -458,6 +464,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" @click="print('receive-voucher/'+formData.id)">
+                        <span><i class="fa fa-print"></i> Print</span>
+                    </button>
                     <button type="button" class="btn" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -466,7 +475,20 @@
 
 
 </div>
-
+{{-- signatoryConfig Modal --}}
+<div class="modal" id="globalModal" tabindex="-1" role="dialog" aria-labelledby="esModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="loader">
+                    <div class="es-spinner">
+                        <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+   </div>
+</div>
 @endsection
 
 

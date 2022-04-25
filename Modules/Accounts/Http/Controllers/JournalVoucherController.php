@@ -19,6 +19,7 @@ use Modules\Setting\Entities\Institute;
 use App;
 use PDF;
 use DateTime;
+use Modules\Accounts\Entities\SignatoryConfig;
 
 class JournalVoucherController extends Controller
 {
@@ -567,8 +568,16 @@ class JournalVoucherController extends Controller
         $data['formData']['institute_address2'] = $institute->address2;
         $data['formData']['campus'] = Campus::findOrFail(self::getCampusId())->name;
 
+        $signatories = SignatoryConfig::with('employeeInfo.singleUser', 'employeeInfo.singleDesignation', 'employeeInfo.singleDepartment')->where([
+            ['reportName','journal'],
+            ['campus_id',self::getCampusId()],
+            ['institute_id',self::getInstituteId()]
+        ]);
+        $totalSignatory = $signatories->count();
+         $signatories = $signatories->get();
+        // return view('accounts::journal-voucher.journal-voucher-pdf', compact('data','totalSignatory','signatories'));
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('accounts::journal-voucher.journal-voucher-pdf', compact('data'))->setPaper('a4', 'portrait');
+        $pdf->loadView('accounts::journal-voucher.journal-voucher-pdf', compact('data', 'totalSignatory', 'signatories'))->setPaper('a4', 'portrait');
         return $pdf->stream();
     }
 }
