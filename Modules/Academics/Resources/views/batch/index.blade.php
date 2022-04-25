@@ -66,7 +66,7 @@
                                         <tr class="gradeX">
                                             <td>{{$i++}}</td>
                                             {{--<td>{{$values->academicsYear()->year_name}}</td>--}}
-                                            <td>{{$values->academicsLevel()->level_name}}</td>
+                                            <td>@if ($values->academicsLevel()){{$values->academicsLevel()->level_name}}@endif</td>
                                             <td>{{$values->batch_name}}</td>
                                             <td>{{$values->batch_alias}}</td>
                                             {{-- <td>{{isset($values->division_id)?$values->division()->name:'-'}}</td> --}}

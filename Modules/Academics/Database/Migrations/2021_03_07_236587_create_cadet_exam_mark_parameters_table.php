@@ -21,8 +21,6 @@ class CreateCadetExamMarkParametersTable extends Migration
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();
             $table->integer('deleted_by')->nullable();
-            $table->integer('campus_id');
-            $table->integer('institute_id');
         });
     }
 

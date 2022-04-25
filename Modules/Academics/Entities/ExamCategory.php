@@ -8,11 +8,7 @@ class ExamCategory extends Model
 {
     protected $table = 'cadet_exam_category';
 
-    protected $fillable = [
-        'exam_category_name',
-        'campus',
-        'institute',
-    ];
+    protected $guarded = [];
 
     public function examNames()
     {

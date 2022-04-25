@@ -47,7 +47,7 @@
 						      <li class="@if($page == 'addresses')active @endif"><a href="/student/profile/addresses/{{$personalInfo->id}}">Address</a></li>
 						      <li class="@if($page == 'guardians')active @endif"><a href="/student/profile/guardians/{{$personalInfo->id}}">Family</a></li>
 							<li class="@if($page == 'academics')active @endif"><a href="/student/profile/academic/{{$personalInfo->id}}">Academics</a></li>
-								<li class="@if($page == 'academics')active @endif"><a href="/student/profile/academic2/{{$personalInfo->id}}">Academics.</a></li>
+							<li class="@if($page == 'examResult')active @endif"><a href="/student/profile/academic2/{{$personalInfo->id}}">Exam-Result</a></li>
 						      {{-- <li class="@if($page == 'performance')active @endif"><a href="/student/profile/factor/{{$personalInfo->id}}/1">Performance (Co-Curricular)</a></li>
 						      <li class="@if($page == 'performanceExtra')active @endif"><a href="/student/profile/factor/{{$personalInfo->id}}/9">Performance (Extra-Curricular)</a></li>
 							  <li class="@if($page == 'psychology')active @endif"><a href="/student/profile/factor/{{$personalInfo->id}}/2">Psychology</a></li>

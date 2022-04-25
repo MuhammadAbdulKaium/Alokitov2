@@ -21,23 +21,23 @@ class ExamName extends Model
     protected $casts = [
         'classes' => 'array',
     ];
-    private function ordinal($number) {
-        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
-        if ((($number % 100) >= 11) && (($number%100) <= 13))
-            return $number. 'th';
+    private function ordinal($number)
+    {
+        $ends = array('th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th');
+        if ((($number % 100) >= 11) && (($number % 100) <= 13))
+            return $number . 'th';
         else
-            return $number. $ends[$number % 10];
+            return $number . $ends[$number % 10];
     }
 
     public function ExamCategory()
     {
-        return $this->hasOne(ExamCategory::class,'id','exam_category_id');
+        return $this->belongsTo(ExamCategory::class, 'exam_category_id', 'id');
     }
 
     public function Term()
     {
-        return $this->hasOne(Semester::class,'id','term_id');
-
+        return $this->hasOne(Semester::class, 'id', 'term_id');
     }
 
     public function houseWisePosition($academicYearId, $semesterId)
@@ -77,5 +77,4 @@ class ExamName extends Model
 
         return $positions;
     }
-
 }

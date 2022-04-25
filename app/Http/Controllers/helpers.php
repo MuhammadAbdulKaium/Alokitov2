@@ -400,3 +400,52 @@ function ordinal($number) {
     else
         return $number. $ends[$number % 10];
 }
+
+function grade($allGrades, $mark)
+{
+    $mark = round($mark);
+    $grades = $allGrades->where('min_per', '<=', $mark)->where('max_per', '>=', $mark);
+    if (sizeof($grades) > 0) {
+        foreach ($grades as $key => $grade) {
+            return $grade->name;
+        }
+    } else {
+        return "";
+    }
+}
+
+function gradePoint($allGrades, $mark)
+{
+    $mark = round($mark);
+    $grades = $allGrades->where('min_per', '<=', $mark)->where('max_per', '>=', $mark);
+    if (sizeof($grades) > 0) {
+        foreach ($grades as $key => $grade) {
+            return $grade->points;
+        }
+    } else {
+        return "";
+    }
+}
+
+function sum_time()
+{
+    $i = 0;
+    foreach (func_get_args() as $time) {
+        sscanf($time, '%d:%d', $hour, $min);
+        $i += $hour * 60 + $min;
+    }
+    if ($h = floor($i / 60)) {
+        $i %= 60;
+    }
+    return sprintf('%02d:%02d', $h, $i);
+}
+
+function numToMonth($num)
+{
+    $months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    if (isset($months[$num])) {
+        return $months[$num];
+    } else {
+        return "";
+    }
+}

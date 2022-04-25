@@ -16,6 +16,11 @@
         .sorted_table tr {
             cursor: pointer;
         }
+
+        .select2-container{
+            width: 100% !important;
+            /* min-width: 150px; */
+        }
     </style>
 
     <!-- DataTables -->
@@ -72,7 +77,7 @@
 
                     <ul class="nav nav-tabs">
                         <li class="my-tab active"><a data-toggle="tab" href="#class_subject">Class Subject</a></li>
-                        <li class="my-tab"><a data-toggle="tab" href="#fourth_subject">Fourth Subject</a></li>
+                        <li class="my-tab"><a data-toggle="tab" href="#fourth_subject">Variable Subject</a></li>
                     </ul>
 
                     <br/>
@@ -109,6 +114,9 @@
             </div>
         </div>
     </div>
+    <select name="teachers" class="form-control" multiple>
+        <option value=""></option>
+    </select>
 @endsection
 
 @section('scripts')
@@ -120,12 +128,10 @@
 
     {{--page script--}}
     <script type="text/javascript">
-
         var my_group_list = '<option value="0" selected>N/A</option>';
-
+        var teacherList = {!! $teacherList !!};
 
         $(document).ready(function () {
-
             $('#count_all_class_subject').click(function () {
                 // checking is checked or not
                 if ($(this).is(':checked')) {
@@ -178,6 +184,21 @@
 
             // set submit button disable
             sbmitButtonStatus();
+
+            $(document).on('change', '#batch_id', function (param) {
+                // remove previous all table row
+                $("#tableBody").html('');
+                // remove previous all checked subjects
+                $(":checkbox").prop( "checked", false);
+                // set counter default value
+                $("#tr_count").val(0);
+
+                // append table rows
+                $("#tableHead").addClass('hide');
+                $("#tableBody").addClass('hide');
+                $("#tableFoot").addClass('hide');
+                $(":submit").addClass("hide");
+            });
 
             // request for sction subject list using section id
             $(document).on('change','.section_id',function(){
@@ -259,7 +280,6 @@
                 },
 
                 success:function(responseData){
-
                     var data = responseData.class_sub_list;
                     sub_group = responseData.sub_group_list;
 
@@ -279,16 +299,37 @@
                             var teacher = data[i].teacher;
                             var viewTeacher = null;
                             var sub_count_check = (data[i].is_countable==1?'checked':'');
-                            if(teacher>0){
-                                viewTeacher = '<a href="/academics/manage/subjcet/teacher/assign/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">Assign</a><a id="view_'+data[i].id+'" href="/academics/manage/subjcet/teacher/view/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"> / View</a>'
-                            }else{
-                                viewTeacher =  '<a href="/academics/manage/subjcet/teacher/assign/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">Assign</a>'
-                            }
+                            // if(teacher>0){
+                            //     viewTeacher = '<a href="/academics/manage/subjcet/teacher/assign/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">Assign</a><a id="view_'+data[i].id+'" href="/academics/manage/subjcet/teacher/view/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md"> / View</a>'
+                            // }else{
+                            //     viewTeacher =  '<a href="/academics/manage/subjcet/teacher/assign/'+data[i].id+'" data-target="#globalModal" data-toggle="modal" data-modal-size="modal-md">Assign</a>'
+                            // }
+
+                            let teacherOptions = "";
+                            var teacherSelected = "";
+                            teacherList.forEach(teacher => {
+                                teacherSelected = (data[i].teacherIds.includes(teacher.id))?"selected":"";
+                                teacherOptions += '<option value="'+teacher.id+'" '+teacherSelected+'>'+teacher.first_name+' ('+teacher.single_user.username+')</option>';
+                            });
+
+                            viewTeacher = '<select class="form-control subject-teacher-list" name="subject'+data[i].subjectId+'[teachers][]" multiple>'+teacherOptions+'</select>';
 
                             // cs id
                             var cs_id = is_copy?0:data[i].id;
                             // table row
-                            td += '<tr class="item" id="row_'+data[i].subjectId+'"><td><input type="hidden" name="subject'+data[i].subjectId+'[is_countable]" value="0"><input type="checkbox" class="is_countable" name="subject'+data[i].subjectId+'[is_countable]" value="1" '+sub_count_check+'></td><td><input id="cs_id_'+data[i].subjectId+'" type="hidden" name="subject'+data[i].subjectId+'[cs_id]" value="'+cs_id+'">'+data[i].subjectName+'<input type="hidden" name="subject'+data[i].subjectId+'[id]" value="'+data[i].subjectId+'"><input type="hidden" id="sort_'+data[i].subjectId+'" name="subject'+data[i].subjectId+'[sort_order]" value="'+data[i].sortOrder+'"></td> <td><input class="form-control" type="text" name="subject'+data[i].subjectId+'[code]" value="'+data[i].subjectCode+'" required></td>  <td><input class="form-control" type="text" name="subject'+data[i].subjectId+'[pass_mark]" value="'+data[i].subjectPassMark+'" required></td><td><input class="form-control" type="text" name="subject'+data[i].subjectId+'[exam_mark]" value="'+data[i].subjectExamMark+'" required></td> <td><select id="subject_type'+data[i].subjectId+'" class="form-control" name="subject'+data[i].subjectId+'[type]" required><option value="0" selected> N/A</option><option value="1">Compulsory</option><option value="2">Elective</option><option value="3">Optional</option></select></td><td><select id="subject_group'+data[i].subjectId+'" class="form-control" name="subject'+data[i].subjectId+'[group]" required>'+my_group_list+'</select></td><td><select id="subject_list'+data[i].subjectId+'" class="form-control" name="subject'+data[i].subjectId+'[list]" required><option value="0" selected> N/A</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></td><td>'+viewTeacher+'</td> </tr>';
+                            td += '<tr class="item" id="row_'+data[i].subjectId+'"><td><input type="hidden" name="subject'+data[i].subjectId+
+                                '[is_countable]" value="0"><input type="checkbox" class="is_countable" name="subject'+data[i].subjectId+
+                                '[is_countable]" value="1" '+sub_count_check+'></td><td><input id="cs_id_'+data[i].subjectId+
+                                '" type="hidden" name="subject'+data[i].subjectId+'[cs_id]" value="'+cs_id+'">'+data[i].subjectName+
+                                '<input type="hidden" name="subject'+data[i].subjectId+'[id]" value="'+data[i].subjectId+
+                                '"><input type="hidden" id="sort_'+data[i].subjectId+'" name="subject'+data[i].subjectId+
+                                '[sort_order]" value="'+data[i].sortOrder+'"></td> <td><input class="form-control" type="text" name="subject'+
+                                data[i].subjectId+'[code]" value="'+data[i].subjectCode+'" required></td> <td><select id="subject_type'+
+                                data[i].subjectId+'" class="form-control subject_type" name="subject'+data[i].subjectId+
+                                '[type]" required><option value="0" selected> N/A</option><option value="1">Compulsory</option><option value="2">Elective</option><option value="3">Optional</option></select></td><td><select id="subject_group'+
+                                data[i].subjectId+'" class="form-control select-subject-group" name="subject'+data[i].subjectId+'[group]" required disabled>'+my_group_list+
+                                '</select></td><td><select id="subject_list'+data[i].subjectId+'" class="form-control" name="subject'+data[i].subjectId+
+                                '[list]" required><option value="0" selected> N/A</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select></td><td>'+viewTeacher+'</td> </tr>';
 
                             // marking selected the checkbox
                             $("#"+data[i].subjectId).prop( "checked", true );
@@ -325,7 +366,7 @@
                         $("#copy_from").removeAttr('disabled');
                     }
 
-
+                    $('.subject-teacher-list').select2();
                 },
 
                 error:function(data){
@@ -340,6 +381,7 @@
                 var subjectId = id+"_s";
                 var subjectName = $("#"+id+"_s").val();
                 var subjectCode = $("#"+id+"_c").val();
+                var subjectGroup = $("#"+id+"_sg").val();
                 var rowCount = parseInt(document.getElementById('tr_count').value);
                 var count = rowCount + 1;
 
@@ -348,7 +390,24 @@
                     $('#'+id).attr('name','subjects[sub_'+count+']');
                     $('#'+id).attr('value', id);
 
-                    var td = '<tr class="item" id="row_'+id+'"><td><input type="hidden" name="subject'+id+'[is_countable]" value="0"><input type="checkbox" class="is_countable" name="subject'+id+'[is_countable]" value="1" checked></td><td><input id="cs_id_'+id+'" type="hidden" name="subject'+id+'[cs_id]" value="0">'+subjectName+'<input type="hidden" name="subject'+id+'[id]" value="'+id+'"><input type="hidden" id="sort_'+id+'" name="subject'+id+'[sort_order]" value="'+(count)+'"></td> <td><input class="form-control" type="text" name="subject'+id+'[code]" value="'+subjectCode+'" required></td><td><input class="form-control" type="text" name="subject'+id+'[pass_mark]" value="33" required></td><td><input class="form-control" type="text" name="subject'+id+'[exam_mark]" value="100" required></td> <td><select class="form-control" name="subject'+id+'[type]" required><option value="0" selected> N/A </option><option value="1">Compulsory</option><option value="2">Elective</option><option value="3">Optional</option></select></td></td> <td><select class="form-control" name="subject'+id+'[group]" required>'+my_group_list+'</select></td></td> <td><select class="form-control" name="subject'+id+'[list]" required><option value="0" selected> N/A </option><option value="1">one</option><option value="2">Two</option><option value="3">Three</option></select></td><td>N/A</td> </tr>';
+                    let teacherOptions = "";
+                    teacherList.forEach(teacher => {
+                        teacherOptions += '<option value="'+teacher.id+'">'+teacher.first_name+' ('+teacher.single_user.username+')</option>';
+                    });
+
+                    viewTeacher = '<select class="form-control subject-teacher-list" name="subject'+id+'[teachers][]" multiple>'+teacherOptions+'</select>';
+
+                    var td = '<tr class="item" id="row_'+id+'"><td><input type="hidden" name="subject'+id+
+                    '[is_countable]" value="0"><input type="checkbox" class="is_countable" name="subject'+id+
+                    '[is_countable]" value="1" checked></td><td><input id="cs_id_'+id+'" type="hidden" name="subject'+id+
+                    '[cs_id]" value="0">'+subjectName+'<input type="hidden" name="subject'+id+'[id]" value="'+id+
+                    '"><input type="hidden" id="sort_'+id+'" name="subject'+id+'[sort_order]" value="'+(count)+
+                    '"></td> <td><input class="form-control" type="text" name="subject'+id+'[code]" value="'+subjectCode+
+                    '" required></td> <td><select class="form-control subject_type" name="subject'+id+
+                    '[type]" required><option value="0" selected> N/A </option><option value="1" selected>Compulsory</option><option value="2">Elective</option><option value="3">Optional</option></select></td></td> <td><select class="form-control select-subject-group" name="subject'+
+                    id+'[group]" required disabled>'+my_group_list+'</select></td> <td><select class="form-control" name="subject'+id+
+                    '[list]" required><option value="0" selected> N/A </option><option value="1">one</option><option value="2">Two</option><option value="3">Three</option></select></td><td>'+
+                    viewTeacher+'</td> </tr>';
 
                     $("#tableHead").removeClass('hide');
                     $("#tableBody").removeClass('hide');
@@ -356,6 +415,11 @@
                     $(":submit").removeClass("hide");
 
                     $("#tableBody").append(td);
+
+                    // Select subject group
+                    if (subjectGroup) {
+                        $('#row_'+id).find('.select-subject-group').val(subjectGroup).change();
+                    }
 
                     // row count
                     document.getElementById('tr_count').value =  count;
@@ -399,6 +463,7 @@
                 $(":checkbox").prop( "checked", false);
                 alert('Please select a section');
             }
+            $('.subject-teacher-list').select2();
         }
 
         // submit button diable function
@@ -498,6 +563,41 @@
                 }
             });
         });
+
+        // request for section list using batch id
+        jQuery(document).on('change','#batch_id',function(){
+            // get academic level id
+            var batch_id = $(this).val();
+            var div = $(this).parent();
+            var op="";
+
+            $.ajax({
+                url: "{{ url('/academics/get/form/from/academics-batch') }}",
+                type: 'GET',
+                cache: false,
+                data: {'id': batch_id }, //see the $_token
+                datatype: 'application/json',
+
+                beforeSend: function() {
+                    // statements
+                },
+
+                success:function(data){
+                    op+='<option value="" selected disabled>-- Select Section --</option>';
+                    for(var i=0;i<data.length;i++){
+                        op+='<option value="'+data[i].id+'">'+data[i].section_name+'</option>';
+                    }
+
+                    // set value to the academic batch
+                    $('#section_id').html("");
+                    $('#section_id').append(op);
+                },
+                error:function(){
+                    // statements
+                }
+            });
+        });
+
         // request for section list using batch id
         jQuery(document).on('change','.academicSection',function(){
             $('#fourth_subject_list_container').html('');
@@ -542,5 +642,25 @@
 
         });
 
+        $(document).on('click', '.subject_form_submit_btn', function () {
+            // make disable select fields enable
+            $('#class_subject_form').find(':input').prop('disabled', false);
+            $('#class_subject_form').submit();
+        });
+
+        $(document).on('change', '.subject_type', function () {
+            console.log("Yeah");
+            var thisTr = $(this).parent().parent();
+            var thisGroupId = thisTr.find('.select-subject-group').val();
+            var thisTypeId = $(this).val();
+
+            var allTr = $('.select-subject-group');
+
+            allTr.each((index, item) => {
+                if ($(item).val() == thisGroupId && $(item).val() != 0) {
+                    $(item).parent().parent().find('.subject_type').val(thisTypeId);
+                }
+            });
+        });  
     </script>
 @endsection

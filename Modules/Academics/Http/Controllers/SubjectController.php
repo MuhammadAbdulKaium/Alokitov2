@@ -279,11 +279,11 @@ class SubjectController extends Controller
         $subId = $request->input('sub_id');
         $subGroupId = $request->input('sub_group_id');
         // assign subject group
-        if($subGroupProfile = $this->subjectGroupAssign->where(['sub_id'=>$subId])->withTrashed()->first()){
-            $subGroupProfile->restore();
-        }else{
+        // if($subGroupProfile = $this->subjectGroupAssign->where(['sub_id'=>$subId])->withTrashed()->first()){
+        //     $subGroupProfile->restore();
+        // }else{
             $subGroupProfile = new $this->subjectGroupAssign();
-        }
+        // }
         // input details
         $subGroupProfile->sub_id = $subId;
         $subGroupProfile->sub_group_id = $subGroupId;

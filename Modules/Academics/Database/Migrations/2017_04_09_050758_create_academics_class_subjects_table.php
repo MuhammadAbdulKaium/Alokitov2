@@ -22,16 +22,17 @@ class CreateAcademicsClassSubjectsTable extends Migration
             $table->integer('subject_id')->unsigned()->default(0);
             $table->foreign('subject_id')->references('id')->on('subject')->onDelete('cascade');
             $table->string('subject_code')->default('(not set)');
-            $table->string('subject_type')->default('(not set)');
-            $table->string('subject_credit')->default('(not set)');
-            $table->integer('pass_mark')->unsigned()->default(0);
-            $table->integer('exam_mark')->unsigned()->default(0);
+            $table->string('subject_type')->default(1);
+            $table->integer('subject_group')->nullable()->default(0);
+            $table->integer('subject_list')->nullable()->default(0);
+            $table->string('subject_credit')->default(5);
             $table->integer('sorting_order')->unsigned()->default(0);
             $table->boolean('is_active')->default(0);
             $table->boolean('is_countable')->default(1);
             $table->timestamps();
             $table->softDeletes();
-
+            $table->integer('campus_id');
+            $table->integer('institute_id');
         });
     }
 

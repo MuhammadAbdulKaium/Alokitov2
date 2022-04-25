@@ -2,6 +2,7 @@
 
 namespace Modules\Academics\Http\Controllers;
 
+use App\Helpers\UserAccessHelper;
 use App\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,6 +45,7 @@ class ManageAcademicsController extends Controller
     private $attendanceUploadController;
     private $additionalSubject;
     private $subjectGroup;
+    use UserAccessHelper;
 
     public function __construct(AcademicsYear $academicYear, Batch $batch, Section $section, Division $division, Subject $subject, ClassSubject $classSubject, SubjectTeacher $subjectTeacher, EmployeeInformation $employee, AcademicHelper $academicHelper, BatchSemester $batchSemester, SectionController $sectionController, AttendanceUploadController $attendanceUploadController, AdditionalSubject $additionalSubject, SubjectGroup $subjectGroup)
     {
@@ -65,14 +67,15 @@ class ManageAcademicsController extends Controller
 
     public function index()
     {
+        return abort('404');
         $campus = $this->academicHelper->getCampus();
         $institute = $this->academicHelper->getInstitute();
         // division list
-        $divisions = $this->division->where(['campus' => $campus, 'institute' => $institute])->get();
+        $divisions = $this->division->get();
         // batches with division
-        $batchesWithoutDivision = $this->batch->where(['campus' => $campus, 'institute' => $institute])->whereNull('division_id')->orderBy('division_id')->get();
+        $batchesWithoutDivision = $this->batch->whereNull('division_id')->orderBy('division_id')->get();
         // batches without division
-        $batchesWithDivision = $this->batch->where(['campus' => $campus, 'institute' => $institute])->whereNotNull('division_id')->orderBy('division_id')->get();
+        $batchesWithDivision = $this->batch->whereNotNull('division_id')->orderBy('division_id')->get();
         // return all variables with view
         return view('academics::manage-academics.index', compact('divisions', 'batchesWithoutDivision', 'batchesWithDivision'));
     }
@@ -134,24 +137,49 @@ class ManageAcademicsController extends Controller
     }
 
     // add subject
-    public function addSubject($batchId)
+    public function addSubject(Request $request)
     {
+        $pageAccessData = self::linkAccess($request);
+
+        // return $pageAccessData;
+
+        $campusId = $this->academicHelper->getCampus();
+        $instituteId = $this->academicHelper->getInstitute();
         // section id
         $sectionId = null;
         //All Academic Level list
         $allAcademicsLevel = $this->academicHelper->getAllAcademicLevel();
         //All batch section and division list
         $allBatchSectionDivision = $this->sectionController->findBatchSection();
-        // batch profile
-        $batchProfile = $this->batch->where('id', $batchId)->first();
         // all Subjects;
-        $allSubjects = $this->subjcet->where([
-            //'academic_year'=>$this->academicHelper->getAcademicYear(),
+        $allSubjects = $this->subjcet->with('checkSubGroupAssignSingle.subjectGroupSingle')->where([
             'campus' => $this->academicHelper->getCampus(),
-            'institute' => $this->academicHelper->getInstitute()
+            'institute' => $this->academicHelper->getInstitute(),
         ])->get()->toArray();
+
+        $user = Auth::user();
+        $employeeId = ($user->employee()) ? $user->employee()->id : null;
+        $batches = $this->batch->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
+
+        if (!($user->role()->id == 1 || $user->role()->id == 6)) {
+            if ($employeeId) {
+                $batchIds = DB::table('class_teacher_assign')->where([
+                    'campus_id' => $this->academicHelper->getCampus(),
+                    'institute_id' => $this->academicHelper->getInstitute(),
+                    'teacher_id' => $employeeId,
+                    'status' => 1
+                ])->get()->groupBy('batch_id')->toArray();
+                $batches = Batch::whereIn('id', array_keys($batchIds))->get();
+            }
+        }
+
+        // teacher lists
+        $teacherList = $this->employee->with('singleUser')->where(['category' => 1, 'campus_id' => $campusId, 'institute_id' => $instituteId])->get();
         // return view with variable
-        return view('academics::manage-academics.class-subject-add', compact('batchProfile', 'sectionId', 'allSubjects', 'allBatchSectionDivision', 'allAcademicsLevel'));
+        return view('academics::manage-academics.class-subject-add', compact('pageAccessData', 'batches', 'sectionId', 'allSubjects', 'allBatchSectionDivision', 'allAcademicsLevel', 'teacherList'));
     }
 
     // storing class subject
@@ -204,16 +232,37 @@ class ManageAcademicsController extends Controller
             $classSubjectProfile->subject_group   = $subjectProfile['group'];
             $classSubjectProfile->subject_list  = $subjectProfile['list'];
             //$classSubjectProfile->subject_credit = $subjectProfile['credit'];
-            $classSubjectProfile->pass_mark = $subjectProfile['pass_mark'];
-            $classSubjectProfile->exam_mark = $subjectProfile['exam_mark'];
             $classSubjectProfile->is_countable = $subjectProfile['is_countable'];
             $classSubjectProfile->sorting_order  = $subjectProfile['sort_order'];
+            $classSubjectProfile->campus_id  = $this->academicHelper->getCampus();
+            $classSubjectProfile->institute_id  = $this->academicHelper->getInstitute();
+
             // saving classSubjectProfile
             $classSubjectProfileSubmitted = $classSubjectProfile->save();
             // checking
             if ($classSubjectProfileSubmitted) {
                 // count classSubjectProfile creation
                 $x = $x + 1;
+
+                if (isset($subjectProfile['teachers'])) {
+                    SubjectTeacher::where('class_subject_id', $classSubjectProfile->id)->whereNotIn('employee_id', $subjectProfile['teachers'])->delete();
+                    $subTeachers = SubjectTeacher::where('class_subject_id', $classSubjectProfile->id)->get();
+
+                    foreach ($subjectProfile['teachers'] as $key => $teacherId) {
+                        $prevSubTeacher = $subTeachers->firstWhere('employee_id', $teacherId);
+
+                        if (!$prevSubTeacher) {
+                            SubjectTeacher::create([
+                                'class_subject_id' => $classSubjectProfile->id,
+                                'employee_id' => $teacherId,
+                                'status' => 'PERMANENT',
+                                'is_active' => 1,
+                            ]);
+                        }
+                    }
+                } else {
+                    SubjectTeacher::where('class_subject_id', $classSubjectProfile->id)->delete();
+                }
             }
         }
 
@@ -239,8 +288,16 @@ class ManageAcademicsController extends Controller
         $campus = $this->academicHelper->getCampus();
         $institute = $this->academicHelper->getInstitute();
         // class subject profile
-        $classSubjectList = $this->classSubject->where(['class_id' => $batch, 'section_id' => $section])->orderBy('sorting_order', 'ASC')->get();
-        $subjectGroupList = $this->subjectGroup->where(['campus' => $campus, 'institute' => $institute])->get();
+        $classSubjectList = $this->classSubject->with('teachers')->where([
+            'class_id' => $batch,
+            'section_id' => $section,
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->orderBy('sorting_order', 'ASC')->get();
+        $subjectGroupList = $this->subjectGroup->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute()
+        ])->get();
 
         // checking subject group list
         if ($subjectGroupList and $subjectGroupList->count() > 0) {
@@ -264,13 +321,11 @@ class ManageAcademicsController extends Controller
                     'subjectName'   => $subject->subject()->subject_name,
                     'subjectCode'   => $subject->subject_code,
                     'subjectCredit' => $subject->subject_credit,
-                    'subjectPassMark' => $subject->pass_mark,
-                    'subjectExamMark' => $subject->exam_mark,
                     'is_countable' => $subject->is_countable,
                     'subjectType'   => $subject->subject_type,
                     'subjectGroup'   => $subject->subject_group,
                     'subjectList'   => $subject->subject_list,
-                    'teacher'       => $subject->subjectTeacher(),
+                    'teacherIds'       => $subject->teachers->pluck('employee_id'),
                 ];
             }
         }
@@ -286,9 +341,14 @@ class ManageAcademicsController extends Controller
         $class = $request->input('class_id');
         $section = $request->input('section_id');
         // response array
-      $data = array();
+        $data = array();
         // all class subject
-     $allClassSubject = $this->classSubject->where(['class_id' => $class, 'section_id' => $section])->orderBy('sorting_order', 'ASC')->get();
+        $allClassSubject = $this->classSubject->where([
+            'class_id' => $class,
+            'section_id' => $section,
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->orderBy('sorting_order', 'ASC')->get();
         // active user information
         $userInfo = Auth::user();
         // checking user role
@@ -296,8 +356,7 @@ class ManageAcademicsController extends Controller
             // find user employee profile
             $teacherInfoProfile = $userInfo->employee();
             // find class teacher subject list
-            $classTeacherSubjects = $this->subjectTeacher
-                ->where(['employee_id' => $teacherInfoProfile->id, 'is_active' => 1])->get();
+            $classTeacherSubjects = $this->subjectTeacher->where(['employee_id' => $teacherInfoProfile->id, 'is_active' => 1])->get();
             // Teacher subject looping for finding subjects of this class-section
             foreach ($classTeacherSubjects as $teacherSubject) {
                 // find class subject profile anc checking
@@ -456,7 +515,7 @@ class ManageAcademicsController extends Controller
         // find class section student list
         $studentList = $this->attendanceUploadController->stdList($academicLevel, $academicBatch, $academicSection);
         // subject group list
-        $subjectGroupList = $this->subjectGroup->where(['campus' => $campus, 'institute' => $institute])->get();
+        $subjectGroupList = $this->subjectGroup->get();
         // checking subject group list
         if ($subjectGroupList and $subjectGroupList->count() > 0) {
             // class subject group list
@@ -466,7 +525,12 @@ class ManageAcademicsController extends Controller
         }
 
         // qry marker
-        $qry = ['class_id' => $academicBatch, 'section_id' => $academicSection];
+        $qry = [
+            'class_id' => $academicBatch,
+            'section_id' => $academicSection,
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ];
         // class subject list
 
         // compulsory subject list
@@ -484,15 +548,18 @@ class ManageAcademicsController extends Controller
         $electiveSubListTwo = $this->reArrangeClassGroupSubjectList($electiveSubListTwo);
         $electiveSubListThree = $this->reArrangeClassGroupSubjectList($electiveSubListThree);
         $optionalSubList = $this->reArrangeClassGroupSubjectList($optionalSubList);
+
         // // find class section additional subjects
         $studentAdditionalSubjectList = $this->additionalSubject->where([
-            'batch' => $academicBatch, 'section' => $academicSection, 'campus' => $campus, 'institute' => $institute
+            'batch' => $academicBatch, 'section' => $academicSection
         ])->get();
         // // re-arrange student additional subject list
         $stdAddSubArrayList = $this->reArrangeStudentAdditionalSubjectList($studentAdditionalSubjectList);
 
+        $canSave = $request->can_save;
+
         // return view with batch profile variable
-        return view('academics::manage-academics.modals.class-section-fourth-subject-list', compact('studentList', 'compulsorySubList', 'electiveSubListOne', 'electiveSubListTwo', 'electiveSubListThree', 'optionalSubList', 'stdAddSubArrayList', 'subGroupArrayList', 'batchProfile'));
+        return view('academics::manage-academics.modals.class-section-fourth-subject-list', compact('studentList', 'compulsorySubList', 'electiveSubListOne', 'electiveSubListTwo', 'electiveSubListThree', 'optionalSubList', 'stdAddSubArrayList', 'subGroupArrayList', 'batchProfile', 'canSave'));
     }
 
     // re-arrange class group subject
@@ -506,7 +573,7 @@ class ManageAcademicsController extends Controller
             foreach ($classSubjectList as $subject) {
                 // checking subject group
                 if ($subject->subject_group == null || $subject->subject_group == 0) continue;
-                $groupSubArrayList[$subject->subject_group][] = $subject->id;
+                $groupSubArrayList[$subject->subject_group][] = $subject->subject_id;
             }
         }
         // return
@@ -563,8 +630,8 @@ class ManageAcademicsController extends Controller
                     $additionalSubjectProfile->batch = $academicBatch;
                     $additionalSubjectProfile->section = $academicSection;
                     $additionalSubjectProfile->a_year = $academicYear;
-                    $additionalSubjectProfile->campus = $campus;
-                    $additionalSubjectProfile->institute = $institute;
+                    // $additionalSubjectProfile->campus = $campus;
+                    // $additionalSubjectProfile->institute = $institute;
                     // save and checking
                     if ($additionalSubjectProfile->save()) {
                         $stdCount++;
@@ -663,15 +730,41 @@ class ManageAcademicsController extends Controller
     {
         $data = [];
 
-        $activity=Section::where('batch_id',$id)->get();
+        $activity = Section::where('batch_id', $id)->get();
 
-        if($activity->count() > 0){
+        if ($activity->count() > 0) {
             array_push($data, '<option value="">-- Select --</option>');
-            foreach($activity as $item)
-            {
-                array_push($data, '<option value="'. $item->id .'" data-point="'. $item->id .'">'. $item->section_name .'</option>');
+            foreach ($activity as $item) {
+                array_push($data, '<option value="' . $item->id . '" data-point="' . $item->id . '">' . $item->section_name . '</option>');
             }
         }
         return json_encode($data);
+    }
+
+    public function getFormFromAcademicsBatch(Request $request)
+    {
+        if ($request->id) {
+            $batch = Batch::findOrFail($request->id);
+            $sections = $batch->section();
+            $user = Auth::user();
+            $employeeId = ($user->employee()) ? $user->employee()->id : null;
+
+            if (!($user->role()->id == 1 || $user->role()->id == 6)) {
+                if ($employeeId) {
+                    $sectionIds = DB::table('class_teacher_assign')->where([
+                        'campus_id' => $this->academicHelper->getCampus(),
+                        'institute_id' => $this->academicHelper->getInstitute(),
+                        'teacher_id' => $employeeId,
+                        'batch_id' => $request->id,
+                        'status' => 1
+                    ])->get()->groupBy('section_id')->toArray();
+                    $sections = Section::whereIn('id', array_keys($sectionIds))->get();
+                }
+            }
+        }else{
+            $sections = [];
+        }
+
+        return $sections;
     }
 }
