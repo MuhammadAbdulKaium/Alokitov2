@@ -48,15 +48,15 @@
                     </h3>
                 </div>
                 <div class="box-body table-responsive">
-                    <form id="std_manage_search_form" method="GET" action="{{ url('/student/cadet/bulk/search') }}"
+                    <form id="std_manage_search_form" method="POST" action="{{ url('/student/cadet/bulk/search') }}"
                         target="_blank">
                         @csrf
-
+                        <input type="hidden" name="search_type" class="search_type" value="search">
                         <div class="row" style="margin-bottom: 50px">
 
                             <div class="col-sm-2">
                                 <label for="">Class*</label>
-                                <select name="classId" id="" class="form-control select-class" required>
+                                <select name="classId" id="" class="form-control select-class" >
                                     <option value="">Select Class</option>
                                     @foreach ($batches as $batch)
                                         <option value="{{ $batch->id }}">{{ $batch->batch_name }}</option>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="col-sm-2">
                                 <label for="">Section*</label>
-                                <select name="sectionId" id="" class="form-control select-section" required>
+                                <select name="sectionId" id="" class="form-control select-section">
                                     <option value="">Select Section*</option>
 
                                 </select>
@@ -76,6 +76,7 @@
                                 <label for="">Search Multiple Field</label>
                                 <select class="form-control select-form js-example-basic-multiple" name="selectForm[]"
                                     multiple="multiple" style="color: #000;">
+                                    <option value="">__Select__</option>
                                     <option value="CadetNumber">Student Number</option>
                                     <option value="FirstName">First Name</option>
                                     <option value="LastName">Last Name</option>
@@ -121,8 +122,8 @@
 
                             </div>
                             <div class="col-sm-1" style="margin-top: 25px;">
-                                <input type="reset" class="btn-primary" value="Reset" style="width: 50px">
-
+                                <button class="btn btn-sm btn-success print-btn" type="button"><i class="fa fa-print"></i>Print</button>
+                                <button class="print-submit-btn" type="submit" style="display: none"></button>
                             </div>
                         </div>
                     </form>
@@ -176,7 +177,7 @@
                     beforeSend: function() {},
 
                     success: function(data) {
-                        var txt = '<option value="0">Select Section*</option>';
+                        var txt = '<option value="">Select Section*</option>';
                         data.forEach(element => {
                             txt += '<option value="' + element.id + '">' + element
                                 .section_name + '</option>';
@@ -193,7 +194,6 @@
 
 
             var selectForm = [];
-
             function searchStudents() {
                 // var yearId = $('.select-year').val();
                 var classId = $('.select-class').val();
@@ -209,7 +209,7 @@
                             'X-CSRF-Token': $('meta[name=_token]').attr('content')
                         },
                         url: "{{ url('/student/cadet/bulk/search') }}",
-                        type: 'GET',
+                        type: 'POST',
                         cache: false,
                         data: $('form#std_manage_search_form').serialize(),
                         datatype: 'application/json',
@@ -220,7 +220,7 @@
                         },
 
                         success: function(data) {
-                            // console.log(data);
+                            console.log(data);
                             // hide waiting dialog
                             waitingDialog.hide();
                             var std_list_container_row = $('#std_list_container_row');
@@ -237,7 +237,10 @@
                             alert(JSON.stringify(data));
                         }
                     });
-
+                    // if (!newSelectForm.length > 0) {
+                    //     Swal.fire('Error!', 'Select A.Y or Ad.Y or A.l or Batch or Section Multiple Field!', 'error');
+                    // } else {
+                    // }
 
                 } else {
                     $_token = "{{ csrf_token() }}";
@@ -246,7 +249,7 @@
                             'X-CSRF-Token': $('meta[name=_token]').attr('content')
                         },
                         url: "{{ url('/student/cadet/bulk/search') }}",
-                        type: 'GET',
+                        type: 'Post',
                         cache: false,
                         data: $('form#std_manage_search_form').serialize(),
                         datatype: 'application/json',
@@ -257,7 +260,7 @@
                         },
 
                         success: function(data) {
-                            // console.log(data);
+                            console.log(data);
                             // hide waiting dialog
                             waitingDialog.hide();
                             var std_list_container_row = $('#std_list_container_row');
@@ -280,7 +283,7 @@
 
 
             $('.search-btn').click(function() {
-                $('.select-type').val('search');
+                $('.search_type').val('search');
                 searchStudents();
             });
             // bulk Edit Save
@@ -296,29 +299,25 @@
                         toast.addEventListener('mouseleave', Swal.resumeTimer)
                     }
                 });
+                $('.search_type').val('search');
                 e.preventDefault();
                 var first_name = true;
                 var language = true;
-                var userName = true;
 
                 $('input[name^=upload]').each(function() {
                     if ($(this).is(':checked')) {
                         var tr = $(this).parent().parent();
                         var languageVal = tr.find('input[name^=language]').val();
-                        if (!languageVal && selectForm?.indexOf("Language") !== -1) {
+                        if (!languageVal && selectForm.indexOf("Language") !== -1) {
                             language = false;
                         }
                         var nameVal = tr.find('input[name^=first_name]').val();
-                        if (!nameVal && selectForm?.indexOf("FirstName") !== -1) {
+                        if (!nameVal && selectForm.indexOf("FirstName") !== -1) {
                             first_name = false;
-                        }
-                        var userVal = tr.find('input[name^=user_name]').val();
-                        if (!userVal && selectForm?.indexOf("CadetNumber") !== -1) {
-                            userName = false;
                         }
                     }
                 })
-
+              
                 console.log(language);
                 // ajax request
                 if (!first_name) {
@@ -330,11 +329,6 @@
                     Toast.fire({
                         icon: "error",
                         title: "Language Field is required"
-                    });
-                } else if (!userName) {
-                    Toast.fire({
-                        icon: "error",
-                        title: "Student Number Field is required"
                     });
                 } else {
                     $.ajax({
@@ -353,7 +347,7 @@
                         success: function(data) {
                             // console.log(data);
                             waitingDialog.hide();
-                            // console.log(data);
+                            console.log(data);
                             if (data.errors) {
                                 Toast.fire({
                                     icon: 'error',
@@ -380,6 +374,13 @@
                 }
 
             });
+
+            // print click
+            $('.print-btn').click(function(){
+                $('.search_type').val("Print");
+                $('.print-submit-btn').click();
+            });
+           
 
         });
     </script>

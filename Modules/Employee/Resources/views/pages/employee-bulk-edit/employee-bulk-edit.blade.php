@@ -39,20 +39,20 @@
                     </h3>
                 </div>
                 <div class="box-body table-responsive">
-                    <form id="std_manage_search_form" method="GET" action="{{ url('/employee/bulk-edit/search') }}"
+                    <form id="std_manage_search_form" method="POST" action="{{ url('/employee/bulk-edit/search') }}"
                         target="_blank">
                         @csrf
-
+                        <input type="hidden" name="search_type" class="search_type" value="search">
                         <div class="row" style="margin-bottom: 50px">
                             <div class="col-sm-2">
-                                <select name="category" id="" class="form-control select-category" required>
+                                <select name="category" id="" class="form-control select-category">
                                     <option value="">Category*</option>
                                     <option value="1">Teaching</option>
                                     <option value="0">Non Teaching</option>
                                 </select>
                             </div>
                             <div class="col-sm-2">
-                                <select name="department" id="" class="form-control select-class " required>
+                                <select name="department" id="" class="form-control select-class ">
                                     <option value="">Select Department*</option>
                                     @foreach ($allDepartment as $department)
                                         <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -60,7 +60,7 @@
                                 </select>
                             </div>
                             <div class="col-sm-2">
-                                <select name="designation" id="selectSection" class="form-control select-section" required>
+                                <select name="designation" id="selectSection" class="form-control select-section" >
                                     <option value="">Select Designation*</option>
                                     @foreach ($allDesignation as $designation)
                                         <option value="{{ $designation->id }}">{{ $designation->name }}</option>
@@ -108,10 +108,13 @@
                                 <input type="checkbox" name="showNull" id="showNull" style="width: 15px">
                             </div>
 
-                            <div class="col-sm-1">
+                            <div class="col-sm-2">
 
                                 <button class="btn btn-sm btn-primary search-btn" type="button"><i
                                         class="fa fa-search"></i></button>
+                                <button class="btn btn-sm btn-success print-btn" type="button"><i
+                                        class="fa fa-print"></i>Print</button>
+                                <button class="print-submit-btn" type="submit" style="display: none"></button>
 
                             </div>
                         </div>
@@ -148,14 +151,14 @@
             });
 
             function searchEmployee() {
-               
+
                 $_token = "{{ csrf_token() }}";
                 $.ajax({
                     headers: {
                         'X-CSRF-Token': $('meta[name=_token]').attr('content')
                     },
                     url: "{{ url('/employee/bulk-edit/search') }}",
-                    type: 'GET',
+                    type: 'POST',
                     cache: false,
                     data: $('form#std_manage_search_form').serialize(),
                     datatype: 'application/json',
@@ -182,16 +185,16 @@
                     }
                 });
             }
-           
-           
+
+
             $('.search-btn').click(function() {
-                $('.select-type').val('search');
+                $('.search_type').val('search');
                 searchEmployee();
             });
             // employee bulk edit save
 
             $(document).on('submit', 'form#employee_bulk_edit', function(e) {
-
+                $('.search_type').val('search');
                 e.preventDefault();
                 $.ajax({
                     url: "/employee/bulk/edit/save",
@@ -230,6 +233,11 @@
                     }
                 });
             })
+             // print click
+             $('.print-btn').click(function(){
+                $('.search_type').val("Print");
+                $('.print-submit-btn').click();
+            });
 
         })
     </script>

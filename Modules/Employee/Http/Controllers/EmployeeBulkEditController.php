@@ -19,6 +19,8 @@ use Modules\Employee\Entities\EmployeeDesignation;
 use Modules\Employee\Entities\EmployeeInformation;
 use Modules\Employee\Entities\EmployeeInformationHistory;
 use Modules\Setting\Entities\Country;
+use App;
+use Modules\Setting\Entities\Institute;
 
 class EmployeeBulkEditController extends Controller
 {
@@ -364,7 +366,19 @@ class EmployeeBulkEditController extends Controller
         ])->orderBy('name', 'ASC')->get();
         $allNationality = Country::all();
         // return $allEmployee;
-        return view('employee::pages.employee-bulk-edit.employee-bulk-edit-form', compact('allEmployee', 'allRole', 'allDepartment', 'allDesignation', 'allNationality', 'selectForm'));
+        if($request->search_type == "Print"){
+            $user = Auth::user();
+             $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+             $pdf = App::make('dompdf.wrapper');
+             $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('employee::pages.employee-bulk-edit.employee-bulk-print', compact('user','institute','allEmployee', 'allRole', 'allDepartment', 'allDesignation', 'allNationality', 'selectForm'))
+            ->setPaper('a1', 'landscape');
+            return $pdf->stream();
+            // return view('employee::pages.employee-bulk-edit.employee-bulk-print', compact('user','institute','allEmployee', 'allRole', 'allDepartment', 'allDesignation', 'allNationality', 'selectForm'));
+        }else{
+            return view('employee::pages.employee-bulk-edit.employee-bulk-edit-form', compact('allEmployee', 'allRole', 'allDepartment', 'allDesignation', 'allNationality', 'selectForm'));
+
+        }
     }
 
     public function employeEdit(Request $request)
