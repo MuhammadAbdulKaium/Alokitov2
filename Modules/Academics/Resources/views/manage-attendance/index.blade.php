@@ -44,9 +44,11 @@
 
                             {{--checking user role--}}
                             @role(['super-admin','admin'])
+                            @role(['super-admin'])
                             <li @if($page == "upload") class="active" @endif>
                                 <a href="{{url('/academics/manage/attendance/upload')}}">Upload Daily Attendance</a>
                             </li>
+                            @endrole
                             <li @if($page == "report") class="active" @endif>
                                 <a href="{{url('/academics/manage/attendance/report')}}">Report</a>
                             </li>
