@@ -98,7 +98,10 @@ class TimeTableController extends Controller
     }
     public function getAll()
     {
-        return $sectionList = $this->section->with('divisions')->get();
+        return $sectionList = $this->section->with('divisions')->where([
+            'campus' => $this->academicHelper->getCampus(),
+            'institute' => $this->academicHelper->getInstitute(),
+        ])->get();
     }
 
     // class teacher assign

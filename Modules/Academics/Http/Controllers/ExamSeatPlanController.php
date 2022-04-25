@@ -42,9 +42,15 @@ class ExamSeatPlanController extends Controller
     {
         $pageAccessData = self::linkAccess($request);
 
-        $examCategories = ExamCategory::all();
+        $examCategories = ExamCategory::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
         $academicYears = $this->academicHelper->getAllAcademicYears();
-        $semesters = Semester::all();
+        $semesters = Semester::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get();
 
         return view('academics::exam.exam-seatPlan', compact('pageAccessData', 'examCategories', 'academicYears', 'semesters'));
     }
@@ -327,7 +333,10 @@ class ExamSeatPlanController extends Controller
             'academic_year_id' => $academicYear->id
         ])->get()->keyBy('id');
 
-        $exams = ExamName::all()->keyBy('id');
+        $exams = ExamName::where([
+            'campus_id' => $this->academicHelper->getCampus(),
+            'institute_id' => $this->academicHelper->getInstitute(),
+        ])->get()->keyBy('id');
 
         $examSeatPlans = ExamSeatPlan::where([
             'campus_id' => $this->academicHelper->getCampus(),
