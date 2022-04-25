@@ -22,7 +22,10 @@ use App\Helpers\InventoryHelper;
 use App\User;
 use Illuminate\Validation\Rule;
 use DateTime;
-
+use App;
+use App\Http\Controllers\Helpers\AcademicHelper;
+use Modules\Accounts\Entities\SignatoryConfig;
+use Modules\Setting\Entities\Institute;
 
 class ComparativeStatementController extends Controller
 {
@@ -31,9 +34,10 @@ class ComparativeStatementController extends Controller
      * @return Renderable
      */
     use InventoryHelper;
-
-    public function __construct(Request $request)
+    private $academicHelper;
+    public function __construct(Request $request , AcademicHelper $academicHelper)
     {
+        $this->academicHelper = $academicHelper;
         $this->middleware(function ($request, $next) {
             $user_id = Auth::user()->id;
             $this->AccessStore = self::UserAccessStore($user_id);
@@ -739,7 +743,36 @@ class ComparativeStatementController extends Controller
         }
         return response()->json($data);
     }
+    public function print($id){
+        $item_list = self::getItemList($this);
+        $item_ids = $item_list->pluck('item_id')->all();
+        $voucherInfo  = ComparativeStatementInfoModel::module()->valid()
+            ->join('setting_campus', 'setting_campus.id','=', 'inventory_comparative_statement_info.campus_id')
+            ->join('inventory_vendor_info', 'inventory_vendor_info.id','=', 'inventory_comparative_statement_info.vendor_id')
+            ->leftJoin('users', 'inventory_comparative_statement_info.instruction_of','=', 'users.id')
+            ->select('inventory_comparative_statement_info.*',DB::raw("DATE_FORMAT(date,'%d/%m/%Y') AS cs_date, DATE_FORMAT(due_date,'%d/%m/%Y') AS due_date_formate"), 'users.name', 'setting_campus.name as campus_name', 'inventory_vendor_info.name as vendor_name')
+            ->where('inventory_comparative_statement_info.id', $id)
+            ->first();
+        if(!empty($voucherInfo)){
+            $voucherDetailsData = ComparativeStatementDetailsModel::module()->itemAccess($item_ids)->valid()
+                ->join('cadet_stock_products', 'cadet_stock_products.id','=', 'inventory_comparative_statement_details_info.item_id')
+                ->join('cadet_inventory_uom', 'cadet_inventory_uom.id', 'cadet_stock_products.unit')
+                ->select('inventory_comparative_statement_details_info.*','cadet_stock_products.product_name', 'cadet_inventory_uom.symbol_name as uom', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'),'cadet_stock_products.sku')
+                ->where('cs_id', $id)->get(); 
+        }
+        $institute = Institute::findOrFail(self::getInstituteId());
+        $pdf = App::make('dompdf.wrapper');
+        $signatories = SignatoryConfig::with('employeeInfo.singleUser', 'employeeInfo.singleDesignation', 'employeeInfo.singleDepartment')->where([
+            ['reportName', 'comparative-statement'],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()]
+        ]);
+        $totalSignatory = $signatories->count();
+        $signatories = $signatories->get();
 
+        $pdf->loadView('inventory::purchase.comparativeStatement.comparative-statement-print', compact('voucherDetailsData', 'voucherInfo', 'institute', 'totalSignatory', 'signatories'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
     public function csHistory($id){
         $item_list = self::getItemList($this);
         $item_ids = $item_list->pluck('item_id')->all();

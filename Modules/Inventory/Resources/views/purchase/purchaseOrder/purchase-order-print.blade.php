@@ -1,13 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Journal Voucher</title>
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"> --}}
+    <title>Purchase order</title>
     <style>
         .clearfix {
             overflow: auto;
@@ -34,41 +32,105 @@
         }
 
         .logo {
-            width: 16%;
+            width: 12%;
             float: left;
         }
 
         .headline {
-            width: 40%;
+            width: 82%;
             float: right;
             padding: 0 20px;
-            text-align: right;
+            text-align: left;
+        }
+        td{
+            font-size: 12px;
+            padding: 3px 0;
         }
 
-        table,
-        td,
-        th {
-            border: 1px solid black;
+        a {
+            text-decoration: none
         }
+
+
 
         table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .top-left-table {
-            width: 400px;
-            float: left;
+        .top-table {
+            width: 100%;
         }
 
-        .top-right-table {
-            width: 200px;
-            float: right;
+        .top-table table {
+            /* padding: 0 15px; */
+        }
+
+        .top-table table tbody tr td {
+            padding: 8px;
+            border: 1px solid black;
+        }
+
+        /* .bottom-table {
+            width: 100%;
             overflow: hidden;
+        }
+
+        */
+        .bottom-table table {
+            border-collapse: collapse;
+
+        }
+
+        .bottom-table table th,
+        .bottom-table table td {
+            border: 1px solid #000;
+            text-align: center
+                /* padding: 10px; */
+        }
+
+        .hidden_border {
+            border-style: none !important;
+        }
+
+        .terms {
+            border-bottom: 2px solid black;
+            width: 175px;
+        }
+
+        ul {
+            color: blue;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        h1,
+        h3,
+        h4,
+        p {
+            margin: 5px 0;
+        }
+
+        h2 {
+            margin: 10px 0;
         }
 
         .text-center {
             text-align: center;
+        }
+
+        .approved {
+            text-transform: capitalize;
+            color: rgba(3, 80, 3, 0.911);
+            font-size: 18px
+        }
+
+        .pending {
+            text-transform: capitalize;
+            color: red;
+            font-size: 18px;
         }
 
         .signature {
@@ -80,7 +142,7 @@
             height: auto;
             vertical-align: top;
         }
-       
+
 
 
         .signature p {
@@ -88,12 +150,14 @@
             margin: 0;
             font-size: 12px;
         }
-        .signotry_img{
+
+        .signotry_img {
             height: 60px;
             widows: 100%;
             text-align: center;
         }
-        .signotry_img img{
+
+        .signotry_img img {
             height: 100%;
             widows: 100%;
             overflow: hidden;
@@ -101,7 +165,10 @@
 
         .footer {
             overflow: auto;
-            margin-top: 100px;
+            margin-top: 0px;
+        }
+        .cadet_Name{
+            margin-top: 0;
         }
 
     </style>
@@ -110,105 +177,193 @@
 <body>
     <div class="header clearfix">
         <div class="logo">
-            <img src="{{ public_path('assets/users/images/' . $data['formData']['institute_logo']) }}" alt="">
-            {{-- <img src="{{ asset('assets/users/images/'.$institute->logo) }}" alt=""> --}}
+            <img src="{{ public_path('assets/users/images/' . $institute->logo) }}" alt="logo">
         </div>
         <div class="headline">
-            <h5>{{ $data['formData']['institute_name'] }}</h5>
-            <p>{{ $data['formData']['institute_address1'] }}</p>
-            <p>{{ $data['formData']['institute_address2'] }}</p>
+            <h2 class="cadet_Name">{{$institute->institute_name}}({{$voucherInfo->campus_name}})</h2>
+            <p>{{ $institute->address1 }} </p>
+            <p>
+                <strong>Phone:</strong>{{ $institute->phone }} <strong>Email:</strong> <a
+                    href="{{ $institute->email }}" target="_blank">{{ $institute->email }}</a> <strong>Web:</strong>
+                <a href=" {{ $institute->website }}" target="_blank"> {{ $institute->website }}</a>
+            </p>
         </div>
     </div>
     <div class="content clearfix">
 
-        <h3 class="text-center">Journal Voucher</h3>
+        <h1 class="text-center"  style="margin-bottom: 0px; font-size:20px">Purchase Order(PO)</h1>
+        <h2 class="text-center" style="margin-top: 0; font-size:17px;">PO Category: <span
+                style="text-transform: capitalize;">{{ $voucherInfo->purchase_category }}</span> </h2>
 
         <div class="clearfix">
-            <div class="top-left-table">
+            <div class="top-table">
                 <table>
                     <tbody>
                         <tr>
-                            <td><b>Campus:</b></td>
-                            <td>{{ $data['formData']['campus'] }}</td>
+                            <td>
+                                Purchase Order No: <strong>{{ $voucherInfo->voucher_no }}</strong>
+                            </td>
+                            <td>
+                                Vendor Name: <strong>{{ $voucherInfo->vendor_name }}</strong>
+                            </td>
                         </tr>
                         <tr>
-                            <td><b>Voucher No:</b></td>
-                            <td>{{ $data['formData']['voucher_no'] }}</td>
+                            <td>
+                                References: <strong>{{ $voucherInfo->reference_type }}</strong>
+                            </td>
+                            <td>
+                                Instruction of : <strong>{{ $voucherInfo->name }}</strong>
+                            </td>
                         </tr>
                         <tr>
-                            <td><b>Reference No:</b></td>
+                            <td>
+                                Date: <strong>{{ $voucherInfo->date }}</strong>
+                            </td>
+                            <td>
+                                Institute: <strong>{{ $institute->institute_alias}}</strong> , Campus:<strong>{{ $voucherInfo->campus_name }}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Due Date: <strong>{{ $voucherInfo->due_date }}</strong>
+                            </td>
                             <td></td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
-            <div class="top-right-table">
+            <div class="bottom-table">
+                <p style="margin:13px 0; font-size:14px">Following are the List of required item List:</p>
                 <table>
-                    <tbody>
+                    <thead>
                         <tr>
-                            <th>Date:</th>
-                            <td>{{ $data['formData']['trans_date'] }}</td>
+                            <th>SL</th>
+                            <th>Item Name</th>
+                            <th>SKU</th>
+                            <th>Uom</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Discount</th>
+                            <th>Vat</th>
+                            <th>Vat Type</th>
+                            <th>Net Amount</th>
+                            <th>Refarance</th>
                         </tr>
-                       
+                    </thead>
+                    <tbody>
+                        @php
+                            $totalAmount = 0;
+                            $totalDiscount = 0;
+                            $totalVat = 0;
+                            $totalNetAmount = 0;
+                        @endphp
+                        @foreach ($voucherDetailsData as $data)
+                            {{-- {{ $data}} --}}
+                            <tr>
+                                <td>
+                                    {{ $loop->index + 1 }}
+                                </td>
+                                <td>
+                                    {{ $data->product_name }}
+                                </td>
+                                <td>
+                                    {{ $data->sku }}
+                                </td>
+                                <td>
+                                    {{ $data->uom }}
+                                </td>
+                                <td>
+                                    {{ (int) $data->pur_qty }}
+                                </td>
+                                <td>
+                                    {{ (int) $data->rate }}
+                                </td>
+                                <td>
+                                    {{ (int) $data->total_amount }}
+                                    @php
+                                        $totalAmount += $data->total_amount;
+                                    @endphp
+                                </td>
+                                <td>
+                                    {{ (int) $data->discount }}
+                                    @php
+                                        $totalDiscount += $data->discount;
+                                    @endphp
+
+                                </td>
+                                <td>
+                                    {{ (int) $data->vat_per }}
+                                    @php
+                                        $totalVat += $data->vat_per;
+                                    @endphp
+
+                                </td>
+                                <td>
+                                    {{ $data->vat_type }}
+                                </td>
+                                <td>
+                                    {{ (int) $data->net_total }}
+                                    @php
+                                        $totalNetAmount += $data->net_total;
+                                    @endphp
+                                </td>
+                                <td>
+                                    {{ $data->ref_voucher_name }}
+                                </td>
+                                {{-- <td></td> --}}
+                            </tr>
+                        @endforeach
+
+                        <tr>
+
+                            <td colspan="6" class="hidden_border"
+                                style="text-align: right; border-style: none; padding-right:10px;">Total
+                            </td>
+                            <td>
+                                {{ $totalAmount }}
+                            </td>
+                            <td>
+                                {{ $totalDiscount }}
+                            </td>
+                            <td>
+                                {{ $totalVat }}
+                            </td>
+                            <td style="border-style: none;"></td>
+                            <td>
+                                {{ $totalNetAmount }}
+                            </td>
+                            <td style="border-style: none;"></td>
+                        </tr>
                     </tbody>
                 </table>
+                <h5>Net Amount In: {{ $totalNetAmount }} Taka Only </h5>
             </div>
+            <div style="margin-top:0px">
+                <h3 class="terms">Terms & Conditions:</h3>
+                <ul>
+                    <li>1</li>
+                    <li>2</li>
+                    <li>3</li>
+                    <li>4</li>
+                    <li>5</li>
+                </ul>
+            </div>
+            <div style="margin-top:0px">
+                <h3>Approval Status:</h3>
+
+                <p>Level 1 Approval: <span class="approved">Approved</span>, by ..... on
+                    {{ date('Y-m-d H:i:s') }}</p>
+                <p>Level 1 Approval: <span class="approved">Approved</span>, by ..... on
+                    {{ date('Y-m-d H:i:s') }}</p>
+                <p>Level 1 Approval: <span class="pending">Pending</span></p>
+
+            </div>
+
         </div>
-
-        <table style="margin-top: 30px">
-            <thead>
-                <tr>
-                    <th>Accounts Head</th>
-                    <th>Debit</th>
-                    <th>Credit</th>
-                    <th>Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($data['formData']['voucherDebitData'] as $d)
-                    <tr>
-                        <td>{{ $d['dr_accountCode'] }}</td>
-                        <td style="text-align: right;">{{ $d['dr_amount'] }}</td>
-                        <td style="text-align: right;">0</td>
-                        <td>{{ $d['remarks'] }}</td>
-                    </tr>
-                @endforeach
-                @foreach ($data['formData']['voucherCreditData'] as $d)
-                    <tr>
-                        <td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ $d['cr_accountCode'] }}</td>
-                        <td style="text-align: right;">0</td>
-                        <td style="text-align: right;">{{ $d['cr_amount'] }}</td>
-                        <td>{{ $d['remarks'] }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td class="text-right"><b>Total</b></td>
-                    <td class="text-right" style="text-align: right;">{{ $data['formData']['totalDebit'] }}</td>
-                    <td class="text-right" style="text-align: right;">{{ $data['formData']['totalCredit'] }}</td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <table style="margin-top: 30px">
-            <tbody>
-                <tr>
-                    <td>Amount In Word: </td>
-                    <td><span class="in-word-amount">{{ $data['formData']['totalDebit'] }}</span></td>
-                </tr>
-                <tr>
-                    <td>Narration: </td>
-                    <td>{{ $data['formData']['remarks'] }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p style="text-align: right">For {{ $data['formData']['institute_name'] }} only.</p>
     </div>
-
-    <div class="footer clearfix">
+    <div class="footer clearfix" style="margin-top: 20px;">
         <div class="signature-row">
             @php
                 $numOfFullLineSignatories = ((int)($totalSignatory/5))*5;
@@ -342,31 +497,9 @@
             @endif
         </div>
     </div>
+    <p style="margin-top: 25px">
+        Printed from {{ $institute->institute_alias }} ICT  {{ Auth::user()->username}}, on  {{ date('Y/m/d H:i:s') }}
+    </p>
 </body>
-{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script> --}}
-{{-- <script>
-    function inWords(num) {
-        var a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ',
-            'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '
-        ];
-        var b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-        if ((num = num.toString()).length > 9) return 'overflow';
-        n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-        if (!n) return;
-        var str = '';
-        str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
-        str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
-        str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
-        str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
-        str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) +
-            'taka only. ' : '';
-        return str;
-    }
-
-    var wordAmountHolder = document.querySelector('.in-word-amount');
-    var amount = wordAmountHolder.innerHTML;
-    wordAmountHolder.innerHTML = inWords(amount);
-</script> --}}
 
 </html>

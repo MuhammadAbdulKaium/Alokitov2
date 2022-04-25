@@ -113,7 +113,7 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::post('purchase-requisition-data', ['access'=>['inventory/purchase-requisition-data/create','inventory/purchase-requisition.edit'], 'uses'=>'PurchaseRequisitionController@store']);
     Route::get('purchase-requisition-data/{id}', ['access'=>['inventory/purchase-requisition.show'], 'uses'=>'PurchaseRequisitionController@show']);
     Route::delete('purchase-requisition-data/{id}', ['access'=>['inventory/purchase-requisition.delete'], 'uses'=>'PurchaseRequisitionController@destroy']);
-
+    Route::get('purchase/requisition/print/{id}','PurchaseRequisitionController@print');
     // Comparative Statement
     Route::get('comparative-statement', 'ComparativeStatementController@page');
     Route::get('comparative-statement-create-form-data', ['access'=>['inventory/comparative-statement-data/create'], 'uses'=>'ComparativeStatementController@comparativeStatementCreateData']);
@@ -129,7 +129,7 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::get('comparative-statement-data/{id}', ['access'=>['inventory/comparative-statement.show'], 'uses'=>'ComparativeStatementController@show']);
     Route::get('comparative-statement-history/{id}', ['access'=>['inventory/comparative-statement.show'], 'uses'=>'ComparativeStatementController@csHistory']);
     Route::delete('comparative-statement-data/{id}', ['access'=>['inventory/comparative-statement.delete'], 'uses'=>'ComparativeStatementController@destroy']);
-
+    Route::get('purchase/comparative-statement/print/{id}','ComparativeStatementController@print');
 
     
     // Purchase Order
@@ -145,7 +145,8 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::post('purchase-order-data', ['access'=>['inventory/purchase-order-data/create','inventory/purchase-order.edit'], 'uses'=>'PurchaseOrderController@store']);
     Route::get('purchase-order-data/{id}', ['access'=>['inventory/purchase-order.show'], 'uses'=>'PurchaseOrderController@show']);
     Route::delete('purchase-order-data/{id}', ['access'=>['inventory/purchase-order.delete'], 'uses'=>'PurchaseOrderController@destroy']);
-
+    // Purchase Order Print
+    Route::get('purchase/order/print/{id}','PurchaseOrderController@print');
     // Purchase order receive
     Route::get('purchase-receive', 'PurchaseReceiveController@page');
     Route::get('purchase-receive-reference-list', ['access'=>['inventory/purchase-receive-data/create','inventory/purchase-receive.edit'], 'uses'=>'PurchaseReceiveController@purchaseReceiveReferenceList']);
@@ -158,6 +159,7 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::post('purchase-receive-data', ['access'=>['inventory/purchase-receive-data/create','inventory/purchase-receive.edit'], 'uses'=>'PurchaseReceiveController@store']);
     Route::get('purchase-receive-data/{id}', ['access'=>['inventory/purchase-receive.show'], 'uses'=>'PurchaseReceiveController@show']);
     Route::delete('purchase-receive-data/{id}', ['access'=>['inventory/purchase-receive.delete'], 'uses'=>'PurchaseReceiveController@destroy']);
+    Route::get('purchase/receive/print/{id}','PurchaseReceiveController@print');
     
     // Purchase return
     Route::resource('purchase-return', 'PurchaseReturnController');
@@ -174,6 +176,7 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::delete('purchase-invoice-data/{id}', ['access'=>['inventory/purchase-invoice.delete'], 'uses'=>'PurchaseInvoiceController@destroy']);
      Route::get('purchase-invoice-data/{id}', ['access'=>['inventory/purchase-invoice.show'], 'uses'=>'PurchaseInvoiceController@show']);
      Route::post('purchase-invoice-approval/{id}', ['access'=>['inventory/purchase-invoice.approval'], 'uses'=>'PurchaseInvoiceController@voucherApproval']);
+     Route::get('purchase/invoice/print/{id}','PurchaseInvoiceController@print');
 
     // Purchase Invoice end
 

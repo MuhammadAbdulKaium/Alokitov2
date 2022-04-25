@@ -67,7 +67,7 @@
                                     <v-date-picker v-model="filter.to_date" :config="dateOptions" style="width: 100%;" placeholder="To Date"></v-date-picker>
                                 </div>
                                 
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <input type="text" name="search_key" placeholder="Search by keyword" class="form-control" v-model="filter.search_key" style="width: 100%;" autocomplete="off">
                                 </div>
                                 <div class="col-sm-1">
@@ -75,6 +75,12 @@
                                 </div>
                                 <div class="col-sm-1" style="padding-left: 0">
                                     <button type="button" class="btn btn-secondary"><i class="fa fa-print"></i> Print <i class="fa fa-caret-down"></i></button>
+                                </div>
+                                <div class="col-sm-2" style="padding-left: 0">
+                                    <a class="btn btn-success btn-xs"
+                                    href="{{url('accounts/signatory-config-data',"purchase-invoice")}}"
+                                    data-target="#globalModal" data-toggle="modal"
+                                    data-modal-size="modal-lg">signatory-config</a>
                                 </div>
                             </div>
                         </form>
@@ -516,6 +522,7 @@
                 </div>
                 
                 <div class="modal-footer">
+                    <button class="btn btn-success" @click="PrintPurchase(formData.id)"> <i class="fa fa-print"></i> Print</button>
                     <button type="button" class="btn" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -525,7 +532,19 @@
       
 
 </div>
-
+<div class="modal" id="globalModal" tabindex="-1" role="dialog" aria-labelledby="esModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="loader">
+                    <div class="es-spinner">
+                        <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+   </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -580,6 +599,12 @@
       },
       
       methods:{
+        //   print 
+        PrintPurchase(id){
+            const url = this.baseUrl+'/purchase/invoice/print/'+id;
+            window.open(url, '_blank');
+            // console.log(id);
+        }, 
         addPurchaseInvoiceRefData(event){
             event.preventDefault();
             const _this = this;

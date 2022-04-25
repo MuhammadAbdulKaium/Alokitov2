@@ -58,7 +58,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts'], function () {
     Route::delete('/payment-voucher-data/{id}', 'PaymentVoucherController@destroy');
 
     Route::get('/check-acc-voucher-no', 'PaymentVoucherController@checkVoucher');
-
+    Route::get('/print/payment-voucher/{id}', 'PaymentVoucherController@print');
     // Payment Voucher End
 
     // Receive Voucher Start
@@ -71,7 +71,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts'], function () {
     Route::post('/receive-voucher-approval/{id}', 'ReceiveVoucherController@voucherApproval');
     Route::get('/receive-voucher-data/{id}', 'ReceiveVoucherController@show');
     Route::delete('/receive-voucher-data/{id}', 'ReceiveVoucherController@destroy');
-
+    Route::get('/print/receive-voucher/{id}', 'ReceiveVoucherController@print');
     // Receive Voucher End
 
 
@@ -100,8 +100,16 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts'], function () {
     Route::post('/contra-voucher-approval/{id}', 'ContraVoucherController@voucherApproval');
     Route::get('/contra-voucher-data/{id}', 'ContraVoucherController@show');
     Route::delete('/contra-voucher-data/{id}', 'ContraVoucherController@destroy');
+    Route::get('/print/contra-voucher/{id}', 'ContraVoucherController@print');
 
     // Contra Voucher End
-
+    
+    // SignatoryConfig Start
+    Route::get('/signatory-config-data/{report_name}', 'SignatoryConfigController@page');
+    Route::get('/signatory-confin-form', 'SignatoryConfigController@createForm');
+    Route::get('/signatory-confin-getdesignation', 'SignatoryConfigController@getdesignation');
+    Route::post('/signatory-confin-data/post', "SignatoryConfigController@insertSignatory");
+    Route::get('/signatory-confin-data/delete/{id}', "SignatoryConfigController@deleteSignatory");
+    // SignatoryConfig End
 
 });

@@ -28,13 +28,19 @@ use App\Helpers\InventoryHelper;
 use App\User;
 use Illuminate\Validation\Rule;
 use DateTime;
+use App;
+use App\Http\Controllers\Helpers\AcademicHelper;
+use Modules\Accounts\Entities\SignatoryConfig;
+use Modules\Setting\Entities\Institute;
 
 class PurchaseInvoiceController extends Controller
 {
 
     use InventoryHelper;
-    public function __construct(Request $request)
+    private $academicHelper;
+    public function __construct(Request $request, AcademicHelper $academicHelper)
     {
+        $this->academicHelper = $academicHelper;
         $this->middleware(function ($request, $next) {
             $user_id = Auth::user()->id;
             $this->AccessStore = self::UserAccessStore($user_id);
@@ -492,6 +498,43 @@ class PurchaseInvoiceController extends Controller
 
     }
 
+    public function print($id)
+    {
+
+        $item_list = self::getItemList($this);
+        $item_ids = $item_list->pluck('item_id')->all();
+          $voucherInfo  = PurchaseInvoiceModel::module()
+            ->join('setting_campus', 'setting_campus.id', '=', 'inventory_purchase_invoice_info.campus_id')
+            ->join('inventory_vendor_info', 'inventory_vendor_info.id', '=', 'inventory_purchase_invoice_info.vendor_id')
+            ->select('inventory_purchase_invoice_info.*', DB::raw("DATE_FORMAT(date,'%d/%m/%Y') AS pur_invoice_date, DATE_FORMAT(due_date,'%d/%m/%Y') AS due_date_formate"), 'setting_campus.name as campus_name', 'inventory_vendor_info.name as vendor_name')
+            ->where('inventory_purchase_invoice_info.id', $id)
+            ->first();
+        if (!empty($voucherInfo)) {
+            // return PurchaseInvoiceDetailsModel::all();
+            $voucherDetailsData = PurchaseInvoiceDetailsModel::module()
+                ->join('cadet_stock_products', 'cadet_stock_products.id', '=', 'inventory_purchase_invoice_details.item_id')
+                ->join('cadet_inventory_uom', 'cadet_inventory_uom.id', '=', 'cadet_stock_products.unit')
+                ->join('inventory_purchase_receive_info', 'inventory_purchase_receive_info.id', '=', 'inventory_purchase_invoice_details.reference_id')
+                ->join('inventory_purchase_receive_details', 'inventory_purchase_receive_details.id', '=', 'inventory_purchase_invoice_details.reference_details_id')
+                ->select('inventory_purchase_invoice_details.*', 'cadet_stock_products.product_name', 'cadet_stock_products.sku', DB::raw('ifnull(cadet_stock_products.decimal_point_place, 0) as decimal_point_place'), 'cadet_inventory_uom.symbol_name as uom', 'cadet_stock_products.has_fraction', 'cadet_stock_products.round_of', 'cadet_stock_products.use_serial', 'inventory_purchase_receive_details.app_rec_qty', 'inventory_purchase_receive_info.voucher_no as ref_voucher_name')
+                ->where('inventory_purchase_invoice_details.pur_invoice_id', $id)
+                ->whereIn('inventory_purchase_invoice_details.item_id', $item_ids)
+                ->orderBy('inventory_purchase_invoice_details.id', 'asc')
+                ->get();
+        }
+        $institute = Institute::findOrFail(self::getInstituteId());
+        $pdf = App::make('dompdf.wrapper');
+        $signatories = SignatoryConfig::with('employeeInfo.singleUser', 'employeeInfo.singleDesignation', 'employeeInfo.singleDepartment')->where([
+            ['reportName', 'purchase-invoice'],
+            ['campus_id', $this->academicHelper->getCampus()],
+            ['institute_id', $this->academicHelper->getInstitute()]
+        ]);
+        $totalSignatory = $signatories->count();
+        $signatories = $signatories->get();
+
+        $pdf->loadView('inventory::purchase.purchaseInvoice.purchase-invoice-print', compact('voucherDetailsData', 'voucherInfo', 'institute', 'totalSignatory', 'signatories'))->setPaper('a4', 'portrait');
+        return $pdf->stream();
+    }
     /**
      * Show the form for editing the specified resource.
      * @param int $id
