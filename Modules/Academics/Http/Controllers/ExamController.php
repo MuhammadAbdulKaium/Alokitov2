@@ -1807,6 +1807,26 @@ class ExamController extends Controller
             $pdf = App::make('dompdf.wrapper');
             $pdf->loadView('academics::exam.snippets.exam-schedule-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type'))->setPaper('a4', 'landscape');
             return $pdf->stream();
+        } else if ($type == 'print-admit') {
+            $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+            $academicsYear = AcademicsYear::findOrFail($request->yearId);
+            $semester = Semester::findOrFail($request->termId);
+            $exam = ExamName::findOrFail($request->examId);
+
+            $stdIds = StudentEnrollment::join('student_enrollment_history', 'student_enrollment_history.enroll_id', 'student_enrollments.id')
+            ->where('student_enrollment_history.academic_year', $request->yearId)->whereIn('student_enrollment_history.batch', $classes->pluck('id'))
+            ->select('student_enrollment_history.*', 'student_enrollments.std_id')->pluck('std_id');
+            $students = StudentProfileView::where([
+                'campus' => $this->academicHelper->getCampus(),
+                'institute' => $this->academicHelper->getInstitute(),
+            ])->whereIn('std_id', $stdIds)->get();
+
+            $user = Auth::user();
+            // return view('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user'));
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user'))->setPaper('a4', 'Portrait');
+            return $pdf->stream();
         } else {
             return view('academics::exam.snippets.exam-schedule-table', compact('canSave', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type'))->render();
         }

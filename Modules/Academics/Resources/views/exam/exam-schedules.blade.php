@@ -71,6 +71,7 @@
                         {{-- @if (in_array(3850 ,$pageAccessData)) --}}
                         <button class="btn btn-sm btn-primary print-schedule-button"><i class="fa fa-print"></i></button>
                         {{-- @endif --}}
+                        <button class="btn btn-sm btn-primary print-admit-button"><i class="fa fa-print"></i> Admit Card</button>
                     </div>
                 </div>
 
@@ -186,13 +187,15 @@
             scheduleFormData.examId = datas.examNameId;
 
             if (datas.yearId && datas.termId && datas.examNameId){
-                if (type == 'print') {
+                if (type == 'print' || type == 'print-admit') {
                     $('.hidden_type_field').val(type);
                     $('.hidden_year_id_field').val(datas.yearId);
                     $('.hidden_term_id_field').val(datas.termId);
                     $('.hidden_exam_id_field').val(datas.examNameId);
                     $('.hidden_subject_id_field').val(datas.subjectId);
-                    $('.hidden_class_ids_field').val(datas.classId);
+                    if (datas.classId) {
+                        $('.hidden_class_ids_field').val(datas.classId);
+                    }
 
                     $('.hidden_print_btn').click();
                 } else {
@@ -225,6 +228,7 @@
                         },
 
                         success: function (datas) {
+                            console.log(datas);
                             waitingDialog.hide();
                             $('#marksTableHolder').html(datas);
                         },
@@ -251,9 +255,14 @@
             searchSchedules('view');
         });
 
-        // View Schedules
+        // Print Schedules
         $('.print-schedule-button').click(function () {
             searchSchedules('print');
+        });
+
+        // Print Admit
+        $('.print-admit-button').click(function () {
+            searchSchedules('print-admit');
         });
 
 
