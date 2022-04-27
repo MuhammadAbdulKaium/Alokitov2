@@ -1820,12 +1820,20 @@ class ExamController extends Controller
                 'campus' => $this->academicHelper->getCampus(),
                 'institute' => $this->academicHelper->getInstitute(),
             ])->whereIn('std_id', $stdIds)->get();
+            $class = Batch::with('singleLevel')->whereIn('id', $request->classIds)->first();
+            $sections = Section::where([
+                'campus' => $this->academicHelper->getCampus(),
+                'institute' => $this->academicHelper->getInstitute(),
+            ])->get()->keyBy('id');
+            $enrollmentHistories = StudentEnrollment::join('student_enrollment_history', 'student_enrollment_history.enroll_id', 'student_enrollments.id')
+            ->where('student_enrollment_history.academic_year', $request->yearId)->whereIn('student_enrollment_history.batch', $classes->pluck('id'))
+            ->select('student_enrollment_history.*', 'student_enrollments.std_id')->get()->keyBy('std_id');
 
             $user = Auth::user();
-            // return view('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user'));
+            // return view('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user', 'class', 'enrollmentHistories', 'sections'));
             $pdf = App::make('dompdf.wrapper');
             $pdf->getDomPDF()->set_option("enable_php", true);
-            $pdf->loadView('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user'))->setPaper('a4', 'Portrait');
+            $pdf->loadView('academics::exam.snippets.admit-card-pdf', compact('institute', 'academicsYear', 'semester', 'exam', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type', 'students', 'user', 'class', 'enrollmentHistories', 'sections'))->setPaper('a4', 'Portrait');
             return $pdf->stream();
         } else {
             return view('academics::exam.snippets.exam-schedule-table', compact('canSave', 'subjectMarks', 'classes', 'markParameters', 'previousSchedules', 'type'))->render();

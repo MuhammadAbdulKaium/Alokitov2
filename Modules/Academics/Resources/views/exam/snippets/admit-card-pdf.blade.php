@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Admit Cards</title>
     <style>
         .page-break {
             page-break-after: always;
@@ -30,7 +30,7 @@
             width: 100%;
         }
         .header{
-            border-bottom: 1px solid #f1f1f1;   
+            /* border-bottom: 1px solid #f1f1f1;    */
             padding: 10px 0;
         }
         .logo{
@@ -108,22 +108,33 @@
             color: white;
             height: 50px;
         }
-
+        .student-info{
+            margin: 20px 0;
+        }
+        .student-info ul{
+            margin: 0;
+        }
+        .student-info ul li{
+            list-style: none;
+        }
         .student-info-block{
             width: 33.33%;
             float: left;
+        }
+        .student-photo{
+            padding-right: 30px;
         }
     </style>
 </head>
 <body>
     <footer>
         <div style="padding:.5rem">
-            <span  >Printed from <b>CCIS</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
+            <span >Printed from <b>CCIS</b> by {{$user->name}} on <?php echo date('l jS \of F Y h:i:s A'); ?> </span>
         </div>
         <script type="text/php">
             if (isset($pdf)) {
-                $x = 730;
-                $y = 574;
+                $x = 490;
+                $y = 820;
                 $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
                 $font = null;
                 $size = 14;
@@ -137,6 +148,15 @@
     </footer>
 
     @foreach ($students as $student)
+        @php
+            $sectionName = null;
+            if($enrollmentHistories[$student->std_id]){
+                $section = $sections[$enrollmentHistories[$student->std_id]->section];
+                if ($section) {
+                    $sectionName = $section->section_name;
+                }
+            }
+        @endphp
         <div class="header clearfix">
             <div class="logo">
                 <img src="{{ public_path('assets/users/images/'.$institute->logo) }}" alt="">
@@ -144,11 +164,6 @@
             <div class="headline">
                 <h2>{{ $institute->institute_name }}</h2>
                 <p>{{ $institute->address2 }}</p>
-            </div>
-            {{-- <div class="headline-details">
-                <p><b>Year: </b>{{ $academicsYear->year_name }}</p>
-                <p><b>Term: </b>{{ $semester->name }}</p>
-                <p><b>Exam: </b>{{ $exam->exam_name }}</p> --}}
             </div>
         </div>
 
@@ -161,23 +176,29 @@
                 <ul>
                     <li><b>Name: </b>{{ $student->first_name }} {{ $student->last_name }}</li>
                     <li><b>Year: </b>{{ $academicsYear->year_name }}</li>
-                    <li><b>Class: </b></li>
+                    <li><b>Batch: </b>{{ $class->batch_name }}</li>
+                    <li><b>Section: </b>{{ $sectionName }}</li>
                 </ul>
             </div>
             <div class="student-info-block">
                 <ul>
-                    <li><b>Roll No: </b></li>
-                    <li><b>Level: </b></li>
-                    <li><b>Semester: </b></li>
+                    <li><b>Roll No: </b>{{ $student->gr_no }}</li>
+                    <li><b>Level: </b>{{ $class->singleLevel->level_name }}</li>
+                    <li><b>Semester: </b>{{ $semester->name }}</li>
+                    <li><b>Exam: </b>{{ $exam->exam_name }}</li>
                 </ul>
             </div>
             <div class="student-info-block" style="text-align: right">
                 @if($student->singelAttachment("PROFILE_PHOTO"))
-                    <img class="center-block img-thumbnail img-responsive" src="{{public_path('assets/users/images/'.$student->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}" alt="No Image" style="width:70px;height:70px">
+                    <img class="center-block img-thumbnail img-responsive student-photo" src="{{public_path('assets/users/images/'.$student->singelAttachment('PROFILE_PHOTO')->singleContent()->name)}}" alt="No Image" style="width:70px;height:auto">
                 @else
-                    <img class="center-block img-thumbnail img-responsive" src="{{public_path('assets/users/images/user-default.png')}}" alt="No Image" style="width:70px;height:70px">
+                    <img class="center-block img-thumbnail img-responsive student-photo" src="{{public_path('assets/users/images/user-default.png')}}" alt="No Image" style="width:70px;height:auto">
                 @endif
             </div>
+        </div>
+
+        <div class="heading">
+            <h3>Exam Routine</h3>
         </div>
 
         <div class="content">
@@ -187,7 +208,7 @@
                         <th>SL</th>
                         <th>Subject</th>
                         @foreach ($classes as $class)
-                            <th>{{ $class->batch_name }}</th>
+                            <th>Date Time</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -213,9 +234,8 @@
                                         $updateStatus = true;
                                     }
                                 @endphp
-                                
-                                <td>
-                                    @if ($criterias)
+                                @if ($criterias)
+                                    <td>
                                         @foreach ($criterias as $criteria)
                                             @php
                                                 $prevScheduleByCriteria = ($prevScheduleBySubBatch)?$prevScheduleBySubBatch[$criteria->id]:null;
@@ -224,13 +244,16 @@
                                                 <span><b>{{ $criteria->name }}:</b></span>
                                                 <span>
                                                     @if ($prevScheduleByCriteria)
-                                                        {{ $prevScheduleByCriteria['date'] }}, {{ date("g:i a", strtotime($prevScheduleByCriteria['startTime'])) }} - {{ date("g:i a", strtotime($prevScheduleByCriteria['endTime'])) }}
+                                                        {{ date("d/m/Y", strtotime($prevScheduleByCriteria['date'])) }} - {{ date("g:i a", strtotime($prevScheduleByCriteria['startTime'])) }} - {{ date("g:i a", strtotime($prevScheduleByCriteria['endTime'])) }}
                                                     @endif
                                                 </span>
                                             </div>
                                         @endforeach
-                                    @endif
-                                </td>
+                                    </td>
+                                @else
+                                    <td></td>
+                                    <td></td>
+                                @endif
                             @endforeach
                         </tr>
                     @empty

@@ -197,7 +197,19 @@
                         $('.hidden_class_ids_field').val(datas.classId);
                     }
 
-                    $('.hidden_print_btn').click();
+                    if (type == 'print-admit') {
+                        if (datas.classId) {
+                            if (datas.classId.length>1) {
+                                swal("Error!", "Please choose only one class!", "error");
+                            }else{
+                                $('.hidden_print_btn').click();
+                            }
+                        }else{
+                            swal("Error!", "Please choose a class!", "error");
+                        }
+                    }else{
+                        $('.hidden_print_btn').click();
+                    }
                 } else {
                     // Ajax Request Start
                     $_token = "{{ csrf_token() }}";

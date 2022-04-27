@@ -69,6 +69,11 @@ class Batch extends Model
         }
     }
 
+    public function singleLevel()
+    {
+        return $this->belongsTo('Modules\Academics\Entities\AcademicsLevel', 'academics_level_id', 'id');
+    }
+
     public function academicsLevelAll()
     {
         // getting user info
