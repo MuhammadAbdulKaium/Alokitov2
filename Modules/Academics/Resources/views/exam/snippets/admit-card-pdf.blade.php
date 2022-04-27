@@ -133,7 +133,7 @@
         </div>
         <script type="text/php">
             if (isset($pdf)) {
-                $x = 490;
+                $x = 480;
                 $y = 820;
                 $text = "Page {PAGE_NUM} of {PAGE_COUNT}";
                 $font = null;
