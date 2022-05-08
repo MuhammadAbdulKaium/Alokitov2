@@ -556,4 +556,30 @@ class AcademicHelper extends Controller
         return $this->city->where(['state_id'=>$stateId])->get(['id', 'name']);
     }
 
+    public function stdIdsHasTheSub($batchId, $sectionId, $subjectId)
+    {
+        $stdIds = [];
+        if (is_array($batchId)) {
+            $stdSubjects = AdditionalSubject::whereIn('batch', $batchId)->get();
+        } else {
+            $stdSubjects = AdditionalSubject::where('batch', $batchId)->get();
+        }
+
+        if ($sectionId) {
+            $stdSubjects = $stdSubjects->where('section', $sectionId);
+        }
+
+        foreach ($stdSubjects as $key1 => $stdSubject) {
+            $subList = json_decode($stdSubject->sub_list, 1);
+
+            foreach ($subList as $key2 => $subIds) {
+                if (strpos($subIds, (string)$subjectId)) {
+                    $stdIds[$stdSubject->std_id] = $stdSubject->std_id;
+                }
+            }
+        }
+
+        return $stdIds;
+    }
+
 }

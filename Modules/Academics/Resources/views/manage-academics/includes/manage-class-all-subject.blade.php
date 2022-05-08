@@ -29,7 +29,7 @@
                                                     <input type="checkbox" id='{{$allSubjects[($x).""]["id"]}}' onclick="addSubject(this.id)">
                                                     <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_s' value='{{$allSubjects[($x).""]["subject_name"]}}'>
                                                     <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_c' value='{{$allSubjects[($x).""]["subject_code"]}}'>
-                                                    <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_sg' value='@if($allSubjects[($x).""]["check_sub_group_assign_single"])@if($allSubjects[($x).""]["check_sub_group_assign_single"]["subject_group_single"]){{$allSubjects[($x).""]["check_sub_group_assign_single"]["subject_group_single"]["id"]}}@endif @endif'>
+                                                    <input type="hidden" id='{{$allSubjects[($x).""]["id"]}}_sg' @if($allSubjects[($x).""]["check_sub_group_assign_single"])@if($allSubjects[($x).""]["check_sub_group_assign_single"]["subject_group_single"])value='{{$allSubjects[($x).""]["check_sub_group_assign_single"]["subject_group_single"]["id"]}}'@endif @endif>
                                                     <input type="hidden" >
                                                     {{$allSubjects[($x).""]["subject_name"]}}
                                                 </label>
