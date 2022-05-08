@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\In;
+use Modules\Academics\Entities\AttendanceViewOne;
 use Modules\Student\Entities\StudentProfileView;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -441,15 +442,13 @@ class AttendanceUploadController extends Controller
         $stdList = $this->stdList($level, $batch, $section);
         // attendance list
         $start = microtime(true);
-
-        $selectedDateAttendanceList = $this->attendanceList($attendanceDate, null, $level, $batch, $section, $academicYearId, $campusId, $instituteId);
+//return $attendanceDate;
+     $selectedDateAttendanceList = $this->attendanceList($attendanceDate, null, $level, $batch, $section,
+        $academicYearId, $campusId, $instituteId);
         // Execute the query
         $time = microtime(true) - $start;
-        Log::info("Time taken for quering database for attendance :" .$time);
-        // attendanceArrayList
         $attendanceArrayList = array();
 
-        // std and attendance list empty checking
         if($stdList AND $stdList->count()>0){
             // std list looping
             $start = microtime(true);
@@ -458,6 +457,7 @@ class AttendanceUploadController extends Controller
                 // std enrollment details
                 $stdProfileDetails = $this->stdEnrollmentDetails($stdProfile);
                 // std attendance checking
+              //  return $selectedDateAttendanceList;
                 if (array_key_exists($stdProfile->std_id, $selectedDateAttendanceList) == true) {
                     // stdAttendanceDetails
                     $stdAttendanceDetails = $selectedDateAttendanceList[$stdProfile->std_id];
@@ -465,7 +465,22 @@ class AttendanceUploadController extends Controller
                     $entryDateTime = $stdAttendanceDetails['entry_date_time'];
                     $outDateTime = $stdAttendanceDetails['out_date_time'];
                     // attendance array list
-                    $attendanceArrayList[$stdProfile->std_id] = $this->attendanceFineController->check_attendance_type($entryDateTime, $outDateTime, $stdProfileDetails,$attendanceDate);
+                   //return $stdAttendanceDetails;
+                    $type=$stdAttendanceDetails['type'];
+
+                    if($type==1) $type_det="PRESENT";
+                   else if($type==2) $type_det="PRESENT (L)";
+                    else $type_det="ABSENT";
+                    $attendanceArrayList[$stdProfile->std_id] =[
+                        'att_type' => $type_det,
+                        'att_date' => $attendanceDate,
+                        'entry_date_time' => 'N/A',
+                        'out_date_time' => 'N/A',
+                        'std_profile' => $stdProfileDetails,
+                    ];
+                  //  $this->attendanceFineController->check_attendance_type($entryDateTime, $outDateTime,
+                     //   $stdProfileDetails,$attendanceDate);
+              //return  $attendanceArrayList;
                 } else {
                     $attendanceArrayList[$stdProfile->std_id] = [
                         'att_type' => 'ABSENT',
@@ -476,6 +491,7 @@ class AttendanceUploadController extends Controller
                     ];
                 }
             }
+       //  return $attendanceArrayList;
 
             $time = microtime(true) - $start;
             Log::info("Time taken for making dataset of stuent attendace :" .$time);
@@ -486,18 +502,21 @@ class AttendanceUploadController extends Controller
             // checking requestType (view or download)
             if($requestType=='pdf'){
                 // generate pdf
-                // $pdf = App::make('dompdf.wrapper');
-                // $pdf->loadView('academics::manage-attendance.reports.report-upload-list-report')->setPaper('a4', 'portrait');
-                // return $pdf->stream();
+                $pdf = App::make('dompdf.wrapper');
+                 $pdf->loadView('academics::manage-attendance.reports.report-upload-list-report')->setPaper('a4', 'portrait');
+                 return $pdf->stream();
                 // return $pdf->download('upload_attendance_report.pdf');
 
-                $html = view('academics::manage-attendance.reports.report-upload-list-report', compact('attendanceArrayList', 'reportType', 'requestType', 'instituteInfo'));
+                $html = view('academics::manage-attendance.reports.report-upload-list-report',
+                    compact('attendanceArrayList', 'reportType', 'requestType', 'instituteInfo'));
                 $pdf = App::make('snappy.pdf.wrapper');
                 $pdf->loadHTML($html);
                 return $pdf->inline();
 
             }elseif($requestType=='xlsx'){
+
                 //generate excel
+
                 Excel::create('upload_attendance_report', function ($excel) {
                     $excel->sheet('upload_attendance_report', function ($sheet) {
                         // Font family
@@ -519,7 +538,7 @@ class AttendanceUploadController extends Controller
                 $start = microtime(true);
                 $html = view('academics::manage-attendance.modals.upload-list-report');
                 $time = microtime(true) - $start;
-                Log::info("Time taken for making HTML stuent attendace :" .$time);
+                Log::info("Time taken for making HTML student attendances :" .$time);
                 /*$file = $redis_token.'_manage-attendance.modals.upload-list-report.html';
                 Storage::put($file, $html);
                 Cache::put($redis_token, $file, 22*60);*/
@@ -528,7 +547,8 @@ class AttendanceUploadController extends Controller
             }
         }else{
             // return view with variable
-            $html = view('academics::manage-attendance.modals.upload-list-report', compact('attendanceArrayList', 'reportType'));
+            $html = view('academics::manage-attendance.modals.upload-list-report',
+                compact('attendanceArrayList', 'reportType'));
             Log::info("HTML is returned and updated cache 2");
             Cache::put($redis_token, json_encode($html), 22*60);
             return $html;
@@ -558,8 +578,11 @@ class AttendanceUploadController extends Controller
     // find attendance list
     public function attendanceList($attendanceFromDate, $attendanceToDate, $level, $batch, $section, $academicYearId, $campusId, $instituteId)
     {
+
+        $fromDateTime= Carbon::parse($attendanceFromDate)->toDateString();
+       // return gettype($fromDateTime);
         // attendance date time
-        $fromDateTime = date('Y-m-d 00:00:00', strtotime($attendanceFromDate));
+       // $fromDateTime = date('Y-m-d 00:00:00', strtotime($attendanceFromDate));
         // checking
         if($attendanceToDate==null){
             $toDateTime = date('Y-m-d 23:59:59', strtotime($attendanceFromDate));
@@ -570,12 +593,20 @@ class AttendanceUploadController extends Controller
         // qry
         $qry = ['campus'=>$campusId,'institute'=>$instituteId];
         // checking
-        if($level) $qry['level']=$level;
-        if($batch) $qry['batch']=$batch;
-        if($section) $qry['section']=$section;
+        //  if($level) $qry['level']=$level;
+       // if($batch) $qry['batch']=$batch;
+      if($batch) $qry['class_id']=$batch;
+       //if($section) $qry['section']=$section;
+       if($section) $qry['section_id']=$section;
+       //if($fromDateTime) $qry['attendance_date']=$fromDateTime;
         if($academicYearId) $qry['academic_year']=$academicYearId;
         // find attendance list
-        $attendanceList = $this->attendanceUpload->where($qry)->whereBetween('entry_date_time', array($fromDateTime, $toDateTime))->get();
+    /*  $attendanceList = $this->attendanceUpload->where($qry)->whereBetween('entry_date_time', array($fromDateTime,
+        $toDateTime))->get();*/
+        //new change 8 may 2022
+        $attendanceList = AttendanceViewOne::where($qry)->where('attendance_date',$fromDateTime)->get();
+
+
         /*if(Cache::has('attendance_'.json_encode($qry))){
             Log::info(111);
             return $attendanceList = Cache::get('attendance_'.json_encode($qry));
@@ -588,19 +619,26 @@ class AttendanceUploadController extends Controller
 
         // attendance array list
         $attendanceArrayList = array();
+       // return $attendanceList;
+
         // checking
-        if($attendanceList->count()>0){
+        if( count($attendanceList)>0){
+
+
             // checking for attendance array list type
             if(($attendanceToDate==null)){
                 // looping
                 foreach ($attendanceList as $attendance){
+                   // return $attendance;
                     // store attendance to the array list
-                    $attendanceArrayList[$attendance->std_id] = [
-                        'std_id'=> $attendance->std_id,
+                    $attendanceArrayList[$attendance->student_id] = [
+                        'std_id'=> $attendance->student_id,
+                        'type'=>$attendance->attendacnce_type,
                         'std_gr_no'=> $attendance->std_gr_no,
                         'card_no'=> $attendance->card_no,
-                        'atd_date'=> $attendance->entry_date_time?(date('Y-m-d', strtotime($attendance->entry_date_time))):'-',
-                        'entry_date_time'=> $attendance->entry_date_time?(date('h:i:s a', strtotime($attendance->entry_date_time))):'-',
+                        'atd_date'=> $attendance->attendance_date?(date('Y-m-d', strtotime($attendance->attendance_date))):'-',
+                        'entry_date_time'=> $attendance->attendance_date?(date('h:i:s a', strtotime
+                        ($attendance->attendance_date))):'-',
                         'out_date_time'=> $attendance->out_date_time?(date('h:i:s a', strtotime($attendance->out_date_time))):'-',
                     ];
                 }
@@ -610,8 +648,8 @@ class AttendanceUploadController extends Controller
                     // attendance date
                     $atdDate = $attendance->entry_date_time?(date('Y-m-d', strtotime($attendance->entry_date_time))):'-';
                     // store attendance to the array list
-                    $attendanceArrayList[$atdDate][$attendance->std_id] = [
-                        'std_id'=> $attendance->std_id,
+                    $attendanceArrayList[$atdDate][$attendance->student_id] = [
+                        'std_id'=> $attendance->student_id,
                         'std_gr_no'=> $attendance->std_gr_no,
                         'card_no'=> $attendance->card_no,
                         'entry_date_time'=> $attendance->entry_date_time?(date('h:i:s a', strtotime($attendance->entry_date_time))):'-',
@@ -621,11 +659,12 @@ class AttendanceUploadController extends Controller
             }
 
             // return attendance array list
-            Cache::put('attendance_'.json_encode($qry), $attendanceArrayList, 22*60);
+            //Cache::put('attendance_'.json_encode($qry), $attendanceArrayList, 22*60);
             return $attendanceArrayList;
         }else{
+           // return "3";
             // return false
-            return $attendanceArrayList;
+            return [];
         }
     }
 

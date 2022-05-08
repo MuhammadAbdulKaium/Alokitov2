@@ -77,7 +77,7 @@
 @if($requestType=='pdf')
 	{{--Student Infromation--}}
 	<div class="clear" style="width: 100%;">
-		<p class="label text-center row-second">Upload Report</p>
+		<p class="label text-center row-second">Attendance Report</p>
 		@endif
 
 		@if(!empty($attendanceArrayList))
@@ -87,10 +87,10 @@
 					<tr class="bg-gray-active">
 						<th width="10%">GR. NO</th>
 						<th>Full Name</th>
-						{{--<th width="20%">Class (Section)</th>--}}
+						<th width="20%">Class (Section)</th>
 						<th>Attendance Date</th>
-						<th>Entry Time</th>
-						<th>Out Time</th>
+<!--						<th>Entry Time</th>
+						<th>Out Time</th>-->
 						<th>Attendance Type</th>
 					</tr>
 				@else
@@ -109,6 +109,7 @@
 				@php $i=1; @endphp
 				@foreach ($attendanceArrayList as $key=>$attendance)
 					{{--checking report type--}}
+					`
 					@if($reportType=='ALL')
 						{{--ALL type statements--}}
 					@elseif ($reportType=='PRESENT')
@@ -121,18 +122,11 @@
 					{{--student profile--}}
 					@php $stdProfile = $attendance['std_profile'] @endphp
 					<tr class="{{$i%2==0?'bg-gray':'bg-gray-active'}}">
-						<td> {{$stdProfile->gr_no}} </td>
+						<td>{{$i}} {{--{{$stdProfile->gr_no}}--}} </td>
 						<td> {{$stdProfile->name}} </td>
-						{{--<td> {{$stdProfile->enroll}} </td>--}}
+						<td> {{$stdProfile->enroll}} </td>
 						<td> {{$attendance['att_date']}} </td>
-						<td class="{{$attendance['att_type']=='ABSENT'?'text-danger':''}}">
-							{{--checking--}}
-							@if($attendance['att_type']!='ABSENT') {{$attendance['entry_date_time']}} @else - @endif
-						</td>
-						<td class="{{$attendance['att_type']=='ABSENT'?'text-danger':''}}">
-							{{--checking--}}
-							@if($attendance['att_type']!='ABSENT') {{$attendance['out_date_time']}} @else - @endif
-						</td>
+
 						<td class="{{$attendance['att_type']=='ABSENT'?'text-danger':''}}"> {{$attendance['att_type']}} </td>
 					</tr>
 					@php $i+=1; @endphp
