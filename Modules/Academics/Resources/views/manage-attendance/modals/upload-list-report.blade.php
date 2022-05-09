@@ -4,7 +4,7 @@
 	Uploaded Attendance List
 	@if(count($attendanceArrayList)>0)
 		<span data-id="pdf" class="pull-right label label-success download-upload-attendance-report" style="margin: 5px; cursor: pointer">Download PDF</span>
-		<span data-id="xlsx" class="pull-right label label-success download-upload-attendance-report" style="margin: 5px; cursor: pointer">Download Excel</span>
+<!--		<span data-id="xlsx" class="pull-right label label-success download-upload-attendance-report" style="margin: 5px; cursor: pointer">Download Excel</span>-->
 	@endif
 </h4>
 <div class="col-md-12">
