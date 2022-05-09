@@ -2,6 +2,12 @@
 $extraCol = 2;
 $colspan = sizeof($examCategories);
 $rowNumber=0;
+$hasTermFinalExam=false;
+foreach ($examCategories as $examCategory) {
+    if ($examCategory->id == $termFinalExamCategory->id) {
+        $hasTermFinalExam=true;
+    }
+}
 @endphp
 
 <style>
@@ -155,7 +161,7 @@ $rowNumber=0;
                 @foreach ($subjectGroup as $subject)
                     @php
                         $criteriaSize = 0;
-                        if(isset($subjectMarksExamWise[$subject['id']])){
+                        if(isset($subjectMarksExamWise[$subject['id']]) && $hasTermFinalExam){
                             if ($subjectMarksExamWise[$subject['id']]->exam->ExamCategory->id == $termFinalExamCategory->id) {
                                 $marks = json_decode($subjectMarksExamWise[$subject['id']]->marks, 1);
                                 $criteriaSize = sizeof($marks['fullMarks'])-1;

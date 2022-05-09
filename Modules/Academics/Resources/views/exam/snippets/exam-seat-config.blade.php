@@ -77,7 +77,7 @@
                         <option value="">Criteria</option>
                         @isset($criteriaIds)
                             @foreach ($criteriaIds as $criteriaId)
-                                <option value="{{ $criteriaId }}" @if ($batchCriteriaId == $criteriaId) selected @endif>{{ $criterias[$criteriaId]->name }}</option>
+                                <option value="{{ $criteriaId }}" @if ($batchCriteriaId == $criteriaId) selected @endif>@isset($criterias[$criteriaId]){{ $criterias[$criteriaId]->name }}@endisset</option>
                             @endforeach
                         @endisset
                     </select>
