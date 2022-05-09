@@ -37,6 +37,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\Locale::class,
+            \App\Http\Middleware\PreventBackHistory::class
         ],
 
         'api' => [
@@ -68,6 +69,6 @@ class Kernel extends HttpKernel
         'cadet-user-permission' => \App\Http\Middleware\CadetUserPermission::class,
         'cors' => \App\Http\Middleware\CORS::class,
         'jwt.verify' =>JWTMiddleware::class,
-
+        'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
     ];
 }
