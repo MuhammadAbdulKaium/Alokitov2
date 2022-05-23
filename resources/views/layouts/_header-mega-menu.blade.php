@@ -670,12 +670,17 @@ background:#0b460b !important;
  -->
                               <li><a href="{{url('/inventory/stock-in')}}"><i class="fa fa-building"></i> Stock In</a></li>
 
-                              <li><a href="{{url('/inventory/stock-out')}}"><i class="fa fa-building"></i> Stock Out</a></li>
+                              <li><a href="{{url('/inventory/stock-out')}}"><i class="fa fa-building"></i> Stock Summary</a></li>
 
                              
                            </ul>
                         </li>
-                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a></li>
+                        <li><a href="#"><i class="fa fa-line-chart" aria-hidden="true"></i> Reports <span class="caret"></span></a>
+                           <ul class="dropdown-menus">
+                              <li><a href="{{url('/inventory/store-ledger/reports')}}"><i class="fa fa-calendar"></i> Store Ledger</a></li>
+                              <li><a href="{{url('/inventory/stock-summary/reports')}}"><i class="fa fa-calendar"></i> Stock Summary</a></li>
+                           </ul>
+                        </li>
                      </ul>
 
                   </li>
