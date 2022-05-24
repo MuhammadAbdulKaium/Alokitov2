@@ -67,12 +67,12 @@ class InventoryReportController extends Controller
         $institute = Institute::findOrFail($this->academicHelper->getInstitute());
 
         $stockGroups = $this->stockGroup->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
-        error_log('campus Id');
-        error_log($campus->id);
-        error_log('institute Id');
-        error_log($institute->id);
-        error_log('stockGroups');
-        error_log($stockGroups);
+        // error_log('campus Id');
+        // error_log($campus->id);
+        // error_log('institute Id');
+        // error_log($institute->id);
+        // error_log('stockGroups');
+        // error_log($stockGroups);
         $productCatagories = $this->stockCategory->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
         $products = $this->cadetInventoryProduct->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
         $stores = $this->inventoryStore->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
@@ -80,16 +80,19 @@ class InventoryReportController extends Controller
         return view('inventory::reports.store-ledger-reports', compact('stockGroups', 'productCatagories', 'products', 'stores'));
     }
 
-    // public function storeSearchProduct(Request $request)
-    // {
-    //     if($request->data && $request->groupId && $request->categoryId) {
+    public function storeSearchProduct(Request $request)
+    {
+        $campus = Campus::findOrFail($this->academicHelper->getCampus());
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+
+        if($request->data && $request->groupId && $request->categoryId) {
             
-    //         return CadetInventoryProduct::where('category_id', $request->categoryId)->where('stock_group', $request->groupId)->get();
-    //     }
-    //     else {
-    //         return [];
-    //     }
-    // }
+            return CadetInventoryProduct::where('category_id', $request->categoryId)->where(['stock_group' => $request->groupId, 'institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
+        }
+        else {
+            return [];
+        }
+    }
 
 
     public function storeSearchCategory(Request $request)

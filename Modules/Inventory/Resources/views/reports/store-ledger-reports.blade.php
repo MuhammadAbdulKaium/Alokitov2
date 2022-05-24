@@ -185,68 +185,69 @@
         });
 
         
-    //     $('.select-store').select2({
-    //         // placeholder: "All store",
-    //     });
+        $('.select-store').select2({
+            // placeholder: "All store",
+        });
 
-    //     $('.select-product').select2({
-    //         placeholder: "--- Select Product* ---",
-    //     });
-    //     $('.select-product-category').change(function () {
-    //         categoryId = $('.select-product-category').val();
-    //         console.log(groupId);
-    //         console.log(categoryId);
+        $('.select-product').select2({
+            placeholder: "--- Select Product* ---",
+        });
+        
+        $('.select-product-category').change(function () {
+            categoryId = $('.select-product-category').val();
+            console.log(groupId);
+            console.log(categoryId);
 
-    //         if(groupId && categoryId) {
-    //             // Ajax Request Start
-    //             $_token = "{{ csrf_token() }}";
-    //             $.ajax({
-    //                 headers: {
-    //                     'X-CSRF-Token': $('meta[name=_token]').attr('content')
-    //                 },
-    //                 url: "{{ url('/inventory/store-ledger-report/search-product') }}",
-    //                 type: 'GET',
-    //                 cache: false,
-    //                 data: {
-    //                     '_token': $_token,
-    //                     'data': $(this).val(),
-    //                     'groupId': groupId,
-    //                     'categoryId': categoryId,
-    //                 }, //see the _token
-    //                 datatype: 'application/json',
+            if(groupId && categoryId) {
+                // Ajax Request Start
+                $_token = "{{ csrf_token() }}";
+                $.ajax({
+                    headers: {
+                        'X-CSRF-Token': $('meta[name=_token]').attr('content')
+                    },
+                    url: "{{ url('/inventory/store-ledger-report/search-product') }}",
+                    type: 'GET',
+                    cache: false,
+                    data: {
+                        '_token': $_token,
+                        'data': $(this).val(),
+                        'groupId': groupId,
+                        'categoryId': categoryId,
+                    }, //see the _token
+                    datatype: 'application/json',
                 
-    //                 beforeSend: function () {
-    //                     // show waiting dialog
-    //                     waitingDialog.show('Loading...');
-    //                     console.log('beforeSend');
-    //                 },
+                    beforeSend: function () {
+                        // show waiting dialog
+                        waitingDialog.show('Loading...');
+                        console.log('beforeSend');
+                    },
                 
-    //                 success: function (data) {
-    //                     // hide waiting dialog
-    //                     waitingDialog.hide();
+                    success: function (data) {
+                        // hide waiting dialog
+                        waitingDialog.hide();
                 
-    //                     console.log('success');
+                        console.log('success');
 
-    //                     var txt = '<option value="" selected>--- Select Product* ---</option>';
-    //                     data.forEach(element => {
-    //                         txt += '<option value="'+element.id+'">'+element.product_name+'</option>'
-    //                     });
+                        var txt = '<option value="" selected>--- Select Product* ---</option>';
+                        data.forEach(element => {
+                            txt += '<option value="'+element.id+'">'+element.product_name+'</option>'
+                        });
 
-    //                     $('.select-product').html(txt);
-    //                     $('.select-product').select2("val", "");
-    //                 },
+                        $('.select-product').html(txt);
+                        $('.select-product').select2("val", "");
+                    },
                 
-    //                 error: function (error) {
-    //                     // hide waiting dialog
-    //                     waitingDialog.hide();
+                    error: function (error) {
+                        // hide waiting dialog
+                        waitingDialog.hide();
                 
-    //                     console.log(error);
-    //                     console.log('error');
-    //                 }
-    //             });
-    //             // Ajax Request End
-    //         }
-    //     });
+                        console.log(error);
+                        console.log('error');
+                    }
+                });
+                // Ajax Request End
+            }
+        });
 
     //     $('.select-from-date').change(function () {
     //         var fromDate = null;
