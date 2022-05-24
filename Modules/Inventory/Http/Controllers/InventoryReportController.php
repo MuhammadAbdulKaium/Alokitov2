@@ -114,219 +114,219 @@ class InventoryReportController extends Controller
         }
     }
 
-    // public function searchItemLedgerReport(Request $request)
-    // {
-    //     $campus = Campus::findOrFail($this->academicHelper->getCampus());
-    //     $institute = Institute::findOrFail($this->academicHelper->getInstitute());
-    //     $productGroupId = $request->productGroupId;
-    //     $productCategoryId = $request->productCategoryId;
-    //     $productId = $request->productId;
-    //     $fromDate = $request->fromDate;
-    //     $toDate = $request->toDate;
-    //     if(!empty($fromDate)){
-    //         $fromDate = DateTime::createFromFormat('Y-m-d', $fromDate)->format('d-m-Y');
-    //     }
-    //     if(!empty($toDate)){
-    //         $toDate = DateTime::createFromFormat('Y-m-d', $toDate)->format('d-m-Y');
-    //     }
+    public function searchItemLedgerReport(Request $request)
+    {
+        $campus = Campus::findOrFail($this->academicHelper->getCampus());
+        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+        $productGroupId = $request->productGroupId;
+        $productCategoryId = $request->productCategoryId;
+        $productId = $request->productId;
+        $fromDate = $request->fromDate;
+        $toDate = $request->toDate;
+        if(!empty($fromDate)){
+            $fromDate = DateTime::createFromFormat('Y-m-d', $fromDate)->format('d-m-Y');
+        }
+        if(!empty($toDate)){
+            $toDate = DateTime::createFromFormat('Y-m-d', $toDate)->format('d-m-Y');
+        }
 
-    //     $group = StockGroup::findOrFail($request->productGroupId);
-    //     $category = StockCategory::findOrFail($request->productCategoryId);
-    //     $stores = $request->storeId;
-    //     $all = 0;
-    //     $stores1 = array();
+        $group = StockGroup::findOrFail($request->productGroupId);
+        $category = StockCategory::findOrFail($request->productCategoryId);
+        $stores = $request->storeId;
+        $all = 0;
+        $stores1 = array();
         
 
-    //     if($stores[0] == 'all'){
-    //         $all = 'all';
-    //         // unset($stores[0]);
-    //         // error_log(count($stores));
+        if($stores[0] == 'all'){
+            $all = 'all';
+            // unset($stores[0]);
+            // error_log(count($stores));
             
-    //         $stores1 = InventoryStore::pluck('id')->toArray();
-    //         error_log($stores1[8]);
+            $stores1 = InventoryStore::pluck('id')->toArray();
+            error_log($stores1[8]);
             
-    //     }
-    //     else{
-    //         $all = InventoryStore::findOrFail($request->storeId);
-    //         $stores1 = $stores;
-    //     }
+        }
+        else{
+            $all = InventoryStore::findOrFail($request->storeId);
+            $stores1 = $stores;
+        }
 
 
-    //     $product = CadetInventoryProduct::where([
-    //         ['id', $request->productId],
-    //         ['category_id', $request->productCategoryId],
-    //         ['stock_group', $request->productGroupId],
-    //     ])->first();
+        $product = CadetInventoryProduct::where([
+            ['id', $request->productId],
+            ['category_id', $request->productCategoryId],
+            ['stock_group', $request->productGroupId],
+        ])->first();
 
-    //     $products = CadetInventoryProduct::where('category_id', $request->productCategoryId)->where('stock_group', $request->productGroupId)->get();
+        $products = CadetInventoryProduct::where('category_id', $request->productCategoryId)->where('stock_group', $request->productGroupId)->get();
 
-    //     $directStockInItems = StockInDetailsModel::join('inventory_direct_stock_in', 'inventory_direct_stock_in.id', 'inventory_direct_stock_in_details.stock_in_id')
-    //     ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_direct_stock_in_details.item_id')
-    //     ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_direct_stock_in.store_id')
-    //     ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_direct_stock_in.voucher_no', 'inventory_direct_stock_in.category', 'inventory_direct_stock_in_details.qty', 'inventory_direct_stock_in_details.rate', 'inventory_direct_stock_in_details.amount')
-    //     ->selectRaw('"inward" AS type')
-    //     ->where(['item_id' => $productId,
-    //     'inventory_direct_stock_in.status' => 1,
-    //     'inventory_direct_stock_in.campus_id' => $campus->id,
-    //     'inventory_direct_stock_in.institute_id' => $institute->id,
-    //     'inventory_direct_stock_in_details.status' => 1,
-    //     'inventory_direct_stock_in_details.campus_id' => $campus->id,
-    //     'inventory_direct_stock_in_details.institute_id' => $institute->id])       
-    //     ->whereIn('inventory_direct_stock_in.store_id', $stores1)
-    //     ->get();
+        $directStockInItems = StockInDetailsModel::join('inventory_direct_stock_in', 'inventory_direct_stock_in.id', 'inventory_direct_stock_in_details.stock_in_id')
+        ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_direct_stock_in_details.item_id')
+        ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_direct_stock_in.store_id')
+        ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_direct_stock_in.voucher_no', 'inventory_direct_stock_in.category', 'inventory_direct_stock_in_details.qty', 'inventory_direct_stock_in_details.rate', 'inventory_direct_stock_in_details.amount')
+        ->selectRaw('"inward" AS type')
+        ->where(['item_id' => $productId,
+        'inventory_direct_stock_in.status' => 1,
+        'inventory_direct_stock_in.campus_id' => $campus->id,
+        'inventory_direct_stock_in.institute_id' => $institute->id,
+        'inventory_direct_stock_in_details.status' => 1,
+        'inventory_direct_stock_in_details.campus_id' => $campus->id,
+        'inventory_direct_stock_in_details.institute_id' => $institute->id])       
+        ->whereIn('inventory_direct_stock_in.store_id', $stores1)
+        ->get();
 
-    //     $directStockInItemsArray = json_decode($directStockInItems);
+        $directStockInItemsArray = json_decode($directStockInItems);
         
-    //     $receivedPurchases = PurchaseReceiveDetailsModel::join('inventory_purchase_receive_info', 'inventory_purchase_receive_info.id', 'inventory_purchase_receive_details.pur_receive_id')
-    //     ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_purchase_receive_details.item_id')
-    //     ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_purchase_receive_info.store_id')
-    //     ->join('inventory_vendor_info', 'inventory_vendor_info.id', 'inventory_purchase_receive_info.vendor_id')
-    //     ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_purchase_receive_info.voucher_no', 'inventory_purchase_receive_details.reference_type AS category', 'inventory_purchase_receive_details.rec_qty AS qty', 'inventory_purchase_receive_details.rate', 'inventory_purchase_receive_details.total_amount AS amount', 'inventory_vendor_info.id AS vendor_id', 'inventory_vendor_info.name AS vendor_name')
-    //     ->selectRaw('"inward" AS type')
-    //     ->where(['item_id' => $productId,
-    //     'inventory_purchase_receive_info.status' => 1,
-    //     'inventory_purchase_receive_info.campus_id' => $campus->id,
-    //     'inventory_purchase_receive_info.institute_id' => $institute->id,
-    //     'inventory_purchase_receive_details.status' => 1,
-    //     'inventory_purchase_receive_details.campus_id' => $campus->id,
-    //     'inventory_purchase_receive_details.institute_id' => $institute->id])      
-    //     ->whereIn('inventory_purchase_receive_info.store_id', $stores1)
-    //     ->get();
+        $receivedPurchases = PurchaseReceiveDetailsModel::join('inventory_purchase_receive_info', 'inventory_purchase_receive_info.id', 'inventory_purchase_receive_details.pur_receive_id')
+        ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_purchase_receive_details.item_id')
+        ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_purchase_receive_info.store_id')
+        ->join('inventory_vendor_info', 'inventory_vendor_info.id', 'inventory_purchase_receive_info.vendor_id')
+        ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_purchase_receive_info.voucher_no', 'inventory_purchase_receive_details.reference_type AS category', 'inventory_purchase_receive_details.rec_qty AS qty', 'inventory_purchase_receive_details.rate', 'inventory_purchase_receive_details.total_amount AS amount', 'inventory_vendor_info.id AS vendor_id', 'inventory_vendor_info.name AS vendor_name')
+        ->selectRaw('"inward" AS type')
+        ->where(['item_id' => $productId,
+        'inventory_purchase_receive_info.status' => 1,
+        'inventory_purchase_receive_info.campus_id' => $campus->id,
+        'inventory_purchase_receive_info.institute_id' => $institute->id,
+        'inventory_purchase_receive_details.status' => 1,
+        'inventory_purchase_receive_details.campus_id' => $campus->id,
+        'inventory_purchase_receive_details.institute_id' => $institute->id])      
+        ->whereIn('inventory_purchase_receive_info.store_id', $stores1)
+        ->get();
        
-    //     $receivedPurchasesArray = json_decode($receivedPurchases);
+        $receivedPurchasesArray = json_decode($receivedPurchases);
 
-    //     error_log('directStockOutItems');
-    //     $directStockOutItems = StockOutDetailsModel::join('inventory_direct_stock_out', 'inventory_direct_stock_out.id', 'inventory_direct_stock_out_details.stock_out_id')
-    //     ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_direct_stock_out_details.item_id')
-    //     ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_direct_stock_out.store_id')
-    //     ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_direct_stock_out.store_id', 'inventory_direct_stock_out.voucher_no', 'inventory_direct_stock_out.category', 'inventory_direct_stock_out_details.qty', 'inventory_direct_stock_out_details.rate', 'inventory_direct_stock_out_details.amount')
-    //     ->selectRaw('"outward" AS type')
-    //     ->where(['item_id' => $productId,
-    //     'inventory_direct_stock_out.status' => 1,
-    //     'inventory_direct_stock_out.campus_id' => $campus->id,
-    //     'inventory_direct_stock_out.institute_id' => $institute->id,
-    //     'inventory_direct_stock_out_details.status' => 1,
-    //     'inventory_direct_stock_out_details.campus_id' => $campus->id,
-    //     'inventory_direct_stock_out_details.institute_id' => $institute->id])
-    //     ->whereIn('inventory_direct_stock_out.store_id', $stores1)
-    //     ->get();
+        error_log('directStockOutItems');
+        $directStockOutItems = StockOutDetailsModel::join('inventory_direct_stock_out', 'inventory_direct_stock_out.id', 'inventory_direct_stock_out_details.stock_out_id')
+        ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_direct_stock_out_details.item_id')
+        ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_direct_stock_out.store_id')
+        ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_direct_stock_out.store_id', 'inventory_direct_stock_out.voucher_no', 'inventory_direct_stock_out.category', 'inventory_direct_stock_out_details.qty', 'inventory_direct_stock_out_details.rate', 'inventory_direct_stock_out_details.amount')
+        ->selectRaw('"outward" AS type')
+        ->where(['item_id' => $productId,
+        'inventory_direct_stock_out.status' => 1,
+        'inventory_direct_stock_out.campus_id' => $campus->id,
+        'inventory_direct_stock_out.institute_id' => $institute->id,
+        'inventory_direct_stock_out_details.status' => 1,
+        'inventory_direct_stock_out_details.campus_id' => $campus->id,
+        'inventory_direct_stock_out_details.institute_id' => $institute->id])
+        ->whereIn('inventory_direct_stock_out.store_id', $stores1)
+        ->get();
 
-    //     $directStockOutItemsArray = json_decode($directStockOutItems);
+        $directStockOutItemsArray = json_decode($directStockOutItems);
 
 
-    //     error_log('FromInventory');
-    //     $issueFromInventory = IssueFromInventoryDetailsModel::join('inventory_issue_from', 'inventory_issue_from.id', 'inventory_issue_details.issue_id')
-    //     ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_issue_details.item_id')
-    //     ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_issue_from.store_id')
-    //     ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_issue_from.voucher_no', 'inventory_issue_from.reference_type AS category', 'inventory_issue_details.issue_qty AS qty', 'inventory_issue_details.rate')
-    //     ->selectRaw('"outward" AS type')
-    //     ->where(['item_id' => $productId,
-    //     'inventory_issue_from.status' => 1,
-    //     'inventory_issue_from.campus_id' => $campus->id,
-    //     'inventory_issue_from.institute_id' => $institute->id,
-    //     'inventory_issue_details.status' => 1,
-    //     'inventory_issue_details.campus_id' => $campus->id,
-    //     'inventory_issue_details.institute_id' => $institute->id])
-    //     ->whereIn('inventory_issue_from.store_id', $stores1)
-    //     ->get();
+        error_log('FromInventory');
+        $issueFromInventory = IssueFromInventoryDetailsModel::join('inventory_issue_from', 'inventory_issue_from.id', 'inventory_issue_details.issue_id')
+        ->join('cadet_stock_products', 'cadet_stock_products.id', 'inventory_issue_details.item_id')
+        ->join('cadet_inventory_store', 'cadet_inventory_store.id', 'inventory_issue_from.store_id')
+        ->select('cadet_stock_products.id', 'cadet_stock_products.product_name',DB::raw("DATE_FORMAT(date,'%d-%m-%Y') AS tran_date"), 'cadet_inventory_store.id AS store_id', 'cadet_inventory_store.store_name', 'inventory_issue_from.voucher_no', 'inventory_issue_from.reference_type AS category', 'inventory_issue_details.issue_qty AS qty', 'inventory_issue_details.rate')
+        ->selectRaw('"outward" AS type')
+        ->where(['item_id' => $productId,
+        'inventory_issue_from.status' => 1,
+        'inventory_issue_from.campus_id' => $campus->id,
+        'inventory_issue_from.institute_id' => $institute->id,
+        'inventory_issue_details.status' => 1,
+        'inventory_issue_details.campus_id' => $campus->id,
+        'inventory_issue_details.institute_id' => $institute->id])
+        ->whereIn('inventory_issue_from.store_id', $stores1)
+        ->get();
 
-    //     $issueFromInventoryArray = json_decode($issueFromInventory);
-    //     $directStockInItemsArray = array_merge($directStockInItemsArray, $receivedPurchasesArray, $directStockOutItemsArray, $issueFromInventoryArray);
+        $issueFromInventoryArray = json_decode($issueFromInventory);
+        $directStockInItemsArray = array_merge($directStockInItemsArray, $receivedPurchasesArray, $directStockOutItemsArray, $issueFromInventoryArray);
         
 
-    //     $result = json_decode(json_encode($directStockInItemsArray), true);
-    //     $lowest = array();
+        $result = json_decode(json_encode($directStockInItemsArray), true);
+        $lowest = array();
         
-    //     for($i=0; $i<count($result); $i++){
-    //         for($j=$i+1; $j<count($result); $j++){
-    //             if(strtotime($result[$i]['tran_date']) > strtotime($result[$j]['tran_date'])){
-    //                 $lowest[$i] = $result[$i];
-    //                 $result[$i] = $result[$j];
-    //                 $result[$j] = $lowest[$i];
-    //             }
-    //         }
-    //     }
+        for($i=0; $i<count($result); $i++){
+            for($j=$i+1; $j<count($result); $j++){
+                if(strtotime($result[$i]['tran_date']) > strtotime($result[$j]['tran_date'])){
+                    $lowest[$i] = $result[$i];
+                    $result[$i] = $result[$j];
+                    $result[$j] = $lowest[$i];
+                }
+            }
+        }
 
         
-    //     $openingQty = 0;
-    //     $openingRate = 0;
-    //     $openingValue = 0;
+        $openingQty = 0;
+        $openingRate = 0;
+        $openingValue = 0;
 
-    //     $closingQty = 0;
-    //     $closingRate = 0;
-    //     $closingValue = 0;
+        $closingQty = 0;
+        $closingRate = 0;
+        $closingValue = 0;
 
-    //     $inwardQtyGrandTotal = 0;
-    //     $inwardRateGrandTotal = 0;
-    //     $inwardValueGrandTotal = 0;
+        $inwardQtyGrandTotal = 0;
+        $inwardRateGrandTotal = 0;
+        $inwardValueGrandTotal = 0;
 
-    //     $outwardQtyGrandTotal = 0;
-    //     $outwardRateGrandTotal = 0;
-    //     $outwardValueGrandTotal = 0;
+        $outwardQtyGrandTotal = 0;
+        $outwardRateGrandTotal = 0;
+        $outwardValueGrandTotal = 0;
 
-    //     $closingQtys = array();
-    //     $closingRates = array();
-    //     $closingValues = array();
+        $closingQtys = array();
+        $closingRates = array();
+        $closingValues = array();
 
-    //     for($i=0; $i<count($result); $i++){
-    //         if(strtotime($result[$i]['tran_date']) < strtotime($fromDate)){
-    //             if($result[$i]['type'] === 'inward'){
-    //                 $closingQty = $openingQty += $result[$i]['qty'];
-    //                 $closingValue = $openingValue += $result[$i]['amount'];
-    //                 $closingRate = $openingRate = $openingValue/$openingQty;
-    //             }
-    //             if($result[$i]['type'] === 'outward'){
-    //                 $closingQty = $openingQty -= $result[$i]['qty'];
-    //                 $outwardValue = $closingRate*$result[$i]['qty'];
-    //                 $closingValue = $openingValue -= $outwardValue;
-    //                 $closingRate = $openingRate = $openingValue/$openingQty;
-    //             }
-    //         }
-    //         elseif((strtotime($result[$i]['tran_date']) >= strtotime($fromDate)) && (strtotime($result[$i]['tran_date']) <= strtotime($toDate))){
-    //             if($result[$i]['type'] == 'inward'){
-    //                 error_log($closingRate);
-    //                 $closingQty += $result[$i]['qty'];
-    //                 $closingValue += $result[$i]['amount'];
-    //                 $closingRate = $closingValue/$closingQty;
+        for($i=0; $i<count($result); $i++){
+            if(strtotime($result[$i]['tran_date']) < strtotime($fromDate)){
+                if($result[$i]['type'] === 'inward'){
+                    $closingQty = $openingQty += $result[$i]['qty'];
+                    $closingValue = $openingValue += $result[$i]['amount'];
+                    $closingRate = $openingRate = $openingValue/$openingQty;
+                }
+                if($result[$i]['type'] === 'outward'){
+                    $closingQty = $openingQty -= $result[$i]['qty'];
+                    $outwardValue = $closingRate*$result[$i]['qty'];
+                    $closingValue = $openingValue -= $outwardValue;
+                    $closingRate = $openingRate = $openingValue/$openingQty;
+                }
+            }
+            elseif((strtotime($result[$i]['tran_date']) >= strtotime($fromDate)) && (strtotime($result[$i]['tran_date']) <= strtotime($toDate))){
+                if($result[$i]['type'] == 'inward'){
+                    error_log($closingRate);
+                    $closingQty += $result[$i]['qty'];
+                    $closingValue += $result[$i]['amount'];
+                    $closingRate = $closingValue/$closingQty;
 
-    //                 $inwardQtyGrandTotal += $result[$i]['qty'];
-    //                 $inwardValueGrandTotal += $result[$i]['amount'];
-    //                 $inwardRateGrandTotal = $inwardValueGrandTotal/$inwardQtyGrandTotal;
+                    $inwardQtyGrandTotal += $result[$i]['qty'];
+                    $inwardValueGrandTotal += $result[$i]['amount'];
+                    $inwardRateGrandTotal = $inwardValueGrandTotal/$inwardQtyGrandTotal;
 
-    //                 $closingQtys[$result[$i]['voucher_no']] = $closingQty;
-    //                 $closingRates[$result[$i]['voucher_no']] = $closingRate;
-    //                 $closingValues[$result[$i]['voucher_no']] = $closingValue;
-    //             }
-    //             if($result[$i]['type'] == 'outward'){
-    //                 $result[$i]['rate'] = $closingRate;
+                    $closingQtys[$result[$i]['voucher_no']] = $closingQty;
+                    $closingRates[$result[$i]['voucher_no']] = $closingRate;
+                    $closingValues[$result[$i]['voucher_no']] = $closingValue;
+                }
+                if($result[$i]['type'] == 'outward'){
+                    $result[$i]['rate'] = $closingRate;
                     
-    //                 $closingQty -= $result[$i]['qty'];
-    //                 $outwardValue = $closingRate*$result[$i]['qty'];
-    //                 $closingValue -= $outwardValue;
-    //                 $closingRate = $closingValue/$closingQty;
+                    $closingQty -= $result[$i]['qty'];
+                    $outwardValue = $closingRate*$result[$i]['qty'];
+                    $closingValue -= $outwardValue;
+                    $closingRate = $closingValue/$closingQty;
 
-    //                 $outwardQtyGrandTotal += $result[$i]['qty'];
-    //                 $outwardValueGrandTotal += $outwardValue;
-    //                 $outwardRateGrandTotal = $outwardValueGrandTotal/$outwardQtyGrandTotal;
+                    $outwardQtyGrandTotal += $result[$i]['qty'];
+                    $outwardValueGrandTotal += $outwardValue;
+                    $outwardRateGrandTotal = $outwardValueGrandTotal/$outwardQtyGrandTotal;
 
-    //                 $closingQtys[$result[$i]['voucher_no']] = $closingQty;
-    //                 $closingRates[$result[$i]['voucher_no']] = $closingRate;
-    //                 $closingValues[$result[$i]['voucher_no']] = $closingValue;
-    //             }
-    //         }           
-    //     }
+                    $closingQtys[$result[$i]['voucher_no']] = $closingQty;
+                    $closingRates[$result[$i]['voucher_no']] = $closingRate;
+                    $closingValues[$result[$i]['voucher_no']] = $closingValue;
+                }
+            }           
+        }
 
-    //     if ($request->type == "print") {
-    //         $pdf = App::make('dompdf.wrapper');
-    //         $pdf->getDomPDF()->set_option("enable_php", true);
-    //         $user = Auth::user();
-    //         $pdf->loadView('inventory::reports.store-ledger-reports-pdf', compact('user', 'institute', 'products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->setPaper('a2', 'landscape');
-    //         return $pdf->stream();
-    //     }
-    //     else{
-    //         return view('inventory::reports.store-ledger-reports-table', compact('products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->render();
-    //     }
-    // }
+        if ($request->type == "print") {
+            $pdf = App::make('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $user = Auth::user();
+            $pdf->loadView('inventory::reports.store-ledger-reports-pdf', compact('user', 'institute', 'products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->setPaper('a2', 'landscape');
+            return $pdf->stream();
+        }
+        else{
+            return view('inventory::reports.store-ledger-reports-table', compact('products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->render();
+        }
+    }
 
 
 

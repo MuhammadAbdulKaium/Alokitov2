@@ -249,73 +249,73 @@
             }
         });
 
-    //     $('.select-from-date').change(function () {
-    //         var fromDate = null;
-    //         fromDate = $('.select-from-date').val();
-    //         console.log(fromDate);
-    //     });
+        $('.select-from-date').change(function () {
+            var fromDate = null;
+            fromDate = $('.select-from-date').val();
+            console.log(fromDate);
+        });
 
-    //     $('.search-btn').click(function() {
-    //         groupId = $('.select-product-group').val();
-    //         categoryId = $('.select-product-category').val();
-    //         storeId = $('.select-store').val();
-    //         productId = $('.select-product').val();
-    //         fromDate = $('.select-from-date').val();
-    //         toDate = $('.select-to-date').val();
+        $('.search-btn').click(function() {
+            groupId = $('.select-product-group').val();
+            categoryId = $('.select-product-category').val();
+            storeId = $('.select-store').val();
+            productId = $('.select-product').val();
+            fromDate = $('.select-from-date').val();
+            toDate = $('.select-to-date').val();
 
 
-    //         console.log(groupId);
-    //         console.log(categoryId);
-    //         console.log(storeId);
-    //         console.log(productId);
-    //         console.log(fromDate);
-    //         console.log(toDate);
+            console.log(groupId);
+            console.log(categoryId);
+            console.log(storeId);
+            console.log(productId);
+            console.log(fromDate);
+            console.log(toDate);
 
-    //         if(groupId && categoryId && storeId && productId && fromDate && toDate) {
-    //             $('.select-type').val('search');
-    //             // Ajax Request Start
-    //             $_token = "{{ csrf_token() }}";
-    //             $.ajax({
-    //                 headers: {
-    //                     'X-CSRF-Token': $('meta[name=_token]').attr('content')
-    //                 },
-    //                 url: "{{ url('/inventory/store-ledger-report/item-report') }}",
-    //                 type: 'POST',
-    //                 cache: false,
-    //                 data: $('form#search-results-form').serialize(),
+            if(groupId && categoryId && storeId && productId && fromDate && toDate) {
+                $('.select-type').val('search');
+                // Ajax Request Start
+                $_token = "{{ csrf_token() }}";
+                $.ajax({
+                    headers: {
+                        'X-CSRF-Token': $('meta[name=_token]').attr('content')
+                    },
+                    url: "{{ url('/inventory/store-ledger-report/item-report') }}",
+                    type: 'POST',
+                    cache: false,
+                    data: $('form#search-results-form').serialize(),
                     
-    //                 datatype: 'application/json',
+                    datatype: 'application/json',
                 
-    //                 beforeSend: function () {
-    //                     // show waiting dialog
-    //                     waitingDialog.show('Loading...');
-    //                     console.log('beforeSend');
-    //                 },
+                    beforeSend: function () {
+                        // show waiting dialog
+                        waitingDialog.show('Loading...');
+                        console.log('beforeSend');
+                    },
                 
-    //                 success: function (data) {
-    //                     // hide waiting dialog
-    //                     waitingDialog.hide();
+                    success: function (data) {
+                        // hide waiting dialog
+                        waitingDialog.hide();
 
-    //                     $('.marks-table-holder').html(data);
-    //                 },
+                        $('.marks-table-holder').html(data);
+                    },
                 
-    //                 error: function (error) {
-    //                     // hide waiting dialog
-    //                     waitingDialog.hide();
+                    error: function (error) {
+                        // hide waiting dialog
+                        waitingDialog.hide();
                 
-    //                     console.log(error);
-    //                     console.log('error');
-    //                 }
-    //             });
-    //         } else {
-    //             swal('Error!', 'Please Fill up all the required fields first.', 'error');
-    //         }
-    //     });
+                        console.log(error);
+                        console.log('error');
+                    }
+                });
+            } else {
+                swal('Error!', 'Please Fill up all the required fields first.', 'error');
+            }
+        });
 
-    //     $('.print-btn').click(function () {
-    //         $('.select-type').val('print');
-    //         $('.print-submit-btn').click();
-    //     });
+        $('.print-btn').click(function () {
+            $('.select-type').val('print');
+            $('.print-submit-btn').click();
+        });
     });
 </script>
 @stop
