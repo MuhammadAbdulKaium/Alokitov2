@@ -262,13 +262,6 @@
             toDate = $('.select-to-date').val();
 
 
-            console.log(groupId);
-            console.log(categoryId);
-            console.log(storeId);
-            console.log(productId);
-            console.log(fromDate);
-            console.log(toDate);
-
             if(groupId && categoryId && storeId && productId && fromDate && toDate) {
                 $('.select-type').val('search');
                 // Ajax Request Start
