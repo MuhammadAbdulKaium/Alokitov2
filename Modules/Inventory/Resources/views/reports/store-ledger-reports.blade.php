@@ -52,55 +52,51 @@
 
                 <div class="box-body">
                     <div class="row">
-                        {{-- <form id="search-results-form" method="POST" action="{{ url('/inventory/store-ledger-report/item-report') }}" target="_blank">
-                            @csrf
-                            <input type="hidden" name="type" class="select-type" value="search"> --}}
-
-                            <div class="col-sm-2">
-                                <label class="control-label" for="product_group">Product Group</label>
-                                <select id="product_group" class="form-control select-product-group" name="productGroupId" required>
-                                    <option value="">--- Select Group* ---</option>
-                                    @foreach($stockGroups as $group)
-                                        <option value="{{$group->id}}">{{$group->stock_group_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="control-label" for="product_category">Product Category</label>
-                                <select id="product_category" class="form-control select-product-category" name="productCategoryId" required>
-                                    <option value="" selected>--- Select Category* ---</option>
-                                    {{-- @foreach($productCatagories as $category)
-                                        <option value="{{$category->id}}">{{$category->stock_category_name}}</option>
-                                    @endforeach --}}
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="control-label" for="store">Product Store</label>
-                                <select name="storeId[]" id="" class="form-control select-store" style="height: 32px" multiple required>
-                                    <option value="all" selected>All</option>
-                                    @foreach($stores as $store)
-                                        <option value="{{$store->id}}">{{$store->store_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="control-label" for="product">Product</label>
-                                <select id="product" class="form-control select-product" name="productId" style="height: 32px" required>
-                                    <option value="" selected>--- Select Product* ---</option>
-                                    <!-- @foreach($products as $product)
-                                        <option value="{{$product->id}}">{{$product->product_name}}</option>
-                                    @endforeach -->
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="control-label" for="academic_level">From Date</label>
-                                <input type="date" name="fromDate" class="form-control select-from-date" required>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="control-label" for="academic_level">To Date</label>
-                                <input type="date" name="toDate" class="form-control select-to-date" required>
-                            </div>
-                        {{-- </form> --}}
+                        <div class="col-sm-2">
+                            <label class="control-label" for="product_group">Product Group</label>
+                            <select id="product_group" class="form-control select-product-group" name="productGroupId" required>
+                                <option value="">--- Select Group* ---</option>
+                                @foreach($stockGroups as $group)
+                                    <option value="{{$group->id}}">{{$group->stock_group_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label" for="product_category">Product Category</label>
+                            <select id="product_category" class="form-control select-product-category" name="productCategoryId" required>
+                                <option value="" selected>--- Select Category* ---</option>
+                                {{-- @foreach($productCatagories as $category)
+                                    <option value="{{$category->id}}">{{$category->stock_category_name}}</option>
+                                @endforeach --}}
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label" for="store">Product Store</label>
+                            <select name="storeId[]" id="" class="form-control select-store" style="height: 32px" multiple required>
+                                <option value="all" selected>All</option>
+                                {{-- @foreach($stores as $store)
+                                    <option value="{{$store->id}}">{{$store->store_name}}</option>
+                                @endforeach --}}
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label" for="product">Product</label>
+                            <select id="product" class="form-control select-product" name="productId" style="height: 32px" required>
+                                <option value="" selected>--- Select Product* ---</option>
+                                {{-- @foreach($products as $product)
+                                    <option value="{{$product->id}}">{{$product->product_name}}</option>
+                                @endforeach --}}
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label" for="academic_level">From Date</label>
+                            <input type="date" value="{{ $fromDate }}" name="fromDate" class="form-control select-from-date" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label" for="academic_level">To Date</label>
+                            <input type="date" value="{{ $toDate }}" name="toDate" class="form-control select-to-date" required>
+                        </div>
+                    
                         <div class="col-sm-12" >
                             <button type="button" class="btn btn-success search-btn"  style="margin-top: 23px;"><i class="fa fa-search"></i> Search</button>
                             <button type="button" class="btn btn-primary print-btn" style="margin-top: 23px; margin-left: 20px"><i class="fa fa-print"></i> Print</button>
@@ -166,11 +162,14 @@
 
 
                     var txt = '<option value="" selected>--- Select Category* ---</option>';
+                    var store = '<option value="all" selected>All</option> @foreach($stores as $store) <option value="{{$store->id}}">{{$store->store_name}}</option> @endforeach';
                     data.forEach(element => {
                         txt += '<option value="'+element.id+'">'+element.stock_category_name+'</option>'
                     });
 
                     $('.select-product-category').html(txt);
+                    $('.select-product').select2("val", "");
+                    $('.select-store').html(store);
                 },
             
                 error: function (error) {
@@ -252,7 +251,6 @@
         $('.select-from-date').change(function () {
             var fromDate = null;
             fromDate = $('.select-from-date').val();
-            console.log(fromDate);
         });
 
         $('.search-btn').click(function() {

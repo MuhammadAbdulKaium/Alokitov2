@@ -62,22 +62,17 @@ class InventoryReportController extends Controller
 
     public function storeLedgerReport(Request $request)
     {
-        // $pageAccessData = self::linkAccess($request);
-        $campus = Campus::findOrFail($this->academicHelper->getCampus());
-        $institute = Institute::findOrFail($this->academicHelper->getInstitute());
+        $campus = Campus::find($this->academicHelper->getCampus());
+        $institute = Institute::find($this->academicHelper->getInstitute());
 
         $stockGroups = $this->stockGroup->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
-        // error_log('campus Id');
-        // error_log($campus->id);
-        // error_log('institute Id');
-        // error_log($institute->id);
-        // error_log('stockGroups');
-        // error_log($stockGroups);
         $productCatagories = $this->stockCategory->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
         $products = $this->cadetInventoryProduct->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
         $stores = $this->inventoryStore->where(['institute_id' => $institute->id, 'campus_id' => $campus->id])->get();
+        $fromDate = date("Y-m-01");
+        $toDate = date("Y-m-d");
 
-        return view('inventory::reports.store-ledger-reports', compact('stockGroups', 'productCatagories', 'products', 'stores'));
+        return view('inventory::reports.store-ledger-reports', compact('stockGroups', 'productCatagories', 'products', 'stores', 'fromDate', 'toDate'));
     }
 
     public function storeSearchProduct(Request $request)
@@ -94,7 +89,6 @@ class InventoryReportController extends Controller
         }
     }
 
-
     public function storeSearchCategory(Request $request)
     {
         $campus = Campus::findOrFail($this->academicHelper->getCampus());
@@ -102,8 +96,7 @@ class InventoryReportController extends Controller
 
         if($request->data) {
             $productCategoryIds = CadetInventoryProduct::select('category_id')->where(['stock_group' => $request->data, 'institute_id' => $institute->id, 'campus_id' => $campus->id])->distinct()->get();
-            error_log('$productCategoryIds');
-            error_log($productCategoryIds);
+
             if($productCategoryIds) {
                 return StockCategory::whereIn('id', $productCategoryIds)->get();
             }
