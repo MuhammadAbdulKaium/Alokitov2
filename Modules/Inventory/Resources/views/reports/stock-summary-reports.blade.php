@@ -2,9 +2,6 @@
 
 @section('styles')
 <style>
-    /* .select2-selection__rendered {
-    line-height: 30px !important;
-    } */
     .select2-container .select2-selection--single {
         height: 34px;
         border-radius: 1px;
@@ -51,9 +48,6 @@
 
                 <div class="box-body">
                     <div class="row">
-                        {{-- <form id="search-results-form" method="POST" action="{{ url('/inventory/stock-summary-report/stock-report') }}" target="_blank">
-                            @csrf
-                            <input type="hidden" name="type" class="select-type" value="search"> --}}
 
                             <div class="col-sm-2">
                                 <label class="control-label" for="product_group">Product Group</label>
@@ -93,23 +87,21 @@
                             </div>
                             <div class="col-sm-2">
                                 <label class="control-label" for="academic_level">From Date</label>
-                                <input type="date" name="fromDate" class="form-control select-from-date" required>
+                                <input type="date" value="{{ $fromDate }}" name="fromDate" class="form-control select-from-date" required>
                             </div>
                             <div class="col-sm-2">
                                 <label class="control-label" for="academic_level">To Date</label>
-                                <input type="date" name="toDate" class="form-control select-to-date" required>
+                                <input type="date" value="{{ $toDate }}" name="toDate" class="form-control select-to-date" required>
                             </div>
-                        {{-- </form> --}}
                         <div class="col-sm-12">
                             <button type="button" class="btn btn-success search-btn" style="margin-top: 23px"><i class="fa fa-search"></i> Search</button>
                             <button type="button" class="btn btn-primary print_btn" style="margin-top: 23px; margin-left: 20px"><i class="fa fa-print"></i> Print</button>
-                            {{-- <button type="reset" class="btn btn-default" style="margin-top: 23px; margin-left: 20px">Reset</button> --}}
                             <button type="submit" class="print-submit-btn" style="display: none"></button>
                         </div>
                     </div>
                 </div>
             </form>
-            <div class="marks-table-holder table-responsive">
+            <div class="marks-table-holder table-responsive box-body">
                     
             </div>
         </div>
@@ -152,13 +144,6 @@
             fromDate = $('.select-from-date').val();
             toDate = $('.select-to-date').val();
 
-            console.log(groupId);
-            console.log(categoryId);
-            console.log(storeId);
-            console.log(productId);
-            console.log(fromDate);
-            console.log(toDate);
-
             if(groupId && categoryId && storeId && productId && fromDate && toDate) {
                 $('.select-type').val('search');
                 // Ajax Request Start
@@ -182,11 +167,14 @@
                     success: function (data) {
                         // hide waiting dialog
                         waitingDialog.hide();
-                
-                        console.log(data);
 
-                        $('.marks-table-holder').html(data);
-
+                        if(data) {
+                            console.log(data);
+                            $('.marks-table-holder').html(data);   
+                        }
+                        else {
+                            $('.marks-table-holder').html('');
+                        }
                     },
                 
                     error: function (error) {
@@ -195,6 +183,9 @@
                 
                         console.log(error);
                         console.log('error');
+                        if(error){
+                            $('.marks-table-holder').html('');
+                        }
                     }
                 });
             } else {

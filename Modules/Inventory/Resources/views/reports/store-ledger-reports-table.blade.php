@@ -33,13 +33,17 @@
 <div>
     <h3>Store Ledger</h3>
     <h4>{{ $product->product_name }},  {{ $fromDate }} to {{ $toDate }}</h4>
-    <h5>Group: {{ $group->stock_group_name }}, Category: {{ $category->stock_category_name }}, Store: @if ($all=='all')All
+    <h5>Group: {{ $group->stock_group_name }}, Category: {{ $category->stock_category_name }}, 
+        Store: @if ($all=='all')All
                                                                                                     
-                                                                                                    @else {{ '(' }} @foreach ($all as $al) {{ $al->store_name }}, 
-                                                                                                        
-                                                                                                    @endforeach {{ ')' }}           
-        
-                                                                                                    @endif
+            @else 
+                {{ '(' }} 
+                    @foreach ($all as $al) 
+                        @if ($loop->index !=0),@endif {{ $al->store_name }} 
+                    @endforeach 
+                {{ ')' }}           
+
+            @endif
     </h5>
     <table class="table table-bordered ">
         <thead style="background: #dee2e6;">
@@ -117,12 +121,4 @@
             </tr>
         </tbody>
     </table>
-    {{-- <ul>
-        @foreach ($products as $product1)
-            <li>{{ $product1->product_name }}</li>
-        @endforeach
-    </ul>
-    
-
-    <h4>Product Name, <span>From Date</span> to <span>To Date</span></h4> --}}
 </div>

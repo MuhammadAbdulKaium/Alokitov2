@@ -2,9 +2,6 @@
 
 @section('styles')
 <style>
-    /* .select2-selection__rendered {
-    line-height: 30px !important;
-    } */
     .select2-container .select2-selection--single {
         height: 34px;
         border-radius: 1px;
@@ -49,7 +46,6 @@
                 @csrf
                 <input type="hidden" name="type" class="select-type" value="search">
 
-
                 <div class="box-body">
                     <div class="row">
                         <div class="col-sm-2">
@@ -65,27 +61,18 @@
                             <label class="control-label" for="product_category">Product Category</label>
                             <select id="product_category" class="form-control select-product-category" name="productCategoryId" required>
                                 <option value="" selected>--- Select Category* ---</option>
-                                {{-- @foreach($productCatagories as $category)
-                                    <option value="{{$category->id}}">{{$category->stock_category_name}}</option>
-                                @endforeach --}}
                             </select>
                         </div>
                         <div class="col-sm-2">
                             <label class="control-label" for="store">Product Store</label>
                             <select name="storeId[]" id="" class="form-control select-store" style="height: 32px" multiple required>
                                 <option value="all" selected>All</option>
-                                {{-- @foreach($stores as $store)
-                                    <option value="{{$store->id}}">{{$store->store_name}}</option>
-                                @endforeach --}}
                             </select>
                         </div>
                         <div class="col-sm-2">
                             <label class="control-label" for="product">Product</label>
                             <select id="product" class="form-control select-product" name="productId" style="height: 32px" required>
                                 <option value="" selected>--- Select Product* ---</option>
-                                {{-- @foreach($products as $product)
-                                    <option value="{{$product->id}}">{{$product->product_name}}</option>
-                                @endforeach --}}
                             </select>
                         </div>
                         <div class="col-sm-2">
@@ -106,7 +93,7 @@
                     </div>
                 </div>
             </form>
-            <div class="marks-table-holder table-responsive">
+            <div class="marks-table-holder table-responsive box-body">
                     
             </div>
         </div>
@@ -129,7 +116,6 @@
         var productId = null;
         var fromDate = null;
         var toDate = null;
-
 
         $('.select-product-group').change(function () {
             groupId = $('.select-product-group').val();
@@ -194,8 +180,6 @@
         
         $('.select-product-category').change(function () {
             categoryId = $('.select-product-category').val();
-            console.log(groupId);
-            console.log(categoryId);
 
             if(groupId && categoryId) {
                 // Ajax Request Start

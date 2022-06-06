@@ -30,6 +30,7 @@
         "wildside/userstamps": "2.1.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.6",
         "barryvdh/laravel-ide-helper": "^2.8",
         "filp/whoops": "^2.4",
         "fzaninotto/faker": "^1.9.1",

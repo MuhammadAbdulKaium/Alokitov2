@@ -131,13 +131,17 @@
     <div>
         <h3>Product: {{ $product->product_name }}</h3>
         <h3>From: {{ $fromDate }} To: {{ $toDate }}</h3>
-        <h3>Selected Parameters: Group: {{ $group->stock_group_name }}, Category: {{ $category->stock_category_name }}, Store: @if ($all=='all')All
+        <h3>Selected Parameters: Group: {{ $group->stock_group_name }}, Category: {{ $category->stock_category_name }}, 
+            Store: @if ($all=='all')All
                                                                                                     
-            @else {{ '(' }} @foreach ($all as $al) {{ $al->store_name }}, 
+                @else 
+                    {{ '(' }} 
+                        @foreach ($all as $al) 
+                            @if ($loop->index !=0),@endif {{ $al->store_name }} 
+                        @endforeach 
+                    {{ ')' }}           
 
-            @endforeach {{ ')' }}           
-
-            @endif
+                @endif
         </h3>
     </div>
     <div>
