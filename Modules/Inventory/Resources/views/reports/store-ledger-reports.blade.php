@@ -42,7 +42,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title" style="line-height: 40px"><i class="fa fa-search"></i> Store Ledger Report </h3>
             </div>
-            <form id="search-results-form" method="POST" action="{{ url('/inventory/store-ledger-report/item-report') }}" target="_blank">
+            <form id="search-results-form" method="GET" action="{{ url('/inventory/store-ledger-report/item-report') }}" target="_blank">
                 @csrf
                 <input type="hidden" name="type" class="select-type" value="search">
 
@@ -255,7 +255,7 @@
                         'X-CSRF-Token': $('meta[name=_token]').attr('content')
                     },
                     url: "{{ url('/inventory/store-ledger-report/item-report') }}",
-                    type: 'POST',
+                    type: 'GET',
                     cache: false,
                     data: $('form#search-results-form').serialize(),
                     

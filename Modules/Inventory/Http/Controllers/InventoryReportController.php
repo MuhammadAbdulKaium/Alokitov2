@@ -329,7 +329,7 @@ class InventoryReportController extends Controller
             $pdf->getDomPDF()->set_option("enable_php", true);
             $user = Auth::user();
             $pdf->loadView('inventory::reports.store-ledger-reports-pdf', compact('user', 'institute', 'products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->setPaper('a2', 'landscape');
-            return $pdf->stream();
+            return $pdf->stream('store-ledger-report.pdf');
         }
         else{
             return view('inventory::reports.store-ledger-reports-table', compact('products', 'product', 'group', 'category', 'fromDate', 'toDate', 'result', 'openingQty', 'openingRate', 'openingValue', 'closingQtys', 'closingRates', 'closingValues', 'openingQty', 'openingRate', 'openingValue', 'inwardQtyGrandTotal', 'inwardRateGrandTotal', 'inwardValueGrandTotal', 'outwardQtyGrandTotal', 'outwardRateGrandTotal', 'outwardValueGrandTotal', 'closingQty', 'closingRate', 'closingValue', 'all'))->render();
@@ -758,7 +758,7 @@ class InventoryReportController extends Controller
             $pdf->getDomPDF()->set_option("enable_php", true);
             $user = Auth::user();
             $pdf->loadView('inventory::reports.stock-summary-reports-pdf', compact('user', 'institute', 'fromDate', 'toDate', 'stocks', 'value', 'totalOpeningQty', 'totalOpeningValue', 'totalInwardQty', 'totalInwardValue', 'totalOutwardQty', 'totalOutwardValue', 'totalClosingQty', 'totalClosingValue'))->setPaper('a2', 'landscape');
-            return $pdf->stream();
+            return $pdf->stream('stock-summary-report.pdf');
         }
         else{
             return view('inventory::reports.stock-summary-reports-table', compact('fromDate', 'toDate', 'stocks', 'value', 'totalOpeningQty', 'totalOpeningValue', 'totalInwardQty', 'totalInwardValue', 'totalOutwardQty', 'totalOutwardValue', 'totalClosingQty', 'totalClosingValue'))->render();

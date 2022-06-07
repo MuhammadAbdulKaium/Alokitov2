@@ -240,11 +240,11 @@ Route::group(['middleware' => ['auth', 'cadet-user-permission'], 'prefix' => 'in
     Route::get('/store-ledger/reports', 'InventoryReportController@storeLedgerReport');
     Route::get('/store-ledger-report/search-product', 'InventoryReportController@storeSearchProduct');
     Route::get('/store-ledger-report/search-category', 'InventoryReportController@storeSearchCategory'); 
-    Route::post('/store-ledger-report/item-report', 'InventoryReportController@searchItemLedgerReport');
+    Route::get('/store-ledger-report/item-report', 'InventoryReportController@searchItemLedgerReport');
    
         
     // Stock Summary
     Route::get('/stock-summary/reports', 'InventoryReportController@stockSummaryReport');
-    Route::post('/stock-summary-report/stock-report', 'InventoryReportController@searchStockSummaryReport');
+    Route::get('/stock-summary-report/stock-report', 'InventoryReportController@searchStockSummaryReport');
 
 });
